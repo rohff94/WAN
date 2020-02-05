@@ -31,7 +31,3 @@ FOR:
 WAN$ php pentest.php FOR "<type WIN|LINUX> <vmem_path> <vmem_profile> "
 WAN$ php pentest.php FOR "WIN /tmp/stuxnet.vmem WinXPSP2x86"
 WAN$ php pentest.php FOR "LINUX /tmp/test.vmem ub1604x86"
-
-
-
-# WAN

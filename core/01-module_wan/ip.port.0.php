@@ -267,6 +267,10 @@ class PORT extends IP{
 	    $this->gtitre(__FUNCTION__);
 		    
            
+	    $sql_r_1 = "SELECT service2vuln FROM SERVICE WHERE id8port=$this->port2id  AND service2vuln IS NOT NULL";
+	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out("service2vuln","SERVICE","id8port = $this->port2id "));
+	    else {
+	        
 	    
 	    list($service_name,$service_version,$service_product,$service_extrainfo) = $this->port2version4run($this->port2version());
 	    $service = new SERVICE($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$service_name,$service_version,$service_product,$service_extrainfo);
@@ -549,7 +553,10 @@ class PORT extends IP{
 
 	
 		echo $result;
-
+		
+		$result = base64_encode($result);
+		//return base64_decode($this->req2BD4in("service2vuln","SERVICE","id8port = $this->port2id ",$result));
+	    }
 	}
 	
 	public function port2os4ttl(){

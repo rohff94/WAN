@@ -244,17 +244,18 @@ class WEB extends SERVICE4COM{
 		    $result = "";
 		    $this->gtitre(__FUNCTION__);
 		    //return "";
-		    //$result .= $this->web2enum();$this->pause();
+		    $result .= $this->web2enum();$this->pause();
 
 		    //$this->web2scan4gui4zap();$this->pause();
 			$tab_urls = $this->web2urls();
+			
 			$tab_urls = array_filter($tab_urls);
 
-			echo $this->tab($tab_urls);
+			$this->article("ALL URLs", $this->tab($tab_urls));
 			$this->pause();
 			
             if ( !empty($tab_urls)  ) {			
-				//$result .= $this->web2scan4cli();	
+                $result .= $this->web2scan4cli();$this->pause();
 				//$result .= $this->web2waf();
                     $ips = $tab_urls;
                     if (!empty($ips)) {
@@ -283,9 +284,9 @@ class WEB extends SERVICE4COM{
 			foreach ($tab_urls as $url){
 			    $url = trim($url);			    
 			    if(!empty($url)){
-			        $this->article("URL",$url);
+			        //$this->article("URL",$url);
 			$obj_url = new URL($this->eth,$this->domain,$url);			
-			$obj_url->url4pentest();
+			$result .= $obj_url->url4pentest();
 			    }
 			                             }
 			                                     }					
@@ -309,17 +310,17 @@ class WEB extends SERVICE4COM{
 		    else {
 		        
 		    
-		    if($this->web2check_200()){			
-		        $tab_result = $this->web2urls4spider();$this->pause();
-			//$result .= $this->web2urls4dico();$this->pause();
-			if(is_dir("./$this->vhost")) $this->requette("rm -vr ./$this->vhost");
-			if(is_dir("./$this->vhost:$this->port")) $this->requette("rm -vr ./$this->vhost:$this->port");
-			}			
+		    if($this->web2check_200()){		
+		        $result = "";
+		        $tab_result = array_merge($this->web2urls4spider(),$this->web2urls4dico());$this->pause();
+		     
+			}	
+			$tab_result = array_filter(array_unique($tab_result));
 			$result = $this->tab($tab_result);			
-			echo $result;
+			$this->article("ALL URLs", $result) ;
 			
-			return $result;
-			
+			$this->pause();
+
 			$result = base64_encode($result);
 			return explode("\n", base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,$this->web2where,$result)));
 		    }
@@ -350,16 +351,42 @@ class WEB extends SERVICE4COM{
 		    $this->ssTitre(__FUNCTION__); 
 		    $url = trim($url);
 		    $dico = trim($dico);
-		    $result = "";
+		    $result = array();
+		    $req_result_tab = array();
+		    $req_result = "";
+		    $url_test = "";
+		    /*
 		    $query = "dirb '$url' '$dico' -a '$this->user2agent' -S -w | grep 'CODE:200' | cut -d'+' -f2 | cut -d'(' -f1 | sort -u  ";
 		    
-		    //$query = "wfuzz -u $this->http_type://$this->vhost:$this->port/FUZZ -w $this->dico_web -H 'user2agent: $this->user2agent' --sc 200  | grep 'C=200' | cut -d'\"' -f2  | cut -d'\"' -f1 | sort -u ";
-		    //$query = "python $this->dir_tools/enum/Dir-Xcan6.py -s $this->http_type://$this->vhost -d $this->dico_web -u '$this->user2agent' -V -n 8 | grep -Po \"$this->http_type://[[:print:]]*\" | sed \"s#$this->http_type://$this->vhost##g\"  | grep -v ';' | sort -u ";
-		    $req_result = $this->req_ret_str($query);
-		    $req_result_tab = explode("\n", $req_result);
+		    $query = "wfuzz -u $this->http_type://$this->vhost:$this->port/FUZZ -w $this->dico_web -H 'user2agent: $this->user2agent' --sc 200  | grep 'C=200' | cut -d'\"' -f2  | cut -d'\"' -f1 | sort -u ";
+		    $query = "python $this->dir_tools/enum/Dir-Xcan6.py -s $this->http_type://$this->vhost -d $this->dico_web -u '$this->user2agent' -V -n 8 | grep -Po \"$this->http_type://[[:print:]]*\" | sed \"s#$this->http_type://$this->vhost##g\"  | grep -v ';' | sort -u ";
+		    
+		    $query = "cd /opt/crawlbox/;python2 crawlbox.py -u '$url' -w '$dico'  | grep '200' ";
+		    */
 		    $req_dico = file($dico);
-		    if (count($req_dico)<=count($req_result_tab)) $result = "";
-		    else $result = $req_result;
+		    $size = count($req_dico);
+		    for ($i=0;$i<$size;$i++){
+		        $url_test = trim($req_dico[$i]);
+		        $url_test = "$this->web$url_test";
+		        $code = $this->url2code($url_test);
+		        $code = trim($code);
+		        echo "$i/$size: ".$this->web2response($code);
+		        switch ($code) {
+		            case "404" :
+		                break;
+		            default: 
+		                $req_result .= $url_test."\n";
+		                break;
+		        }
+		    }
+
+		    $req_result_tab = explode("\n", $req_result);
+		    
+		    if (count($req_dico)<=count($req_result_tab)) $result = array("");
+		    else $result = $req_result_tab;
+		    
+		    $this->article("URLs FROM DICO", $this->tab($result)) ;
+		    $this->pause();
 		    return $result;
 		}
 	
@@ -485,6 +512,8 @@ class WEB extends SERVICE4COM{
 		//$result .= $this->web2scan4cli4cmseek();   // OK
 		//$result .= $this->web2scan4cli4XAttacker();$this->pause();   // NOT YET 
 		}
+		
+		return $result;
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->web2where",$result));
 	    }
@@ -575,7 +604,7 @@ class WEB extends SERVICE4COM{
 	public function web2scan4cli4nikto(){
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
-		$query = "nikto -host '$this->http_type://$this->vhost' -port '$this->port' -timeout 3 -nointeractive -useragent '$this->user2agent' -until 2400s -nolookup -maxtime 1h -ask no";
+	    $query = "nikto -host '$this->http_type://$this->vhost' -port '$this->port' -timeout 3 -nointeractive -until 2400s -nolookup -maxtime 1h -ask no"; //-useragent '$this->user2agent' 
 		$result .= $this->cmd("localhost",$query);
 		$result .= $this->req_ret_str($query);
 		return $result;
@@ -647,63 +676,48 @@ class WEB extends SERVICE4COM{
 		/*
 		 *
 		 * * net("www.ascii-table.com");
-		 *
-		 *
-		 * "100" => "Continue"
-		 * ,"101" => "Switching Protocols"
-		 * ,"200" => "OK"
-		 * ,"201" => "Created"
-		 * ,"202" => "Accepted"
-		 * ,"203" => "Non-Authoritative Information"
-		 * ,"204" => "No Content"
-		 * ,"205" => "Reset Content"
-		 * ,"206" => "Partial Content"
-		 * ,"300" => "Multiple Choices"
-		 * ,"301" => "Moved Permanently"
-		 * ,"302" => "Found"
-		 * ,"303" => "See Other"
-		 * ,"304" => "Not Modified"
-		 * ,"305" => "Use Proxy"
-		 * ,"306" => "(Unused)"
-		 * ,"307" => "Temporary Redirect"
-		 * ,"400" => "Bad Request"
-		 * ,"401" => "Unauthorized"
-		 * ,"402" => "Payment Required"
-		 * ,"403" => "Forbidden"
-		 * ,"404" => "Not Found"
-		 * ,"405" => "Method Not Allowed"
-		 * ,"406" => "Not Acceptable"
-		 * ,"407" => "Proxy Authentication Required"
-		 * ,"408" => "Request Timeout"
-		 * ,"409" => "Conflict"
-		 * ,"410" => "Gone"
-		 * ,"411" => "Length Required"
-		 * ,"412" => "Precondition Failed"
-		 * ,"413" => "Request Entity Too Large"
-		 * ,"414" => "Request-URI Too Long"
-		 * ,"415" => "Unsupported Media Type"
-		 * ,"416" => "Requested Range Not Satisfiable"
-		 * ,"417" => "Expectation Failed"
-		 * ,"500" => "Internal Server Error"
-		 * ,"501" => "Not Implemented"
-		 * ,"502" => "Bad Gateway"
-		 * ,"503" => "Service Unavailable"
-		 * ,"504" => "Gateway Timeout"
-		 * ,"505" => "HTTP Version Not Supported"
-		 * ,"500SQL" => "SQL Server Error"
-		 * ,"500SQLP" => "SQL Server Perfect"
-		 * ,"500SQLS" => "SQL Server Syntax"
-		 * ,"500ACCESS" => "Access Driver"
-		 * ,"500ADO" => "ADODB"
-		 * ,"500JET" => "JET Database"
-		 * ,"200XSS" => "Cross Site Scripting"
-		 * ,"200FILE" => "File Upload Form"
 		 */
 	
 	
 		$message = "";
 		switch ($reponse_http) {
-			case 211 :
+		    
+		    case 100 :
+		        $message = "Continue";
+		        break;		        
+		    case 101 :
+		        $message = "Switching Protocols";
+		        break;
+	
+		    case 200 :
+		        $message = "OK";
+		        break;
+		   
+		    case 201 :
+		        $message = "Created";
+		        break;
+		        
+		    case 202 :
+		        $message = "Accepted";
+		        break;
+		        
+		    case 203 :
+		        $message = "Non-Authoritative Information";
+		        break;
+		        
+		    case 204 :
+		        $message = "No Content";
+		        break;
+		        
+		    case 205 :
+		        $message = "Reset Content";
+		        break;
+		        
+		    case 206 :
+		        $message = "Partial Content";
+		        break;
+		        
+		    case 211 :
 				$message = "Status du système ou réponse à la commande HELP";
 				break;
 			case 214 :
@@ -724,9 +738,96 @@ class WEB extends SERVICE4COM{
 			case 252 :
 				$message = "User existant";
 				break;
+				
+			case 300 :
+			    $message = "Multiple Choices";
+			    break;
+			    
+			case 301 :
+			    $message = "Moved Permanently";
+			    break;
+			    
+			case 302 :
+			    $message = "Found";
+			    break;
+			    
+			case 303 :
+			    $message = "See Other";
+			    break;
+			    
+			case 304 :
+			    $message = "Not Modified";
+			    break;
+			    
+			case 305 :
+			    $message = "Use Proxy";
+			    break;
+			case 306 :
+			    $message = "Unused";
+			    break;
+			    
+			case 307 :
+			    $message = "Temporary Redirect";
+			    break;
+			    
 			case 354 :
 				$message = "Commencer l'écriture du mail (finir avec un <CRLF>.<CRLF>";
 				break;
+			case 400 :
+			    $message = "Bad Request";
+			    break;
+			case 401 :
+			    $message = "Unauthorized";
+			    break;
+			case 402 :
+			    $message = "Payment Required";
+			    break;
+			case 403 :
+			    $message = "Forbidden";
+			    break;
+			case 404 :
+			    $message = "Not Found";
+			    break;
+			case 405 :
+			    $message = "Method Not Allowed";
+			    break;
+			case 406 :
+			    $message = "Not Acceptable";
+			    break;
+			case 407 :
+			    $message = "Proxy Authentication Required";
+			    break;
+			case 408 :
+			    $message = "Request Timeout";
+			    break;
+			case 409 :
+			    $message = "Conflict";
+			    break;
+			case 410 :
+			    $message = "Gone";
+			    break;
+			case 411 :
+			    $message = "Length Required";
+			    break;
+			case 412 :
+			    $message = "Precondition Failed";
+			    break;
+			case 413 :
+			    $message = "Request Entity Too Large";
+			    break;
+			case 414 :
+			    $message = "Request-URI Too Long";
+			    break;
+			case 415 :
+			    $message = "Unsupported Media Type";
+			    break;
+			case 416 :
+			    $message = "Requested Range Not Satisfiable";
+			    break;
+			case 417 :
+			    $message = "Expectation Failed";
+			    break;
+			    
 			case 421 :
 				$message = "Domaine non accessible";
 				break;
@@ -740,21 +841,34 @@ class WEB extends SERVICE4COM{
 				$message = "Action non réalisée du à un problème de taille";
 				break;
 			case 500 :
-				$message = "Erreur de syntaxe : commande non reconnue - Ligne trop longue.";
+				$message = "Internal Server Error - Erreur de syntaxe : commande non reconnue - Ligne trop longue.";
 				break;
 				// Erreur
+				/*
+		 * ,"500SQL" => "SQL Server Error"
+		 * ,"500SQLP" => "SQL Server Perfect"
+		 * ,"500SQLS" => "SQL Server Syntax"
+		 * ,"500ACCESS" => "Access Driver"
+		 * ,"500ADO" => "ADODB"
+		 * ,"500JET" => "JET Database"
+		 * ,"200XSS" => "Cross Site Scripting"
+		 * ,"200FILE" => "File Upload Form"
+				 */
 			case 501 :
-				$message = "Erreur de syntaxe : parametres ou arguments inconnus - Chemin trop long	";
+				$message = "Not Implemented - Erreur de syntaxe : parametres ou arguments inconnus - Chemin trop long	";
 				break;
 			case 502 :
-				$message = "Commande non implémentée";
+				$message = "Bad Gateway - Commande non implémentée";
 				break;
 			case 503 :
-				$message = "Mauvaise séquence de commandes";
+				$message = "Service Unavailable - Mauvaise séquence de commandes";
 				break;
 			case 504 :
-				$message = "Paramètre de commande non implémenté";
+				$message = "Gateway Timeout - Paramètre de commande non implémenté";
 				break;
+			case 505 :
+			    $message = "HTTP Version Not Supported";
+			    break;
 			case 550 :
 				$message = "Action non réalisée : boite aux lettres inexistante";
 				break;
@@ -886,20 +1000,22 @@ class WEB extends SERVICE4COM{
 
         $tab_urls = array_filter(array_unique($tab_urls));
 
-        
+        $this->article("URLs FROM SPIDERING", $this->tab($tab_urls));
+        $this->pause();
 		return $tab_urls;
 	}
 	
 	public function web2enum(){
 	    $result = "";
+	    $this->titre(__FUNCTION__);
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->web2where AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->web2where"));
 	    else {
-	        $result .= $this->titre(__FUNCTION__);
-	    $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --reason --script \"http-enum,http-title,http-traceroute,http-methods,http-headers,http-method-tamper\" $this->vhost -p $this->port -e $this->eth -oX -";
+
+	    $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --reason --script \"http-enum,http-title,http-traceroute,http-methods,http-headers,http-method-tamper\" $this->vhost -p $this->port -e $this->eth -oN - $this->filter_file_path";
 		
 	    
-	    $result .= $this->req_ret_str($query);	
+	    $result = $this->req_ret_str($query);	
 		//$result .= $this->web2enum4user2agent(); // BUG USER AGENT 
 		//$result .= $this->web2enum4dav(); // later 
 		//$result .= $this->web2enum4bing();
@@ -907,6 +1023,7 @@ class WEB extends SERVICE4COM{
 		
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->web2where",$result));
+		 
 	       }
 	}
 	

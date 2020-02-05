@@ -160,31 +160,38 @@ class URL extends WEB{
 	    $result = "";
 	    if (!empty($this->url)){
 	        
-	        //$this->web2scan4gui4burp();$this->article("Burp","localproxy $this->proxy_port_burp ");$this->requette("wget -qO- --no-check-certificate --timeout=2 --tries=1 -e use_proxy=yes -e http_proxy=$this->proxy_addr:$this->proxy_port_burp -e https_proxy=$this->proxy_addr:$this->proxy_port_burp \"$this->url\" --user-agent='$this->user2agent' > /dev/null ");
-	        //$this->web2scan4gui4zap();
+	        $this->web2scan4gui4burp();
+	        $this->article("Burp","localproxy $this->proxy_port_burp ");
+	        $this->requette("wget -qO- --no-check-certificate --timeout=2 --tries=1 -e use_proxy=yes -e http_proxy=$this->proxy_addr:$this->proxy_port_burp -e https_proxy=$this->proxy_addr:$this->proxy_port_burp \"$this->url\" --user-agent='$this->user2agent' > /dev/null ");
+	        $this->web2scan4gui4zap();
 	        
 	        $code = $this->url2code($this->url);
 	        $code = trim($code);
 	        $this->web2response($code);
 	        switch ($code) {
 	            case "401" :
-	                $auth_401 .= $this->auth2login4hydra($this->req_ret_str("hydra -l \"root\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
-	                $auth_401 .= $this->auth2login4hydra($this->req_ret_str("hydra -l \"admin\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
-	                $auth_401 .= $this->auth2login4hydra($this->req_ret_str("hydra -l \"guest\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
-	                $auth_401 .= $this->auth2login4hydra($this->req_ret_str("hydra -l \"administrator\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
-	                $auth_401 .= $this->auth2login4hydra($this->req_ret_str("hydra -l \"user\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
-	                $auth_401 .= $this->auth2login4hydra($this->req_ret_str("hydra -l \"test\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
-	                //if(!empty($auth_401)) $result .= $this->yesAUTH($this->vhost, $this->port, $this->protocol, "", "", "", "", "", "", "", "401 AUTH=$auth_401", $this->ip2geoip());
+	                $this->auth2login4hydra($this->req_ret_str("hydra -l \"root\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
+	                $this->auth2login4hydra($this->req_ret_str("hydra -l \"admin\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
+	                $this->auth2login4hydra($this->req_ret_str("hydra -l \"guest\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
+	                $this->auth2login4hydra($this->req_ret_str("hydra -l \"administrator\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
+	                $this->auth2login4hydra($this->req_ret_str("hydra -l \"user\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
+	                $this->auth2login4hydra($this->req_ret_str("hydra -l \"test\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
 	                
 	                break;
 	            case "200" :
-	                //$result .= $this->url2ok();
+	                $result .= $this->url2ok();
 	                break;
 	        }
 	    }
 	    return $result;
 	}
 	
+	
+	public function url2brute(){
+	    $result = "";
+	    $this->ssTitre(__FUNCTION__);
+	    
+	}
 	
 	public function url2ok(){
 	    $result = "";
