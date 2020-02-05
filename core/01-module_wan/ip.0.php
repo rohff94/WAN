@@ -301,6 +301,7 @@ class IP extends DOMAIN{
 	public function ip2cidr(){
 		$this->ssTitre(__FUNCTION__);
 		$cidr = $this->req_ret_str("echo '$this->ip' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" ");
+		$this->pause();
 		return $cidr;
 	}
 	
@@ -317,8 +318,8 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	     */
 	    $this->ssTitre(__FUNCTION__);
 	    // mysql -u rohff --password=hacker -b bot -e "select ip,port,from_base64(service2vuln) FROM PORT where from_base64(service2vuln) LIKE \"%VULNERABLE%\" ;" | grep -v -i "not bulnerable" | grep -A5 -B5 -i "vulnerable" | sed "s/\\\n/\n/g" | more
-	    $result .= $this->openvas($this->ip);
-	    $result .= $this->ip2cve4nmap();
+	    $result .= $this->openvas($this->ip);$this->pause();
+	    $result .= $this->ip2cve4nmap();$this->pause();
 	    return $result;
 	}
 	
@@ -400,8 +401,9 @@ like by using a service like traceroute.org.
 Please keep in mind that routes do change. However, if you see traffic making a drastic change (i.e. being
 routed halfway around the world) you may want to work with your ISP to investigate.");
 		$result .= $this->ip2asn4db();
+		$this->pause();
 		$result .= $this->ip2asn4nmap();
-		
+		$this->pause();
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
 		}
@@ -983,7 +985,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		$result .= "\nINFO: ".$this->ip2icmpINFO();
 		$result .= "\nMASK: ".$this->ip2icmpMASK();
 		
-
+		$this->pause();
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
 	    }
@@ -1138,7 +1140,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		                		            }
 		            }
 		    }
-		    
+		    $this->pause();
 		    $result = base64_encode($result);
 		return $this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result);
 	}
@@ -1314,6 +1316,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		$this->net("http://www.malwareurl.com/listing-urls.php"); // captcha pas utils
 		$this->net("http://www.malwaredomainlist.com/mdl.php?search=$this->ip&colsearch=All&quantity=50"); // ne detecte rien
 		$this->ip2malw4blacklist();
+		$this->pause();
 	}
 
 	
@@ -1384,7 +1387,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		$result .= "\nFRAG:\n".$this->ip2fw4frag();
 		$result .= "\nFWLK:\n".$this->ip2fw4nmap2fk();
 		$result .= "\nFW:\n".$this->ip2fw4nmap2fw();
-		
+		$this->pause();
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
 		}
@@ -1438,6 +1441,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 
 	    }
 	    echo "END IP4SERVICE:$this->ip =============================================================================\n";
+	    $this->pause();
 	    return $result;
 	}
 
@@ -1526,6 +1530,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		//$result .=  $this->ip2vuln();$this->pause();
         echo $result;
 		echo "END IP4PENTEST:$this->ip =============================================================================\n";
+		$this->pause();
 		return $result;
 		
 	}

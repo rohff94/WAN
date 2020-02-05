@@ -37,7 +37,7 @@ class SERVICE extends SERVICE4COM {
 	}
 	
 	public function service4cve(){
-	    return "not checked";
+	    //return "not checked";
 	    $sql_r_1 = "SELECT service2cve FROM SERVICE WHERE $this->service2where AND service2cve IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) {
 	        return base64_decode($this->req2BD4out("service2cve","SERVICE",$this->service2where ));

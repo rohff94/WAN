@@ -313,8 +313,13 @@ public function screenshot($seconde){
 	
 	public function time2laps($start,$end){	    
 	    $time = $end - $start;
-	    $laps = date("H:i:s",$time);
-	    $this->note("Spending $laps");
+	    
+	    $sec = intval($time);
+	    $micro = $time - $sec;
+
+	    $final = strftime('%T', mktime(0, 0, $sec)) . str_replace('0.', '.', sprintf('%.3f', $micro));
+
+	    $this->note("Spending $final");
 	}
 	
 	// blanc sur fond rouge
