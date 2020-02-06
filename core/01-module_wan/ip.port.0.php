@@ -268,7 +268,10 @@ class PORT extends IP{
 		    
            
 	    $sql_r_1 = "SELECT service2vuln FROM SERVICE WHERE id8port=$this->port2id  AND service2vuln IS NOT NULL";
-	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out("service2vuln","SERVICE","id8port = $this->port2id "));
+	    if ($this->checkBD($sql_r_1) ) {
+	        
+	        return  base64_decode($this->req2BD4out("service2vuln","SERVICE","id8port = $this->port2id "));
+	    }
 	    else {
 	        
 	    

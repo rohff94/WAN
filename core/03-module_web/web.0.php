@@ -242,14 +242,12 @@ class WEB extends SERVICE4COM{
 		
 		public function web4pentest(){
 		    $result = "";
+		    $tab_urls = array();
 		    $this->gtitre(__FUNCTION__);
 		    //return "";
-		    $result .= $this->web2enum();$this->pause();
-
-		    //$this->web2scan4gui4zap();$this->pause();
+		    
 			$tab_urls = $this->web2urls();
 			
-			$tab_urls = array_filter($tab_urls);
 
 			$this->article("ALL URLs", $this->tab($tab_urls));
 			$this->pause();
@@ -257,36 +255,15 @@ class WEB extends SERVICE4COM{
             if ( !empty($tab_urls)  ) {			
                 $result .= $this->web2scan4cli();$this->pause();
 				//$result .= $this->web2waf();
-                    $ips = $tab_urls;
-                    if (!empty($ips)) {
-                        $max_iter = count($ips);
-                        $this->rouge("ITER $max_iter");
-                        $gauche_iter = intval($max_iter/2);
-                        $droite_iter = intval($max_iter-$gauche_iter);
-                        $file_path = "$this->dir_tmp/$this->eth.$this->domain.".__FUNCTION__.".lst";
-                        $fp = fopen($file_path, 'w+');
-                        foreach ($ips as $ip_addr) {
-                            if(!empty($ip_addr)){
-                                $data = "$this->eth $this->domain $ip_addr";
-                                $data = $data."\n";
-                                fputs($fp,$data);
-                            }
-                        }
-                        fclose($fp);
- 
-                        //if (1<$max_iter) $this->requette("php parallel.php \"cat  $file_path | awk 'FNR>0 && FNR<=$gauche_iter' | parallel --progress --no-notice -k -j$gauche_iter php pentest.php URL {} \" \"cat  $file_path | awk 'FNR>$gauche_iter && FNR<=$max_iter' | parallel --progress --no-notice -k -j$droite_iter php pentest.php URL {} \" 0 ");
-                        
-                    }
-                
-                                
-                
-                
+				//$this->web2scan4gui4zap();$this->pause();
 			foreach ($tab_urls as $url){
 			    $url = trim($url);			    
 			    if(!empty($url)){
 			        //$this->article("URL",$url);
-			$obj_url = new URL($this->eth,$this->domain,$url);			
+			$obj_url = new URL($this->eth,$this->domain,$url);	
+			$obj_url->poc($this->flag_poc);
 			$result .= $obj_url->url4pentest();
+			$this->pause();
 			    }
 			                             }
 			                                     }					
@@ -305,14 +282,16 @@ class WEB extends SERVICE4COM{
 		public function web2urls(){
 		    $this->titre(__FUNCTION__);
 		    $tab_result = array();
+		    $tab_enum = array();
 		    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->web2where AND ".__FUNCTION__." IS NOT NULL";
 		    if ($this->checkBD($sql_r_1) ) return  explode("\n", base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->web2where)));
 		    else {
 		        
 		    
 		    if($this->web2check_200()){		
-		        $result = "";
-		        $tab_result = array_merge($this->web2urls4spider(),$this->web2urls4dico());$this->pause();
+		        $result = $this->web2enum();
+		        exec("echo '$result' $this->filter_file_path ",$tab_enum);
+		        $tab_result = array_merge($tab_enum,$this->web2urls4spider(),$this->web2urls4dico());
 		     
 			}	
 			$tab_result = array_filter(array_unique($tab_result));
@@ -372,6 +351,8 @@ class WEB extends SERVICE4COM{
 		        $code = trim($code);
 		        echo "$i/$size: ".$this->web2response($code);
 		        switch ($code) {
+		            case "000" :
+		            case "301" :
 		            case "404" :
 		                break;
 		            default: 
@@ -431,9 +412,9 @@ class WEB extends SERVICE4COM{
 		// -config scanner.attackPolicy=MyAttackPolicy
 		
 		while (!$this->tcp2open("127.0.0.1", $this->proxy_port_zap)) {
-        $filename = "/usr/share/zaproxy/zap.sh";
+        $filename = "/opt/zaproxy/zap.sh";
         $this->article("ZAP","localproxy $this->proxy_port_burp without connection outgoing  ");        
-		$this->cmd("TOR","echo '$this->root_passwd' | sudo -S bash $filename -DsocksProxyHost=127.0.0.1-DsocksProxyPort=9050");
+		$this->cmd("Using TOR","echo '$this->root_passwd' | sudo -S bash $filename -DsocksProxyHost=127.0.0.1-DsocksProxyPort=9050");
 		//if(!file_exists($filename)) $this->install_web2scan4gui4zap();
 		$this->cmd("localhost","bash $filename");
 		sleep(30);
@@ -513,7 +494,7 @@ class WEB extends SERVICE4COM{
 		//$result .= $this->web2scan4cli4XAttacker();$this->pause();   // NOT YET 
 		}
 		
-		return $result;
+
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->web2where",$result));
 	    }
@@ -1012,7 +993,7 @@ class WEB extends SERVICE4COM{
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->web2where"));
 	    else {
 
-	    $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --reason --script \"http-enum,http-title,http-traceroute,http-methods,http-headers,http-method-tamper\" $this->vhost -p $this->port -e $this->eth -oN - $this->filter_file_path";
+	    $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --reason --script \"http-enum,http-title,http-traceroute,http-methods,http-headers,http-method-tamper\" $this->vhost -p $this->port -e $this->eth -oN - ";
 		
 	    
 	    $result = $this->req_ret_str($query);	

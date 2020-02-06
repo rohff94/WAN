@@ -69,12 +69,15 @@ public function  req2BD($colonne,$table,$where,$query){
 
 public function  req2BD4out($colonne,$table,$where){
     $colonne = trim($colonne);$table = trim($table);$where = trim($where);
-    $sql_r2 = "SELECT $colonne FROM $table WHERE $where ORDER BY 'ladate' DESC LIMIT 1";
+    $sql_r2 = "SELECT $colonne FROM $table WHERE $where ";
     //echo "$sql_r2\n";
     $conn = $this->mysql_ressource->query($sql_r2);
     $row = $conn->fetch_assoc();
     $result = $row["$colonne"];    
-    
+
+    $sql_d = "UPDATE $table set $colonne=NULL WHERE $where ";
+    $texte = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_d;\"  2>/dev/null \n";
+    $this->article("IF YOU WANT TO DELETE THIS RECORD", $texte);
     return $result;
 }
 
@@ -162,14 +165,18 @@ public function  port2write8db($port2id){
 public function checkBD($sql){
 	//echo "$sql;\n";
 	//echo "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"SELECT EXISTS($sql);\"  2>/dev/null \n";
-	//$this->pause();	
+	//echo "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql;\"  2>/dev/null \n";
+	//$this->pause();
+	
 	$result = $this->mysql_ressource->query("SELECT EXISTS($sql)");
 	if (is_bool($result)) return FALSE ;
 	$row = $result->fetch_array(MYSQLI_NUM);
-	if ($row[0]==1) return TRUE;
+	
+
+	
+	if ($row[0]==1) {return TRUE;}
 	else return FALSE;
 }
-
 
 
 public function faraday2cve(){

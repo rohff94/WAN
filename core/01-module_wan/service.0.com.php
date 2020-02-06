@@ -933,8 +933,10 @@ class SERVICE extends SERVICE4COM {
 	    $result .= $this->ssTitre(__FUNCTION__);
 	    
 		$obj_web = new WEB($this->eth,$this->domain,"http://$this->ip:$this->port/");
+		$obj_web->poc($this->flag_poc);
 		if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
 		$obj_web = new WEB($this->eth,$this->domain,"https://$this->ip:$this->port/");
+		$obj_web->poc($this->flag_poc);
 		if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
 		
 		return $result;

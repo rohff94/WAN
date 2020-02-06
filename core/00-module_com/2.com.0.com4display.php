@@ -21,46 +21,7 @@ class com4display extends INSTALL {
 	}
 
 	
-	public function watching(){
-	    $query = "echo '$this->root_passwd' | sudo -S top";
-	    $this->cmd("localhost", $query);
-	    $query = "echo '$this->root_passwd' | sudo -S ps aux";
-	    $this->cmd("localhost", $query);
-	    $query = "echo '$this->root_passwd' | sudo -S arpwatch -dN -i wlp5s0 -a -n 192.168.1.0/24";
-	    $this->cmd("localhost", $query);
-	    $query = "echo '$this->root_passwd' | sudo -S snort -A console -q -c /etc/snort/snort.conf -i wlp5s0  'not host 192.168.1.12'";
-	    $this->cmd("localhost", $query);
-	    $query = "echo '$this->root_passwd' | sudo -S nmap -sn --reason 192.168.1.0/24 -e wlp5s0 ";
-	    $this->cmd("localhost", $query);
-	    $query = "echo '$this->root_passwd' | sudo -S arp -av -i wlp5s0";
-	    $this->cmd("localhost", $query);
-	    $query = "echo '$this->root_passwd' | sudo -S ";
-	    $this->cmd("localhost", $query);
-	    $query = "mysql -u root -p -b bot";
-	    $this->cmd("localhost", $query);
-	    $query = "cd ./EH/CODE/POO/TMP/; php -S 10.60.10.1:8085";
-	    $this->cmd("localhost", $query);
-	    $query = "tail -f /var/log/syslog";
-	    $this->cmd("localhost", $query);
-	    $query = "tail -f /var/log/auth.log";
-	    $this->cmd("localhost", $query);
-	    $query = "tail -f /var/log/kern.log";
-	    $this->cmd("localhost", $query);
-	    $query = "tail -f /var/log/mail.log";
-	    $this->cmd("localhost", $query);
-	    $query = "for i in $(cat /home/rohff/EH/CODE/POO/TMP/bounty.bugs); do php pentest.php DOMAIN \"wlp5s0 \$i FALSE\";done";
-	    $this->cmd("localhost", $query);
-	    $query = "for i in $(tac /home/rohff/EH/CODE/POO/TMP/bounty.bugs); do php pentest.php DOMAIN \"wlp5s0 \$i FALSE\";done";
-	    $this->cmd("localhost", $query);
-	    $query = "watch -n 5 -e \"grep -i segfault /var/log/kern.log\"";
-	    $this->cmd("localhost", $query);
-	    $query = "msfconsole -q";
-	    $this->cmd("localhost", $query);
-	    
 
-	    //sleep(5);
-	    $this->pause();
-	}
 	
 	//  jaune gras | jaune
 	public function cmd($host,$query){

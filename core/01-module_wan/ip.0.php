@@ -96,7 +96,7 @@ class IP extends DOMAIN{
 		$sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->ip2where ";
 		echo "$sql_r\n";
 		$this->ip2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
-		
+		$this->watching();
 		}
 		else {
 		    $sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->ip2where ";
@@ -106,6 +106,40 @@ class IP extends DOMAIN{
 	}
 	
 	
+	public function watching(){
+	    $chaine = "Monitors your environment";
+	    $this->rouge($chaine);
+	    if ($this->ip4priv($this->ip)){
+	        $cidr = trim($this->ip2cidr());
+	        $query = "echo '$this->root_passwd' | sudo -S arpwatch -dN -i $this->eth -a -n $cidr.0/24";
+	        $this->cmd("localhost", $query);
+	        $query = "echo '$this->root_passwd' | sudo -S nmap -sn --reason $cidr.0/24 -e $this->eth ";
+	        $this->cmd("localhost", $query);
+	        $query = "echo '$this->root_passwd' | sudo -S arp -av -i $this->eth";
+	        $this->cmd("localhost", $query);
+	    }
+	    
+	    $query = "echo '$this->root_passwd' | sudo -S top";
+	    $this->cmd("localhost", $query);
+	    $query = "echo '$this->root_passwd' | sudo -S ps aux";
+	    $this->cmd("localhost", $query);
+	    $query = "echo '$this->root_passwd' | sudo -S snort -A console -q -c /etc/snort/snort.conf -i $this->eth  'not host $this->ip'";
+	    $this->cmd("localhost", $query);	    
+	    $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=bot";
+	    $this->cmd("localhost", $query);
+	    $query = "cd $this->dir_tmp; php -S $this->ip:$this->port_rfi";
+	    $this->cmd("localhost", $query);
+	    $query = "tail -f /var/log/syslog";
+	    $this->cmd("localhost", $query);
+	    $query = "tail -f /var/log/auth.log";
+	    $this->cmd("localhost", $query);
+	    $query = "tail -f /var/log/kern.log";
+	    $this->cmd("localhost", $query);
+	    $query = "tail -f /var/log/mail.log";
+	    $this->cmd("localhost", $query);
+	    $query = "watch -n 5 -e \"grep -i segfault /var/log/kern.log\"";
+	    $this->cmd("localhost", $query);
+	}
 	
 	public function ip2dot4port(){
 	    $this->ssTitre(__FUNCTION__);
@@ -300,9 +334,7 @@ class IP extends DOMAIN{
 	
 	public function ip2cidr(){
 		$this->ssTitre(__FUNCTION__);
-		$cidr = $this->req_ret_str("echo '$this->ip' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" ");
-		$this->pause();
-		return $cidr;
+		return trim($this->req_ret_str("echo '$this->ip' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" "));
 	}
 	
 	public function ip2cve(){
@@ -386,7 +418,9 @@ $filenames = explode("\n",$test->req_ret_str($query));
 		if ($this->ip4priv($this->ip)) return "Private IP";
 		$result = "";
 		$sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
-		if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
+		if ($this->checkBD($sql_r_1) ) {
+		    return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
+		}
 		else {
 		    $result .= $this->titre(__FUNCTION__);
 		   
@@ -1120,7 +1154,9 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	public function ip2auth(){
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
-	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
+	    if ($this->checkBD($sql_r_1) ) {
+	        return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
+	    }
 	    else {
 	        $this->titre(__FUNCTION__);
 	        $sql_service = "select DISTINCT service2name,port,protocol from PORT where id8port = '$this->port2id' AND (service2name = 'asterisk' OR service2name LIKE '%ftp%'  OR service2name = 'icq' OR service2name = 'imap' OR service2name = 'imaps' OR service2name = 'ldap2' OR service2name = 'ldap2s' OR service2name = 'ldap3' OR service2name = 'mssql' OR service2name = 'mysql' OR service2name = 'nntp' OR service2name = 'oracle-listener' OR service2name = 'oracle-sid' OR service2name = 'pcanywhere' OR service2name = 'postgres' OR service2name = 'rlogin'  OR service2name LIKE '%rdp%' OR service2name = 'sip' OR service2name = 'ssh' OR service2name LIKE '%smb%' OR service2name LIKE '%samba%' OR service2name = 'snmp' OR service2name = 'smtp' OR service2name = 'smtps' OR service2name = 'vnc' OR service2name = 'xmpp') ORDER BY port  ;";

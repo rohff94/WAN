@@ -139,7 +139,9 @@ class URL extends WEB{
 		parse_str(parse_url( $this->url, PHP_URL_QUERY),$my_arr);
 		foreach($my_arr as $key=>$value){	
 			if(!is_array($key && !empty($value))){
+			    
 			    $obj_fi = new PARAM($this->eth,$this->domain,$this->url,$key,$value,"GET");
+			    $obj_fi->poc($this->flag_poc);
 				$result .= $obj_fi->param4pentest($OS);
 				$this->pause();
 		}
@@ -160,10 +162,12 @@ class URL extends WEB{
 	    $result = "";
 	    if (!empty($this->url)){
 	        
+	        /*
 	        $this->web2scan4gui4burp();
 	        $this->article("Burp","localproxy $this->proxy_port_burp ");
 	        $this->requette("wget -qO- --no-check-certificate --timeout=2 --tries=1 -e use_proxy=yes -e http_proxy=$this->proxy_addr:$this->proxy_port_burp -e https_proxy=$this->proxy_addr:$this->proxy_port_burp \"$this->url\" --user-agent='$this->user2agent' > /dev/null ");
 	        $this->web2scan4gui4zap();
+	        */
 	        
 	        $code = $this->url2code($this->url);
 	        $code = trim($code);
@@ -186,12 +190,6 @@ class URL extends WEB{
 	    return $result;
 	}
 	
-	
-	public function url2brute(){
-	    $result = "";
-	    $this->ssTitre(__FUNCTION__);
-	    
-	}
 	
 	public function url2ok(){
 	    $result = "";

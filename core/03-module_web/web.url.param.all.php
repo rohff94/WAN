@@ -28,11 +28,7 @@ class PARAM extends XSS{
         if (!$this->tcp2open($this->ip4addr4target($this->ip), $port)) {$this->rouge($open_server);exit();}
         
         //$result .=  $this->param2hash();
-        $result .=  $this->fi4pentest($OS);$this->pause();
-        
-        
-        return $result;
-        
+  
         $result .=  $this->fi4pentest($OS);$this->pause();
         $result .=  $this->ce4pentest($OS);$this->pause();
         $result .=  $this->xss4pentest();$this->pause();
