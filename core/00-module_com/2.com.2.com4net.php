@@ -101,8 +101,13 @@ class com4net extends com4user {
     
     public function url2code($url){
         $this->ssTitre(__FUNCTION__);
+        $this->article("URL", $url);
+        
+        $path = str_replace("$this->web", '', $url);
+        
+        $url_test = $this->web.$this->url2encode($path);
         //$query ="wget --server-response --no-check-certificate --spider --timeout=5 --tries=2 \"$url\" -qO-  | grep 'HTTP/' | grep -Po \"[0-9]{3}\" | tail -1";
-        $query = "curl -o /dev/null --silent --head --write-out '%{http_code}' --connect-timeout 3 --no-keepalive '$url' | grep -Po \"[0-9]{3}\" ";
+        $query = "curl -o /dev/null --silent --head --write-out '%{http_code}' --connect-timeout 3 --no-keepalive '$url_test' | grep -Po \"[0-9]{3}\" ";
         return trim($this->req_ret_str($query));
        }
     

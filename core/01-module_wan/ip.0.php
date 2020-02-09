@@ -1580,7 +1580,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $this->ssTitre(__FUNCTION__);
 	    $tab_ip2users4shell = array("root");
 	    $sql_r_2 = "SELECT distinct(user2name) FROM USERS WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' AND user2methode = 'cat /etc/passwd' AND ( from_base64(user2infos) LIKE \"%/bin/sh%\" OR from_base64(user2infos) LIKE \"%/bin/bash%\") ) ORDER by user2name ASC ";
-	    echo "$sql_r_2\n";
+	    //echo "$sql_r_2\n";
 	    $conn = $this->mysql_ressource->query($sql_r_2);
 	    while($row = $conn->fetch_assoc()){
 	        $user2name = trim($row["user2name"]);

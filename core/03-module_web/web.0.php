@@ -22,7 +22,7 @@ class WEB extends SERVICE4COM{
 	    $this->http_type = parse_url( $this->web, PHP_URL_SCHEME);
 
 	    
-	    if (parse_url( $this->web, PHP_URL_PORT)!==null) $port = parse_url( $this->web, PHP_URL_PORT);
+	    if (parse_url( $this->web, PHP_URL_PORT)!==FALSE) $port = parse_url( $this->web, PHP_URL_PORT);
 	    else {
 	        if($this->http_type=="https") $port = 443 ;
 	        if($this->http_type=="http") $port = 80;
@@ -244,22 +244,37 @@ class WEB extends SERVICE4COM{
 		    $result = "";
 		    $tab_urls = array();
 		    $this->gtitre(__FUNCTION__);
-		    //return "";
 		    
 			$tab_urls = $this->web2urls();
-			
-
-			$this->article("ALL URLs", $this->tab($tab_urls));
+			$this->article("ALL URLs For Testing", $this->tab($tab_urls));
 			$this->pause();
 			
             if ( !empty($tab_urls)  ) {			
-                $result .= $this->web2scan4cli();$this->pause();
 				//$result .= $this->web2waf();
 				//$this->web2scan4gui4zap();$this->pause();
+				
+                $file_path = "/tmp/$this->eth.$this->domain.$this->ip.$this->port.urls";
+                $fp = fopen($file_path, 'w+');
+                foreach ($tab_urls as $url){
+                    $url = trim($url);
+                    if(!empty($url)){
+                        $data = "$this->eth $this->domain $url url4pentest FALSE";
+                        $data = $data."\n";
+                        fputs($fp,$data);
+                    }
+                }
+                fclose($fp);
+                
+                $query = "gedit $file_path";
+                $this->requette($query);
+                
+                //$this->requette("cat $file_path | parallel --progress --no-notice -k -j24 php pentest.php URL {} ");
+
+                
+                $tab_urls = $this->req_ret_tab("awk '{print $3}' $file_path ");
 			foreach ($tab_urls as $url){
 			    $url = trim($url);			    
 			    if(!empty($url)){
-			        //$this->article("URL",$url);
 			$obj_url = new URL($this->eth,$this->domain,$url);	
 			$obj_url->poc($this->flag_poc);
 			$result .= $obj_url->url4pentest();
@@ -282,24 +297,36 @@ class WEB extends SERVICE4COM{
 		public function web2urls(){
 		    $this->titre(__FUNCTION__);
 		    $tab_result = array();
-		    $tab_enum = array();
+		    $tab_tmp = array();
+		    $tab_tmp2 = array();
+		    $tab_enum1 = array();
+		    $tab_enum2 = array();
 		    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->web2where AND ".__FUNCTION__." IS NOT NULL";
 		    if ($this->checkBD($sql_r_1) ) return  explode("\n", base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->web2where)));
 		    else {
 		        
 		    
 		    if($this->web2check_200()){		
-		        $result = $this->web2enum();
-		        exec("echo '$result' $this->filter_file_path ",$tab_enum);
-		        $tab_result = array_merge($tab_enum,$this->web2urls4spider(),$this->web2urls4dico());
+		        $nmap = $this->web2enum();
+		        exec("echo '$nmap' $this->filter_file_path ",$tab_enum1);
+		        $scancli = $this->web2scan4cli();
+		        exec("echo '$scancli' $this->filter_file_path ",$tab_enum2);
+		        $tab_tmp = array_merge($tab_enum1,$tab_enum2);
+		        $tab_tmp = array_filter(array_unique($tab_tmp));
+		        
+		        foreach ($tab_tmp as $uri ){
+		            $tab_tmp2[] = "$this->http_type://$this->ip:$this->port".trim($uri);
+		        }
+		        $tab_tmp = array_filter(array_unique($tab_tmp2));
+		        $tab_result = array_merge($tab_tmp,$this->web2urls4spider(),$this->web2urls4dico()); // 
 		     
 			}	
-			$tab_result = array_filter(array_unique($tab_result));
+			
+			$tab_result = array_unique($tab_result);
 			$result = $this->tab($tab_result);			
-			$this->article("ALL URLs", $result) ;
+			
 			
 			$this->pause();
-
 			$result = base64_encode($result);
 			return explode("\n", base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,$this->web2where,$result)));
 		    }
@@ -373,12 +400,13 @@ class WEB extends SERVICE4COM{
 	
 		public function web2urls4dico(){
            $this->ssTitre(__FUNCTION__);//  -e use_proxy=yes -e http_proxy=$this->proxy_addr:$this->proxy_port --spider 
-		//$query = "for i in `cat $this->dico_web`; do wget --server-response -qO- --no-check-certificate --timeout=1 --tries=1 \"$this->http_type://$this->vhost:$this->port/\$i\" 2>&1 | grep '200 OK' -B3 | grep '$this->http_type://$this->vhost' | grep -Po \"$this->http_type://[[:print:]]*\"  | sed \"s#$this->http_type://$this->vhost##g\" | grep -v ';';done ";
-		//$query = "cat $this->dico_web | parallel --progress -j64 --no-notice wget --server-response --spider -qO- --no-check-certificate --timeout=1 --tries=1  \"$this->http_type://$this->vhost:$this->port/{}\" 2>&1 | grep '200 OK' -B3 | grep '$this->http_type://$this->vhost' | grep -Po \"$this->http_type://[[:print:]]*\" | sed \"s#$this->http_type://$this->vhost##g\" | grep -v ';' ";
-		$url = "$this->http_type://$this->vhost:$this->port/";
+		
 		$dico = $this->dico_web ;
-		return $this->web2path($url, $dico);		
+		$tmp1 = $this->web2path($this->web, $dico);		
 
+		$dico = $this->dico_web_file ;
+		$tmp2 = $this->web2path($this->web, $dico);
+		return array_filter(array_unique(array_merge($tmp1,$tmp2)));
 	}
 	
 
@@ -585,7 +613,7 @@ class WEB extends SERVICE4COM{
 	public function web2scan4cli4nikto(){
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
-	    $query = "nikto -host '$this->http_type://$this->vhost' -port '$this->port' -timeout 3 -nointeractive -until 2400s -nolookup -maxtime 1h -ask no"; //-useragent '$this->user2agent' 
+	    $query = "nikto -host '$this->http_type://$this->vhost' -port '$this->port' -timeout 3 -nointeractive -until 2400s -nolookup -maxtime 1h -ask no -C all"; //-useragent '$this->user2agent' 
 		$result .= $this->cmd("localhost",$query);
 		$result .= $this->req_ret_str($query);
 		return $result;
@@ -946,39 +974,11 @@ class WEB extends SERVICE4COM{
 	
 	public function web2urls4spider(){
 	    $tab_urls = array();
-	    $tab_urls_tmp = array();
 	    // https://api.hackertarget.com/pagelinks/?q=https://www.ubisoft.com/en-gb
 	    $this->ssTitre(__FUNCTION__);// --proxy=http://$this->proxy_addr:$this->proxy_port  --output-dir=$this->rep_path -t $this->rep_path/$this->vhost.http.log.sqlmap --dump-format=SQLITE | tee $file_output 
 		// webshag-cli
-	    
-	    $query = "wget --no-check-certificate --recursive  --spider --timeout=5 --tries=2 '$this->web' 2>&1 | grep '200 OK' -B3 | grep '$this->http_type://$this->vhost' | grep -Po \"$this->http_type://[[:print:]]*\" | grep -v ';' | egrep  \"(\.php|\.html|\.xhtml|\.xml|\.asp|\.aspx|\.jsp|\.py|\.rb|\.sh|\.cgi|\.pl|\.js)\" | sort -u ";
 		$query = "hxwls '$this->web' 2> /dev/null | grep '$this->vhost' | grep -v '#' | sort -u ";
-		//$query = "sqlmap --forms --batch -v5 --crawl=30 --smart --hpp --threads 8 --answers=Y --parse-errors --random-agent --url '$this->vhost' ";
-		//$result .= $this->cmd("localhost",$query);
 		$tab_urls = $this->req_ret_tab($query);
-		
-		//$urls_1 = file("$this->dir_tmp/mut2.urls");
-		
-
-		
-		/*
-		if (!empty($urls_1)){
-		foreach ($urls_1 as $url_tmp){
-		    $url_tmp = trim($url_tmp);
-		    if (!empty($url_tmp)){
-		        $query = "wget -qO- '$url_tmp' | grep -Po \"(?<=href=\\\")[^\\\"]*(?=\\\")\" | sed \"s#^./#$url_tmp#g\" | sed \"s#^$url_tmp##g\" | grep -v '://' | egrep  \"(\.php|\.html|\.xhtml|\.xml|\.asp|\.aspx|\.jsp|\.py|\.rb|\.sh|\.cgi|\.pl|\.js)\" | sort -u ";
-		        $tab_urls_tmp = $this->req_ret_tab($query); 
-		        $tab_urls_tmp = array_filter(array_unique($tab_urls_tmp));
-		        $size = count($tab_urls_tmp);
-		        for($i=0;$i<$size;$i++){
-		            $tab_urls[] = $url_tmp.$tab_urls_tmp[$i];
-		        }
-		            
-		    }
-		}
-		}
-		*/
-
         $tab_urls = array_filter(array_unique($tab_urls));
 
         $this->article("URLs FROM SPIDERING", $this->tab($tab_urls));

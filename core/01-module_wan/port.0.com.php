@@ -599,6 +599,11 @@ as the header options; the TTL changes.");
             $chaine = "DO NOT FOUND $str - COMMAND NOT EXECUTED";
             $this->note($chaine);
             $this->rouge("NOT bash SHELL");
+            /*
+            https://fireshellsecurity.team/restricted-linux-shell-escaping-techniques/
+            https://www.asafety.fr/reverse-shell-one-liner-cheat-sheet/
+            https://resources.infosecinstitute.com/privilege-escalation-linux-live-examples/#gref
+            */
             var_dump($tmp);
             $data = "echo \$SHELL";
             $this->article("DATA", $data);
@@ -611,9 +616,10 @@ as the header options; the TTL changes.");
             if (!empty($tmp2)) {
                 $shell_found = $tmp2[0];
                 if (strstr($shell_found, "lshell")) $this->article("LIMITED SHELL", $shell_found);
-                if (strstr($shell_found, "rbash")) {
-                    $this->article("RESTRICTED SHELL", $shell_found);
-                }
+                if (strstr($shell_found, "rbash"))  $this->article("RESTRICTED Bash", $shell_found);
+                if (strstr($shell_found, "rksh"))  $this->article("Korn Shell in restricted mode", $shell_found);
+                if (strstr($shell_found, "rzsh"))  $this->article("RESTRICTED SHELL", $shell_found);
+                if (strstr($shell_found, "rssh"))  $this->article("Restricted Secure Shell", $shell_found);
             }
             return FALSE;
         }

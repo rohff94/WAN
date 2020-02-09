@@ -1,6 +1,6 @@
 <?php
 
-class poc4service extends poc4root {
+class poc4service extends poc4net {
     
     
     public function __construct() {

