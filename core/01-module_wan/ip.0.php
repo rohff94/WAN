@@ -901,11 +901,21 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	public function ip2fw4ack(){
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
-	    if ($this->checkBD($sql_r_1) ) {$result = $this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where ");echo $result;return $result;}
+	    if ($this->checkBD($sql_r_1) ) {
+	        $result = $this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where ");
+	        echo $result."\n";
+	        if ($result=="filtered") { $chaine = "This Host is Protected By Firewall";$this->note($chaine);}
+	        if ($result=="unfiltered") {$chaine = "This Host is not Protected By Firewall";$this->rouge($chaine);}
+	        
+	        return $result;
+	    }
 	    else {
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sA -Pn -n --reason -p 80 $this->ip -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/state/@state";
         $result = trim($this->req_ret_str($query));
-		return $this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result);
+        if ($result=="filtered") { $chaine = "This Host is Protected By Firewall";$this->note($chaine);}
+        if ($result=="unfiltered") {$chaine = "This Host is not Protected By Firewall";$this->rouge($chaine);}
+        
+        return $this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result);
 	    }
 	}
 	

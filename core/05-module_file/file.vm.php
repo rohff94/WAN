@@ -586,11 +586,12 @@ function vm2exec_ret( $cmd) {
 }
 
 function vm2check_online() {
+    $resu_vm = array();
 	exec("vmrun -T ws List | grep $this->vmx_name", $resu_vm);
 	if (empty($resu_vm [0]))
 		return FALSE;
 	else
-		return $resu_vm [0];
+		return TRUE;
 }
 
 function vm2start() {

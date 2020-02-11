@@ -590,7 +590,7 @@ class DOMAIN extends ETH{
 		    $this->str2file($search, $file_path);
 		}
 		$query = "cat $file_path | grep -Po \"([0-9a-zA-Z\.\-_]{1,})@$this->domain\" | sort -u ";
-		return $this->req_ret_tab($query);
+		return $this->req_ret_str($query);
 
 	}
 

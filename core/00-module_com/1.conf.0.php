@@ -319,7 +319,7 @@ public function screenshot($seconde){
 
 	    $final = strftime('%T', mktime(0, 0, $sec)) . str_replace('0.', '.', sprintf('%.3f', $micro));
 
-	    $this->note("Spending $final");
+	    $this->note("Spending Time $final");
 	}
 	
 	// blanc sur fond rouge
