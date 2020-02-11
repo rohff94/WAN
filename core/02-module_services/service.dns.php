@@ -1,6 +1,7 @@
 <?php
 
 
+
 class service2dns extends SERVICE {
 
 

@@ -14,6 +14,14 @@ class DOMAIN extends ETH{
 	var $tab_dns ;
 	var $domain2id ;
 	var $domain2where ;
+	
+	var $path_theHarvester ;
+	var $path_sublist3r ;
+	var $path_fping ;
+	var $path_nmap ;
+	var $path_whois ;
+	var $path_dig ;
+	var $path_nslookup;
 
 
 	public function __construct($eth,$domain) {
@@ -38,16 +46,11 @@ class DOMAIN extends ETH{
 			$sql_w = "INSERT  INTO ".__CLASS__." (id8eth,domain) VALUES ('$this->eth2id','$this->domain'); ";
 			$this->mysql_ressource->query($sql_w);
 			echo $this->note("Working on DOMAIN:$this->domain ");
-			$sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->domain2where ";
-			$this->domain2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
-
 		}
-		else {
-		    $sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->domain2where ";
-		    $this->domain2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
 
-		}
 		
+		$sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->domain2where ";
+		$this->domain2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
 		
 		}
 		
@@ -247,8 +250,6 @@ class DOMAIN extends ETH{
 	    $result = "";
 	    $this->titre(__FUNCTION__);
 	    
-	    
-	///*
 	    //$result .= $this->domain2asn() ;$this->pause(); // NOT YET 
 	    $cidr = $this->domain2cidr() ;
 	    echo $this->tab($cidr);$this->pause();
@@ -260,7 +261,7 @@ class DOMAIN extends ETH{
 	        $fp = fopen($file_path_hosts, 'w+');
 	        foreach ($hosts as $host) {
 	            if(!empty($host) ){
-	                $data = "$this->eth $this->domain $host host4pentest FALSE";
+	                $data = "$this->eth $this->domain $host host4service FALSE";
 	                $data = $data."\n";
 	                fputs($fp,$data);
 	            }
@@ -307,7 +308,7 @@ class DOMAIN extends ETH{
 	            echo "\n$i/$size :$hosts[$i] =======================================================\n";
 	            $host = $hosts[$i];
 	            $obj_host = new HOST($this->eth, $this->domain,$host);
-	            $obj_host->host4pentest();
+	            $obj_host->host4service();
 	            
 	            $tmp_host = str_replace(".$this->domain","", $host);
 	            $tab_tmp_host = explode(".", $tmp_host);
@@ -320,7 +321,7 @@ class DOMAIN extends ETH{
 	                    $host_check = "$host_check_tmp$this->domain";
 	                    $obj_host2 = new HOST($this->eth, $this->domain,$host_check);
 	                    $this->pause();
-	                    $obj_host2->host4pentest();
+	                    $obj_host2->host4service();
 	                    $this->domain2host2check($host_check,10);
 	                    $this->pause();
 	                }
@@ -437,7 +438,7 @@ class DOMAIN extends ETH{
 	            $this->article("HOST8DOMAIN CHECK", $host_filtred);
 	            $this->pause();
 	            $obj_host_filtred = new HOST($this->eth, $this->domain,$host_filtred);
-	            $obj_host_filtred->host4pentest();$this->pause();
+	            $obj_host_filtred->host4service();$this->pause();
 	            
 	        }
 	        

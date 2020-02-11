@@ -3,6 +3,8 @@
 class com4user extends com4display {
     var $tab_sudo8app2shell;
     var $tab_sudo8app2read;
+    var $path_ssh ;
+    var $path_sshpass ;
     
     function __construct(){
         parent::__construct();

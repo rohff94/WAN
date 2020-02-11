@@ -232,12 +232,178 @@ Default location on Linux: /var/log/lastlog
 
 class com4for extends com4code{
 	
-	
+    
+    var $vmem_clean_win_xp;
+    
+    var $vmem_trojan_win_zeus;
+    var $vmem_trojan_win_zeus2;
+    var $vmem_trojan_win_Shylock;
+    var $vmem_trojan_win_silentbanker;
+    var $vmem_trojan_win_spyeye;
+    var $vmem_trojan_win_blackEnergy;
+    var $vmem_trojan_win_bob;
+    var $vmem_trojan_win_darkcomet;
+    var $vmem_trojan_win_aka ;
+    var $vmem_trojan_win_coreflood ;
+    var $vmem_trojan_win_all ;
+    
+    var $vmem_rootkit_win_sality;
+    var $vmem_rootkit_win_prolaco;
+    var $vmem_rootkit_win_tigger;
+    var $vmem_rootkit_win_hackerDefender ;
+    var $vmem_rootkit_win_laqma ; // http://10.50.10.170:8080/
+    var $vmem_rootkit_win_all;
+    
+    var $vmem_worm_win_cridex;
+    var $vmem_worm_win_stuxnet;
+    var $vmem_worm_win_all;
+    
+    var $vmem_inc_win_zaptis;
+    var $vmem_inc_win_boomer;
+    var $vmem_inc_win_ds;
+    var $vmem_inc_win_inc_1;
+    var $vmem_inc_win_inc_3;
+    var $vmem_inc_win_inc_all;
+    
+    var $vmem_rootkit_all;
+    var $vmem_clean_win_all;
+    
+    var $vmem_book_win_all ;
+    var $vmem_book_win_1 ;
+    var $vmem_book_win_2 ;
+    var $vmem_book_win_3 ;
+    var $vmem_book_win_4 ;
+    var $vmem_book_win_5 ;
+    var $vmem_book_win_6 ;
+    var $vmem_book_win_7 ;
+    var $vmem_book_win_8 ;
+    var $vmem_book_win_9 ;
+    
+    var $vmem_inject_pid ;
+    var $vmem_persistance_win_mz ;
+    var $vmem_persistance_win_dll ;
+    var $vmem_hook_usermode_syscall ;
+    var $vmem_hook_kernelmode_Trampoline ;
+    var $vmem_hook_usermode_got ;
+    var $vmem_hook_usermode_Trampoline ;
+    var $vmem_ssdt ;
+    var $vmem_code_inject_win ;
+    var $vmem_code_inject_lin ;
+    
+    var $vmem_book_linux_all ;
+    var $vmem_book_linux_1 ;
+    var $vmem_book_linux_2 ;
+    var $vmem_book_linux_3 ;
+    var $vmem_book_linux_4 ;
+    var $vmem_book_linux_5 ;
+    var $vmem_book_linux_6 ;
+    
+    var $vmem_rootkit_lin_kbeast ;
+    var $vmem_rootkit_lin_azazel ;
+    var $vmem_rootkit_lin_all ;
+    
+    var $vmem_win_all;
+    var $vmem_lin_all;
+    var $vmem_all;
+    
+    var $path_volatility ;
+    
 
     public function __construct() {
 	parent::__construct();
 	
-
+	
+	$this->vmem_clean_win_xp = array("XP CLEAN","$this->dir_tmp/xp-clean.bin","WinXPSP3x86");
+	$this->vmem_clean_win_all = array_merge($this->vmem_clean_win_xp);
+	
+	$this->vmem_trojan_win_zeus = array("ZEUS Trojan","$this->dir_tmp/Trojan_Zeus.vmem","WinXPSP2x86");
+	$this->vmem_trojan_win_zeus2 = array("ZEUS Trojan 2","$this->dir_tmp/Trojan_Zeus2x4.vmem","WinXPSP2x86");
+	$this->vmem_trojan_win_Shylock = array("SHYLOCK Trojan","$this->dir_tmp/Trojan_Shylock.vmem","WinXPSP2x86");
+	$this->vmem_trojan_win_silentbanker = array("SilentBanker Trojan","$this->dir_tmp/Trojan_Silentbanker.vmem","WinXPSP2x86");
+	$this->vmem_trojan_win_spyeye = array("SPYEYE Trojan","$this->dir_tmp/Trojan_Spyeye.vmem","WinXPSP2x86");
+	$this->vmem_trojan_win_blackEnergy = array("Trojan_BlackEnergy_2","$this->dir_tmp/Trojan_BlackEnergy_2.vmem","WinXPSP2x86");
+	$this->vmem_trojan_win_bob = array("Trojan Bob","$this->dir_tmp/Trojan_Bob.vmem","WinXPSP2x86");
+	$this->vmem_trojan_win_darkcomet = array("DARKCOMET Trojan","$this->dir_tmp/Trojan_DarkComet_RAT.vmem","Win7SP1x86");
+	$this->vmem_trojan_win_aka = array("Trojan R2D2 - Aka","$this->dir_tmp/Trojan_Aka.vmem","WinXPSP2x86"); // est un rootkit, a modifier later
+	$this->vmem_trojan_win_coreflood = array("coreflood","$this->dir_tmp/Trojan_Coreflood.vmem","WinXPSP2x86");
+	$this->vmem_trojan_win_all = array_merge($this->vmem_trojan_win_zeus,$this->vmem_trojan_win_zeus2,$this->vmem_trojan_win_Shylock,$this->vmem_trojan_win_silentbanker,$this->vmem_trojan_win_coreflood,$this->vmem_trojan_win_spyeye,$this->vmem_trojan_win_blackEnergy,$this->vmem_trojan_win_aka);// $this->vmem_trojan_win_darkcomet,
+	
+	$this->vmem_rootkit_win_sality = array("ROOTKIT sality","$this->dir_tmp/Rootkit_Sality.vmem","WinXPSP2x86");
+	$this->vmem_rootkit_win_prolaco = array("ROOTKIT prolaco","$this->dir_tmp/Rootkit_Prolaco.vmem","WinXPSP2x86");
+	$this->vmem_rootkit_win_tigger = array("ROOTKIT tigger","$this->dir_tmp/Rootkit_Tigger.vmem","WinXPSP2x86");
+	$this->vmem_rootkit_win_hackerDefender = array("ROOTKIT Hacker Defender","$this->dir_tmp/rootkit4win_user2hackerDefender.vmem","WinXPSP3x86");
+	$this->vmem_rootkit_win_laqma = array("Rootkit LAQMA","$this->dir_tmp/Rootkit_Laqma.vmem","WinXPSP2x86");
+	$this->vmem_rootkit_win_all = array_merge($this->vmem_rootkit_win_sality,$this->vmem_rootkit_win_prolaco,$this->vmem_rootkit_win_tigger,$this->vmem_rootkit_win_hackerDefender,$this->vmem_rootkit_win_laqma);
+	
+	$this->vmem_worm_win_cridex = array("WORM CRIDEX","$this->dir_tmp/Worm_Cridex.vmem","WinXPSP2x86");
+	$this->vmem_worm_win_stuxnet = array("WORM Stuxnet","$this->dir_tmp/Worm_Stuxnet.vmem","WinXPSP3x86");
+	$this->vmem_worm_win_all = array_merge($this->vmem_worm_win_cridex,$this->vmem_worm_win_stuxnet);
+	
+	$this->vmem_inc_win_boomer = array("boomer","$this->dir_tmp/Boomer-2006-03-17.vmem","Win2003SP0x86");
+	$this->vmem_inc_win_ds = array("ds_fuzz_hidden_proc","$this->dir_tmp/ds_fuzz_hidden_proc.vmem","WinXPSP3x86");
+	$this->vmem_inc_win_inc_1 = array("Win2008SP1x86","$this->dir_tmp/Win2008SP1x86.vmem","Win2008SP1x86");
+	$this->vmem_inc_win_inc_3 = array("xp-laptop_WinXPSP2x86-2005-06-25","$this->dir_tmp/xp-laptop-2005-06-25.vmem","WinXPSP2x86");
+	$this->vmem_inc_win_all = array_merge($this->vmem_inc_win_boomer,$this->vmem_inc_win_ds,$this->vmem_inc_win_inc_1,$this->vmem_inc_win_inc_3);
+	
+	$this->vmem_book_win_1 = array("Book","$this->dir_tmp/sample001.bin","WinXPSP2x86");
+	$this->vmem_book_win_2 = array("Book","$this->dir_tmp/sample002.bin","WinXPSP2x86");
+	$this->vmem_book_win_3 = array("Book","$this->dir_tmp/sample003.bin","WinXPSP2x86");
+	$this->vmem_book_win_4 = array("Book","$this->dir_tmp/sample004.bin","WinXPSP2x86");
+	$this->vmem_book_win_5 = array("Book","$this->dir_tmp/sample005.bin","WinXPSP2x86");
+	$this->vmem_book_win_6 = array("Book","$this->dir_tmp/sample006.bin","WinXPSP2x86");
+	$this->vmem_book_win_7 = array("Book","$this->dir_tmp/sample007.bin","WinXPSP2x86");
+	$this->vmem_book_win_8 = array("Book","$this->dir_tmp/sample008.bin","WinXPSP2x86");
+	$this->vmem_book_win_9 = array("Book","$this->dir_tmp/sample009.bin","WinXPSP2x86");
+	$this->vmem_book_win_all = array_merge($this->vmem_book_win_1,$this->vmem_book_win_2,$this->vmem_book_win_3,$this->vmem_book_win_4,$this->vmem_book_win_5,$this->vmem_book_win_6,$this->vmem_book_win_7,$this->vmem_book_win_8,$this->vmem_book_win_9);
+	
+	$this->vmem_code_inject_win = array("Code Inject into Explorer","$this->dir_tmp/code_inject_msf_migrate_explorer_PID1372_WinXPSP3x86.vmem","WinXPSP3x86");
+	
+	$this->vmem_win_all = array_merge($this->vmem_clean_win_all,$this->vmem_worm_win_all,$this->vmem_rootkit_win_all,$this->vmem_trojan_win_all,$this->vmem_inc_win_all,$this->vmem_book_win_all,$this->vmem_code_inject_win);
+	
+	
+	// ######################### Linux .VMEM ##################################################
+	
+	$this->vmem_rootkit_lin_kbeast = array("Rootkit Kernel LAND KBEASTv1","$this->dir_tmp/rootkit4linux_kernel_kbeastv1_ub10040_2.6.32-21-generic.vmem","LinuxUbuntu10040x86");
+	$this->vmem_rootkit_lin_azazel = array("Rootkit USER LAND AZAZEL","$this->dir_tmp/rootkit4linux_user2azazel_ub1404_3.13.0-32-generic.vmem","LinuxUbuntu14041x86");
+	$this->vmem_rootkit_lin_jynx2 = array("Rootkit USER LAND JYNX2","$this->dir_tmp/rootkit4linux_user2jynx2_ub14041x86_2.6.32-21-generic.vmem","LinuxUbuntu14041x86");
+	$this->vmem_rootkit_lin_avgcoder = array("Rootkit KERNEL LAND avgcoder","$this->dir_tmp/rootkit4linux_kernel_avgcoder_ub1404_3.13.0-32-generic.vmem","LinuxUbuntu14043x86");
+	$this->vmem_rootkit_lin_all = array_merge($this->vmem_rootkit_lin_kbeast,$this->vmem_rootkit_lin_azazel);
+	
+	
+	$this->vmem_code_inject_lin = array("Code Inject into PID on Linux","$this->dir_tmp/code_inject_linux_LinuxUbuntu1404x86.vmem","LinuxUbuntu1404x86");
+	
+	
+	$this->vmem_book_linux_1 = array("Book","$this->dir_tmp/linux-sample-1.bin","Linuxbookx64");
+	$this->vmem_book_linux_2 = array("Book","$this->dir_tmp/linux-sample-2.bin","Linuxbookx64");
+	$this->vmem_book_linux_3 = array("Book","$this->dir_tmp/linux-sample-3.bin","Linuxbookx64");
+	$this->vmem_book_linux_4 = array("Book","$this->dir_tmp/linux-sample-4.bin","Linuxbookx64");
+	$this->vmem_book_linux_5 = array("Book","$this->dir_tmp/linux-sample-5.bin","Linuxbookx64");
+	$this->vmem_book_linux_6 = array("Book","$this->dir_tmp/linux-sample-6.bin","Linuxbookx64");
+	$this->vmem_book_linux_all = array_merge($this->vmem_book_linux_1,$this->vmem_book_linux_2,$this->vmem_book_linux_3,$this->vmem_book_linux_4,$this->vmem_book_linux_5,$this->vmem_book_linux_6);
+	
+	
+	$this->vmem_lin_all = array_merge($this->vmem_rootkit_lin_all,$this->vmem_book_linux_all,$this->vmem_code_inject_lin);
+	
+	
+	
+	
+	$this->vmem_all = array_merge($this->vmem_win_all,$this->vmem_lin_all);
+	
+	
+	$this->vmem_inject_pid = array($this->vmem_worm_win_cridex,$this->vmem_worm_win_stuxnet,$this->vmem_rootkit_win_laqma,$this->vmem_trojan_win_spyeye,$this->vmem_rootkit_win_sality,$this->vmem_trojan_win_Shylock,$this->vmem_trojan_win_silentbanker,$this->vmem_trojan_win_blackEnergy); // add $this->vmem_trojan_win_bob,
+	
+	//$this->vmem_inject_pid = array($this->vmem_trojan_win_zeus,$this->vmem_worm_win_cridex,$this->vmem_worm_win_stuxnet,$this->vmem_rootkit_win_laqma,$this->vmem_trojan_win_spyeye,$this->vmem_rootkit_win_sality,$this->vmem_trojan_win_Shylock,$this->vmem_trojan_win_silentbanker,$this->vmem_trojan_win_blackEnergy); // add $this->vmem_trojan_win_bob,
+	$this->vmem_persistance_win_mz = array($this->vmem_trojan_win_zeus,$this->vmem_trojan_win_Shylock,$this->vmem_trojan_win_spyeye,$this->vmem_worm_win_cridex); // $this->vmem_trojan_win_bob,
+	$this->vmem_persistance_win_dll = array($this->vmem_trojan_win_aka);
+	$this->vmem_hook_usermode_syscall = array($this->vmem_worm_win_stuxnet);
+	$this->vmem_hook_kernelmode_Trampoline = array($this->vmem_trojan_win_blackEnergy);
+	$this->vmem_hook_usermode_got = array($this->vmem_trojan_win_Shylock,$this->vmem_trojan_win_coreflood); // ,$this->vmem_trojan_win_bob,$this->vmem_trojan_win_darkcomet
+	$this->vmem_hook_usermode_Trampoline = array($this->vmem_worm_win_cridex,$this->vmem_trojan_win_zeus,$this->vmem_trojan_win_silentbanker,$this->vmem_trojan_win_spyeye,$this->vmem_rootkit_win_prolaco,$this->vmem_rootkit_win_hackerDefender);
+	$this->vmem_ssdt = array($this->vmem_trojan_win_blackEnergy,$this->vmem_rootkit_win_laqma,$this->vmem_worm_win_stuxnet); // $this->vmem_trojan_win_darkcomet,
+	$this->vmem_rootkit_all = array_merge($this->vmem_rootkit_win_all,$this->vmem_rootkit_lin_all);
+	
+	############################################################################################################
+	
 	}
 	
 	public function vol2start($profile){
@@ -342,6 +508,93 @@ to disassemble the dumped code resp. alerted functions 	");
 	}
 	}
 	}
+	
+	
+	
+	function linux_memory_acquisition() {
+	    $this->gtitre("Memory Acquisition");
+	    $this->article(" /dev/mem and /dev/kmem", " are character device files (or “special files”) that provide access to system memory.
+ /dev/mem provides access to physical memory; byte addresses in mem are interpreted as physical memory addresses.
+ /dev/kmem provides access to the virtual address space of the operating system kernel. Unlike mem, kmem uses virtual memory addresses.");
+	    
+	    $this->titre("Physical Memory Acquisition");
+	    $this->ssTitre("With dc3dd");
+	    $this->requette("dc3dd if=/dev/mem of=$rep_path/mem_physical_dc3dd_mem.dmp");
+	    $this->ssTitre("with MemDump");
+	    $this->requette("memdump > $rep_path/mem_physical_memdump.dmp");
+	    $this->ssTitre("Collecting the /proc/kcore file");
+	    $this->article("/proc/kcore", "Linux systems (and other modern versions of UNIX) have a “ /proc ” directory that contains a virtual file system with files that represent the current state
+of the kernel.
+The file /proc/kcore contains all data in physical memory in ELF format.
+Collect the contents of this file in addition to a raw memory dump, because the ELF-formatted data in /proc/kcore can be examined using the GNU Debugger(gdb).");
+	    $this->requette("dc3dd if=/dev/kcore of=$rep_path/mem_physical_dc3dd_kcore.dmp");
+	    $this->titre("LIME"); // Later
+	    $this->cmd("localhost", "svn checkout http://lime-forensics.googlecode.com/svn/trunk/ lime-forensics-read-only");
+	    
+	    $this->ssTitre("Dump the memory info into our image via lime");
+	    $this->cmd("localhost", " sudo insmod lime-3.2.0-51-generic.ko \"path=./ubuntu.lime format=lime\"");
+	    
+	    $this->ssTitre("Via network, victim");
+	    $this->cmd("localhost", " insmod lime.ko \"path=tcp:4444 format=lime\" ");
+	    
+	    $this->ssTitre("uploading LIME Image for RAM");
+	    $this->cmd("localhost", "nc target-ip port > memdump.lime");
+	}
+	
+	function os_get_memory_vm($host) {
+	    $this->titre("Dump Memory on Virtual Machine");
+	    $this->ssTitre("Virtual Machine Memory Acquisition");
+	    $this->article("On VMware (Fusion/Workstation/Server/Player)", " on the virtual machine, acquiring the memory image is easy, you can do it by suspending the VM and grabbing the “.vmem” file, .vmem file = raw memory image");
+	    $this->article("On Microsoft Hyper-V", ".bin file = raw memory image");
+	    $this->article("Parallels", ".mem file = raw memory image");
+	    $this->article("VirtualBox", ".sav file = partial memory image");
+	    
+	    // vm_suspend($host);
+	}
+	
+	
+	
+	
+	function os_get_memory() {
+	    // Win32dd/Win64dd, Memoryze, DumpIt, FastDump
+	    gtitre("Memory Acquisition");
+	    os_get_memory_no_vm ();
+	    os_get_memory_vm($xp);
+	}
+	function os_get_memory_no_vm() {
+	    titre("Dump Memory on No Virtual Machine");
+	    $this->article("Dump Memory on No Virtual Machine", " On the physical machine you can use tools like Win32dd/Win64dd, Memoryze, DumpIt, FastDump.");
+	    $this->ssTitre("Dump Memory On Windows");
+	    $this->article("Recuperation de la RAM", "Dans le cas d’un WINDOWS et dans certaines conditions, l’extraction de la mémoire à partir du fichier hiberfil.sys suffit, en effet, ce fichier est utilisé par Windows pour stocker l'état courant de votre ordinateur (le contenu de la mémoire, les applications et documents ouverts, etc.) lors d'une mise en veille prolongée.");
+	    $this->cmd($xp, "python vol.py -f /tmp/hiberfil.sys --profile=WinXPSP2x86 imagecopy -O > $dir_tmp/winxp_sp2_ram.img");
+	    // dd if=\\.\PhysicalMemory of=c:\xp-2005-07-04-1430.img conv=noerror
+	    $this->net("http://www.moonsols.com/windows-memory-toolkit/");
+	    $this->cmd($xp, "DumpIt.exe");
+	    $this->cmd($xp, "mdd_1.3.exe -o C:\MEMORY.DMP");
+	    $this->ssTitre("Extract Memory from Hibernation File (hiberfil.sys) ");
+	    $this->article("Hibernation File", "\n• Contains a compressed RAM Image\n• %SystemDrive%/hiberfil.sys");
+	    $this->article("Exemple", "Example: Extract hibernation file memory and save to a USB DRIVE\n
+D:\> hibr2bin D:\hiberfil.sys E:\hibernation_memory.img	");
+	    $this->article("resume", "Windows
+Live system
+–  win32dd.exe
+o  http://win32dd.msuiche.net/
+o  Computes MD5 hash of memory image file
+–  mdd.exe
+o  http://www.mantech.com/msma/mdd.asp
+–  Memoryze
+o  http://www.mandiant.com/software/memoryze.htm
+Dead system
+–  Compressed RAM in Hibernation File (hiberfil.sys)");
+	    // pause();
+	    
+	    $this->ssTitre("Dump Memory On Linux");
+	    $this->cmd("localhost", "memdump > $dir_tmp/$ub_ram.img");
+	    // dd if=/dev/fmem of=memory.dd bs=1MB count=512
+	    $this->net("https://code.google.com/p/lime-forensics/downloads/list");
+	    $this->ssTitre("Via Metasploit run memdump");
+	}
+	
 	
 	
 	public function vol2exec4dot($cmd,$profile){

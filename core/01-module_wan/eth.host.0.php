@@ -5,6 +5,7 @@ class HOST extends DOMAIN{
     
     
     var $host;
+    var $path_dmitry ;
 
     
     
@@ -110,7 +111,7 @@ class HOST extends DOMAIN{
         return $this->req2BD(__FUNCTION__,__CLASS__,"host = '$this->host'",$query);
     }
     
-    public function host4pentest() {
+    public function host4service() {
         $this->gtitre(__FUNCTION__);
        
         $host_ips = $this->host4ip($this->host);

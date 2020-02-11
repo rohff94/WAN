@@ -36,21 +36,13 @@ class IP extends DOMAIN{
     var $tab_open_ports_udp ;
     var $tab_open_ports_all;
     var $tab_cve_source ;
-
-
+    
+    var $path_xmlstarlet ;
+    var $path_elinks ;
+    var $path_faraday ;
+    var $path_openvas ;
     
 
-
-
-   // var $firewalled ;
-	
-	//var $port_open;
-
-	
-    // update IP SET ip2tcp4select=NULL, ip2tcp4top4000=NULL where ip2tcp4select='' ;
-    // DELETE FROM HOST WHERE host2ip IS NULL ;
-    
-    
 	
     public function __construct($eth,$domain,$ip) {	
 		$ip_addr = trim($ip);
@@ -62,9 +54,7 @@ class IP extends DOMAIN{
 		if (empty($ip)) return $this->rouge("EMPTY IP");
 		if ( ($this->isIPv4($ip_addr)) || ($this->isIPv6($ip_addr)) ) {
 		    $this->ip = $ip_addr;
-		    //$query = "echo '".$this->ip2host("")."' | sed \"s/\.$//g\" | grep -Po \"[0-9a-zA-Z_-]{1,}\.[0-9a-zA-Z]{2,5}$\" ";
-		    //$this->domain = trim($this->req_ret_str($query));
-		}
+		   }
 		if ( (!$this->isIPv4($ip_addr)) && (!$this->isIPv6($ip_addr)) ) 
 		{
 			$ip_tab = $this->host4ip($ip_addr);
@@ -81,27 +71,19 @@ class IP extends DOMAIN{
 		}
 		parent::__construct($eth,$domain);
 		$this->ip2where = "id8eth = $this->eth2id AND ip = '$this->ip'";
-		//$this->cidr = trim($this->ip2cidr4range());
-		//$this->port_open = str_replace("\n", ",", trim($this->ip2port()));
-		 
-
 		
 		$sql_r = "SELECT ip FROM ".__CLASS__." WHERE $this->ip2where ORDER BY ladate DESC LIMIT 1";
 		if (!$this->checkBD($sql_r)) {
 		$sql_w = "INSERT  INTO ".__CLASS__." (id8domain,id8eth,ip) VALUES ('$this->domain2id','$this->eth2id','$this->ip'); ";
-		//echo "$sql_w\n";
 		$this->mysql_ressource->query($sql_w);	
-		//$this->cmd("localhost","echo '$this->root_passwd' | sudo -S tshark -i $this->eth_wlan  host $this->ip -w $this->dir_tmp/$this->ip.pcap");
 		echo $this->note("Working on IP:$this->ip for the first time");
-		$sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->ip2where ";
-		echo "$sql_r\n";
-		$this->ip2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
 		$this->watching();
 		}
 		else {
-		    $sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->ip2where ";
-		    $this->ip2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];	    
+	    
 		}
+		$sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->ip2where ";
+		$this->ip2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
 
 	}
 	
@@ -1163,12 +1145,13 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	
 	public function ip2auth(){
 	    $result = "";
+	    $this->titre(__FUNCTION__);
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) {
 	        return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    }
 	    else {
-	        $this->titre(__FUNCTION__);
+	        
 	        $sql_service = "select DISTINCT service2name,port,protocol from PORT where id8port = '$this->port2id' AND (service2name = 'asterisk' OR service2name LIKE '%ftp%'  OR service2name = 'icq' OR service2name = 'imap' OR service2name = 'imaps' OR service2name = 'ldap2' OR service2name = 'ldap2s' OR service2name = 'ldap3' OR service2name = 'mssql' OR service2name = 'mysql' OR service2name = 'nntp' OR service2name = 'oracle-listener' OR service2name = 'oracle-sid' OR service2name = 'pcanywhere' OR service2name = 'postgres' OR service2name = 'rlogin'  OR service2name LIKE '%rdp%' OR service2name = 'sip' OR service2name = 'ssh' OR service2name LIKE '%smb%' OR service2name LIKE '%samba%' OR service2name = 'snmp' OR service2name = 'smtp' OR service2name = 'smtps' OR service2name = 'vnc' OR service2name = 'xmpp') ORDER BY port  ;";
 		    $this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_service\"  2>/dev/null ");
 		    
@@ -1331,7 +1314,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
-		$query = "mysql --user=root --password=hacker --database=geoip --execute=\"CALL geoipbloc(\\\"$this->ip\\\");\" 2> /dev/null | tail -1 ";
+		$query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=geoip --execute=\"CALL geoipbloc(\\\"$this->ip\\\");\" 2> /dev/null | tail -1 ";
 		$result .= $this->cmd("localhost",$query);
 		$result .= $this->req_ret_str($query);
 		return $result;
@@ -1457,7 +1440,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	                
 	                foreach ($port as $port_num => $protocol){
                     
-                    $data = "$this->eth $this->domain $this->ip $port_num $protocol port2version FALSE";
+                    $data = "$this->eth $this->domain $this->ip $port_num $protocol port4service FALSE";
 	                $data = $data."\n";
 	                fputs($fp,$data);
 	                         }
@@ -1496,7 +1479,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $this->gtitre(__FUNCTION__);
 	    $result = "";
 	    echo "=============================================================================\n";
-	    /*
+	    
 	    if(!$this->ip4priv($this->ip)){
 	    $this->rouge("Determining DOMAIN RANGE");
 	    $this->ip2asn();$this->pause();
@@ -1518,7 +1501,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $this->ip2tracert();$this->pause();
 	    $this->ip2icmp();$this->pause();
 	    $this->ip2cve();$this->pause();
-	    */
+	    
 	    $this->rouge("Enumeration");
 
 	    

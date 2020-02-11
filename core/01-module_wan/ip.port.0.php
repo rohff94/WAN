@@ -20,6 +20,8 @@ class PORT extends IP{
     var $protocol ;
     var $port2id;
     var $port2where ;
+
+    
     var $date_rec ;
     
 
@@ -172,7 +174,12 @@ class PORT extends IP{
 	    }
 	}
 	
-	
+	public function port4service(){
+	    $this->titre(__FUNCTION__);
+	    $this->port2version();
+	    $this->port2traceroute();
+	    
+	}
 	
 
 	public function port2fake($version_resu){
@@ -572,10 +579,30 @@ Linux 	64
 Solaris 	255
 Cisco / Network 	255
 	     */
-	    $query = "echo '$this->root_passwd' | sudo -S nmap  --traceroute  --reason  $this->ip -s$this->protocol -p $this->port -e $this->eth -Pn -oX - ";
-	    $this->req_ret_str($query);
+	    return $this->port2traceroute();
 	}
 
+
+	
+	public function port2traceroute(){
+	    //return "not checked";
+	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->port2where  AND ".__FUNCTION__." IS NOT NULL";
+	    if ($this->checkBD($sql_r_1) ) {
+	        return base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->port2where "));
+	    }
+	    else {
+	        
+	        $this->note("In a traceroute operation, a series of packets gets sent to a destination with very low Time-to-Live (TTL) values, starting at one up incrementing from
+there. As each packet dies, an ICMP Time Exceeded message gets sent back to the sender. Thus, the source and destination addresses stay the same, as well
+as the header options; the TTL changes.");
+	        $query = "echo '$this->root_passwd' | sudo -S nmap  --traceroute  --reason  $this->ip -s$this->protocol -p $this->port -e $this->eth -Pn -oX - | xmlstarlet sel -t -v /nmaprun/host/trace/hop";
+	        
+	        $result = $this->req_ret_str($query);
+	        $result = base64_encode($result);
+	        return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->port2where ",$result));
+	    }
+	}
+	
 	
 
 

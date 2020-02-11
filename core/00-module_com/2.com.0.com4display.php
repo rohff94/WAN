@@ -12,6 +12,9 @@ class com4display extends INSTALL {
     var $session_log_linux ;
     
     var $filter_file_path ;
+    var $path_grep ;
+    var $path_sort ;
+    var $path_strings ;
     
     
 	

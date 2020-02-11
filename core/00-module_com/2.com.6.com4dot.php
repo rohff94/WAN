@@ -5,6 +5,8 @@ class com4dot extends com4bin{
 	var $body ;
 	var $footer ;
 	var $file_dot ;
+	
+	var $path_xdot ;
 
 
 

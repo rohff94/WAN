@@ -2,6 +2,7 @@
 
 class com4obj extends com4net {
     var $stream_timeout ;
+    var $path_parallel ;
     
     
     function __construct(){

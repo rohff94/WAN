@@ -5,7 +5,6 @@
 //  for i in `find . -type f -iname "*.php" | sort -u`;do echo -e "include_once(\"$i\");" | tac | uniq | grep 'core' | grep -v "all.inc" | tee -a ./all.inc.class.php.bak ;done
 
 
-include_once("./core/00-module_com/0.inter.intro.php");
 include_once("./core/00-module_com/1.conf.0.php");
 include_once("./core/00-module_com/1.conf.install.0.php");
 include_once("./core/00-module_com/2.com.0.com4display.php");

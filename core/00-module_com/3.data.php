@@ -5,6 +5,8 @@ class DATA extends com4for {
 	var $mysql_ressource ;
 	var $clean_indb ;
 	var $flag_poc ;
+	
+
 
 
 	

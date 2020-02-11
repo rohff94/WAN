@@ -28,6 +28,7 @@ class INSTALL extends CONFIG{
 	var $mysql_database;
 	var $faraday_workspace_name;
 	var $root_passwd;
+	var $path_mysql ;
 
 
 	

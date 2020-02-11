@@ -4,15 +4,18 @@
 
 
 class AUTH extends PORT{
-    var $created_user_name;
-    var $created_user_pass;
+
+    var $path_rpcclient ;
+    var $path_hydra ;
+    var $path_medusa ;
+    var $path_ncrack ;
+    var $path_smbclient ;
     
 	// mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute="select service2vuln from PORT where service2vuln like '%valid%';"  2>/dev/null | grep -i -E "(Valid credentials|password)"o
     public function __construct($eth,$domain,$ip,$port,$service_protocol) {
 		// /usr/share/nmap/scripts/
         parent::__construct($eth,$domain,$ip,$port,$service_protocol);
-        $this->created_user_name = "sateam";
-        $this->created_user_pass = "sateam123456789";
+
 	}
 	
 

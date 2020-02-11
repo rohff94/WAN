@@ -20,15 +20,10 @@ class ETH extends DATA{
                 $sql_w = "INSERT  INTO ".__CLASS__." (eth) VALUES ('$this->eth'); ";
                 $this->mysql_ressource->query($sql_w);
                 echo $this->note("Interface $this->eth");
-                $sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->eth2where ";
-                $this->eth2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
-                
             }
-            else {
-                $sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->eth2where ";
-                $this->eth2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
-                
-            }
+
+            $sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->eth2where ";
+            $this->eth2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
             
             
         }

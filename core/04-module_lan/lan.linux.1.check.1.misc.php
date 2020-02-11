@@ -3,6 +3,9 @@
 class check4linux8misc extends check4linux8enum{
     var $tab_authorized_keys_hosts ;
     var $tab_private_keys ;
+    
+    var $created_user_name;
+    var $created_user_pass;
 
     
     /*
@@ -15,6 +18,8 @@ class check4linux8misc extends check4linux8enum{
      */
     public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context) {
         parent::__construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context);
+        $this->created_user_name = "syslog_admin";
+        $this->created_user_pass = "admin123456789";
     }
     
     

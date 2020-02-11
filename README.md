@@ -3,7 +3,7 @@
 
 DOMAIN:
 WAN$ php pentest.php DOMAIN "<interface> <domain> <function2run> <pause for true or false>"
-WAN$ php pentest.php DOMAIN "vmnet6 hack.vlan domain4pentest false"
+WAN$ php pentest.php DOMAIN "vmnet6 hack.vlan domain4service false"
 
 HOST : 
 WAN$ php pentest.php HOST "<interface> <domain> <hostname> <function2run> <pause for true or false>"

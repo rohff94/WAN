@@ -798,7 +798,7 @@ class SERVICE extends SERVICE4COM {
 	    $this->article("extrainfo",$this->service_extrainfo);
 	    $service2banner = $this->service2banner();$this->article("Banner",$service2banner);
 	    $service4cve = $this->service4cve();$this->article("CVE",$service4cve);
-
+	    $service4traceroute = $this->port2traceroute();$this->article("Traceroute Port",$service4traceroute);
 	    
 	    
 	    $port2root = $this->port2root8db($this->port2id);
