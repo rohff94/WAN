@@ -1,9 +1,13 @@
 <?php
 
-include "./class/0.all.inc.php";
+include "./core/0.all.inc.php";
 
 
 
+
+
+$exec = new DATA();
+$exec->start("Training Ethical Hacking", "");
 
 ##############################################################################
 // HACK 000

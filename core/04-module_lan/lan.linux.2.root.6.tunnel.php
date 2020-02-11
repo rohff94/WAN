@@ -1,36 +1,6 @@
 <?php 
 
-/*
-SSH Tunneling :
-Remote Port Forwarding
-SSH remote port forwarding allows us to tunnel a remote port to a local server.
-ssh sshserver -R <remote port to bind>:<local host>:<local port>
 
-Local Port Forwarding
-SSH local port forwarding allows us to tunnel a local port to a remote server, using SSH as the transport protocol.
-ssh sshserver -L <local port to listen>:<remote host>:<remote port>
-
-
-SSH as SOCKS Proxy
-We can use ssh to have a socks proxy to connect to vnc, ssh, rdp if vm is hosting in another vm and then use remmina to access VNC.
-ssh -D localhost:9050 user@host
--D [bind_address:]port Specifies a local “dynamic” application-level port forwarding.  This works by allocating a socket to listen to port on the local side, optionally bound to the specified bind_address.  Whenever a connection is made to this port, the connection is forwarded over the secure channel, and the application protocol is then used to determine where to connect to from the remote machine.  Currently the SOCKS4 and SOCKS5 protocols are supported, and ssh will act as a SOCKS server.  Only root can forward privileged ports. Dynamic port forwardings can also be specified in the configuration file.
-and
-proxychains4 remmina/ rdesktop
-
-VPN-like tunnelling?
-sshuttle Transparent proxy server that works as a poor man’s VPN. Forwards over ssh. Doesn’t require admin. Works with Linux and MacOS. Supports DNS tunneling.
-So if we have a access to device at 10.1.1.1, and it also has an interface on 192.168.122.0/24 with other hosts behind it, we can run:
-
-# sshuttle -r root@10.1.1.1 192.168.122.0/24
-root@10.1.1.1's password:
-client: Connected.
-
-This creates a VPN-like connection, allowing me to visit 192.168.122.4 in a browser or with curl, and see the result.
-
-
-
- */
 
 
 class tunnel4linux extends pivot4linux{

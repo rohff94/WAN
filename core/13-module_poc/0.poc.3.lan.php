@@ -9,6 +9,25 @@ class poc4lan extends poc4web {
    
     
     
+    public function poc4lan4crypto(){
+        // ######### CRYPTOGRAPHY #############
+        $this->poc4crypto();
+        // ###########################
+        
+        ssl ();
+        https ();
+        
+        // openssl s_client -host google.com -port 443 -prexit -showcerts
+        
+        // ssTitre("Creates a 2048-bit RSA key pair and generates a Certificate Signing Request for it");
+        // requette("openssl req -new -nodes -newkey rsa:2048 -keyout newprivate.key -out request.csr");
+        $this->pause();
+        // ###########################
+    }
+    
+    
+    
+    
     public function poc4root8users(){
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';

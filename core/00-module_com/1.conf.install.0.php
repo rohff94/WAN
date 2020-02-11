@@ -384,19 +384,19 @@ class INSTALL extends CONFIG{
 
 	function install4ub(){
 	    $this->gtitre(__FUNCTION__);
-	    /*
-	    //$this->ssTitre("Upgrade on Host");$this->update_dep();$this->pause();
+	    
+	    $this->ssTitre("Upgrade on Host");$this->update_dep();$this->pause();
 	    $this->install_soft();$this->pause();
 		$this->install_labs();$this->pause();
 		$this->install_scanner();$this->pause();
 		$this->ssTitre("Upgrade on Host");$this->update_dep();$this->pause();
-		//$this->install_malware();$this->pause();
-		//$this->install_bof();$this->pause();
+		$this->install_malware();$this->pause();
+		$this->install_bof();$this->pause();
 		 
-		 */
+		 
 		$this->install_exploit();$this->pause();
-		//$this->install_for();$this->pause();
-		//$this->ssTitre("Upgrade on Host");$this->update_dep();$this->pause();		
+		$this->install_for();$this->pause();
+		$this->ssTitre("Upgrade on Host");$this->update_dep();$this->pause();		
 	}
 	
 	

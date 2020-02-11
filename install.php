@@ -2,7 +2,8 @@
 
 include "./core/0.all.inc.php";
 
-
+$config = new DATA();
+$config->start("Training Ethical Hacking", "");
 
 $config_file_path = "./config.xml";
 
@@ -48,14 +49,9 @@ CFG;
 }
 
 
-$config = new DATA();
 
+$config->install4ub();
 
-
-
-$config->install_labs_ide_eclipse();
-$config->install_labs_geoip();
-$config->install_labs_bot();
 
 $config->requette("sudo chown $config->user2local:$config->user2local -R $config->racine");
 
