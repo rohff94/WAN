@@ -20,7 +20,7 @@ class CE extends PARAM4COM{
         $this->ce2shell($OS);$this->pause();
         //$this->ce2write($OS);$this->pause();
         //$this->ce2read($OS);$this->pause();
-        return $this->req2BD4in("param2ce","URI",$this->uri2where,"1");
+        //return $this->req2BD4in("param2ce","URI",$this->uri2where,"1");
         }
     }
     

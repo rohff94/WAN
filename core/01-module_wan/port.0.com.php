@@ -87,7 +87,7 @@ class SERVICE4COM extends AUTH {
     
     public function service4lan($cmd_rev,$templateB64_shell,$lport,$lprotocol){
         $templateB64_cmd = base64_encode($cmd_rev);
-        $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $lport $lprotocol $templateB64_shell $templateB64_shell server 660 listening_Server\" ";
+        $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $lport $lprotocol $templateB64_cmd $templateB64_shell server 60 listening_Server\" ";
         $time = 5 ;       
         $this->exec_parallel($cmd1, $cmd_rev, $time);
     }

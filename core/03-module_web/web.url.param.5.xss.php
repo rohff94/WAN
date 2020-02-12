@@ -28,7 +28,7 @@ class XSS extends XML{
         
         
         $result = base64_encode($result);
-        return base64_decode($this->req2BD4in("param2xss","URI",$this->uri2where,$result));
+        //return base64_decode($this->req2BD4in("param2xss","URI",$this->uri2where,$result));
         }
     }
    

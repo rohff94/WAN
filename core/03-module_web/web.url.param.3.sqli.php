@@ -28,7 +28,7 @@ class SQLI extends FI{
 	    
 
 	    $result = base64_encode($result);
-	    return base64_decode($this->req2BD4in("param2fi","URI",$this->uri2where,$result));
+	    //return base64_decode($this->req2BD4in("param2fi","URI",$this->uri2where,$result));
 	    }
 	}
 	

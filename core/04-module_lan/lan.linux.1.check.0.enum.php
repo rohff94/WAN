@@ -283,9 +283,6 @@ class check4linux8enum extends lan4linux{
         $result = "";
         $result .= $this->ssTitre(__FUNCTION__);
         
-        $open_server = "cd $this->dir_tmp; python -m SimpleHTTPServer $this->port_rfi ";
-        $this->cmd("localhost",$open_server );
-        // if (!$this->tcp2open($this->ip4addr4target($this->ip), $this->port_rfi)) {$this->rouge($open_server);exit();}
         if (!file_exists("$this->dir_tmp/lynis-master.tar.xz")) $this->requette("cp -v $this->dir_tools/lan/linux/lynis-master.tar.xz $this->dir_tmp/lynis-master.tar.xz ");
         // $data = "wget https://github.com/CISOfy/lynis/archive/master.zip -O  /tmp/lynis.zip && unzip /tmp/lynis.zip -d /tmp/ && /tmp/lynis-master/lynis audit system  > /tmp/lynis-master/lynis.rst && cat /tmp/lynis-master/lynis.rst && rm -vr /tmp/lynis-master";
         
@@ -319,10 +316,8 @@ class check4linux8enum extends lan4linux{
         $sql_r_1 = "SELECT ".__FUNCTION__." FROM LAN WHERE $this->lan2where AND ".__FUNCTION__." IS NOT NULL";
         if ($this->checkBD($sql_r_1) ) return base64_decode($this->req2BD4out(__FUNCTION__,"LAN","id8port = '$this->port2id'"));
         else {
-            $open_server = "cd $this->dir_tmp; python -m SimpleHTTPServer $this->port_rfi ";
-            $this->cmd("localhost",$open_server );
-            if (!$this->tcp2open($this->ip4addr4target($this->ip), $this->port_rfi)) {$this->rouge($open_server);exit();}
-            
+            $attacker_ip = $this->ip4addr4target($this->ip);
+            $this->tcp2open4server($attacker_ip, $this->port_rfi);
             
             $result .= $this->lan2tools4lynis();$this->pause();
             
@@ -440,11 +435,7 @@ This can be used to help determine the OS running and the last time it's been fu
         $this->note("Process binaries and associated permissions");
         $data = "ps aux 2>/dev/null | awk '{print $11}'|xargs -r ls -la 2>/dev/null |awk '!x[$0]++' 2>/dev/null";
         $this->lan2stream4result($data,$this->stream_timeout);
-        
-        
-
-        
-        
+              
         $this->note("lookup process binary path and permissisons");
         $data = "ps aux 2>/dev/null | awk '{print $11}'|xargs -r ls -la 2>/dev/null |awk '!x[$0]++' 2>/dev/null";
         $this->lan2stream4result($data,$this->stream_timeout);
@@ -453,9 +444,6 @@ This can be used to help determine the OS running and the last time it's been fu
         $this->note("running processes");
         $data = "ps aux 2>/dev/null";
         $this->lan2stream4result($data,$this->stream_timeout);
-        
-
-        
         
         $this->ssTitre("What applications are installed? What version are they? Are they currently running?");
         

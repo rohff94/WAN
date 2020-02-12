@@ -20,12 +20,8 @@ class PARAM extends XSS{
         // https://kalilinuxtutorials.com/sawef-send-attack/
         // /Windows/system.in
         $this->gtitre(__FUNCTION__);
-        
-        $port = $this->port_rfi;
-        $open_server = "cd $this->dir_tmp; python -m SimpleHTTPServer $port ";
-        //$this->cmd("localhost",$open_server );
-        if (!$this->tcp2open($this->ip4addr4target($this->ip), $port)) {$this->rouge($open_server);exit();}
-        
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $this->tcp2open4server($attacker_ip, $this->port_rfi);
         //$result .=  $this->param2hash();
   
         $this->fi4pentest($OS);$this->pause();

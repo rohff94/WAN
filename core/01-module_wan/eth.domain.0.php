@@ -490,12 +490,17 @@ class DOMAIN extends ETH{
 	    $result .= $this->domain2search4harvest();$this->pause();
 	    $result .= $this->domain2search4sublister();$this->pause();
 	    $result .= $this->domain2search4web();$this->pause();
-	    $dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
+	    //
 
 	    exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
 	    //echo $this->tab($tab_cidr);
 	    $size = count($tab_cidr);
-	    if($size<100)
+	    if($size<100){
+	        $dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
+	        exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
+	        //echo $this->tab($tab_cidr);
+	        $size = count($tab_cidr);
+	        if($size<100){
 	    for ($i=0;$i<$size;$i++){
 	        $cidr = $tab_cidr[$i];
 	        if (!empty($cidr)){
@@ -504,12 +509,11 @@ class DOMAIN extends ETH{
 	            $result .=	$this->cidr2scan($cidr);
 	        }
 	    }
-	    $file_path = "$this->dir_tmp/$this->domain.search";
-	    $this->str2file($result, $file_path);
-
 
 	    $result = base64_encode($result);
 	    return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,$this->domain2where,$result));
+	    }
+	    }
 	    }
 	}
 	

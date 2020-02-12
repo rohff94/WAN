@@ -289,7 +289,7 @@ class PORT extends IP{
 	    
 	    if ($service->protocol==='T') {
 	        if ($service->tcp2open($service->ip, $service->port)===FALSE){
-	            return $this->rouge("Port Not Open");
+	            return $this->rouge("Port Not Open, Maybe User Desktop OR Server using redondancy in Cloud");
 	        }
 	    }
 	    

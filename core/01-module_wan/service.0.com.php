@@ -9,6 +9,11 @@ class SERVICE extends SERVICE4COM {
     var $service_extrainfo ;
     var $service_banner ;
     var $service2where ;
+    
+    var $path_patator ;
+    var $path_ident_user_enum ;
+    var $path_OracleScanner ;
+    var $path_sidguess ;
 	
     public function __construct($eth,$domain,$ip,$port,$protocol,$service_name,$service_version,$service_product,$service_extrainfo) {
             parent::__construct($eth,$domain,$ip,$port,$protocol);	

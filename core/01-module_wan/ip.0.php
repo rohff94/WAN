@@ -301,7 +301,7 @@ class IP extends DOMAIN{
 	
 	
 	public function ip2port4service($service){
-	    $this->ssTitre(__FUNCTION__);
+	    $this->ssTitre("Searching service $service recorded on Database for this IP");
 	    $port = "";
 	    $service = trim($service);
 	    //$this->ip4service();
