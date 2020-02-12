@@ -79,7 +79,7 @@ public function  req2BD4out($colonne,$table,$where){
 
     $sql_d = "UPDATE $table set $colonne=NULL WHERE $where ";
     $texte = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_d;\"  2>/dev/null \n";
-    $this->article("IF YOU WANT TO DELETE THIS RECORD", $texte);
+    //$this->article("IF YOU WANT TO DELETE THIS RECORD", $texte);
     return $result;
 }
 

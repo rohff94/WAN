@@ -29,7 +29,7 @@ class poc4web extends poc4service{
         $url_fi = new URL($eth,$domain,$url);
         $url_fi->poc($this->flag_poc);
         $url_fi->url4pentest();
-        $url_fi = new PARAM($eth,$domain,$url,"page","arbitrary-file-inclusion.php");
+        $url_fi = new PARAM($eth,$domain,$url,"page","arbitrary-file-inclusion.php","GET");
         $url_fi->poc($this->flag_poc);
         $url_fi->fi4pentest($OS);
     }

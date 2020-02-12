@@ -93,18 +93,10 @@ Only root can forward privileged ports. Dynamic port forwardings can also be spe
         $this->note("default route configuration");
         $data = "ip r 2>/dev/null | grep default";
         $this->lan2stream4result($data,$this->stream_timeout);
-        
-        
-        
-        
-        
-        
+         
         $data = "systemd-resolve --status 2>/dev/null";
         $this->lan2stream4result($data,$this->stream_timeout);
-        
-        
-        
-        
+         
         $data = "hostname -f";
         $this->lan2stream4result($data,$this->stream_timeout);
         
@@ -137,10 +129,6 @@ Only root can forward privileged ports. Dynamic port forwardings can also be spe
 This is one way to find out IP addresses for other internal servers.");
         $data = "arp -a";
         $this->lan2stream4result($data,$this->stream_timeout);
-        
-        
-        
-        
         
         $data = "ip addr show  | grep 'global'  | grep 'inet'  | awk '{print $2 \" \" $7}'";
         $lines = $this->req_ret_tab("echo '".$this->lan2stream4result($data,$this->stream_timeout)."' | grep -v 'CMD:' ");

