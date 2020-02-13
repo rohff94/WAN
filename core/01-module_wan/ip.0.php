@@ -89,7 +89,7 @@ class IP extends DOMAIN{
 		    $ip_wan = $this->ip4net();
 		    if ($this->isIPv4($ip_wan)) {
 		        $this->article("WAN IP Attacker", $ip_wan);
-		        $this->article("WAN IP Attacker GeoLoc", $this->ip2geoip($ip_wan));
+		        $this->article("WAN IP Attacker GeoLoc", $this->ip2geo($ip_wan));
 		    }
 		    if (empty($ip_wan)) {
 		        $chaine = "Lost Connexion to the net";

@@ -68,7 +68,7 @@ public function  req2BD($colonne,$table,$where,$query){
 	}
 }
 
-public function ip2geoip($ip){
+public function ip2geo($ip){
     $ip = trim($ip);
     if (!empty($ip)){
         if (!$this->ip4priv($ip) ){
