@@ -68,6 +68,16 @@ public function  req2BD($colonne,$table,$where,$query){
 	}
 }
 
+public function ip2geoip($ip){
+    $ip = trim($ip);
+    if (!empty($ip)){
+        if (!$this->ip4priv($ip) ){
+   
+    $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=geoip --execute=\"CALL ip2city(\\\"$ip\\\");\"  2>/dev/null | grep -v loc ";
+    return  trim($this->req_ret_str($query));
+    }
+    }
+}
 
 public function  req2BD4out($colonne,$table,$where){
     $colonne = trim($colonne);$table = trim($table);$where = trim($where);
@@ -79,7 +89,7 @@ public function  req2BD4out($colonne,$table,$where){
 
     $sql_d = "UPDATE $table set $colonne=NULL WHERE $where ";
     $texte = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_d;\"  2>/dev/null \n";
-    //$this->article("IF YOU WANT TO DELETE THIS RECORD", $texte);
+    if ($this->flag_poc) $this->article("IF YOU WANT TO DELETE THIS RECORD", $texte);
     return $result;
 }
 

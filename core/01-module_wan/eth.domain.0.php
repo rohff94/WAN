@@ -495,12 +495,11 @@ class DOMAIN extends ETH{
 	    exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
 	    //echo $this->tab($tab_cidr);
 	    $size = count($tab_cidr);
-	    if($size<50){
-	        $dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
+	    if($size<20){
+	        //$dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
 	        exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
-	        //echo $this->tab($tab_cidr);
 	        $size = count($tab_cidr);
-	        if($size<100){
+	        if($size<50){
 	    for ($i=0;$i<$size;$i++){
 	        $cidr = $tab_cidr[$i];
 	        if (!empty($cidr)){
