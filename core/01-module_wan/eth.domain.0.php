@@ -331,7 +331,7 @@ class DOMAIN extends ETH{
 	    }
 	    
 	    
-	    
+	    /*
 	    
 	    if(!empty($ips)){
 
@@ -349,8 +349,6 @@ class DOMAIN extends ETH{
 	        }
 	        }
 	    }
-	    
-	    //*/
 	    
 	    
 	    $ips_cidrs = array();
@@ -412,7 +410,7 @@ class DOMAIN extends ETH{
 	        }
 	    }
 	    
-	    
+	    */
 	    
 	    
 	    
@@ -487,7 +485,7 @@ class DOMAIN extends ETH{
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->domain2where AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->domain2where));
 	    else {
-	    $result .= $this->domain2search4harvest();$this->pause();
+	    //$result .= $this->domain2search4harvest();$this->pause();
 	    $result .= $this->domain2search4sublister();$this->pause();
 	    $result .= $this->domain2search4web();$this->pause();
 	    //

@@ -85,11 +85,12 @@ class IP extends DOMAIN{
 		$this->ip2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
 		
 		if ($this->ip4priv($this->ip)) $this->article("Private IP", $this->ip);
+		
 		if (!$this->ip4priv($this->ip)) {
 		    $ip_wan = $this->ip4net();
 		    if ($this->isIPv4($ip_wan)) {
 		        $this->article("WAN IP Attacker", $ip_wan);
-		        $this->article("WAN IP Attacker GeoLoc", $this->ip2geo($ip_wan));
+		        //$this->article("WAN IP Attacker GeoLoc", $this->ip2geo($ip_wan));
 		    }
 		    if (empty($ip_wan)) {
 		        $chaine = "Lost Connexion to the net";
