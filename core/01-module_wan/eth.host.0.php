@@ -11,7 +11,12 @@ class HOST extends DOMAIN{
     
     public function __construct($eth,$domain,$host) {
         parent::__construct($eth,$domain);
+        
         $this->host = trim($host);	
+        if (empty($this->host)) {
+            $this->rouge("Empty Host");
+            exit();
+        }
     }
     
     

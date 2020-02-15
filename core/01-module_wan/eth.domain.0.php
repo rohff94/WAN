@@ -269,21 +269,7 @@ class DOMAIN extends ETH{
 	        fclose($fp);
 	    }
 	    
-	    
-	    $ips = $this->domain2ip() ;
-	    echo $this->tab($ips);$this->pause();
-	    if(!empty($ips)){
-	        $file_path_ips = "/tmp/$this->eth.$this->domain.ips";
-	        $fp = fopen($file_path_ips, 'w+');
-	        foreach ($ips as $ip) {
-	            if(!empty($host) ){
-	                $data = "$this->eth $this->domain $ip ip4service FALSE";
-	                $data = $data."\n";
-	                fputs($fp,$data);
-	            }
-	        }
-	        fclose($fp);
-	    }
+
 	    
 	    $mails = $this->domain2mail() ;
 	    echo $mails;$this->pause();
@@ -330,89 +316,7 @@ class DOMAIN extends ETH{
 	        }
 	    }
 	    
-	    
-	    /*
-	    
-	    if(!empty($ips)){
 
-	        
-	        $this->run4split4ip($file_path_ips, 8);
-	        
-	        $size = count($ips);
-	        for($i=0;$i<$size;$i++){
-	            if ( (!$this->isIPv4($ip)) || (!$this->isIPv6($ip)) ){
-	                echo "\n$i/$size : $ips[$i] =======================================================\n";
-	            $this->article("IP8DOMAIN $i/$size", $ips[$i]);
-	            $obj_ip = new IP($this->eth, $this->domain,$ips[$i]);
-	            $obj_ip->ip4service();
-	            echo "END $obj_ip->ip =====================================================================\n";
-	        }
-	        }
-	    }
-	    
-	    
-	    $ips_cidrs = array();
-	    $sql_r = "SELECT ip FROM IP WHERE id8domain = '$this->domain2id' ";
-	    $req = $this->mysql_ressource->query($sql_r);
-	    while ($row = $req->fetch_assoc()) {
-	        $ip_tmp = trim($row['ip']);
-	        $ips_cidrs[] = trim($this->ip4cidr($ip_tmp));
-	    }
-	    
-
-	    
-	    $counts = array_count_values($ips_cidrs);
-	    foreach ($counts as $cidr => $val){
-	        $cidr = trim($cidr);
-	        $val = trim($val);
-	        $val = intval($val);
-	        if ( (!empty($cidr)) && (!empty($val)) ){
-	        
-	        //$this->pause();
-	        if (5<$val) {
-	            $this->article("CIDR $cidr", $val);
-	            $file_path_ips_cidr = "/tmp/$this->eth.$this->domain.$cidr.ips.cidr";
-	            $fp = fopen($file_path_ips_cidr, 'w+');
-	            for ($i=1;$i<256;$i++){
-	                $ip = "$cidr.$i";
-	                $data = "$this->eth $this->domain $ip ip4service FALSE\n";
-	                fputs($fp,$data);
-	            }
-	            fclose($fp);
-	            $this->run4split4ip($file_path_ips_cidr, 8);
-	            
-	          
-	        }
-	        }
-	    }
-	    
-
-	    
-	    $this->pause();
-
-	     
-	    
-	    
-	    foreach ($counts as $cidr => $val){
-	        $cidr = trim($cidr);
-	        $val = trim($val);
-	        $val = intval($val);
-	        if ( (!empty($cidr)) && (!empty($val)) ){
-	            $this->article("CIDR $cidr", $val);
-	            //$this->pause();
-	            if (5<$val) {
-	                for ($i=1;$i<256;$i++){
-	                    $ip = "$cidr.$i";
-	                    $obj_ip_cidr = new IP($this->eth,$this->domain,$ip);
-	                    $obj_ip_cidr->ip4service();$this->pause();
-	                }
-	            }
-	        }
-	    }
-	    
-	    */
-	    
-	    
 	    
 	    
 		return $result;
@@ -494,7 +398,7 @@ class DOMAIN extends ETH{
 	    //echo $this->tab($tab_cidr);
 	    $size = count($tab_cidr);
 	    if($size<20){
-	        //$dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
+	        $dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
 	        exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
 	        $size = count($tab_cidr);
 	        if($size<50){
@@ -502,6 +406,7 @@ class DOMAIN extends ETH{
 	        $cidr = $tab_cidr[$i];
 	        if (!empty($cidr)){
 	            $cidr = "$cidr.0/24";
+	            $this->ssTitre("Searching Hostname with resolution DNS");
 	            $this->article("$i/$size CIDR", $cidr);
 	            $result .=	$this->cidr2scan($cidr);
 	        }
@@ -526,6 +431,10 @@ class DOMAIN extends ETH{
 	}
 	
 	public function domain2search4web(){
+	    $this->titre(__FUNCTION__);
+	    $this->domain2search4web8hackertarget();
+	}
+	public function domain2search4web8hackertarget(){
 	    $this->ssTitre(__FUNCTION__);
 		// https://dnsdumpster.com/
 		// https://censys.io/ipv4?q=exemple.com
@@ -533,6 +442,19 @@ class DOMAIN extends ETH{
 		$query = "wget -qO- \"https://api.hackertarget.com/hostsearch/?q=$this->domain\"  | grep '\.$this->domain' | sed 's/ /\\n/g' | sort -u";
 		return $this->req_ret_str($query);
 	}
+	
+	
+	public function domain2search4web8spyse(){
+	    $this->ssTitre(__FUNCTION__);
+	    // https://dnsdumpster.com/
+	    // https://censys.io/ipv4?q=exemple.com
+	    // https://searchdns.netcraft.com/?restriction=site+contains&host=classdojo.com
+	    // https://www.nmmapper.com/sys/tools/subdomainfinder/
+	    $query = "wget -qO- \"https://spyse.com/search/subdomain?q=$this->domain\"  | grep '\.$this->domain' | grep -Po -i \"([a-z0-9])\.$this->domain\" | sed 's/ /\\n/g' | sort -u";
+	    return $this->req_ret_str($query);
+	}
+	
+	
 	
 	
 	public function domain2search4sublister(){
@@ -689,7 +611,7 @@ class DOMAIN extends ETH{
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->domain2where));
 	    else {
 			$this->requette("cat $this->dico_word | wc -l ");
-			$query = "cat $this->dico_word | parallel --progress -j8 --no-notice  dig +noall {}.$this->domain +answer | grep -v \";;\" ";
+			$query = "cat $this->dico_word | parallel --progress -j24 --no-notice  dig +noall {}.$this->domain +answer | grep -v \";;\" ";
 			$result .= $this->req_ret_str($query);
 		
 		$result = base64_encode($result);

@@ -1425,12 +1425,14 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
 
+	        if (!$this->ip2fw4enable()){
 	       $result .= "SW:\n".$this->ip2fw4sw();
-		$result .= "\nACK:\n".$this->ip2fw4ack();
 		$result .= "\nFRAG:\n".$this->ip2fw4frag();
 		$result .= "\nFWLK:\n".$this->ip2fw4nmap2fk();
 		$result .= "\nFW:\n".$this->ip2fw4nmap2fw();
 		$this->pause();
+	        }
+	        else $result = $this->ip2fw4ack();
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
 		}
@@ -1513,8 +1515,8 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $this->rouge("Determining Firewall Rules");
 	    $this->ip2fw();$this->pause();
 	    $this->ip2tracert();$this->pause();
-	    $this->ip2icmp();$this->pause();
-	    $this->ip2cve();$this->pause();
+	    //$this->ip2icmp();$this->pause();
+	    //$this->ip2cve();$this->pause();
 	    
 	    $this->rouge("Enumeration");
 
