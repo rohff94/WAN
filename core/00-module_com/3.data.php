@@ -71,6 +71,7 @@ public function  req2BD($colonne,$table,$where,$query){
 public function ip2geo($ip){
     $ip = trim($ip);
     if (!empty($ip)){
+        if ($this->ip4priv($ip)) return "Private IP";
         if (!$this->ip4priv($ip) ){
    
     $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=geoip --execute=\"CALL ip2city(\\\"$ip\\\");\"  2>/dev/null | grep -v loc ";

@@ -51,15 +51,15 @@ class POC extends poc4web{
 		public function poc4intro(){
 			$this->start("Hacking","");
 		$this->chapitre("le monde du hacking");
-		intro::def_hacker();$this->pause();
-		intro::def_pirate();$this->pause();
-		intro::culture_hacker();$this->pause();
-		intro::cyber_espionnage();$this->pause();
-		intro::victimes();$this->pause();
-		intro::attack_country_live();$this->pause();
-		intro::malware_challenges_hacking();$this->pause();
-		intro::graphic_step_all_hacking();$this->pause();
-		intro::hosts();intro::labs_hacking();
+		$this->def_hacker();$this->pause();
+		$this->def_pirate();$this->pause();
+		$this->culture_hacker();$this->pause();
+		$this->cyber_espionnage();$this->pause();
+		$this->victimes();$this->pause();
+		$this->attack_country_live();$this->pause();
+		$this->malware_challenges_hacking();$this->pause();
+		$this->graphic_step_all_hacking();$this->pause();
+		$this->hosts();$this->labs_hacking();
 		$this->notify("END $module");
 		}
 		
@@ -75,13 +75,13 @@ class POC extends poc4web{
 		$this->article("Cryptographie", "L'art et la science de garder le secret des messages");
 		$cleartext = "j'ai des informations tres confidentielles a vous confier, appelez moi a 19h precise au 012345";
 		$this->titre("0x050501 Intro");
-		intro::introCrypto($cleartext);
+		$this->introCrypto($cleartext);
 		$this->pause();
 		$this->titre("0x050502 Symetrique");
-		intro::symetrique($cleartext);
+		$this->symetrique($cleartext);
 		$this->pause();
 		$this->titre("0x050503 Asymetrique");
-		intro::asymetrique($cleartext);
+		$this->asymetrique($cleartext);
 		$this->pause();
 		$this->titre("0x050504 Hashage");
 		hashage($cleartext);

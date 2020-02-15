@@ -142,7 +142,7 @@ function android_remote_device_connect(){
 function android_malware_apk(){
 	$this->gtitre("backdoor under android");
 	// ##########################   APK  #######################################################
-	$backdoor_android = new malware4linux($this->prof,$this->prof, 8080,"$this->dir_tmp/backdoor_media_android.apk","");
+	//$backdoor_android = new malware4linux($this->prof,$this->prof, 8080,"$this->dir_tmp/backdoor_media_android.apk","");
 	$backdoor_android->backdoor_media_android();
 	$this->pause(); // 0 / 57	// thefatrat
 	

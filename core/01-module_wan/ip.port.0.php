@@ -583,6 +583,32 @@ Cisco / Network 	255
 	}
 
 
+	public  function parse4traceroute($traceroute_str){
+	    $result = "";
+	    $results = array();
+	    
+	    $ttl = array();
+	    $ipaddr = array();
+	    $geoip = array();
+	    
+	    $tab_lines = explode("\n", $traceroute_str);
+	    foreach ($tab_lines as $line){
+	        $line = trim($line);
+	        if (!empty($line)){
+	            $ttl = "";
+	            $ipaddr = "";
+	            $geoip = "";
+	            if (preg_match('#<hop ttl=\"(?<ttl>[0-9]{1,5})\"([[:space:]]{1})ipaddr=\"(?<ipaddr>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})\"([[:space:]]{1})rtt=\"(?<rtt>[[:print:]]{1,})\"/>#',$line,$results))
+	            {
+	                $ttl = $results['ttl'];
+	                $ipaddr  = $results['ipaddr'];
+	                $geoip = $this->ip2geo($ipaddr);
+	                $result .= "ttl=$ttl ipaddr=$ipaddr geoip=$geoip\n";
+	            }
+	        }
+	    }
+	    return $result;
+	}
 	
 	public function port2traceroute(){
 	    //return "not checked";
@@ -593,11 +619,13 @@ Cisco / Network 	255
 	    else {
 	        
 	        $this->note("In a traceroute operation, a series of packets gets sent to a destination with very low Time-to-Live (TTL) values, starting at one up incrementing from
-there. As each packet dies, an ICMP Time Exceeded message gets sent back to the sender. Thus, the source and destination addresses stay the same, as well
+there. As each packet dies, an ICMP Time Exceeded message gets sent back to the sender.
+Thus, the source and destination addresses stay the same, as well
 as the header options; the TTL changes.");
 	        $query = "echo '$this->root_passwd' | sudo -S nmap  --traceroute  --reason  $this->ip -s$this->protocol -p $this->port -e $this->eth -Pn -oX - | grep 'hop'"; // xmlstarlet sel -t -v /nmaprun/host/trace/hop/@ttl
 	        
 	        $result = $this->req_ret_str($query);
+	        $result = $this->parse4traceroute($result);
 	        $result = base64_encode($result);
 	        return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->port2where ",$result));
 	    }

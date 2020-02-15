@@ -434,11 +434,9 @@ class DOMAIN extends ETH{
 	    $this->titre(__FUNCTION__);
 	    $this->domain2search4web8hackertarget();
 	}
+	
 	public function domain2search4web8hackertarget(){
 	    $this->ssTitre(__FUNCTION__);
-		// https://dnsdumpster.com/
-		// https://censys.io/ipv4?q=exemple.com
-		// https://scans.io/
 		$query = "wget -qO- \"https://api.hackertarget.com/hostsearch/?q=$this->domain\"  | grep '\.$this->domain' | sed 's/ /\\n/g' | sort -u";
 		return $this->req_ret_str($query);
 	}

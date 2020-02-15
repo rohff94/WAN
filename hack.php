@@ -88,7 +88,7 @@ $poc->poc4scan4ip4enum();
 // HACK 030
 $poc = new poc4malware();
 
-intro::poc4malware4intro();$poc->pause(); // OK
+
 $poc->poc4malware4backdoor4static();$poc->pause(); // OK
 $poc->poc4malware4backdoor4Heuristics();$poc->pause(); // OK
 $poc->poc4malware4bypass4hips();$poc->pause();	// OK
@@ -112,7 +112,7 @@ $poc->poc4malware4rootkit4win_hook_dll_32_exemple();$poc->pause();
 $poc->poc4malware4sandbox();$poc->pause(); // OK
 $poc->poc4malware4detection_honeypot_honeyd();$poc->pause();
 $poc->poc4malware4eradication();$poc->pause();
-intro::poc4malware4analysis();$poc->pause();
+
 ##############################################################################
 
 ##############################################################################
