@@ -767,26 +767,14 @@ class SERVICE extends SERVICE4COM {
 	    $date_now = date('Y-m-d H:i:s');
 	    $this->article("Date Now", $date_now);
 	    $this->article("Date Rec", $this->date_rec);
-	    //$this->article("Date Diff", time($now-$this->date_rec));
+
 	    $this->article("ID Domain", $this->domain2id);
 	    $this->article("Domain", $this->domain);
 	    //$this->article("HOST", $this->ip2host(""));
-	    $this->article("ID IP", $this->ip2id);
-	    $this->article("IP", $this->ip);
-	    $ip2geoip = $this->ip2geoip();
-	    $this->article("IP GEOLOC",$ip2geoip);
+	    $this->ip4info();
 	    
-	    
-	    $ip2root = $this->ip2root8db($this->ip2id);
-	    $ip2shell = $this->ip2shell8db($this->ip2id);
-	    $ip2write = $this->ip2write8db($this->ip2id);
-	    $ip2read = $this->ip2read8db($this->ip2id);
 	    
 
-	    if ($ip2root) $this->article("ip2root",$ip2root);
-	    if ($ip2shell)  $this->article("IP2SHELL",$ip2shell);
-	    if ($ip2write) $this->article("IP2WRITE",$ip2write);
-	    if ($ip2read) $this->article("IP2READ", $ip2read);
 	    
 	    $this->article("ID PORT", $this->port2id);
 	    $this->article("PORT NUMBER", $this->port);

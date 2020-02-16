@@ -45,7 +45,7 @@ class DOMAIN extends ETH{
 		if (!$this->checkBD($sql_r)) {
 			$sql_w = "INSERT  INTO ".__CLASS__." (id8eth,domain) VALUES ('$this->eth2id','$this->domain'); ";
 			$this->mysql_ressource->query($sql_w);
-			echo $this->note("Working on DOMAIN:$this->domain ");
+			echo $this->note("Working on DOMAIN:$this->domain for the first time");
 		}
 
 		
@@ -373,13 +373,17 @@ class DOMAIN extends ETH{
 	    // https://kalilinuxtutorials.com/subscraper/
 	    // python3 subscraper.py example.com
 	$this->titre(__FUNCTION__);
+	$tab_hosts = array();
 	$file_path = "$this->dir_tmp/$this->domain.search";
 	if(!file_exists($file_path)){
 	    $search = $this->domain2search();
 	    $this->str2file($search, $file_path);
 	}
 	$query = "cat $file_path | grep -i -Po \"([0-9a-z\-_]{1,}\.)+$this->domain\" | tr '[:upper:]' '[:lower:]' | sort -u ";
-	return array_filter($this->req_ret_tab($query));
+	exec($query,$tab_hosts);
+	$tab_hosts = array_filter($tab_hosts);
+	$this->article("ALL HOSTs", $this->tab($tab_hosts));
+	return $tab_hosts;
 	}
 	
 	public function domain2search(){
@@ -589,7 +593,7 @@ class DOMAIN extends ETH{
 	        $query = "dig @$dns $this->domain SRV +short | grep -v '^;' ";
 	        $result .= "$query\n";
 	        $result .= $this->req_ret_str($query);
-	        $query = "dig @$dns $this->domain TXT +short | grep -v '^;' ";
+	        $query = "dig @$dns $this->domain TXT +short | grep -v '^;' | sed 's/\"//g'";
 	        $result .= "$query\n";
 	        $result .= $this->req_ret_str($query);
 	    

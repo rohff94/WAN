@@ -1064,7 +1064,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $this->ip2port();$this->pause();
 	    $port_sum = count($this->tab_open_ports_all);
 	    $this->article("ALL PORT SUM",$port_sum);
-	    if ($port_sum > 50 ) { $this->rouge("HONEYPOT DETECTED"); return true ;}
+	    if ($port_sum > 50 ) { $this->rouge("HONEYPOT DETECTED"); $this->ip2os();return true ;}
 	    else return false ;
 	}
 	
@@ -1199,8 +1199,8 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    else {
 	        $result .= $this->titre(__FUNCTION__);
 	       $result .= $this->ip2vhost4nmap();
-		//$result .= $this->ip2vhost4web();
-		$result .= $this->req_ret_str("echo '$result' | grep -Po \"[a-z0-9_\-]{1,}\.[a-z_\-]{1,}\.[a-z]{1,5}\" | sort -u  ");
+		$result .= $this->ip2vhost4web();
+		$result .= $this->req_ret_str("echo '$result' | grep -Po \"([0-9a-z\-_]{1,}\.)+\.[a-z]{1,5}\" | sort -u  "); // | grep -i -Po \"([0-9a-z\-_]{1,}\.)+$this->domain\"
 		
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
@@ -1220,7 +1220,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	public function ip2vhost4web(){
 	    $result = "";
 	    $result .= $this->titre(__FUNCTION__);
-		if ($this->ip4priv($this->ip)) return $result."Private IP";
+		if ($this->ip4priv($this->ip)) return "Private IP";
 		$result = $this->ip2vhost4web4online();
 		$result .= $this->ip2vhost4web4bfk();
 		$result .= $this->ip2vhost4web4sameip();
@@ -1440,9 +1440,10 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	
 	public function ip4service(){
 	    $result = "";
-	    echo "=============================================================================\n";
+	    $this->article("Start ".__FUNCTION__.": $this->ip", "=============================================================================");
 	    $this->gtitre(__FUNCTION__);
-	    if(!$this->ip2honey()){	    
+	    if(!$this->ip2honey()){	 
+	        $vhosts = $this->ip2vhost(); $this->article("ALL vHosts", $vhosts);
 	        if (!empty($this->tab_open_ports_all)){
 	        $max_iter = count($this->tab_open_ports_all);
 	        $this->rouge("ITER PORT $max_iter");
@@ -1485,11 +1486,30 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	        }
 
 	    }
-	    echo "END IP4SERVICE:$this->ip =============================================================================\n";
+	    $this->article("END ".__FUNCTION__.": $this->ip", "=============================================================================");
 	    $this->pause();
 	    return $result;
 	}
 
+	public function ip4info(){ 
+	    
+	    $this->article("ID IP", $this->ip2id);
+	    $this->article("IP", $this->ip);
+	    $ip2geoip = $this->ip2geoip();
+	    $this->article("IP GEOLOC",$ip2geoip);
+	    
+	    $ip2root = $this->ip2root8db($this->ip2id);
+	    $ip2shell = $this->ip2shell8db($this->ip2id);
+	    $ip2write = $this->ip2write8db($this->ip2id);
+	    $ip2read = $this->ip2read8db($this->ip2id);
+	    
+	    
+	    if ($ip2root) $this->article("ip2root",$ip2root);
+	    if ($ip2shell)  $this->article("IP2SHELL",$ip2shell);
+	    if ($ip2write) $this->article("IP2WRITE",$ip2write);
+	    if ($ip2read) $this->article("IP2READ", $ip2read);
+	    //$vhosts = $this->ip2vhost(); $this->article("ALL vHosts", $vhosts);
+	}
 	public function ip4pentest(){ // OK
 
 	    $this->gtitre(__FUNCTION__);
