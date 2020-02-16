@@ -323,7 +323,7 @@ class PORT extends IP{
 					
 				case 53 :
 				case 5353 :
-				    $result .= $service->service2dns();$this->pause();
+				    $result .= $service->dns4service($this->ip);$this->pause();
 					break ;
 					
 				case 67 :

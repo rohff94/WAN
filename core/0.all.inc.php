@@ -26,7 +26,6 @@ include_once("./core/01-module_wan/ip.port.auth.0.php");
 include_once("./core/01-module_wan/port.0.com.php");
 include_once("./core/01-module_wan/service.0.com.php");
 include_once("./core/02-module_services/service.asterisk.php");
-include_once("./core/02-module_services/service.dns.php");
 include_once("./core/02-module_services/service.exploitdb.php");
 include_once("./core/02-module_services/service.ftp.php");
 include_once("./core/02-module_services/service.ipmi.php");
@@ -115,8 +114,6 @@ include_once("./core/13-module_poc/0.poc.4.bof.php");
 include_once("./core/13-module_poc/0.poc.5.root.php");
 include_once("./core/13-module_poc/0.poc.6.malware.php");
 include_once("./core/13-module_poc/1.poc.php");
-
-
 
 
 

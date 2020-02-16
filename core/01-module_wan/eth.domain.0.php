@@ -392,6 +392,7 @@ class DOMAIN extends ETH{
 	    //$result .= $this->domain2search4harvest();$this->pause();
 	    $result .= $this->domain2search4sublister();$this->pause();
 	    $result .= $this->domain2search4web();$this->pause();
+	    $result .= $this->domain2ns();$this->pause();
 	    //
 
 	    exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
@@ -432,7 +433,12 @@ class DOMAIN extends ETH{
 	
 	public function domain2search4web(){
 	    $this->titre(__FUNCTION__);
-	    $this->domain2search4web8hackertarget();
+	    $result = "";
+	    $result .= $this->domain2search4web8hackertarget();$this->pause();
+	    $result .= $this->domain2search4web8spyse();$this->pause();
+	    $result .= $this->domain2search4web8netcraft();$this->pause();
+	    $result .= $this->domain2search4web8censys();$this->pause();
+	    return $result ;
 	}
 	
 	public function domain2search4web8hackertarget(){
@@ -442,12 +448,22 @@ class DOMAIN extends ETH{
 	}
 	
 	
-	public function domain2search4web8spyse(){
+	public function domain2search4web8censys(){
 	    $this->ssTitre(__FUNCTION__);
 	    // https://dnsdumpster.com/
-	    // https://censys.io/ipv4?q=exemple.com
-	    // https://searchdns.netcraft.com/?restriction=site+contains&host=classdojo.com
 	    // https://www.nmmapper.com/sys/tools/subdomainfinder/
+	    $query = "wget -qO- \"https://censys.io/ipv4?q=$this->domain\"  | grep '\.$this->domain' | grep -Po -i \"([a-z0-9])\.$this->domain\" | sed 's/ /\\n/g' | sort -u";
+	    return $this->req_ret_str($query);
+	}
+	
+	public function domain2search4web8netcraft(){
+	    $this->ssTitre(__FUNCTION__);
+	    $query = "wget -qO- \"https://searchdns.netcraft.com/?restriction=site+contains&host=$this->domain\"  | grep '\.$this->domain' | grep -Po -i \"([a-z0-9])\.$this->domain\" | sed 's/ /\\n/g' | sort -u";
+	    return $this->req_ret_str($query);
+	}
+	
+	public function domain2search4web8spyse(){
+	    $this->ssTitre(__FUNCTION__);
 	    $query = "wget -qO- \"https://spyse.com/search/subdomain?q=$this->domain\"  | grep '\.$this->domain' | grep -Po -i \"([a-z0-9])\.$this->domain\" | sed 's/ /\\n/g' | sort -u";
 	    return $this->req_ret_str($query);
 	}
@@ -536,10 +552,72 @@ class DOMAIN extends ETH{
 	}
 	}
 	
+	public function dns4service($dns){
+	    $result = "";
+	    $dns = trim($dns);
+	    if ($this->isIPv4($dns)){
+	        $this->note(" A Records - An address record that allows a computer name to be translated to an IP address.
+				Each computer has to have this record for its IP address to be located via DNS.");
+	        $query = "dig @$dns $this->domain A +short | grep -v '^;' ";
+	        $result .= "$query\n";
+	        $result .= $this->req_ret_str($query);
+	        $query = "dig @$dns $this->domain AAAA +short | grep -v '^;' ";
+	        $result .= "$query\n";
+	        $result .= $this->req_ret_str($query);
+	        $query = "dig @$dns $this->domain axfr +short | grep -v '^;' ";
+	        $result .= "$query\n";
+	        $result .= $this->req_ret_str($query);
+	        $query = "dig @$dns $this->domain CNAME +short | grep -v '^;' ";
+	        $result .= "$query\n";
+	        $result .= $this->req_ret_str($query);
+	        $query = "dig @$dns $this->domain HINFO +short | grep -v '^;' ";
+	        $result .= "$query\n";
+	        $result .= $this->req_ret_str($query);
+	        $query = "dig @$dns $this->domain MX +short | grep -v '^;' ";
+	        $result .= "$query\n";
+	        $result .= $this->req_ret_str($query);
+	        $query = "echo '$this->root_passwd' | sudo -S nmap --script dns-nsid -p 53 $dns -Pn -n  -oX - ";
+	        $result .= "$query\n";
+	        $result .= $this->req_ret_str($query);
+	        $query = "nslookup -query=ptr ".gethostbyname($dns)." | grep 'name' | cut -d'=' -f2 | sed \"s/\.$//g\" | tr -d ' ' | grep  -i -Po \"([0-9a-zA-Z_-]{1,}\.)+[a-zA-Z]{1,4}\"  ";
+	        $result .= "$query\n";
+	        $result .= $this->req_ret_str($query);
+	        $query = "dig @$dns $this->domain RP +short | grep -v '^;' ";
+	        $result .= "$query\n";
+	        $result .= $this->req_ret_str($query);
+	        $query = "dig @$dns $this->domain SOA +short | grep -v '^;' ";
+	        $result .= "$query\n";
+	        $result .= $this->req_ret_str($query);
+	        $query = "dig @$dns $this->domain SRV +short | grep -v '^;' ";
+	        $result .= "$query\n";
+	        $result .= $this->req_ret_str($query);
+	        $query = "dig @$dns $this->domain TXT +short | grep -v '^;' ";
+	        $result .= "$query\n";
+	        $result .= $this->req_ret_str($query);
+	    }
+	    return $result ;
+	}
+	
+	
 	public function  domain2ns(){
-	    $this->ssTitre(__FUNCTION__);
+	    $this->titre(__FUNCTION__);
+	    $result = "";
+	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->domain2where AND ".__FUNCTION__." IS NOT NULL";
+	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->domain2where));
+	    else {
 	    $query = "nslookup -query=ns $this->domain | grep '$this->domain' | cut -d'=' -f2 | sed \"s/\.$//g\" ";
-	    return $this->req2BD(__FUNCTION__,__CLASS__,$this->domain2where,$query);
+	    $result .= "$query\n";
+	    $tab_dns = $this->req_ret_tab($query);
+	    
+	    if (!empty($tab_dns)){
+	        $result .= $this->tab($tab_dns);
+	        foreach ($tab_dns as $dns){
+	            $result .= $this->dns4service($dns);
+	        }
+	    }
+	    $result = base64_encode($result);
+	    return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,$this->domain2where,$result));
+	    }
 	}
 	
 
