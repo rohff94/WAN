@@ -399,7 +399,7 @@ class DOMAIN extends ETH{
 	    //echo $this->tab($tab_cidr);
 	    $size = count($tab_cidr);
 	    if($size<20){
-	        $dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
+	        //$dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
 	        exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
 	        $size = count($tab_cidr);
 	        if($size<50){
@@ -443,7 +443,7 @@ class DOMAIN extends ETH{
 	
 	public function domain2search4web8hackertarget(){
 	    $this->ssTitre(__FUNCTION__);
-		$query = "wget -qO- \"https://api.hackertarget.com/hostsearch/?q=$this->domain\"  | grep '\.$this->domain' | sed 's/ /\\n/g' | sort -u";
+		$query = "wget -qO- \"https://api.hackertarget.com/hostsearch/?q=$this->domain\" --timeout=60 --tries=2 --no-check-certificate | grep '\.$this->domain' | sed 's/ /\\n/g' | sort -u";
 		return $this->req_ret_str($query);
 	}
 	
@@ -452,19 +452,19 @@ class DOMAIN extends ETH{
 	    $this->ssTitre(__FUNCTION__);
 	    // https://dnsdumpster.com/
 	    // https://www.nmmapper.com/sys/tools/subdomainfinder/
-	    $query = "wget -qO- \"https://censys.io/ipv4?q=$this->domain\"  | grep '\.$this->domain' | grep -Po -i \"([a-z0-9])\.$this->domain\" | sed 's/ /\\n/g' | sort -u";
+	    $query = "wget -qO- \"https://censys.io/ipv4?q=$this->domain\" --timeout=60 --tries=2 --no-check-certificate | grep '\.$this->domain' | grep -Po -i \"([a-z0-9])\.$this->domain\" | sed 's/ /\\n/g' | sort -u";
 	    return $this->req_ret_str($query);
 	}
 	
 	public function domain2search4web8netcraft(){
 	    $this->ssTitre(__FUNCTION__);
-	    $query = "wget -qO- \"https://searchdns.netcraft.com/?restriction=site+contains&host=$this->domain\"  | grep '\.$this->domain' | grep -Po -i \"([a-z0-9])\.$this->domain\" | sed 's/ /\\n/g' | sort -u";
+	    $query = "wget -qO- \"https://searchdns.netcraft.com/?restriction=site+contains&host=$this->domain\" --timeout=60 --tries=2 --no-check-certificate  | grep '\.$this->domain' | grep -Po -i \"([a-z0-9])\.$this->domain\" | sed 's/ /\\n/g' | sort -u";
 	    return $this->req_ret_str($query);
 	}
 	
 	public function domain2search4web8spyse(){
 	    $this->ssTitre(__FUNCTION__);
-	    $query = "wget -qO- \"https://spyse.com/search/subdomain?q=$this->domain\"  | grep '\.$this->domain' | grep -Po -i \"([a-z0-9])\.$this->domain\" | sed 's/ /\\n/g' | sort -u";
+	    $query = "wget -qO- \"https://spyse.com/search/subdomain?q=$this->domain\" --timeout=60 --tries=2 --no-check-certificate  | grep '\.$this->domain' | grep -Po -i \"([a-z0-9])\.$this->domain\" | sed 's/ /\\n/g' | sort -u";
 	    return $this->req_ret_str($query);
 	}
 	
@@ -555,7 +555,6 @@ class DOMAIN extends ETH{
 	public function dns4service($dns){
 	    $result = "";
 	    $dns = trim($dns);
-	    if ($this->isIPv4($dns)){
 	        $this->note(" A Records - An address record that allows a computer name to be translated to an IP address.
 				Each computer has to have this record for its IP address to be located via DNS.");
 	        $query = "dig @$dns $this->domain A +short | grep -v '^;' ";
@@ -576,8 +575,7 @@ class DOMAIN extends ETH{
 	        $query = "dig @$dns $this->domain MX +short | grep -v '^;' ";
 	        $result .= "$query\n";
 	        $result .= $this->req_ret_str($query);
-	        $query = "echo '$this->root_passwd' | sudo -S nmap --script dns-nsid -p 53 $dns -Pn -n  -oX - ";
-	        $result .= "$query\n";
+	        $query = "echo '$this->root_passwd' | sudo -S nmap --script dns-nsid -p 53 $dns -Pn -n ";
 	        $result .= $this->req_ret_str($query);
 	        $query = "nslookup -query=ptr ".gethostbyname($dns)." | grep 'name' | cut -d'=' -f2 | sed \"s/\.$//g\" | tr -d ' ' | grep  -i -Po \"([0-9a-zA-Z_-]{1,}\.)+[a-zA-Z]{1,4}\"  ";
 	        $result .= "$query\n";
@@ -594,7 +592,7 @@ class DOMAIN extends ETH{
 	        $query = "dig @$dns $this->domain TXT +short | grep -v '^;' ";
 	        $result .= "$query\n";
 	        $result .= $this->req_ret_str($query);
-	    }
+	    
 	    return $result ;
 	}
 	

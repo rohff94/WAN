@@ -130,12 +130,6 @@ class SERVICE extends SERVICE4COM {
 	    
 	}
 	
-	
-	public function service2dns(){
-	    $obj = new service2dns($this->eth,$this->domain,$this->ip,$this->port,$this->protocol);
-	        $obj->poc($this->flag_poc);
-	    return $obj->service2dns4exec();
-	}
 
 	public function service2jdwp(){
 	    $this->ssTitre(__FUNCTION__);
