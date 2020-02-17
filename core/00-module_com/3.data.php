@@ -24,7 +24,7 @@ mysql> select id,ip from IP WHERE ip IN (SELECT ip FROM IP GROUP BY ip HAVING CO
 		parent::__construct();
 		$this->flag_poc = FALSE ;
 		//$this->requette("ulimit -n 9192");
-		$this->clean_indb = array("|","`","'","$","\n\n\n",";","\\",")","(");
+		$this->clean_indb = array("|","`","'","$","\n\n\n",";","\\",")","(","\"");
 	$this->mysql_ressource = new mysqli($this->mysql_host, $this->mysql_login, $this->mysql_passwd, $this->mysql_database);
 	if ($this->mysql_ressource == FALSE) {$this->rouge("Connexion to Mysql $this->mysql_database Failled");exit();}
 	

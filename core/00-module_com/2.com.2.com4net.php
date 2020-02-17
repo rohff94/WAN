@@ -232,10 +232,15 @@ class com4net extends com4user {
     
     
     public function ip4net(){
-        $this->ssTitre(__FUNCTION__);
+        $ip = "";
+        $tmp = array();
         $filter = "| grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"";
         $url = "http://ifconfig.me/ip"; 
-        return $this->url2search($this->user2agent, $url, $filter);
+        $query = "wget --user-agent='$this->user2agent' \"$url\" --timeout=40 --tries=2 --no-check-certificate -qO- $filter 2> /dev/null";
+        $ip = exec($query,$tmp);
+        if (isset($tmp[0])) $ip = $tmp[0];
+        return $ip;
+
     }
     
     public function ip4priv($ip) {

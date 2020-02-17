@@ -79,25 +79,27 @@ class IP extends DOMAIN{
 		$this->mysql_ressource->query($sql_w);	
 		echo $this->note("Working on IP:$this->ip for the first time");
 		$this->watching();
+		
+
+		
+		
 		}
 
 		$sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->ip2where ";
 		$this->ip2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
 		
+		// ============================================================
 		if ($this->ip4priv($this->ip)) $this->article("Private IP", $this->ip);
-		
 		if (!$this->ip4priv($this->ip)) {
 		    $ip_wan = $this->ip4net();
-		    if ($this->isIPv4($ip_wan)) {
-		        $this->article("WAN IP Attacker", $ip_wan);
-		        //$this->article("WAN IP Attacker GeoLoc", $this->ip2geo($ip_wan));
-		    }
-		    if (empty($ip_wan)) {
+		    if (!$this->isIPv4($ip_wan)) {
 		        $chaine = "Lost Connexion to the net";
 		        $this->rouge($chaine);
 		        exit();
 		    }
 		}
+		// ============================================================
+		
 
 	}
 	
@@ -1443,7 +1445,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $this->article("Start ".__FUNCTION__.": $this->ip", "=============================================================================");
 	    $this->gtitre(__FUNCTION__);
 	    if(!$this->ip2honey()){	 
-	        $vhosts = $this->ip2vhost(); $this->article("ALL vHosts", $vhosts);
+	        //$vhosts = $this->ip2vhost(); $this->article("ALL vHosts", $vhosts);
 	        if (!empty($this->tab_open_ports_all)){
 	        $max_iter = count($this->tab_open_ports_all);
 	        $this->rouge("ITER PORT $max_iter");

