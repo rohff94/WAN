@@ -768,10 +768,8 @@ class SERVICE extends SERVICE4COM {
 	    $this->article("Date Now", $date_now);
 	    $this->article("Date Rec", $this->date_rec);
 
-	    $this->article("ID Domain", $this->domain2id);
-	    $this->article("Domain", $this->domain);
 	    //$this->article("HOST", $this->ip2host(""));
-	    $this->ip4info();
+	    
 	    
 	    
 

@@ -249,7 +249,7 @@ class DOMAIN extends ETH{
 	public function domain4service(){
 	    $result = "";
 	    $this->titre(__FUNCTION__);
-	    
+	    $this->domain4info();
 	    //$result .= $this->domain2asn() ;$this->pause(); // NOT YET 
 	    $cidr = $this->domain2cidr() ;
 	    echo $this->tab($cidr);$this->pause();
@@ -605,6 +605,11 @@ class DOMAIN extends ETH{
 	    return $result ;
 	}
 	
+	public function  domain4info(){
+	    
+	    $this->article("ID Domain", $this->domain2id);
+	    $this->article("Domain", $this->domain);
+	}
 	
 	public function  domain2ns(){
 	    $this->titre(__FUNCTION__);
@@ -622,7 +627,6 @@ class DOMAIN extends ETH{
 	            
 	            $dns = trim($tab_dns[$i]);
 	            if (!empty($dns)){
-	                $result .= $this->dns4service($dns);
 	                $this->article("$i/$size DNS", $dns);
 	                $obj_dns = new HOST($this->eth, $this->domain, $dns);
 	                $tab_ip_dns = $this->host4ip($obj_dns->host);

@@ -1196,10 +1196,11 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	
 	public function ip2vhost(){
 	    $result = "";
+	    $this->titre(__FUNCTION__);
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
-	        $result .= $this->titre(__FUNCTION__);
+	        
 	       $result .= $this->ip2vhost4nmap();
 		$result .= $this->ip2vhost4web();
 		$result .= $this->req_ret_str("echo '$result' | grep -Po \"([0-9a-z\-_]{1,}\.)+\.[a-z]{1,5}\" | sort -u  "); // | grep -i -Po \"([0-9a-z\-_]{1,}\.)+$this->domain\"
@@ -1228,7 +1229,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		$result .= $this->ip2vhost4web4sameip();
 		$result .= $this->ip2vhost4web4ipadress();
 		$result .= $this->ip2vhost4web4youg();
-		$result .= $this->ip2vhost4web4dnsdigger();
+		//$result .= $this->ip2vhost4web4dnsdigger();
 		return $result;
 	}
 	
@@ -1445,7 +1446,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $this->article("Start ".__FUNCTION__.": $this->ip", "=============================================================================");
 	    $this->gtitre(__FUNCTION__);
 	    if(!$this->ip2honey()){	 
-	        //$vhosts = $this->ip2vhost(); $this->article("ALL vHosts", $vhosts);
+	        $this->ip4info();
 	        if (!empty($this->tab_open_ports_all)){
 	        $max_iter = count($this->tab_open_ports_all);
 	        $this->rouge("ITER PORT $max_iter");
@@ -1510,7 +1511,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    if ($ip2shell)  $this->article("IP2SHELL",$ip2shell);
 	    if ($ip2write) $this->article("IP2WRITE",$ip2write);
 	    if ($ip2read) $this->article("IP2READ", $ip2read);
-	    //$vhosts = $this->ip2vhost(); $this->article("ALL vHosts", $vhosts);
+	    $vhosts = $this->ip2vhost(); $this->article("ALL vHosts", $vhosts);
 	}
 	public function ip4pentest(){ // OK
 
