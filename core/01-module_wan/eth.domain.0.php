@@ -417,11 +417,13 @@ class DOMAIN extends ETH{
 	        }
 	    }
 
+	    }
+	    }
 	    $result = base64_encode($result);
 	    return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,$this->domain2where,$result));
+	    
 	    }
-	    }
-	    }
+	    
 	}
 	
 	public function domain2ip(){
@@ -477,7 +479,7 @@ class DOMAIN extends ETH{
 	
 	public function domain2search4sublister(){
 	    $this->ssTitre(__FUNCTION__);
-		$query = "python3 /opt/sublist3r/sublist3r.py -d $this->domain --no-color  2> /dev/null | grep '.$this->domain'  | grep -E \"([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|\.$this->domain)\" ";
+		$query = "python3 /opt/sublist3r/sublist3r.py -d $this->domain --no-color  2> /dev/null  | grep -Po -i \"([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|([0-9a-z\-\_\.]{1,}\.$this->domain)\" ";
 		return $this->req_ret_str($query);		
 	}
 	
@@ -563,41 +565,41 @@ class DOMAIN extends ETH{
 	        $this->note(" A Records - An address record that allows a computer name to be translated to an IP address.
 				Each computer has to have this record for its IP address to be located via DNS.");
 	        $query = "dig @$dns $this->domain A +short | grep -v '^;' ";
-	        $result .= $this->cmd("A", $query);
+	        $result .= "$query\n";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        $query = "dig @$dns $this->domain AAAA +short | grep -v '^;' ";
-	        $result .= $this->cmd("AAAA", $query);
+	        $result .= "$query\n";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        $query = "dig @$dns $this->domain AXFR +short | grep -v '^;' ";
-	        $result .= $this->cmd("AXFR", $query);
+	        $result .= "$query\n";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        $query = "dig @$dns $this->domain CNAME +short | grep -v '^;' ";
-	        $result .= $this->cmd("CNAME", $query);
+	        $result .= "$query\n";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        $query = "dig @$dns $this->domain HINFO +short | grep -v '^;' ";
-	        $result .= $this->cmd("HINFO", $query);
+	        $result .= "$query\n";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        $query = "dig @$dns $this->domain MX +short | grep -v '^;' ";
-	        $result .= $this->cmd("MX", $query);
+	        $result .= "$query\n";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        $query = "echo '$this->root_passwd' | sudo -S nmap --script dns-nsid -p 53 $dns -Pn -n ";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        $query = "nslookup -query=ptr ".gethostbyname($dns)." | grep 'name' | cut -d'=' -f2 | sed \"s/\.$//g\" | tr -d ' ' | grep  -i -Po \"([0-9a-zA-Z_-]{1,}\.)+[a-zA-Z]{1,4}\"  ";
-	        $result .= $this->cmd("PTR", $query);
+	        $result .= "$query\n";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        $query = "dig @$dns $this->domain RP +short | grep -v '^;' ";
-	        $result .= $this->cmd("RP", $query);
+	        $result .= "$query\n";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        $query = "dig @$dns $this->domain SOA +short | grep -v '^;' ";
-	        $result .= $this->cmd("SOA", $query);
+	        $result .="$query\n";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        $query = "dig @$dns $this->domain SRV +short | grep -v '^;' ";
-	        $result .= $this->cmd("SRV", $query);
+	        $result .= "$query\n";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        
 	        
 	        $query = "dig @$dns $this->domain TXT +short  ";
-	        $result .= $this->cmd("TXT", $query);
+	        $result .= "$query\n";
 	        exec("$query | grep -v '^;'  | sed 's#/##g'  | sed \"s#\'##g\" | sed 's/\"//g' ",$tmp);
 
 	        $result .= $this->tab($tmp);unset($tmp);
@@ -618,7 +620,6 @@ class DOMAIN extends ETH{
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->domain2where));
 	    else {
 	    $query = "nslookup -query=ns $this->domain | grep '$this->domain' | cut -d'=' -f2 | sed \"s/\.$//g\" ";
-	    $result .= $this->cmd("NS", $query);
 	    $tab_dns = $this->req_ret_tab($query);
 	    $size = count($tab_dns);
 	    if (!empty($tab_dns)){
@@ -675,7 +676,7 @@ class DOMAIN extends ETH{
 	public function cidr2scan4nmap($cidr){
 	    $this->ssTitre(__FUNCTION__);
 	    $cidr = trim($cidr);
-	    $query = " nmap -sn --reason $cidr | sed \"s/Nmap scan report for/IP/g\" | grep IP | sed 's/IP//g' " ; // | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"
+	    $query = " nmap -sn --reason $cidr | grep 'Nmap scan report for' | sed \"s/Nmap scan report for//g\"  " ; // | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"
 	    if (!empty($cidr)) return $this->req_ret_str($query);
 	}
 	

@@ -563,7 +563,7 @@ class PORT extends IP{
 
 	
 		echo $result;
-		
+		return $result;
 		$result = base64_encode($result);
 		//return base64_decode($this->req2BD4in("service2vuln","SERVICE","id8port = $this->port2id ",$result));
 	    }
