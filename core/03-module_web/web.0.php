@@ -306,11 +306,14 @@ class WEB extends SERVICE4COM{
 		    else {
 		        
 		    
-		    if($this->web2check_200()){		
+		    
 		        $nmap = $this->web2enum();
+		        echo $nmap;
 		        exec("echo '$nmap' $this->filter_file_path ",$tab_enum1);
+		        var_dump($tab_enum1);
 		        $scancli = $this->web2scan4cli();
 		        exec("echo '$scancli' $this->filter_file_path ",$tab_enum2);
+		        var_dump($tab_enum2);
 		        $tab_tmp = array_merge($tab_enum1,$tab_enum2);
 		        $tab_tmp = array_filter(array_unique($tab_tmp));
 		        
@@ -318,17 +321,16 @@ class WEB extends SERVICE4COM{
 		            $tab_tmp2[] = "$this->http_type://$this->ip:$this->port".trim($uri);
 		        }
 		        $tab_tmp = array_filter(array_unique($tab_tmp2));
-		        $tab_result = array_merge($tab_tmp,$this->web2urls4spider(),$this->web2urls4dico()); // 
+		        $tab_result = array_merge($tab_tmp,$this->web2urls4spider()); // ,$this->web2urls4dico()
 		     
-			}	
+				
 			
 			$tab_result = array_unique($tab_result);
 			$result = $this->tab($tab_result);			
 			
 			
-			$this->pause();
 			$result = base64_encode($result);
-			return explode("\n", base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,$this->web2where,$result)));
+			//return explode("\n", base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,$this->web2where,$result)));
 		    }
 		}
 		
@@ -406,6 +408,7 @@ class WEB extends SERVICE4COM{
 
 		$dico = $this->dico_web_file ;
 		$tmp2 = $this->web2path($this->web, $dico);
+		$this->pause();
 		return array_filter(array_unique(array_merge($tmp1,$tmp2)));
 	}
 	
@@ -506,7 +509,7 @@ class WEB extends SERVICE4COM{
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->web2where"));
 	    else {
 	        $result .= $this->titre(__FUNCTION__);	        
-		if (!empty($this->web2urls()))
+		if (!$this->web2check_200())
 		{
 		    // https://kalilinuxtutorials.com/curate-tool-archived-urls/
 		$result .= $this->web2scan4cli4nikto(); // OK 		

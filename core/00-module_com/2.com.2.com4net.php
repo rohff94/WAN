@@ -232,6 +232,7 @@ class com4net extends com4user {
     
     
     public function ip4net(){
+        $this->ssTitre(__FUNCTION__);
         $ip = "";
         $tmp = array();
         $filter = "| grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"";

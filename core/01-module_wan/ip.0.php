@@ -1511,7 +1511,10 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    if ($ip2shell)  $this->article("IP2SHELL",$ip2shell);
 	    if ($ip2write) $this->article("IP2WRITE",$ip2write);
 	    if ($ip2read) $this->article("IP2READ", $ip2read);
-	    $vhosts = $this->ip2vhost(); $this->article("ALL vHosts", $vhosts);
+	    if (!$this->ip4priv($this->ip)) {
+	        $vhosts = $this->ip2vhost(); 
+	        $this->article("ALL vHosts", $vhosts);
+	    }
 	}
 	public function ip4pentest(){ // OK
 
