@@ -107,54 +107,16 @@ class POC extends poc4web{
 		
 		
 		
-
+		public function tp4bof2root(){
+		    $this->chapitre("BE ROOT");
+		    // Covfefe bof2stack OR heap
+		    
+		    
+		}
 	
 	
 	
 	
-	
-	
-	
-	
-	
-	public function vuln2scan(){
-	    $this->vuln2scan4gui4nessus();
-	    $this->vuln2scan4gui4nexpose();
-	    $this->vuln2scan4gui4openvas();
-	}
-	
-	
-	public function vuln2scan4gui4nessus(){
-	    $this->ssTitre(__FUNCTION__);
-	    $file_output = "$this->rep_path/$this->ip.$this->vhost.$this->port.".__FUNCTION__;
-	    $this->article("login/password","rohff/rohff");
-	    $this->ssTitre("Mise a jours de Nessus");
-	    $this->cmd("localhost","echo '$this->root_passwd' | sudo -S /opt/nessus/sbin/nessuscli update");pause();
-	    $this->ssTitre("Start Nessus");
-	    $this->cmd("localhost","echo '$this->root_passwd' | sudo -S /etc/init.d/nessusd start");pause();
-	    $this->net("https://localhost:8834/nessus6.html");pause();
-	}
-	
-	
-	public function vuln2scan4gui4nexpose(){
-	    $this->ssTitre(__FUNCTION__);
-	    $this->cmd("localhost","cd /opt/rapid7/nexpose/nsc; sudo ./nsc.sh");
-	    $this->article("login/password","rohff/rafik3615#");
-	    $this->net("http://localhost:3780/manager/html");
-	    $this->pause();
-	}
-	
-	
-	public function vuln2scan4gui4openvas(){
-	    $this->ssTitre(__FUNCTION__);
-	    $this->cmd("localhost","echo '$this->root_passwd' | sudo -S service openvas-server start");
-	    $this->requette("echo -e \"Waiting 120s\" ");
-	    sleep(60);
-	    $this->requette("echo '$this->root_passwd' | sudo -S netstat -anp | grep LISTEN | grep -i 'openvas'");
-	    $this->requette("echo -e \"Connect to openvas-server via openvas-client\" ");
-	    $this->cmd("localhost","openvas-client");
-	    $this->pause();
-	}
 	
 	
 

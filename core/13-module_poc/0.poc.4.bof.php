@@ -2829,16 +2829,18 @@ des dépassements de tampon n'impliquant pas des chaines de caractères.");
 		$this->notify("END OF LINUX CANARY");
 		}
 	
+		public function poc4bof2root(){
+		    $this->chapitre("BE ROOT");
+		    // Covfefe bof2stack OR heap
+		    $this->gtitre("BY SETUID 0");
+		    //$this->poc4host4root4racecondition();
+		    // poc4host4root4setuid0()
+		    // ret2stack4linux_setuid()
+		    //$this->poc4ret2lib4linux_setuid();
+		    
+		}
 	
-	public function poc4bof4root(){
-		$this->chapitre("BE ROOT");
-		$this->gtitre("BY SETUID 0");
-	//$this->poc4host4root4racecondition();
-		// poc4host4root4setuid0()
-		// ret2stack4linux_setuid()
-		//$this->poc4ret2lib4linux_setuid();
 
-	}
 	
 	public function poc4bof2ret2lib4linux_setuid(){
 		

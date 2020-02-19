@@ -103,7 +103,7 @@ public function  req2BD4in($colonne,$table,$where,$result){
 		$sql_w = "UPDATE $table SET $colonne='$result' WHERE $where  ";
 		//$sql_w = $this->mysql_ressource->real_escape_string($sql_w);		
 		$this->mysql_ressource->query($sql_w);
-		echo "$sql_w\n";
+		//echo "$sql_w\n";
 		$this->pause();
 		return $result;
 }
