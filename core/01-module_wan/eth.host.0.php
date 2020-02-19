@@ -127,7 +127,7 @@ class HOST extends DOMAIN{
                 $this->rouge("ITER IP $max_iter");
                 $gauche_iter = intval($max_iter/2);
                 $droite_iter = intval($max_iter-$gauche_iter);
-                $file_path = "/tmp/$this->eth.$this->domain.$this->host.ips";
+                $file_path = "/tmp/$this->eth.$this->domain.$this->host.ip4service";
                 $fp = fopen($file_path, 'w+');
                 foreach ($ips as $ip_addr) {
                     if( (!empty($ip_addr)) && (!$this->ip4priv($ip_addr)) ){

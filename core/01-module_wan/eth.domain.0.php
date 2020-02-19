@@ -257,7 +257,7 @@ class DOMAIN extends ETH{
 	    $hosts = $this->domain2host() ;
 	    echo $this->tab($hosts);$this->pause();
 	    if(!empty($hosts)){
-	        $file_path_hosts = "/tmp/$this->eth.$this->domain.hosts";
+	        $file_path_hosts = "/tmp/$this->eth.$this->domain.host4service";
 	        $fp = fopen($file_path_hosts, 'w+');
 	        foreach ($hosts as $host) {
 	            if(!empty($host) ){
@@ -410,10 +410,8 @@ class DOMAIN extends ETH{
 	    for ($i=0;$i<$size;$i++){
 	        $cidr = $tab_cidr[$i];
 	        if (!empty($cidr)){
-	            $cidr = "$cidr.0/24";
-	            $this->ssTitre("Searching Hostname with resolution DNS");
-	            $this->article("$i/$size CIDR", $cidr);
-	            $result .=	$this->cidr2scan($cidr);
+                $obj_cidr = new CIDR($cidr);
+                $result .=	$obj_cidr->cidr2ns();
 	        }
 	    }
 
@@ -665,28 +663,7 @@ class DOMAIN extends ETH{
 		return $this->req2BD(__FUNCTION__,__CLASS__,$this->domain2where,$query);		
 	}
 	
-	
-	public function cidr2scan($cidr){
-	    $this->titre(__FUNCTION__);
-	    $cidr = trim($cidr);
-	    if (!empty($cidr)) return $this->cidr2scan4nmap($cidr);
-	    //$this->cidr2scan4fping($cidr);
-	}
-	
-	public function cidr2scan4nmap($cidr){
-	    $this->ssTitre(__FUNCTION__);
-	    $cidr = trim($cidr);
-	    $query = " nmap -sn --reason $cidr | grep 'Nmap scan report for' | sed \"s/Nmap scan report for//g\"  " ; // | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"
-	    if (!empty($cidr)) return $this->req_ret_str($query);
-	}
-	
-	public function cidr2scan4fping($cidr){
-	    $this->ssTitre(__FUNCTION__);
-	    $cidr = trim($cidr);
-	    $query = " echo '$this->root_passwd' | sudo -S fping -a -n -g $cidr 2> /dev/null | grep -v -E \"(Unreachable|error)\" ";
-	    if (!empty($cidr)) return $this->req_ret_str($query);
-	}
-	
+
 
 
 	

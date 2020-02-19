@@ -54,6 +54,29 @@ class com4net extends com4user {
     }
     
     
+    public function cidr2scan($cidr){
+        $this->titre(__FUNCTION__);
+        $cidr = trim($cidr);
+        if (!empty($cidr)) return $this->cidr2scan4nmap($cidr);
+        //$this->cidr2scan4fping($cidr);
+    }
+    
+    public function cidr2scan4nmap($cidr){
+        $this->ssTitre(__FUNCTION__);
+        $cidr = trim($cidr);
+        $query = " nmap -sn --reason $cidr | grep 'Nmap scan report for' | sed \"s/Nmap scan report for//g\"  " ; // | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"
+        if (!empty($cidr)) return $this->req_ret_str($query);
+    }
+    
+    public function cidr2scan4fping($cidr){
+        $this->ssTitre(__FUNCTION__);
+        $cidr = trim($cidr);
+        $query = " echo '$this->root_passwd' | sudo -S fping -a -n -g $cidr 2> /dev/null | grep -v -E \"(Unreachable|error)\" ";
+        if (!empty($cidr)) return $this->req_ret_str($query);
+    }
+    
+    
+    
     public function  ip4dns($ip){
         $this->ssTitre(__FUNCTION__);
         $query = "nslookup -query=ptr $ip 2> /dev/null | grep 'name' | cut -d'=' -f2 | sed \"s/\.$//g\" | tr -d ' ' | grep  -i -Po \"([0-9a-zA-Z_-]{1,}\.)+[a-zA-Z]{1,4}\" ";

@@ -16,11 +16,10 @@ class SQLI extends FI{
 
 	public function sqli4pentest(){
 	    $result = "";
-	    $result .= $this->titre(__FUNCTION__);
+	    $this->titre(__FUNCTION__);
 	    $sql_r_1 = "SELECT param2sqli FROM URI WHERE $this->uri2where AND param2sqli IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out("param2sqli","URI",$this->uri2where));
 	    else {
-	        $result .= $this->titre(__FUNCTION__);
 	        if(!empty($this->sqli2sqlmap())) {
 	        $result .= $this->yesAUTH($this->port2id, "www-data", "","","", "$this->url", "", "","SQLI: $this->param", $this->ip2geoip());
 	    }
@@ -28,14 +27,14 @@ class SQLI extends FI{
 	    
 
 	    $result = base64_encode($result);
-	    //return base64_decode($this->req2BD4in("param2fi","URI",$this->uri2where,$result));
+	    return base64_decode($this->req2BD4in("param2fi","URI",$this->uri2where,$result));
 	    }
 	}
 	
 	
 	public function sqli2sqlmap(){
 	    $result = "";
-	    $result .= $this->ssTitre(__FUNCTION__);
+	    $this->ssTitre(__FUNCTION__);
 	    // https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 	    
 	    // ./sqlmap.py --headers="User-Agent:$this->user2agent" --cookie="security=low; PHPSESSID=oikbs8qcic2omf5gnd09kihsm7" -u 'http://localhost/dvwa/vulnerabilities/sqli_blind/?id=1-BR&Submit=Submit#' --level=5 risk=3 -p id

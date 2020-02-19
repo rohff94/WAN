@@ -245,6 +245,24 @@ class WEB extends SERVICE4COM{
 		    $tab_urls = array();
 		    $this->gtitre(__FUNCTION__);
 		    
+		    
+		    $cms = $this->web2cms();
+		    if (!empty($cms)){
+		        $this->ssTitre("Searching exploit associate to CMS");
+		        $exploits_db = $this->tab($this->exploitdb($cms));
+		        $this->article("Exploits 8 DB", $exploits_db);
+		        $result .= $exploits_db;
+		    
+		    $exploits_msf = $this->msf2search2info($cms);
+		    $this->article("Exploits 8 MSF", $exploits_msf);
+		    $result .= $exploits_msf;
+		    //echo $exploits;
+		    
+		    //$this->msf2search2exec($cms);
+		    }
+		    
+		    
+		    
 			$tab_urls = $this->web2urls();
 			$this->article("ALL URLs For Testing", $this->tab($tab_urls));
 			$this->pause();
@@ -293,6 +311,16 @@ class WEB extends SERVICE4COM{
 		    if ($this->url2code($this->web)==="200") return TRUE ; else return FALSE ;
 		}
 		
+		public function web2robots(){
+		    $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --script=\"http-robots.txt\" $this->vhost -p $this->port -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/script/@output | strings "; // --script \"http-enum,http-title,http-traceroute,http-methods,http-headers,http-method-tamper\"
+		    return $this->req_ret_str($query);
+		}
+		
+		public function web2cms(){
+		    $this->ssTitre(__FUNCTION__);
+		    $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --script=\"http-generator\" $this->vhost -p $this->port -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/script/@output | strings "; // 
+		    return $this->req_ret_str($query);	
+		}
 		
 		public function web2urls(){
 		    $this->titre(__FUNCTION__);
@@ -305,7 +333,12 @@ class WEB extends SERVICE4COM{
 		    if ($this->checkBD($sql_r_1) ) return  explode("\n", base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->web2where)));
 		    else {
 		        
-		    
+		        $robots = $this->web2robots();
+		        echo $robots;
+		        exec("echo '$robots' $this->filter_file_path ",$tmp_robots);
+		        
+		        
+		        
 		    
 		        $nmap = $this->web2enum();
 		        echo $nmap;
@@ -316,7 +349,7 @@ class WEB extends SERVICE4COM{
 		        exec("echo '$scancli' $this->filter_file_path ",$tab_enum2);
 		        var_dump($tab_enum2);
 		        $this->pause();
-		        $tab_tmp = array_merge($tab_enum1,$tab_enum2);
+		        $tab_tmp = array_merge($tab_enum1,$tab_enum2,$tmp_robots);
 		        $tab_tmp = array_filter(array_unique($tab_tmp));
 		        $this->pause();
 		        foreach ($tab_tmp as $uri ){
@@ -510,11 +543,12 @@ class WEB extends SERVICE4COM{
 
 	public function web2scan4cli(){
 	    $result = "";
+	    $this->titre(__FUNCTION__);
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->web2where AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->web2where"));
 	    else {
-	        $this->titre(__FUNCTION__);	        
-		if (!$this->web2check_200())
+	        	        
+		if ($this->web2check_200())
 		{
 		    // https://kalilinuxtutorials.com/curate-tool-archived-urls/
 		$result .= $this->web2scan4cli4nikto(); // OK 		
@@ -1001,10 +1035,9 @@ class WEB extends SERVICE4COM{
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->web2where"));
 	    else {
 
-	        $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn -A $this->vhost -p $this->port -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/script/@output | strings "; // --script \"http-enum,http-title,http-traceroute,http-methods,http-headers,http-method-tamper\"
-		
+	        $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --script=\"http-enum\" $this->vhost -p $this->port -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/script/@output | strings "; // --script \"http-enum,http-title,http-traceroute,http-methods,http-headers,http-method-tamper\"
+	        $result = $this->req_ret_str($query);
 	    
-	    $result = $this->req_ret_str($query);	
 		//$result .= $this->web2enum4user2agent(); // BUG USER AGENT 
 		//$result .= $this->web2enum4dav(); // later 
 		//$result .= $this->web2enum4bing();
@@ -1018,7 +1051,14 @@ class WEB extends SERVICE4COM{
 	}
 	
 	
-	
+	public function web4info(){
+	    $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --script=\"http-title,http-traceroute,http-methods,http-headers,http-method-tamper\" $this->vhost -p $this->port -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/script/@output | strings "; // --script \"http-enum,http-title,http-traceroute,http-methods,http-headers,http-method-tamper\"
+	    
+	    
+	    
+	    return $this->req_ret_str($query);
+	    
+	}
 	
 	
 	

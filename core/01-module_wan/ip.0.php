@@ -32,6 +32,7 @@ class IP extends DOMAIN{
     var $ip;
     var $ip2id ;
     var $ip2where ;
+    
     var $tab_open_ports_tcp ;
     var $tab_open_ports_udp ;
     var $tab_open_ports_all;
@@ -100,7 +101,7 @@ class IP extends DOMAIN{
 		}
 		// ============================================================
 		
-
+    
 	}
 	
 	
@@ -389,8 +390,8 @@ $filenames = explode("\n",$test->req_ret_str($query));
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
 		$query = "Automater.py -t $this->ip ";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	
 	}
 	
@@ -447,8 +448,8 @@ routed halfway around the world) you may want to work with your ISP to investiga
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
 		$query = "mysql --user=root --password=hacker --database=geoip --execute=\"CALL ip2asn(\\\"$this->ip\\\");\" 2> /dev/null | grep -Po \"AS[0-9]{1,}.*\" ";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 	
 	public function ip2asn4nmap(){
@@ -457,8 +458,8 @@ routed halfway around the world) you may want to work with your ISP to investiga
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
 		$query = "nmap --script asn-query $this->ip -Pn -sn -e $this->eth -oX -  ";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 	
 
@@ -615,8 +616,8 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | echo '$this->root_passwd' | sudo -S -S nmap -sF -Pn -n --reason --top-ports 5 $this->ip -e $this->eth  ";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 	
 	public function ip2os2xprobe(){
@@ -624,8 +625,8 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S xprobe2 $this->ip  | grep -v 'Xprobe2' ";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 	
 	
@@ -634,8 +635,8 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S nmap -n --reason -O --osscan-guess $this->ip -F -sSU -Pn -e $this->eth -oX - ";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 
 	
@@ -646,8 +647,8 @@ routed halfway around the world) you may want to work with your ISP to investiga
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
 		$query = "mysql --user=root --password=hacker --database=geoip --execute=\"CALL ip2country(\\\"$this->ip\\\");\" 2> /dev/null  | grep -v lepays ";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 	
 
@@ -874,16 +875,16 @@ Explanation : When attempting to defend against Firewalk, the containment phase 
 involves the use IDS signatures that detect TTL shenanigans. The preparation phase involves three options: 1) just live with it. 2) disallow ICMP Time Exceeded
 messages from leaving your internal network and 3) use a proxy server instead of a packet filter.");
 		$query = "echo '$this->root_passwd' | sudo -S nmap --script=\"firewalk\" --traceroute -n --top-ports 5 --reason -Pn $this->ip -e $this->eth -oX -  | xmlstarlet sel -t -v /nmaprun/host/ports/port/state/@state";
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 	
 	public function ip2fw4nmap2fw(){
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S nmap --script=\"firewall-bypass\" -Pn -n --top-ports 5 --reason  $this->ip -e $this->eth -oX -  | xmlstarlet sel -t -v /nmaprun/host/ports/port/state/@state";
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 	
 	
@@ -892,8 +893,8 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sW -Pn -n --reason --top-ports 5 $this->ip -e $this->eth -oX -  | xmlstarlet sel -t -v /nmaprun/host/ports/port/state/@state";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);		
-		return $result;
+		return $this->req_ret_str($query);		
+		
 	}
 	
 	public function ip2fw4ack(){
@@ -932,8 +933,8 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $result = "";
 	    $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S nmap -f -Pn -n --reason  --top-ports 5 $this->ip -e $this->eth -oX - ";
-		$this->req_ret_str($query);		
-		return $result;
+		return $this->req_ret_str($query);		
+		
 	}
 	
 	public function  ip2host($hostname){
@@ -962,8 +963,8 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S traceroute $this->ip ";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 
 
@@ -974,8 +975,8 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		$this->note("ICMP: ECHO 		(Request (Type 08), Reply (Type 00)) " );
 		$query = "echo '$this->root_passwd' | sudo -S nmap -PE -n $this->ip -T 2 -e $this->eth -Pn -oX - ";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 	// ##############################################################################
 	
@@ -986,8 +987,8 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		$this->note("IDEAL INTO LAN - ICMP: Time Stamp 	(Request (Type 13), Reply (Type 14))" );
 		$query = "echo '$this->root_passwd' | sudo -S nmap -PP -n $this->ip -T 2 -e $this->eth -Pn -oX - ";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 	// ##############################################################################
 	
@@ -998,8 +999,8 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		$this->note("ICMP: Information	(Request (Type 15), Reply (Type 16))" );
 		$query = "echo '$this->root_passwd' | sudo -S nmap -PA -n $this->ip -T 2 -e $this->eth -Pn -oX -";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 	// ##############################################################################
 	
@@ -1010,8 +1011,8 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		$this->note("ICMP: Address Mask 	(Request (Type 17), Reply (Type 18))" );
 		$query = "echo '$this->root_passwd' | sudo -S nmap -PM -n $this->ip -T 2 -e $this->eth -Pn -oX -";
 		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
+		
 	}
 	// #############################################################################
 	
@@ -1211,18 +1212,15 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	}
 	
 	public function ip2vhost4nmap(){
-	    $result = "";
-	    $result .= $this->titre(__FUNCTION__);
-		if ($this->ip4priv($this->ip)) return $result."Private IP";
+	    $this->titre(__FUNCTION__);
+		if ($this->ip4priv($this->ip)) return "Private IP";
 		$query = "nmap --script hostmap-ip2hosts -sn -Pn $this->ip -e $this->eth | grep -v -i \"nmap\" | grep -v -i \"csv.php\" | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\" | sort -u ";
-		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		return $this->req_ret_str($query);
 	}
 	
 	public function ip2vhost4web(){
 	    $result = "";
-	    $result .= $this->titre(__FUNCTION__);
+	    $this->titre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return "Private IP";
 		$result = $this->ip2vhost4web4online();
 		$result .= $this->ip2vhost4web4bfk();
@@ -1239,9 +1237,9 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $result .= $this->titre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
 		$query = "wget -qO- \"http://www.bfk.de/bfk_dnslogger.html?query=$this->ip\" | grep '$this->ip'  | grep '  A  ' | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\"  ";
-		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		
+		return $this->req_ret_str($query);
+		
 	}
 	
 	public function ip2vhost4web4sameip(){
@@ -1249,9 +1247,9 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $result .= $this->titre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
 		$query = "wget -qO- \"http://www.sameip.org/$this->ip\" | grep -Po -i \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\" | grep -v -i -E \"(sameip\.org|interserver\.net|bluehost\.com|mltdcoupon\.com|coupondeer\.com)\" | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\"   ";
-		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		
+		return $this->req_ret_str($query);
+		
 	}
 	
 	public function ip2vhost4web4ipadress(){
@@ -1259,9 +1257,9 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $result .= $this->titre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
 		$query = "wget -qO- \"http://www.ip-adress.com/reverse_ip/$this->ip\" | grep '\[Whois\]' | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\"  ";
-		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		
+		return $this->req_ret_str($query);
+		
 	}
 	
 	public function ip2vhost4web4youg(){
@@ -1269,9 +1267,9 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $result .= $this->titre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
 		$query = "wget -qO- \"http://domains.yougetsignal.com/domains.php\" --post-data \"remoteAddress=$this->ip\" | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\"  ";
-		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		
+		return $this->req_ret_str($query);
+		
 	}
 	
 	
@@ -1283,9 +1281,9 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		cat $this->dir_tmp/$this->ip.dnsdigger.cookie.wget | grep -Po \"[0-9a-zA-Z]{40}\"  | tee $this->dir_tmp/$this->ip.dnsdigger.cookie.wget.token ;
 		wget --no-proxy --load-cookies $this->dir_tmp/$this->ip.dnsdigger.cookie.wget \"http://www.dnsdigger.com/hostcollision.php?host=$this->ip&token=`cat $this->dir_tmp/$this->ip.dnsdigger.cookie.wget.token`\" -O $this->dir_tmp/$this->ip.ip2vhost.dnsdigger ;
 		elinks -no-numbering --dump \"file://$this->dir_tmp/$this->ip.ip2vhost.dnsdigger\"  | grep '$this->ip'  | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\"  ;	";
-		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		
+		return $this->req_ret_str($query);
+		
 	}
 	
 
@@ -1311,9 +1309,9 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		    $result .= $this->ssTitre(__FUNCTION__);
 			if ($this->ip4priv($this->ip)) return $result."Private IP";
 			$query = "  ";
-			$result .= $this->cmd("localhost",$query);
-			$result .= $this->req_ret_str($query);
-			return $result;
+			
+			return $this->req_ret_str($query);
+			
 		}
 		
 	public function ip2range4whois(){
@@ -1321,9 +1319,9 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $result .= $this->ssTitre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
 		$query = "echo '".$this->ip2whois()."' | egrep -i \"(NetRange|CIDR|Parent|inetnum)\" ";
-		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		
+		return $this->req_ret_str($query);
+		
 	}
 	
 	
@@ -1332,9 +1330,9 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $result .= $this->ssTitre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
 		$query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=geoip --execute=\"CALL geoipbloc(\\\"$this->ip\\\");\" 2> /dev/null | tail -1 ";
-		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		
+		return $this->req_ret_str($query);
+		
 	}
 	
 	
@@ -1405,9 +1403,9 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		// http://ping.eu/traceroute/
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
 		$query = "wget -qO- \"https://api.hackertarget.com/mtr/?q=$this->ip\"  ";
-		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);
-		return $result;
+		
+		return $this->req_ret_str($query);
+		
 		
 	}
 	
@@ -1452,7 +1450,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	        $this->rouge("ITER PORT $max_iter");
 	        $gauche_iter = intval($max_iter/2);
 	        $droite_iter = intval($max_iter-$gauche_iter);
-	        $file_path = "/tmp/$this->eth.$this->domain.$this->ip.".__FUNCTION__;
+	        $file_path = "/tmp/$this->eth.$this->domain.$this->ip.port4service";
 	        $fp = fopen($file_path, 'w+');
 	        
 	        foreach ($this->tab_open_ports_all as $port){

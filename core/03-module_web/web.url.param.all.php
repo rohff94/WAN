@@ -27,7 +27,7 @@ class PARAM extends XSS{
         $this->fi4pentest($OS);$this->pause();
         $this->ce4pentest($OS);$this->pause();
         $this->xss4pentest();$this->pause();
-        if (!empty($this->value)) $this->sqli4pentest();$this->pause();
+        //if (!empty($this->value)) $this->sqli4pentest();$this->pause();
        
     }
     

