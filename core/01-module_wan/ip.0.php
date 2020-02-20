@@ -1204,7 +1204,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	        
 	       $result .= $this->ip2vhost4nmap();
 		$result .= $this->ip2vhost4web();
-		$result .= $this->req_ret_str("echo '$result' | grep -Po \"([0-9a-z\-_]{1,}\.)+\.[a-z]{1,5}\" | sort -u  "); // | grep -i -Po \"([0-9a-z\-_]{1,}\.)+$this->domain\"
+		$result = $this->req_ret_str("echo '$result' | grep -Po \"([0-9a-z\-_]{1,}\.)+\.[a-z]{1,5}\" | sort -u  "); // | grep -i -Po \"([0-9a-z\-_]{1,}\.)+$this->domain\"
 		
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
@@ -1214,7 +1214,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	public function ip2vhost4nmap(){
 	    $this->titre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return "Private IP";
-		$query = "nmap --script hostmap-ip2hosts -sn -Pn $this->ip -e $this->eth | grep -v -i \"nmap\" | grep -v -i \"csv.php\" | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\" | sort -u ";
+		$query = "nmap --script hostmap-ip2hosts -sn -Pn $this->ip -e $this->eth | grep -v -i \"nmap\" | grep -v -i \"csv.php\" | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\" | grep -v 'huanqiucaipiaotouzhupingtai.com' | sort -u ";
 		return $this->req_ret_str($query);
 	}
 	

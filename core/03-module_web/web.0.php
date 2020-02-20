@@ -258,7 +258,7 @@ class WEB extends SERVICE4COM{
 		    $result .= $exploits_msf;
 		    //echo $exploits;
 		    
-		    //$this->msf2search2exec($cms);
+		    $this->msf2search2exec($cms);
 		    }
 		    
 		    

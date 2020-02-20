@@ -49,11 +49,14 @@ class check4linux8misc extends check4linux8enum{
     }
     
     public function misc2sudo(){
-        $this->ssTitre(__FUNCTION__);
+        $this->ssTitre("can we sudo without supplying a password");
         $attacker_ip = $this->ip4addr4target($this->ip);
         $attacker_port = rand(1024,65535);
         $shell = "/bin/sh";
-        $template_id_euid = "sudo bash -c %ID%";
+
+        
+        
+        $template_id_euid = "echo '' | sudo -S -l -k %ID% 2>/dev/null";
         $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
     }
     

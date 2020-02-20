@@ -37,7 +37,7 @@ class check4linux extends check4linux8jobs{
         $this->etc_passwd_str = trim($this->etc_passwd_str);
         unset($tmp2);
         $this->env_path_str = $this->lan2env4path();
-        
+        $this->pause();
         
     }
     
@@ -58,9 +58,10 @@ class check4linux extends check4linux8jobs{
         
         
         $query = str_replace("%CMD%", "id", $this->template_cmd);
-        $this->requette($query);
+        //$this->requette($query);
         
         $this->lan2start();
+        $this->pause();
         
         if ( $this->uid_name==="root" ) {
             if (!$this->ip2backdoor8db($this->ip2id)) {

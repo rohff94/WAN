@@ -205,10 +205,6 @@ class lan4linux extends LAN{
         $this->lan2stream4result($data,$this->stream_timeout);
         
         
-        $this->ssTitre("can we sudo without supplying a password");
-        $data = "echo '' | sudo -S -l -k 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
-        
         $data = "groups";
         $this->lan2stream4result($data,$this->stream_timeout);
         

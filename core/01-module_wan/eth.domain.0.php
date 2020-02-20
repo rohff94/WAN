@@ -477,7 +477,7 @@ class DOMAIN extends ETH{
 	
 	public function domain2search4sublister(){
 	    $this->ssTitre(__FUNCTION__);
-		$query = "python3 /opt/sublist3r/sublist3r.py -d $this->domain --no-color  2> /dev/null  | grep -Po -i \"([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|([0-9a-z\-\_\.]{1,}\.$this->domain)\" ";
+		$query = "python3 /opt/sublist3r/sublist3r.py -d $this->domain --no-color  2> /dev/null  | grep -Po -i \"([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|([0-9a-z\-\_\.]{1,}\.$this->domain)\" | sort -u ";
 		return $this->req_ret_str($query);		
 	}
 	
@@ -509,7 +509,7 @@ class DOMAIN extends ETH{
 
 	public function domain2search4harvest(){
 	    $this->ssTitre(__FUNCTION__);
-		$query = "python3.8 /opt/theharvester/theHarvester.py -d $this->domain -l 200 -b all -v 2> /dev/null | grep -E \"([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|[0-9a-zA-Z\-_]{1,}\.$this->domain)\" ";
+		$query = "python3.8 /opt/theharvester/theHarvester.py -d $this->domain -l 200 -b all -v 2> /dev/null | grep -E \"([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|[0-9a-zA-Z\-_]{1,}\.$this->domain)\"  | sort -u ";
 		return $this->req_ret_str($query);
 	}
 	
@@ -582,7 +582,7 @@ class DOMAIN extends ETH{
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        $query = "echo '$this->root_passwd' | sudo -S nmap --script dns-nsid -p 53 $dns -Pn -n ";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
-	        $query = "nslookup -query=ptr ".gethostbyname($dns)." | grep 'name' | cut -d'=' -f2 | sed \"s/\.$//g\" | tr -d ' ' | grep  -i -Po \"([0-9a-zA-Z_-]{1,}\.)+[a-zA-Z]{1,4}\"  ";
+	        $query = "nslookup -query=ptr ".gethostbyname($dns)." | grep 'name' | cut -d'=' -f2 | sed \"s/\.$//g\" | tr -d ' ' | grep  -i -Po \"([0-9a-zA-Z_-]{1,}\.)+[a-zA-Z]{1,4}\"  | sort -u  ";
 	        $result .= "$query\n";
 	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
 	        $query = "dig @$dns $this->domain RP +short | grep -v '^;' ";
