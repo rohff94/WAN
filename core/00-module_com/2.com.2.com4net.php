@@ -8,6 +8,19 @@ class com4net extends com4user {
     }
     
     
+    public function web2cms($vhost,$port){
+        $this->ssTitre(__FUNCTION__);
+        $vhost = trim($vhost);
+        $port = trim($port);
+        $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --script=\"http-generator\" $vhost -p $port -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/script/@output | strings "; //
+        return $this->req_ret_str($query);
+    }
+    
+
+    
+    
+    
+    
     function ssh($host,$port,$login,$mdp,$command) {
         $result = "";
         $query = "sshpass -p '$mdp' ssh $login@$host -p $port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C \"$command\" ";

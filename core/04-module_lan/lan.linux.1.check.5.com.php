@@ -70,8 +70,8 @@ class check4linux extends check4linux8jobs{
             }
         }
         else {
-            if (!$this->ip2root8db($this->ip2id)) {$this->misc();$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->users();$this->pause();}
+            //if (!$this->ip2root8db($this->ip2id)) {$this->misc();$this->pause();}
+            //if (!$this->ip2root8db($this->ip2id)) {$this->users2root();$this->pause();}
             if (!$this->ip2root8db($this->ip2id)) {$this->exploits();$this->pause();}
             if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}
             if (!$this->ip2root8db($this->ip2id)) {$this->jobs();$this->pause();}

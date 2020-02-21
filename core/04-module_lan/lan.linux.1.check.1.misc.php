@@ -63,6 +63,7 @@ class check4linux8misc extends check4linux8enum{
     public function misc2container(){
         $this->titre(__FUNCTION__);
         $this->misc2container2lxd();
+        $this->misc2container2docker();
     }
     
     
@@ -159,7 +160,6 @@ lxc launch SomeAlias MyMachine
     public function misc(){
         $this->titre(__FUNCTION__);
         if (!$this->ip2root8db($this->ip2id))  $this->misc2container();$this->pause(); 
-        return 0;
         if (!$this->ip2root8db($this->ip2id))  $this->misc2keys();$this->pause();
         if (!$this->ip2root8db($this->ip2id))  $this->misc4passwd();$this->pause();
         if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_sudoers();$this->pause();
@@ -314,7 +314,7 @@ lxc launch SomeAlias MyMachine
         $data = "find / \( -name \"id_dsa\" -o -name \"id_rsa\" -o -name \"ssh_host_key\" -o -name \"ssh_host_rsa_key\" -o -name \"ssh_host_dsa_key\" -o -name \"identity\"  \) -exec ls {} 2>/dev/null \;";
         $tmp = $this->lan2stream4result($data,$this->stream_timeout*3);
         
-        $command = "echo '$tmp' | grep -i -Po \"^(/[a-z0-9\-\_\.]{1,})*\" ";
+        $command = "echo '$tmp' | grep -i -Po \"^(/[a-z0-9\-\_\.]{1,})*\" | sort -u ";
         exec($command,$tab_privkeys);
         $this->article("All Priv Keys Location", $this->tab($tab_privkeys));
         if (!empty($tab_privkeys)){
@@ -561,15 +561,17 @@ If the user does not have a password, then the password field will have an *(ast
         
         if ($this->lan2file4writable($obj_filename->file_path)){
             if (!$this->lan2file4search($obj_filename->file_path, $search)){
-                $result .= $this->lan2file4add($obj_filename->file_path, $search);
+                $this->lan2file4add($obj_filename->file_path, $search);
             }
-            $result .= $this->users4root($this->uid_name, '');
+            $this->users4root($this->uid_name, '');
         }
-        return $result;
     }
     
   
     
+    
+    
+ 
     
     public function misc2etc_exports2setsuid($mount_rhost_path){
         $this->ssTitre(__FUNCTION__);

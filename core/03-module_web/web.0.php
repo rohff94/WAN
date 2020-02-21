@@ -24,8 +24,8 @@ class WEB extends SERVICE4COM{
 	    
 	    if (parse_url( $this->web, PHP_URL_PORT)!==FALSE) $port = parse_url( $this->web, PHP_URL_PORT);
 	    else {
-	        if($this->http_type=="https") $port = 443 ;
-	        if($this->http_type=="http") $port = 80;
+	        if($this->http_type==="https") $port = 443 ;
+	        if($this->http_type==="http") $port = 80;
 	    }
 	    
 	    
@@ -239,29 +239,15 @@ class WEB extends SERVICE4COM{
 		    return $result;
 		}
 
+
 		
 		public function web4pentest(){
 		    $result = "";
 		    $tab_urls = array();
 		    $this->gtitre(__FUNCTION__);
 		    
-		    
-		    $cms = $this->web2cms();
-		    if (!empty($cms)){
-		        $this->ssTitre("Searching exploit associate to CMS");
-		        $exploits_db = $this->tab($this->exploitdb($cms));
-		        $this->article("Exploits 8 DB", $exploits_db);
-		        $result .= $exploits_db;
-		    
-		    $exploits_msf = $this->msf2search2info($cms);
-		    $this->article("Exploits 8 MSF", $exploits_msf);
-		    $result .= $exploits_msf;
-		    //echo $exploits;
-		    
-		    $this->msf2search2exec($cms);
-		    }
-		    
-		    
+		    $cms = $this->web2cms($this->vhost,$this->port);
+		    if (!empty($cms)) $this->msf2search2exec($cms);
 		    
 			$tab_urls = $this->web2urls();
 			$this->article("ALL URLs For Testing", $this->tab($tab_urls));
@@ -284,7 +270,7 @@ class WEB extends SERVICE4COM{
                 fclose($fp);
                 
                 $query = "gedit $file_path";
-                $this->requette($query);
+                if ($this->flag_poc) $this->requette($query);
                 
                 //$this->requette("cat $file_path | parallel --progress --no-notice -k -j24 php pentest.php URL {} ");
 
@@ -315,12 +301,7 @@ class WEB extends SERVICE4COM{
 		    $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --script=\"http-robots.txt\" $this->vhost -p $this->port -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/script/@output | strings "; // --script \"http-enum,http-title,http-traceroute,http-methods,http-headers,http-method-tamper\"
 		    return $this->req_ret_str($query);
 		}
-		
-		public function web2cms(){
-		    $this->ssTitre(__FUNCTION__);
-		    $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --script=\"http-generator\" $this->vhost -p $this->port -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/script/@output | strings "; // 
-		    return $this->req_ret_str($query);	
-		}
+
 		
 		public function web2urls(){
 		    $this->titre(__FUNCTION__);

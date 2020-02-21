@@ -146,6 +146,8 @@ public function screenshot($seconde){
 	    //if ($this->flag_poc) sleep(2);
 	    //return $display_xml;
 	}
+	
+	
 
 
 	function isIPv4($ip) {

