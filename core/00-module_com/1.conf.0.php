@@ -69,7 +69,7 @@ class CONFIG {
 	$this->dir_c = "$this->racine/cs";
 	$this->dir_vdo = "$this->racine/VDO";
 	$this->dir_img = "$this->racine/../IMG";
-	$this->dir_install = "$this->racine/../install";
+	$this->dir_install = "$this->racine/install";
 	
 	$this->dico_web = "$this->dir_tools/dico/web.dico";
 	$this->dico_web_file = "$this->dir_tools/dico/web.file.dico";

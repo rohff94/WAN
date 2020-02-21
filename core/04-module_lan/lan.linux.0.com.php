@@ -526,6 +526,8 @@ system("/bin/bash -c id");
 return 0;
 }
 EOC;
+          
+            
 
             $query = "echo '$seteuid' > /tmp/seteuid_id_$this->uid_name.c";
             $this->lan2stream4result($query,$this->stream_timeout);

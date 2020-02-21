@@ -895,14 +895,12 @@ This can be used to help determine the OS running and the last time it's been fu
     public function lan2root8shadow($shadow_str,$password_str){
         $this->ssTitre(__FUNCTION__);
         
-        file_put_contents("$this->dir_tmp/$this->ip.$this->port.$this->protocol.shadow", $shadow_str);
-        file_put_contents("$this->dir_tmp/$this->ip.$this->port.$this->protocol.passwd", $password_str);
+        file_put_contents("/tmp/$this->ip.$this->port.$this->protocol.shadow", $shadow_str);
+        file_put_contents("/tmp/$this->ip.$this->port.$this->protocol.passwd", $password_str);
         
-        $unshadow_file = "$this->dir_tmp/$this->ip.$this->port.$this->protocol.unshadow";
-        $this->requette("unshadow '$this->dir_tmp/$this->ip.$this->port.$this->protocol.passwd'  '$this->dir_tmp/$this->ip.$this->port.$this->protocol.shadow'  > $unshadow_file");
+        $unshadow_file = "/tmp/$this->ip.$this->port.$this->protocol.unshadow";
+        $this->requette("unshadow '/tmp/$this->ip.$this->port.$this->protocol.passwd'  '/tmp/$this->ip.$this->port.$this->protocol.shadow'  > $unshadow_file");
         $this->lan2root2crack($unshadow_file);
-        
-        
     }
 
     public function lan2root2crack($unshadow_file){
@@ -914,7 +912,7 @@ This can be used to help determine the OS running and the last time it's been fu
         $pot_file = "$this->vm_tmp_lin/$sha1_hash.pot";
         
         //if($this->ip2crack4check())
-        if (!file_exists($pot_file)) $this->requette("john $obj_file->file_path --session=$pot_file --wordlist:\"$this->dir_tools/dico/password.dico.1000\" ");
+        if (!file_exists($pot_file)) $this->requette("john $obj_file->file_path --session=$pot_file --wordlist:\"$this->dir_tools/dico/password.dico\" ");
         
         if (file_exists($pot_file)){
             $pot_str = file_get_contents($pot_file);

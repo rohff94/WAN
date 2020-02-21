@@ -758,7 +758,7 @@ DATABASE_PASS: hacker");
 	    $this->ssTitre("SHOW ALL DATABASES");
 	    $this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --execute=\"SHOW DATABASES;\" 2>/dev/null");$this->pause();
 	    $this->ssTitre("Install TABLES");
-	    //$this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --database=bot --execute=\"source $this->dir_install/install/bot.sql\" 2>/dev/null ");$this->pause();
+	    //$this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --database=bot --execute=\"source $this->dir_install/bot.sql\" 2>/dev/null ");$this->pause();
 	    $this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --database=bot --execute=\"source $this->dir_install/localhost/port.sql\" 2>/dev/null ");$this->pause();
 	    
 	}
@@ -1471,17 +1471,17 @@ deb-src http://ppa.launchpad.net/nicolas-zin/ossec-ubuntu/ubuntu trusty main ";
 	
 	public function install_soft(){ // OK 
 	    $this->ssTitre("Install in CONSOLE");
-	    $this->cmd("localhost","for i in `cat $this->dir_install/install/install.console` ; do sudo apt-get -y install \$i ;done  ");
+	    $this->cmd("localhost","for i in `cat $this->dir_install/install.console` ; do sudo apt-get -y install \$i ;done  ");
 	    $this->pause();
 	    
 	    
-	     $tab_soft_apt = file("$this->dir_install/install/install.apt");
-	     $tab_soft_pip2 = file("$this->dir_install/install/install.pip2");
-	     $tab_soft_pip3 = file("$this->dir_install/install/install.pip3");
-	     $tab_soft_cpan = file("$this->dir_install/install/install.cpan");
-	     $tab_soft_gems = file("$this->dir_install/install/install.gems");
-	     $tab_soft_brew = file("$this->dir_install/install/install.brew");
-	     $tab_soft_snap = file("$this->dir_install/install/install.snap");
+	     $tab_soft_apt = file("$this->dir_install/install.apt");
+	     $tab_soft_pip2 = file("$this->dir_install/install.pip2");
+	     $tab_soft_pip3 = file("$this->dir_install/install.pip3");
+	     $tab_soft_cpan = file("$this->dir_install/install.cpan");
+	     $tab_soft_gems = file("$this->dir_install/install.gems");
+	     $tab_soft_brew = file("$this->dir_install/install.brew");
+	     $tab_soft_snap = file("$this->dir_install/install.snap");
 	     
 	     $this->ssTitre("Install in APT");foreach($tab_soft_apt as $soft_name) $this->install_soft_apt($soft_name);$this->pause();$this->ssTitre("Upgrade on Host");$this->update_dep(); // OK 
 	     $this->ssTitre("Install in PIP2");foreach($tab_soft_pip2 as $soft_name) $this->install_soft_pip2($soft_name);$this->pause();$this->ssTitre("Upgrade on Host");$this->update_dep(); // OK 
