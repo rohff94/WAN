@@ -89,9 +89,9 @@ Many times, we do want to see if there are any files owned by those users outsid
                        
             if (!$this->ip2root8db($this->ip2id)) $this->lan2root8bin($suid,FALSE,"");$this->pause();
             
-            if (!$this->ip2root8db($this->ip2id))  $this->suids8env($suid);$this->pause();
+            //if (!$this->ip2root8db($this->ip2id))  $this->suids8env($suid);$this->pause();
             
-            if (!$this->ip2root8db($this->ip2id))  $this->suids8app($suid);$this->pause();
+            //if (!$this->ip2root8db($this->ip2id))  $this->suids8app($suid);$this->pause();
             
             //if (!$this->ip2root8db($this->ip2id)) $this->suids8bof($suid);$this->pause();
             

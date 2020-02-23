@@ -123,7 +123,7 @@ class poc4lan extends poc4web {
         $user_name_created = "user" ;
         $user_name_pass = "password";
         
-        $ip = "10.60.10.137"; // DC-1
+        $ip = "10.60.10.137"; // DC-1 OK 
         $port = "22";
         $protocol = "T";
         $user_name_created = "flag4" ;

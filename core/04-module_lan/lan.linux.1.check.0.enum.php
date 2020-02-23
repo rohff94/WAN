@@ -900,57 +900,31 @@ This can be used to help determine the OS running and the last time it's been fu
         
         $unshadow_file = "/tmp/$this->ip.$this->port.$this->protocol.unshadow";
         $this->requette("unshadow '/tmp/$this->ip.$this->port.$this->protocol.passwd'  '/tmp/$this->ip.$this->port.$this->protocol.shadow'  > $unshadow_file");
-        $this->lan2root2crack($unshadow_file);
+        $dico = "$this->dir_tools/dico/password.dico.10k"  ;
+        $this->lan2root2crack($unshadow_file,$dico);
     }
 
-    public function lan2root2crack($unshadow_file){
+    
+    
+    public function lan2root2crack($unshadow_file,$dico){
         $this->ssTitre(__FUNCTION__);
+        $user = array();
         $unshadow_file = trim($unshadow_file);
         $obj_file = new FILE($unshadow_file);
-        $unshadow_str = file_get_contents($unshadow_file);
-        $sha1_hash = sha1($unshadow_str);
-        $pot_file = "$this->vm_tmp_lin/$sha1_hash.pot";
         
-        //if($this->ip2crack4check())
-        if (!file_exists($pot_file)) $this->requette("john $obj_file->file_path --session=$pot_file --wordlist:\"$this->dir_tools/dico/password.dico\" ");
-        
-        if (file_exists($pot_file)){
-            $pot_str = file_get_contents($pot_file);
-            $this->ip2crack($pot_str);
-        $tab_user2pass = $this->req_ret_tab("john --show $this->dir_tmp/$this->ip.$this->port.$this->protocol.crack | grep ':' ");
+        $this->requette("john $obj_file->file_path --wordlist:\",$dico\" ");
+
+        $tab_user2pass = $this->req_ret_tab("john --show $obj_file->file_path | grep ':' ");
         if (!empty($tab_user2pass))
             foreach ($tab_user2pass as $user2tmp){
-                //if (preg_match('/(?<user2name>\w+)\:(?<user2cpw>\w+)\:(?<user2uid>\d+)\:(?<user2gid>\d+)\:(?<user2full_name>\w+)\:(?<user2home>\w+)\:(?<user2shell>\w+)/',$line,$user))
-                if(!empty($user2tmp)){
-                    $auth_user2name = $this->req_ret_str("echo '$user2tmp' | cut -d':' -f1 ");
-                    $this->article("USER NAME", $auth_user2name);
-                    $auth_user2pass = $this->req_ret_str("echo '$user2tmp' | cut -d':' -f2 ");
-                    $this->article("USER PASSWORD", $auth_user2pass);
-                    $auth_user2uid = $this->req_ret_str("echo '$user2tmp' | cut -d':' -f3 ");
-                    $this->article("USER UID", $auth_user2uid);
-                    $auth_user2gid = $this->req_ret_str("echo '$user2tmp' | cut -d':' -f4 ");
-                    $this->article("USER GID", $auth_user2gid);
-                    $auth_user2def = $this->req_ret_str("echo '$user2tmp' | cut -d':' -f5 ");
-                    $this->article("USER COMMENT", $auth_user2def);
-                    $auth_user2home = $this->req_ret_str("echo '$user2tmp' | cut -d':' -f6 ");
-                    $this->article("USER HOME", $auth_user2home);
-                    $auth_user2shell = $this->req_ret_str("echo '$user2tmp' | cut -d':' -f7 ");
-                    $this->article("USER SHELL", $auth_user2shell);
-                    $this->yesAUTH($this->port2id, $auth_user2name, $auth_user2pass,$auth_user2uid,$auth_user2gid,$auth_user2def,$auth_user2home,$auth_user2shell,"crack etc_passwd and shadow with john ", $this->ip2geoip());
-                }
-        }
+                if (preg_match('|^(?<user2name>[a-zA-Z0-9\-\_]{1,}):(?<user2cpw>[[:print:]]{1,}):(?<user2uid>[0-9]{1,}):(?<user2gid>[0-9]{1,}):(?<user2full_name>[[:print:]]{0,}):(?<user2home>[[:print:]]{1,}):(?<user2shell>[[:print:]]{1,})|',$user2tmp,$user))
+                {
+                    $this->yesAUTH($this->port2id, $user['user2name'], $user[''],$user[''],$user[''],$user[''],$user[''],$user[''],"crack etc_passwd and shadow with john ", $this->ip2geoip());
+                    
+                }       
         }
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    }
+   }
     
     
     

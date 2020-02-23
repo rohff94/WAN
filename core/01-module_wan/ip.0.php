@@ -68,6 +68,11 @@ class IP extends DOMAIN{
 			    $this->rouge("No IP");	
 			    exit();
 			}
+			
+			if ( ($this->ip ==="127.0.0.1") && ($this->eth !== "lo") ) {
+			    $this->rouge("localhost IP from $this->eth interface");
+			    exit();
+			}
 		    
 		}
 		
@@ -1448,16 +1453,13 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	        if (!empty($this->tab_open_ports_all)){
 	        $max_iter = count($this->tab_open_ports_all);
 	        $this->rouge("ITER PORT $max_iter");
-	        $gauche_iter = intval($max_iter/2);
-	        $droite_iter = intval($max_iter-$gauche_iter);
+
 	        $file_path = "/tmp/$this->eth.$this->domain.$this->ip.port4service";
 	        $fp = fopen($file_path, 'w+');
 	        
 	        foreach ($this->tab_open_ports_all as $port){
-	            if (!empty($port))  {
-	                
-	                foreach ($port as $port_num => $protocol){
-                    
+	            if (!empty($port))  {	                
+	                foreach ($port as $port_num => $protocol){                    
                     $data = "$this->eth $this->domain $this->ip $port_num $protocol port4service FALSE";
 	                $data = $data."\n";
 	                fputs($fp,$data);
@@ -1468,7 +1470,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	        
 	            fclose($fp);
 	            $this->requette("cat $file_path");
-	            if ( (1<$max_iter) && (30>$max_iter) && ($this->ip2fw4enable()) ) $this->requette("php parallel.php \"cat  $file_path | awk 'FNR>0 && FNR<=$gauche_iter' | parallel --progress --no-notice -k -j$gauche_iter php pentest.php PORT {} \" \"cat  $file_path | awk 'FNR>$gauche_iter && FNR<=$max_iter' | parallel --progress --no-notice -k -j$droite_iter php pentest.php PORT {} \" 0 ");
+	            if ( (1<$max_iter) && (30>$max_iter) && ($this->ip2fw4enable()) ) $this->requette("cat  $file_path | parallel --progress --no-notice -k php pentest.php PORT {} "); // -j$max_iter 
 	        
 	        foreach ($this->tab_open_ports_all as $port){
 	            if (!empty($port))  {

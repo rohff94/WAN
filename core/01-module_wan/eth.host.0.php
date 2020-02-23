@@ -125,8 +125,7 @@ class HOST extends DOMAIN{
             if (!empty($ips)) {
                 $max_iter = count($ips);
                 $this->rouge("ITER IP $max_iter");
-                $gauche_iter = intval($max_iter/2);
-                $droite_iter = intval($max_iter-$gauche_iter);
+
                 $file_path = "/tmp/$this->eth.$this->domain.$this->host.ip4service";
                 $fp = fopen($file_path, 'w+');
                 foreach ($ips as $ip_addr) {
@@ -138,7 +137,7 @@ class HOST extends DOMAIN{
                 }
                 fclose($fp);
                 
-                if ( (1<$max_iter) && (20>$max_iter)) $this->requette("php parallel.php \"cat  $file_path | awk 'FNR>0 && FNR<=$gauche_iter' | parallel --progress --no-notice -k -j$gauche_iter php pentest.php IP {} \" \"cat  $file_path | awk 'FNR>$gauche_iter && FNR<=$max_iter' | parallel --progress --no-notice -k -j$droite_iter php pentest.php IP {} \" 0 ");
+                if ( (1<$max_iter) && (20>$max_iter)) $this->requette("cat  $file_path | parallel --progress --no-notice -k php pentest.php IP {} "); // -j$max_iter
                 
             }
             
