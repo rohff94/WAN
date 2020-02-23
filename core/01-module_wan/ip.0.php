@@ -402,19 +402,33 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	
 
 	
-	public function ip2crack($crack_str){
+	public function ip2crack($unshadow_file,$dico){
 	    $this->titre(__FUNCTION__);
-	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
-	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
+	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." <> 0";
+	    if ($this->checkBD($sql_r_1) ) return $this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where ");
 	    else {
-	        $result = base64_encode($crack_str);
-	        return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
+	        $user = array();
+	        $unshadow_file = trim($unshadow_file);
+	        $obj_file = new FILE($unshadow_file);
+	        
+	        $this->requette("john $obj_file->file_path --wordlist:\",$dico\" ");
+	        
+	        $tab_user2pass = $this->req_ret_tab("john --show $obj_file->file_path | grep ':' ");
+	        if (!empty($tab_user2pass))
+	            foreach ($tab_user2pass as $user2tmp){
+	                if (preg_match('|^(?<user2name>[a-zA-Z0-9\-\_]{1,}):(?<user2cpw>[[:print:]]{1,}):(?<user2uid>[0-9]{1,}):(?<user2gid>[0-9]{1,}):(?<user2full_name>[[:print:]]{0,}):(?<user2home>[[:print:]]{1,}):(?<user2shell>[[:print:]]{1,})|',$user2tmp,$user))
+	                {
+	                    $this->yesAUTH($this->port2id, $user['user2name'], $user['user2cpw'],$user['user2uid'],$user['user2gid'],$user['user2full_name'],$user['user2home'],$user['user2shell'],"crack etc_passwd and shadow with john ");
+	                }
+	        }
+	        
+	        return $this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",1);
 	    }
 	}
 	
 	public function ip2crack4check(){
 	    $this->titre(__FUNCTION__);
-	    $sql_r_1 = "SELECT ip2crack FROM ".__CLASS__." WHERE $this->ip2where  AND ip2crack IS NOT NULL";
+	    $sql_r_1 = "SELECT ip2crack FROM ".__CLASS__." WHERE $this->ip2where  AND ip2crack <> 0";
 	    return $this->checkBD($sql_r_1) ;
 	}
 	

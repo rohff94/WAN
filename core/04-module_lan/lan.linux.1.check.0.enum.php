@@ -901,30 +901,11 @@ This can be used to help determine the OS running and the last time it's been fu
         $unshadow_file = "/tmp/$this->ip.$this->port.$this->protocol.unshadow";
         $this->requette("unshadow '/tmp/$this->ip.$this->port.$this->protocol.passwd'  '/tmp/$this->ip.$this->port.$this->protocol.shadow'  > $unshadow_file");
         $dico = "$this->dir_tools/dico/password.dico.10k"  ;
-        $this->lan2root2crack($unshadow_file,$dico);
+        $this->ip2crack($unshadow_file,$dico);
     }
 
     
-    
-    public function lan2root2crack($unshadow_file,$dico){
-        $this->ssTitre(__FUNCTION__);
-        $user = array();
-        $unshadow_file = trim($unshadow_file);
-        $obj_file = new FILE($unshadow_file);
-        
-        $this->requette("john $obj_file->file_path --wordlist:\",$dico\" ");
-
-        $tab_user2pass = $this->req_ret_tab("john --show $obj_file->file_path | grep ':' ");
-        if (!empty($tab_user2pass))
-            foreach ($tab_user2pass as $user2tmp){
-                if (preg_match('|^(?<user2name>[a-zA-Z0-9\-\_]{1,}):(?<user2cpw>[[:print:]]{1,}):(?<user2uid>[0-9]{1,}):(?<user2gid>[0-9]{1,}):(?<user2full_name>[[:print:]]{0,}):(?<user2home>[[:print:]]{1,}):(?<user2shell>[[:print:]]{1,})|',$user2tmp,$user))
-                {
-                    $this->yesAUTH($this->port2id, $user['user2name'], $user[''],$user[''],$user[''],$user[''],$user[''],$user[''],"crack etc_passwd and shadow with john ", $this->ip2geoip());
-                    
-                }       
-        }
-        
-   }
+   
     
     
     
