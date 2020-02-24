@@ -23,8 +23,20 @@ class com4display extends INSTALL {
 		$this->filter_file_path = " | grep -i -Po \"(/[a-z0-9\-\_\.]{1,})*\"";
 	}
 
+	public function log2succes($chaine,$file,$class,$function,$line,$info,$extrainfo){
+	    $this->notify($chaine);
+	    $time = date('l jS \of F Y h:i:s A');
+	    $str = "$time,$chaine,$file,$class,$function,$line,$info,$extrainfo";
+	    $this->requette("echo '$str' >>  $this->log_succes_path");
+	}
 	
-
+	
+	public function log2error($chaine,$file,$class,$function,$line,$info,$extrainfo){
+	    $this->notify($chaine);
+	    $time = date('l jS \of F Y h:i:s A');
+	    $str = "$time,$chaine,$file,$class,$function,$line,$info,$extrainfo";
+	    $this->requette("echo '$str' >>  $this->log_error_path");
+	}
 	
 	//  jaune gras | jaune
 	public function cmd($host,$query){
@@ -110,7 +122,7 @@ class com4display extends INSTALL {
 	            break;
 	            
 	        case "Unknown":
-	            $this->rouge("unknown stream");
+	            $this->log2error("unknown stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 	            break;
 	            
 	        case "process":

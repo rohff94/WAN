@@ -32,6 +32,27 @@ class ETH extends DATA{
     
     
     
+    public function cidr2scan($cidr,$eth){
+        $this->titre(__FUNCTION__);
+        $cidr = trim($cidr);
+        if (!empty($cidr)) return $this->cidr2scan4nmap($cidr,$this->eth);
+        //$this->cidr2scan4fping($cidr);
+    }
+    
+    public function cidr2scan4nmap($cidr,$eth){
+        $this->ssTitre(__FUNCTION__);
+        $cidr = trim($cidr);
+        $query = " nmap -sn --reason $cidr -e $eth | grep 'Nmap scan report for' | sed \"s/Nmap scan report for//g\"  " ; // | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"
+        if (!empty($cidr)) return $this->req_ret_str($query);
+    }
+    
+    public function cidr2scan4fping($cidr){
+        $this->ssTitre(__FUNCTION__);
+        $cidr = trim($cidr);
+        $query = " echo '$this->root_passwd' | sudo -S fping -a -n -g $cidr 2> /dev/null | grep -v -E \"(Unreachable|error)\" ";
+        if (!empty($cidr)) return $this->req_ret_str($query);
+    }
+    
     
 }
 

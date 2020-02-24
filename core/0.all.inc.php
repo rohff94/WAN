@@ -17,8 +17,8 @@ include_once("./core/00-module_com/2.com.6.com4dot.php");
 include_once("./core/00-module_com/2.com.7.com4code.php");
 include_once("./core/00-module_com/2.com.8.com4for.php");
 include_once("./core/00-module_com/3.data.php");
-include_once("./core/01-module_wan/cidr.0.php");
 include_once("./core/01-module_wan/eth.0.php");
+include_once("./core/01-module_wan/eth.cidr.php");
 include_once("./core/01-module_wan/eth.domain.0.php");
 include_once("./core/01-module_wan/eth.host.0.php");
 include_once("./core/01-module_wan/ip.0.php");
@@ -115,8 +115,6 @@ include_once("./core/13-module_poc/0.poc.4.bof.php");
 include_once("./core/13-module_poc/0.poc.5.root.php");
 include_once("./core/13-module_poc/0.poc.6.malware.php");
 include_once("./core/13-module_poc/1.poc.php");
-
-
 
 
 ?>

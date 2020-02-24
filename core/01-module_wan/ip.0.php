@@ -52,7 +52,7 @@ class IP extends DOMAIN{
 		$this->tab_open_ports_all = array();
 		$this->tab_cve_source = array();
 
-		if (empty($ip)) return $this->rouge("EMPTY IP");
+		if (empty($ip)) return $this->log2error("EMPTY IP",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 		if ( ($this->isIPv4($ip_addr)) || ($this->isIPv6($ip_addr)) ) {
 		    $this->ip = $ip_addr;
 		   }
@@ -65,12 +65,12 @@ class IP extends DOMAIN{
 			else {
 			    var_dump($ip_tmp);
 			    $this->article("IP", $ip_addr);
-			    $this->rouge("No IP");	
+			    $this->log2error("No IP",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");	
 			    exit();
 			}
 			
 			if ( ($this->ip ==="127.0.0.1") && ($this->eth !== "lo") ) {
-			    $this->rouge("localhost IP from $this->eth interface");
+			    $this->log2error("localhost IP from $this->eth interface",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 			    exit();
 			}
 		    
@@ -100,7 +100,7 @@ class IP extends DOMAIN{
 		    $ip_wan = $this->ip4net();
 		    if (!$this->isIPv4($ip_wan)) {
 		        $chaine = "Lost Connexion to the net";
-		        $this->rouge($chaine);
+		        $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 		        exit();
 		    }
 		}
@@ -142,6 +142,10 @@ class IP extends DOMAIN{
 	    $query = "tail -f /var/log/mail.log";
 	    $this->cmd("localhost", $query);
 	    $query = "watch -n 5 -e \"grep -i segfault /var/log/kern.log\"";
+	    $this->cmd("localhost", $query);
+	    $query = "tail -f $this->log_error_path";
+	    $this->cmd("localhost", $query);
+	    $query = "tail -f $this->log_succes_path";
 	    $this->cmd("localhost", $query);
 	}
 	
@@ -418,7 +422,8 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	            foreach ($tab_user2pass as $user2tmp){
 	                if (preg_match('|^(?<user2name>[a-zA-Z0-9\-\_]{1,}):(?<user2cpw>[[:print:]]{1,}):(?<user2uid>[0-9]{1,}):(?<user2gid>[0-9]{1,}):(?<user2full_name>[[:print:]]{0,}):(?<user2home>[[:print:]]{1,}):(?<user2shell>[[:print:]]{1,})|',$user2tmp,$user))
 	                {
-	                    $this->yesAUTH($this->port2id, $user['user2name'], $user['user2cpw'],$user['user2uid'],$user['user2gid'],$user['user2full_name'],$user['user2home'],$user['user2shell'],"crack etc_passwd and shadow with john ");
+	                   $this->yesAUTH($this->port2id, $user['user2name'], $user['user2cpw'],$user['user2uid'],$user['user2gid'],$user['user2full_name'],$user['user2home'],$user['user2shell'],"crack etc_passwd and shadow with john ");
+	                   $this->ip2auth();
 	                }
 	        }
 	        
@@ -1086,7 +1091,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $this->ip2port();$this->pause();
 	    $port_sum = count($this->tab_open_ports_all);
 	    $this->article("ALL PORT SUM",$port_sum);
-	    if ($port_sum > 50 ) { $this->rouge("HONEYPOT DETECTED"); $this->ip2os();return true ;}
+	    if ($port_sum > 50 ) { $this->log2error("HONEYPOT DETECTED",__FILE__,__CLASS__,__FUNCTION__,__LINE__.$this->ip,$this->ip2os());return true ;}
 	    else return false ;
 	}
 	
@@ -1180,35 +1185,28 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	}
 	
 	public function ip2auth(){
-	    $result = "";
 	    $this->titre(__FUNCTION__);
-	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
-	    if ($this->checkBD($sql_r_1) ) {
-	        return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
-	    }
-	    else {
-	        
-	        $sql_service = "select DISTINCT service2name,port,protocol from PORT where id8port = '$this->port2id' AND (service2name = 'asterisk' OR service2name LIKE '%ftp%'  OR service2name = 'icq' OR service2name = 'imap' OR service2name = 'imaps' OR service2name = 'ldap2' OR service2name = 'ldap2s' OR service2name = 'ldap3' OR service2name = 'mssql' OR service2name = 'mysql' OR service2name = 'nntp' OR service2name = 'oracle-listener' OR service2name = 'oracle-sid' OR service2name = 'pcanywhere' OR service2name = 'postgres' OR service2name = 'rlogin'  OR service2name LIKE '%rdp%' OR service2name = 'sip' OR service2name = 'ssh' OR service2name LIKE '%smb%' OR service2name LIKE '%samba%' OR service2name = 'snmp' OR service2name = 'smtp' OR service2name = 'smtps' OR service2name = 'vnc' OR service2name = 'xmpp') ORDER BY port  ;";
-		    $this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_service\"  2>/dev/null ");
-		    
-		    $this->titre("AUTH ");
-		    $sql_auth = "select DISTINCT port,protocol,user2name,user2pass,user2info from AUTH where id8port = '$this->port2id' ORDER BY port;";
-		    $this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_auth\"  2>/dev/null ");
-
-		    if ( ($user2auth = $this->mysql_ressource->query($sql_auth)) && ($service = $this->mysql_ressource->query($sql_service)) ) {
-		        while ($auth_row = $user2auth->fetch_assoc()) {
+	$sql_service = "select id8port,service2name FROM SERVICE WHERE id8port IN (SELECT id FROM PORT WHERE id8ip= '$this->ip2id') AND (service2name = 'asterisk' OR service2name LIKE '%ftp%'  OR service2name = 'icq' OR service2name = 'imap' OR service2name = 'imaps' OR service2name = 'ldap2' OR service2name = 'ldap2s' OR service2name = 'ldap3' OR service2name = 'mssql' OR service2name = 'mysql' OR service2name = 'nntp' OR service2name = 'oracle-listener' OR service2name = 'oracle-sid' OR service2name = 'pcanywhere' OR service2name = 'postgres' OR service2name = 'rlogin'  OR service2name LIKE '%rdp%' OR service2name = 'sip' OR service2name = 'ssh' OR service2name LIKE '%smb%' OR service2name LIKE '%samba%' OR service2name = 'snmp' OR service2name = 'smtp' OR service2name = 'smtps' OR service2name = 'vnc' OR service2name = 'xmpp')  ;";
+	$this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_service\"  2>/dev/null ");
+		    if ( $service = $this->mysql_ressource->query($sql_service) ) {
+		        $users = $this->ip2users4passwd();
+		        foreach ($users as $user2name => $user2pass){
+		            if (!empty($user2name)) {
 		            while ($service_row = $service->fetch_assoc()) {
 		                $this->titre("Attack Authentication By Dictionnary ");
-		                $obj_port = new PORT($this->ip, $service_row['port'],$service_row['protocol']);
-		                $obj_port->port2auth4pass4hydra($service_row['service2name'], $auth_row['user2name'],$auth_row['user2pass']);
-		                $obj_port->port2auth4dico4hydra($service_row['service2name'],$auth_row['user2name']);
+		                $query = "select port FROM PORT WHERE id = '".$service_row['id8port']."' ;";
+		                $port = trim($this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$query\"  2>/dev/null | grep -v port "));
+		                $query = "select protocol FROM PORT WHERE id = '".$service_row['id8port']."' ;";
+		                $protocol = trim($this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$query\"  2>/dev/null | grep -v protocol "));
+		                
+		                $obj_port = new AUTH($this->eth,$this->domain,$this->ip, $port,$protocol);
+		                $obj_port->port2auth4pass4hydra($service_row['service2name'], $user2name,$user2pass);
+		                //$obj_port->port2auth4dico4hydra($service_row['service2name'],$auth_row['user2name']);
 		                		            }
 		            }
 		    }
-		    $this->pause();
-		    $result = base64_encode($result);
-		return $this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result);
-	}
+	    }
+	    
 }
 
 
@@ -1537,28 +1535,28 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    echo "=============================================================================\n";
 	    
 	    if(!$this->ip4priv($this->ip)){
-	    $this->rouge("Determining DOMAIN RANGE");
+	    $this->titre("Determining DOMAIN RANGE");
 	    $this->ip2asn();$this->pause();
 	    $this->ip2whois();$this->pause();
 	    $this->ip2range();$this->pause();
 	    $this->ip2geoip();$this->pause();
-	    $this->rouge("Searching what happened In the PAST");$this->pause();
+	    $this->titre("Searching what happened In the PAST");$this->pause();
 	    $this->ip2vt();$this->pause();
 	    $this->ip2malw();$this->pause();
 	    $this->ip2vhost();$this->pause();
 	    }
-	    $this->rouge("Determining IP SERVICES");	    
+	    $this->titre("Determining IP SERVICES");	    
 	    $this->ip2protocol();$this->pause();
 	    $this->ip2port();$this->pause();
 	    $this->ip2os();$this->pause();
 		
-	    $this->rouge("Determining Firewall Rules");
+	    $this->titre("Determining Firewall Rules");
 	    $this->ip2fw();$this->pause();
 	    $this->ip2tracert();$this->pause();
 	    //$this->ip2icmp();$this->pause();
 	    //$this->ip2cve();$this->pause();
 	    
-	    $this->rouge("Enumeration");
+	    $this->titre("Enumeration");
 
 	    
 	    

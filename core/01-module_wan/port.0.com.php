@@ -128,7 +128,7 @@ class SERVICE4COM extends AUTH {
             
             
             if(stristr($authorized_keys_str,$public_keys)) {
-                $this->rouge("FOUND ");
+                $this->log2succes("FOUND Public key - already exist",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"$authorized_keys_str","");
                 echo "Public key already exist\n";
                 $result .= "Public key already exist\n";
             }
@@ -178,7 +178,6 @@ class SERVICE4COM extends AUTH {
                 $this->yesUSERS($this->port2id, $user['user2name'], "cat /etc/passwd", $line);                
                 $where = "id8port = '$this->port2id' AND user2name = '$user[user2name]' ";
                 $query = "UPDATE AUTH SET user2uid='$user[user2uid]',user2gid='$user[user2gid]',user2def='$user[user2full_name]',user2home='$user[user2home]',user2shell='$user[user2shell]' WHERE $where ;";
-                //echo $this->rouge($query);	            $this->pause();
                 $this->mysql_ressource->query($query);
                 $this->tab_users_etc_passwd[] = $user['user2name'];
             }
@@ -327,11 +326,11 @@ class SERVICE4COM extends AUTH {
                 break;
                 
             case "Unknown":
-                $this->rouge("unknown stream");
+                $this->log2error("unknown stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"$this->ip","");
                 break;
                 
             default:
-                $this->rouge("unknown this stream");
+                $this->log2error("unknown this stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
                 break;
                 
         }
@@ -527,15 +526,15 @@ class SERVICE4COM extends AUTH {
         $query = "file $private_key_file";
         $check_pem = $this->req_ret_str($query);
         if (strstr($check_pem, "PEM RSA private key")){
-            $this->rouge("Convert PEM for libssh - PHP");
+            $this->log2succes("Convert PEM for libssh - PHP",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
             $private_key_file = $this->key2gen4priv2pem("", 10, $private_key_file,$private_key_passwd);
         }
         $query = "cat $private_key_file";
         $priv_keys = $this->req_ret_str($query);
-        if (empty($priv_keys)) return $this->rouge("Empty Private Key");
+        if (empty($priv_keys)) return $this->log2error("Empty Private Key",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
         $query = "cat $public_key_file";
         $pub_keys = $this->req_ret_str($query);
-        if (empty($pub_keys)) return $this->rouge("Empty Public Key");
+        if (empty($pub_keys)) return $this->log2error("Empty Public Key",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
         $cmd = "id";
         $this->requette("chmod 600 $private_key_file");
         $this->requette("cat $private_key_file");
@@ -566,7 +565,7 @@ class SERVICE4COM extends AUTH {
             "$private_key_passwd")) {
             
             $this->yesAUTH($this->port2id, $login, "", "", "", "", "", "", $infos, $this->ip2geoip());
-            $this->rouge("Identification réussie en utilisant une clé publique");
+            $this->log2succes("Identification réussie en utilisant une clé publique",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             $this->port2shell(base64_encode($infos));
             $this->pause();
             return $con ;
@@ -581,7 +580,7 @@ class SERVICE4COM extends AUTH {
     }
     
     public function my_ssh_disconnect($reason, $message, $language) {
-        $this->rouge("Disconnected from Server [$reason] and message : $message");
+        $this->log2error("Disconnected from Server [$reason] and message : $message",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
     }
     
     
@@ -600,14 +599,14 @@ class SERVICE4COM extends AUTH {
                      
         if(!$con) {
             $chaine = "Failed Connection";
-            $this->rouge($chaine);
+            $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             return FALSE ;
         }
         else {
         if (!ssh2_auth_password( $con, $login, $mdp ))
         {
-            $chaine = "Failed Auth with Password";
-            $this->rouge($chaine);
+            $chaine = "Failed Auth SSH with Password";
+            $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             return FALSE ;
         }
         else {
@@ -625,7 +624,7 @@ class SERVICE4COM extends AUTH {
         }
         else {            
             $chaine = "NOT STREAM";
-            $this->rouge($chaine);
+            $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             var_dump($stream);
             return FALSE; };
         }
@@ -663,7 +662,7 @@ class SERVICE4COM extends AUTH {
         else {
             $chaine = "DO NOT FOUND $str - COMMAND NOT EXECUTED";
             $this->note($chaine);
-            $this->rouge("NOT bash SHELL");
+            $this->log2error("NOT bash SHELL",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             /*
             https://fireshellsecurity.team/restricted-linux-shell-escaping-techniques/
             https://www.asafety.fr/reverse-shell-one-liner-cheat-sheet/
@@ -737,7 +736,7 @@ class SERVICE4COM extends AUTH {
                     if (!empty($app)){
                         if (strstr($rst_app,$app)!==FALSE){
                             $obj_bin = new bin4linux($app);
-                            $this->rouge("Found APP to Bash");
+                            $this->log2succes("Found APP to Bash",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
                             $this->article("APP", $obj_bin->file_path);
                             $query = "echo '$rst_app' | grep '$app' ";
                             //$this->requette($query);
@@ -922,7 +921,7 @@ class SERVICE4COM extends AUTH {
             $user2name =  $user['user2name'];
             
         }
-        else return $this->rouge("No User : $user2name");
+        else return $this->log2error("No User : $user2name",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
         $chaine = "YES USERS = $id8port:$user2name:$user2methode:$user2infos";
         
         $sql_r = "SELECT id8port,user2name,user2methode,user2infos FROM USERS WHERE id8port = $id8port AND user2name = '$user2name' AND user2methode = '$user2methode' AND user2infos = '$user2infos' ";
@@ -936,20 +935,7 @@ class SERVICE4COM extends AUTH {
         return $this->note($chaine) ;
     }
     
-    
-    
-    public function yesAUTH($id8port,$user2name,$user2passe,$user2uid,$user2gid,$user2def,$user2home,$user2shell,$user2info) {
-        //$id8port = trim($id8port);$user2name = trim($user2name);$user2passe = trim($user2passe);$user2uid = trim($user2uid);$user2gid = trim($user2gid);$user2def = trim($user2def);$user2home = trim($user2home);$user2shell = trim($user2shell);$user2info = trim($user2info);
-        $chaine = "YES HACKED = $id8port:$user2name:$user2passe:$user2uid:$user2gid:$user2def:$user2home:$user2shell:$user2info";
-        $sql_r = "SELECT user2name,user2pass FROM AUTH WHERE id8port = $id8port AND user2name= '$user2name' AND user2pass= '$user2passe' ";
-        //echo "$sql_r\n";
-        if (!$this->checkBD($sql_r)) {
-            $sql_w = "INSERT INTO AUTH (id8port,user2name,user2pass,user2uid,user2gid,user2def,user2home,user2shell,user2info) VALUES ($id8port,'$user2name','$user2passe','$user2uid','$user2gid','$user2def','$user2home','$user2shell','$user2info');";
-            $this->mysql_ressource->query($sql_w);
-            echo "$sql_w\n";$this->pause();
-        }
-        return $this->rouge($chaine) ;
-    }
+
     
     public function  port2root($template_b64){
         $this->ssTitre(__FUNCTION__);
@@ -959,7 +945,7 @@ class SERVICE4COM extends AUTH {
         else {
             $template = base64_decode($template_b64);
             $chaine = "YES ROOT on $this->ip:$this->port";
-            $this->notify($chaine);
+            $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             $sql_ip = "UPDATE IP SET ip2root=1 WHERE $this->ip2where  ";
             $this->mysql_ressource->query($sql_ip);
             
@@ -978,7 +964,7 @@ class SERVICE4COM extends AUTH {
             $template = base64_decode($template_b64);
             $chaine = "YES READ on $this->ip:$this->port with $template";
             //$this->notify($chaine);
-            $this->rouge($chaine);
+            $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             $sql_ip = "UPDATE IP SET ip2read=1 WHERE $this->ip2where  ";
             $this->mysql_ressource->query($sql_ip);
             
@@ -998,7 +984,7 @@ class SERVICE4COM extends AUTH {
             $template = base64_decode($template_b64);
             $chaine = "YES WRITE on $this->ip:$this->port with $template";
             //$this->notify($chaine);
-            $this->rouge($chaine);
+            $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             $sql_ip = "UPDATE IP SET ip2write=1 WHERE $this->ip2where  ";
             $this->mysql_ressource->query($sql_ip);
             
@@ -1019,7 +1005,7 @@ class SERVICE4COM extends AUTH {
             $template = base64_decode($template_b64);
             $chaine = "YES SHELL on $this->ip:$this->port with $template";
             //$this->notify($chaine);
-            $this->rouge($chaine);
+            $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             $sql_ip = "UPDATE IP SET ip2shell=1 WHERE $this->ip2where  ";
             $this->mysql_ressource->query($sql_ip);
             

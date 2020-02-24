@@ -14,7 +14,7 @@ class HOST extends DOMAIN{
         
         $this->host = trim($host);	
         if (empty($this->host)) {
-            $this->rouge("Empty Host");
+            $this->log2error("Empty Host",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
             exit();
         }
     }

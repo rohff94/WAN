@@ -19,7 +19,7 @@ class com4user extends com4display {
         $query = "file $private_key_file";
         $check_pem = $this->req_ret_str($query);
         if (strstr($check_pem, "PEM RSA private key")){
-            $this->rouge("Convert PEM for libssh - PHP");
+            $this->note("Convert PEM for libssh - PHP");
             $private_key_file = $this->key2gen4priv2pem("", 10, $private_key_file,$private_key_passwd);
         }
         return $private_key_file;

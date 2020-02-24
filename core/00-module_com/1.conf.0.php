@@ -41,6 +41,8 @@ class CONFIG {
     var $display_cli ;
     
     var $time_start ;
+    var $log_error_path ;
+    var $log_succes_path ;
 	
 	public function __construct() {
 	
@@ -76,6 +78,9 @@ class CONFIG {
 	$this->dico_word = "$this->dir_tools/dico/word.dico";
 	$this->dico_password = "$this->dir_tools/dico/password.dico";
 	$this->dico_users = "$this->dir_tools/dico/users.dico";
+	
+	$this->log_error_path = "/tmp/log.error.wan.log";
+	$this->log_succes_path = "/tmp/log.succes.wan.log";
 	$this->time_start = microtime(TRUE);
 }
 
@@ -107,11 +112,11 @@ public function pdf($file,$page){
 public function notify($chaine) {
 	
 	system("espeak  \"Look screen\" ");	
+	//system("flite -t '$chaine' 2> /dev/null");
 	$this->rouge($chaine);
 	system("notify-send -i $this->dir_img/hacker.png \"$chaine\"");
-	sleep(1);
-	//system("flite -t '$chaine' 2> /dev/null");
-	//system("zenity --notification --text '$chaine' --window-icon=$this->dir_img/hacker.png 2> /dev/null");
+	sleep(1);	
+	system("zenity --notification --text '$chaine' --window-icon=$this->dir_img/hacker.png 2> /dev/null");
 }
 
 
@@ -147,7 +152,7 @@ public function screenshot($seconde){
 	    //return $display_xml;
 	}
 	
-	
+
 
 
 	function isIPv4($ip) {

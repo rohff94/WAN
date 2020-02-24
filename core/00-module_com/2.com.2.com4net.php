@@ -16,8 +16,27 @@ class com4net extends com4user {
         return $this->req_ret_str($query);
     }
     
-
     
+    public function cidr2scan($cidr,$eth){
+        $this->titre(__FUNCTION__);
+        $cidr = trim($cidr);
+        if (!empty($cidr)) return $this->cidr2scan4nmap($cidr,$this->eth);
+        //$this->cidr2scan4fping($cidr);
+    }
+    
+    public function cidr2scan4nmap($cidr,$eth){
+        $this->ssTitre(__FUNCTION__);
+        $cidr = trim($cidr);
+        $query = " nmap -sn --reason $cidr -e $eth | grep 'Nmap scan report for' | sed \"s/Nmap scan report for//g\"  " ; // | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"
+        if (!empty($cidr)) return $this->req_ret_str($query);
+    }
+    
+    public function cidr2scan4fping($cidr){
+        $this->ssTitre(__FUNCTION__);
+        $cidr = trim($cidr);
+        $query = " echo '$this->root_passwd' | sudo -S fping -a -n -g $cidr 2> /dev/null | grep -v -E \"(Unreachable|error)\" ";
+        if (!empty($cidr)) return $this->req_ret_str($query);
+    }
     
     
     
@@ -66,28 +85,7 @@ class com4net extends com4user {
         return $result;
     }
     
-    
-    public function cidr2scan($cidr){
-        $this->titre(__FUNCTION__);
-        $cidr = trim($cidr);
-        if (!empty($cidr)) return $this->cidr2scan4nmap($cidr);
-        //$this->cidr2scan4fping($cidr);
-    }
-    
-    public function cidr2scan4nmap($cidr){
-        $this->ssTitre(__FUNCTION__);
-        $cidr = trim($cidr);
-        $query = " nmap -sn --reason $cidr | grep 'Nmap scan report for' | sed \"s/Nmap scan report for//g\"  " ; // | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"
-        if (!empty($cidr)) return $this->req_ret_str($query);
-    }
-    
-    public function cidr2scan4fping($cidr){
-        $this->ssTitre(__FUNCTION__);
-        $cidr = trim($cidr);
-        $query = " echo '$this->root_passwd' | sudo -S fping -a -n -g $cidr 2> /dev/null | grep -v -E \"(Unreachable|error)\" ";
-        if (!empty($cidr)) return $this->req_ret_str($query);
-    }
-    
+
     
     
     public function  ip4dns($ip){
@@ -152,7 +150,7 @@ class com4net extends com4user {
     
     public function ip2domain($ip){
         $ip = trim($ip);
-        if (empty($ip)) $this->rouge("Empty IP");
+        if (empty($ip)) $this->log2error("Empty IP",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
         
         $tab_hosts = $this->ip2host4nslookup($ip);
         if(!empty($tab_hosts)){
@@ -219,7 +217,7 @@ class com4net extends com4user {
             $query = "ip -o route get to $target_ip 2> /dev/null | grep -Po \"src [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"";
             return trim(exec($query));
         }
-        else $this->rouge("$target_ip IS NOT IPv4");
+        else $this->log2error("$target_ip IS NOT IPv4",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
     }
     
     public function ip4eth4target($target_ip){
@@ -229,13 +227,13 @@ class com4net extends com4user {
             exec($query,$tmp);
             return trim($tmp[0]);
         }
-        else $this->rouge("$target_ip IS NOT IPv4");
+        else $this->log2error("$target_ip IS NOT IPv4",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
     }
     
     public function tcp2open4server($ip,$port){
         $open_server = "cd $this->dir_tmp; python -m SimpleHTTPServer $port "; 
         while (!$this->tcp2open($ip, $port)) {
-            $this->rouge("Port:$port not Open");
+            $this->log2error("Port:$port not Open",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
             $this->cmd("localhost",$open_server );           
             sleep(10);
         }
@@ -428,7 +426,7 @@ class com4net extends com4user {
             $this->openvas2report2result($report_uuid_result_xml);
             $this->pause();
             if(!empty($check_done)){
-                $this->rouge("ALL DONE");
+                $this->log2succes("ALL DONE",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
                 $this->pause();
                 
                 //$this->requette("omp -u rohff -w hacker --delete-task $task_uuid ");
@@ -549,7 +547,7 @@ class com4net extends com4user {
             $query = "omp -u $this->mysql_login -w $this->mysql_passwd -X \"<create_port_list><name>Open Port List $this->ip</name><comment>Open Ports</comment><port_range>T:".implode(",",$this->tab_open_ports_tcp)." U:".implode(",",$this->tab_open_ports_udp)."</port_range></create_port_list>\" | xmlstarlet sel -t -v /create_port_list_response/@id";
             $this->cmd("localhost",$query);
             
-            if( (empty($this->tab_open_ports_tcp)) AND (empty($this->tab_open_ports_udp)) ) return $this->rouge("No PORT open found ");
+            if( (empty($this->tab_open_ports_tcp)) AND (empty($this->tab_open_ports_udp)) ) return $this->log2error("No PORT open found ",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
             while ( TRUE )   {
                 if (!empty($port_list_uuid = $this->openvas2port_list2check())) break;
                 if (!empty($port_list_uuid = trim($this->req_ret_str($query))) ) break;

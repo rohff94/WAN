@@ -1,19 +1,20 @@
 <?php
 
-class CIDR extends DATA{
+class CIDR extends ETH{
     
     var $cidr ;
     var $cidr2id ;
     var $cidr2where ;
     
     
-    public function __construct($cidr) {
+    public function __construct($cidr,$eth) {
         $cidr = trim($cidr);
+        $eth = trim($eth);
         $this->cidr = "$cidr.0/24";
         $this->cidr2where = "cidr = '$this->cidr'";
         
         
-        parent::__construct();
+        parent::__construct($eth);
         
         if(!empty($this->cidr)){
             
@@ -33,14 +34,20 @@ class CIDR extends DATA{
     }
     
     
+    
+    
     public function cidr2ns(){
-        $this->ssTitre("Searching Hostname with resolution DNS");
+        $this->titre("Searching Hostname with resolution DNS on $this->cidr");
         $result = "";
         
         $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->cidr2where AND ".__FUNCTION__." IS NOT NULL";
-        if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->cidr2where));
+        if ($this->checkBD($sql_r_1) ) {
+            $cidr2ns =  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->cidr2where));
+            echo $cidr2ns;
+            return $cidr2ns;
+        }
         else {
-            $result = $this->cidr2scan4nmap($this->cidr);
+            $result = $this->cidr2scan4nmap($this->cidr,$this->eth);
             
             $result = base64_encode($result);
             return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,$this->cidr2where,$result));

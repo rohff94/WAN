@@ -53,7 +53,7 @@ class PARAM4COM extends URL{
     
     public function __construct($eth,$domain,$url,$param,$value,$methode_http) {
         $html_original = array();
-        if (empty($param)) return $this->rouge("EMPTY PARAM");
+        if (empty($param)) return $this->log2error("EMPTY PARAM",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port",$url);
         parent::__construct($eth,$domain,$url);
         $this->null_byte = "%00";
         $this->param = trim($param);
@@ -79,7 +79,7 @@ class PARAM4COM extends URL{
             
             if (!$this->web2check_200()){
                 $chaine = "Unreachable URL";
-                return $this->rouge($chaine);
+                return $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port",$this->url);
             }
         
         

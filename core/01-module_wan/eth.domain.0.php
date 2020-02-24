@@ -399,9 +399,9 @@ class DOMAIN extends ETH{
 	    $result .= $this->domain2ns();$this->pause();
 	    //
 
-	    exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
+	    exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tmp);
 	    //echo $this->tab($tab_cidr);
-	    $size = count($tab_cidr);
+	    $size = count($mp);
 	    if($size<20){
 	        //$dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
 	        exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
@@ -410,7 +410,7 @@ class DOMAIN extends ETH{
 	    for ($i=0;$i<$size;$i++){
 	        $cidr = $tab_cidr[$i];
 	        if (!empty($cidr)){
-                $obj_cidr = new CIDR($cidr);
+                $obj_cidr = new CIDR($cidr,$this->eth);
                 $result .=	$obj_cidr->cidr2ns();
 	        }
 	    }

@@ -16,7 +16,7 @@ class WEB extends SERVICE4COM{
 	 */
 	
 	public function __construct($eth,$domain,$web) {		
-	    if (empty($web)) return $this->rouge("EMPTY WEB");
+	    if (empty($web)) return $this->log2error("EMPTY WEB",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","$web");
 	    $this->web = trim($web);
 	    $this->vhost = parse_url( $this->web, PHP_URL_HOST);
 	    $this->http_type = parse_url( $this->web, PHP_URL_SCHEME);

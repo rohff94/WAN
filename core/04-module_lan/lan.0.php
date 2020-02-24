@@ -155,7 +155,7 @@ class LAN extends SERVICE4COM{
 	    // 
 
 	    if (!is_resource($stream)) {
-	        $this->rouge('LAN: Socket Failed');
+	        $this->log2error('LAN: Socket Failed',__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
 	        exit();
 	    }
 	    if (is_resource($stream)) {
@@ -185,11 +185,11 @@ class LAN extends SERVICE4COM{
 	    $this->article("CMD1", $cmd1);
 	    $this->article("CMD2 on stream", $data);
 	    
-	    if (! function_exists('pcntl_fork')) $this->rouge('PCNTL functions not available on this PHP installation');
+	    if (! function_exists('pcntl_fork')) $this->log2error('PCNTL functions not available on this PHP installation',__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
 	    $pid = pcntl_fork();
 	    
 	    if ($pid == -1) {
-	        $this->rouge('duplication impossible');
+	        $this->log2error('duplication impossible',__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
 	    } else if ($pid) {
 	        // le père
 	        //$this->stream8client($port_rev2, $info);

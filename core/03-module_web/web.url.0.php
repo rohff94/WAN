@@ -108,7 +108,7 @@ class URL extends WEB{
 	
 	public function __construct($eth,$domain,$url) {	
 	    $this->url = trim($url);
-	    if (empty($this->url)) return $this->rouge("EMPTY URL");
+	    if (empty($this->url)) return $this->log2error("EMPTY URL",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port",$url);
 	    parent::__construct($eth,$domain,$url);		
 	    $this->uri_path = parse_url( $this->url, PHP_URL_PATH);
 	    $this->uri_path_dirname = dirname($this->url);

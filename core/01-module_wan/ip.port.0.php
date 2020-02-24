@@ -32,13 +32,21 @@ class PORT extends IP{
 
 
     public function __construct($eth,$domain,$ip,$port,$protocol) {
-	    if(empty($port)) return $this->rouge("EMPTY PORT");
+        if(empty($port)) return $this->log2error("EMPTY PORT",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 
 	// /usr/share/nmap/scripts/
 	    if($this->isIPv4($ip)) parent::__construct($eth,$domain,$ip);
 	    if(!$this->isIPv4($ip)) parent::__construct($eth,$domain,gethostbyname($ip));
 	
-    $this->port = trim($port);
+	    $port_check = intval($port,10);
+	    if ( ($port_check>0) && ($port_check<65535) ){
+	        $this->port = trim($port);
+	    }
+	    else {
+	        $this->log2error("Error on Port Numer",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+	    }
+	    
+    
     $this->protocol = trim($protocol) ;
     $this->port2where = "id8ip = '$this->ip2id' AND port = '$this->port' AND protocol = '$this->protocol' ";
     
@@ -142,7 +150,7 @@ class PORT extends IP{
 	public function port2version2check($xml){
 	    //$this->ssTitre(__FUNCTION__);
 	    if (stristr("</nmaprun>",$xml)===FALSE) return TRUE;
-	    else {$this->rouge("No End Tag nmaprun");return FALSE ;}
+	    else {$this->log2error("No End Tag nmaprun",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");return FALSE ;}
 	}
 	
 	public function port2version(){
@@ -289,7 +297,7 @@ class PORT extends IP{
 	    
 	    if ($service->protocol==='T') {
 	        if ($service->tcp2open($service->ip, $service->port)===FALSE){
-	            return $this->rouge("Port Not Open, Maybe User Desktop OR Server using redondancy in Cloud");
+	            return $this->log2error("Port Not Open, Maybe User Desktop OR Server using redondancy in Cloud",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 	        }
 	    }
 	    

