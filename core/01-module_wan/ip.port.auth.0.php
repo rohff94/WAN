@@ -202,7 +202,7 @@ class AUTH extends PORT{
 	            if (preg_match("/login: (?<login>[[:print:]]\w+)([[:space:]]{1,})password: (?<pass>[[:print:]]\w+)$/", $user, $afficheUSER) ) {
 	                //var_dump($afficheUSER);
 	                if (isset($afficheUSER['login'])){ // faire pour plusieurs resultat
-	                    return $this->yesAUTH($this->port2id,$afficheUSER['login'], $afficheUSER['pass'], '','','','','',__FUNCTION__);
+	                    $this->yesAUTH($this->port2id,$afficheUSER['login'], $afficheUSER['pass'], '','','','','',__FUNCTION__);
 
 	                }
 	            }
@@ -211,21 +211,21 @@ class AUTH extends PORT{
 	            if (preg_match("/password: (?<pass>[[:print:]]\w+)$/", $user, $afficheUSER) ) {
 	                //var_dump($afficheUSER);
 	                if (isset($afficheUSER['login'])){ // faire pour plusieurs resultat
-	                    return $this->yesAUTH($this->port2id,"", $afficheUSER['pass'], '','','','','',__FUNCTION__);
+	                    $this->yesAUTH($this->port2id,"", $afficheUSER['pass'], '','','','','',__FUNCTION__);
 
 	                }
 	            }
 	            
 	            if (preg_match("/login: (?<login>[[:print:]]\w+)$/", $user, $afficheUSER) ) {
 	                if (isset($afficheUSER['login'])){ // faire pour plusieurs resultat
-	                    return $this->yesAUTH($this->port2id,$afficheUSER['login'], "", '','','','','',__FUNCTION__);
+	                    $this->yesAUTH($this->port2id,$afficheUSER['login'], "", '','','','','',__FUNCTION__);
 	                }
 	            }
 	            
 	        }
 	    }
 	    
-
+        
 	}
 	
 

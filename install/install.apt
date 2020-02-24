@@ -16,6 +16,7 @@ cpufrequtils
 cryptcat
 cups-pdf
 python-pyftpdlib
+python-software-properties
 curl
 cutycapt
 cx-freeze

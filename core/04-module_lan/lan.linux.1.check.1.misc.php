@@ -798,7 +798,7 @@ Can be used to determine where other interesting files might be located");
                     foreach ($tab_users_shell as $user2name_shell)
                         if (!$this->ip2root8db($this->ip2id)) {
                             $this->users4root($user2name_shell,$user2pass);
-                            $this->users2sudoers8filepath($this->users2sudoers2list($user2name, $user2pass));
+                            $this->users2sudoers8filepath($this->users2sudoers2list($user2name_shell, $user2pass));
                         }
                 }
         }
@@ -813,7 +813,7 @@ Can be used to determine where other interesting files might be located");
     public function users2sudoers2list($user_name,$user_pass){
         $this->titre("Linux Privilege Escalation using Sudo Rights");
         $this->ssTitre("sudo -l – Prints the commands which we are allowed to run as SUDO ");
-        $data = "echo '$user_pass' | sudo -l -S -U $user_name";
+        $data = "echo '$user_pass' | sudo -S su --login '$user_name' --list ";
         return $this->lan2stream4result($data,$this->stream_timeout*3);
     }
     
