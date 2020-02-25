@@ -26,6 +26,10 @@ class INSTALL extends CONFIG{
 	var $mysql_passwd ;
 	var $mysql_base_geoip;
 	var $mysql_database;
+	
+	var $openvas_login;
+	var $openvas_passwd ;
+	
 	var $faraday_workspace_name;
 	var $root_passwd;
 	var $path_mysql ;
@@ -44,6 +48,8 @@ class INSTALL extends CONFIG{
 	    $this->mysql_host = $config_data->mysql_host; 
 	    $this->mysql_login  = $config_data->mysql_login; 
 	    $this->mysql_passwd = $config_data->mysql_passwd; 
+	    $this->openvas_login  = $config_data->openvas_login;
+	    $this->openvas_passwd = $config_data->openvas_passwd; 
 	    $this->root_passwd = $config_data->root_passwd;
 	    $this->faraday_workspace_name = $config_data->faraday_workspace_name;
 	    $this->proxychains = $config_data->proxychains;

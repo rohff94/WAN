@@ -8,7 +8,7 @@ $config->start("Training Ethical Hacking", "");
 $config_file_path = "./config.xml";
 
 if(!file_exists($config_file_path)) {
-    echo "\n\tFor thee first time you need to enter: Email,user2agent,Mysql Host/Login/Passwd\n";
+    echo "\n\tFor thee first time you need to enter: Email,user2agent,Mysql Host/Login/Passwd, OPENVAS LOGIN/PASS\n";
     echo "Enter Email:\n";
     $email = trim(fgets(STDIN)); 
     
@@ -23,6 +23,13 @@ if(!file_exists($config_file_path)) {
     
     echo "Enter MYSQL PASSWORD:\n";
     $mysql_passwd = trim(fgets(STDIN)); 
+    
+    echo "Enter OPENVAS LOGIN:\n";
+    $openvas_login  = trim(fgets(STDIN));
+    
+    echo "Enter OPENVAS PASSWORD:\n";
+    $openvas_passwd = trim(fgets(STDIN)); 
+    
     
     echo "Enter ROOT PASSWORD:\n";
     $root_passwd = trim(fgets(STDIN)); 
@@ -40,6 +47,8 @@ if(!file_exists($config_file_path)) {
 <mysql_host>$mysql_host</mysql_host>
 <mysql_login>$mysql_login</mysql_login>
 <mysql_passwd>$mysql_passwd</mysql_passwd>
+<openvas_login>$openvas_login</openvas_login>
+<openvas_passwd>$openvas_passwd</openvas_passwd>
 <root_passwd>$root_passwd</root_passwd>
 <faraday_workspace_name>$faraday_workspace_name</faraday_workspace_name>
 </document>

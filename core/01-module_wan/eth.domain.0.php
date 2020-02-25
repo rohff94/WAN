@@ -398,10 +398,10 @@ class DOMAIN extends ETH{
 	    $result .= $this->domain2search4web();$this->pause();
 	    $result .= $this->domain2ns();$this->pause();
 	    //
-
+	    $result = str_replace($this->clean_indb, "", $result);
 	    exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tmp);
 	    //echo $this->tab($tab_cidr);
-	    $size = count($mp);
+	    $size = count($tmp);
 	    if($size<20){
 	        //$dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
 	        exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);

@@ -19,6 +19,7 @@ flask
 future
 gprof2dot
 gdbgui
+gvm-tools
 ibm-db
 impacket
 jinja2
