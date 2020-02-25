@@ -12,7 +12,7 @@
  * http://sebug.net/chart/
  */
 
-class POC extends poc4web{
+class POC extends poc4malware{
     var $msf2;
     var $owasp;
     var $xvwa;

