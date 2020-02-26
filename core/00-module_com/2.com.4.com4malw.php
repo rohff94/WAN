@@ -1069,7 +1069,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
     public function msf2search($cve){
         $this->ssTitre(__FUNCTION__);
         $cve = trim($cve);
-        $query = "msfconsole -q -x 'search type:exploit -S $cve;exit' | grep -i \"exploit/\" | awk '{print $2}' | grep \"exploit/\" " ;
+        $query = "msfconsole -q -x \"search type:exploit -S $cve;exit\" | grep -i \"exploit/\" | awk '{print $2}' | grep \"exploit/\" " ;
         return $this->req_ret_tab($query);        
     } 
     

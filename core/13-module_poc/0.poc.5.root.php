@@ -659,16 +659,15 @@ Il faut préciser que lorsqu’un appareil est soupçonné d’être infecté, n
         $domain = 'hack.vlan';
 
         
-        $ip = "10.60.10.163"; // 64Base 1.01
-        $port = "62964";
+        $ip = "10.60.10.143"; // DC-6 
+        $port = "22";
         $protocol = "T";
-        $user_name_created = "64base" ;
-        $user_name_pass = 'NjRiYXNlNWgzNzcK';
+        $login = "graham" ;
+        $pass = 'GSo7isUM1D4';
         
-        $login = "";
-        $pass = "";
-        $titre = "";
-        $fonction2exec = "";
+
+        $titre = "test";
+        $fonction2exec = "users";
         $vm = "";
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         
