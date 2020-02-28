@@ -652,6 +652,27 @@ Il faut préciser que lorsqu’un appareil est soupçonné d’être infecté, n
     
     
     
+    public function poc4root8sudoers2file8exec2users2root8sudoers2nmap(){ // OK
+        $this->titre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        
+        $ip = "10.60.10.143"; // DC-6
+        $port = "22";
+        $protocol = "T";
+        $login = "graham" ;
+        $pass = 'GSo7isUM1D4';
+        
+        
+        $titre = "test";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+        
+    }
+    
         
     public function poc4root8test(){
         $this->titre(__FUNCTION__);        

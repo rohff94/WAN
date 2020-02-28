@@ -35,6 +35,7 @@ class check4linux extends check4linux8jobs{
         exec("echo '$tmp' | grep ':' ",$tmp2);
         $this->etc_passwd_str = $this->tab($tmp2);
         $this->etc_passwd_str = trim($this->etc_passwd_str);
+        $this->parse4etc_passwd($this->etc_passwd_str);
         unset($tmp2);
         $this->env_path_str = $this->lan2env4path();
         $this->pause();
@@ -76,12 +77,11 @@ class check4linux extends check4linux8jobs{
             }
         }
         else {
-            if (!$this->ip2root8db($this->ip2id)) {$this->misc();$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}
             if (!$this->ip2root8db($this->ip2id)) {$this->users();$this->pause();}
-            //if (!$this->ip2root8db($this->ip2id)) {$this->jobs();$this->pause();}
-            
-            //if (!$this->ip2root8db($this->ip2id)) {$this->exploits();$this->pause();}
+            if (!$this->ip2root8db($this->ip2id)) {$this->misc();$this->pause();}
+            if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}           
+            if (!$this->ip2root8db($this->ip2id)) {$this->jobs();$this->pause();}
+            if (!$this->ip2root8db($this->ip2id)) {$this->exploits();$this->pause();}
         }
         
         $this->rouge("Brief");

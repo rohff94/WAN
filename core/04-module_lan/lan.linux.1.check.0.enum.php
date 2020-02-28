@@ -901,11 +901,12 @@ This can be used to help determine the OS running and the last time it's been fu
         $unshadow_file = "/tmp/$this->ip.$this->port.$this->protocol.unshadow";
         $this->requette("unshadow '/tmp/$this->ip.$this->port.$this->protocol.passwd'  '/tmp/$this->ip.$this->port.$this->protocol.shadow'  > $unshadow_file");
         $dico = "$this->dir_tools/dico/password.dico.10k"  ;
+        if (!$this->ip2root8db($this->ip2id)){
         if ($this->ip2crack($unshadow_file,$dico)==="1") {
             $this->note("Cracking unshadow already done");
             
         }
-
+        }
         
     }
 
