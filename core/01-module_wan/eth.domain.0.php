@@ -247,87 +247,48 @@ class DOMAIN extends ETH{
 	
 	
 	public function domain4service(){
-	    $result = "";
-	    $this->titre(__FUNCTION__);
+	    $this->gtitre(__FUNCTION__);
 	    $this->domain4info();
 	    //$result .= $this->domain2asn() ;$this->pause(); // NOT YET 
+
+	    
+	    $sql_r = "SELECT ip FROM IP WHERE id8domain = '$this->domain2id'  ";
+	    //echo "$sql_r\n";
+	    $req = $this->mysql_ressource->query($sql_r);
+	    while ($row = $req->fetch_assoc()) {
+	        $ip = $row['ip'];
+	        if(!empty($ip) ){
+	            $obj_ip = new IP($this->eth, $this->domain, $ip);
+	            $obj_ip->poc($this->flag_poc);
+	            $obj_ip->ip4service();
+	        }
+	    }
+	        
+	    
 	    $cidr = $this->domain2cidr() ;
 	    echo $this->tab($cidr);$this->pause();
-	    
-	    $hosts = $this->domain2host() ;
-	    echo $this->tab($hosts);$this->pause();
-	    if(!empty($hosts)){
-	        $file_path_hosts = "/tmp/$this->eth.$this->domain.host4service";
-	        $fp = fopen($file_path_hosts, 'w+');
-	        foreach ($hosts as $host) {
-	            if(!empty($host) ){
-	                $data = "$this->eth $this->domain $host host4service FALSE";
-	                $data = $data."\n";
-	                fputs($fp,$data);
-	            }
-	        }
-	        fclose($fp);
-	    }
-	    
-
-	    
+	        
 	    $mails = $this->domain2mail() ;
 	    echo $mails;$this->pause();
-
+	        
 	    $files = $this->domain2file() ;
 	    echo $files;$this->pause();
-
+	        
 	    $traces = $this->domain2trace() ;
 	    echo $traces;$this->pause();
-
+	        
 	    $whois = $this->domain2whois() ;
 	    echo $whois;$this->pause();
-	    
-	    //$hosts = array_reverse($hosts);
-	   
-	    if(!empty($hosts)){
-	        
-	        $tab_tmp_host = array();
-	        
-	        $size = count($hosts);
-	        for($i=0;$i<$size;$i++){
-	            echo "\n$i/$size :$hosts[$i] =======================================================\n";
-	            $host = $hosts[$i];
-	            $obj_host = new HOST($this->eth, $this->domain,$host);
-	            $obj_host->host4service();
-	            
-	            $tmp_host = str_replace(".$this->domain","", $host);
-	            $tab_tmp_host = explode(".", $tmp_host);
-	            if (!empty($tab_tmp_host)){
-	                $tab_hosts_check = array_reverse(array_filter($tab_tmp_host));
-	                $host_check_tmp = "";
-	                foreach ($tab_hosts_check as $prefix_check){
-	                    $prefix_check = trim($prefix_check);
-	                    $host_check_tmp = "$prefix_check.$host_check_tmp";
-	                    $host_check = "$host_check_tmp$this->domain";
-	                    $obj_host2 = new HOST($this->eth, $this->domain,$host_check);
-	                    $this->pause();
-	                    $obj_host2->host4service();
-	                    $this->domain2host2check($host_check,10);
-	                    $this->pause();
-	                }
-	            }
-                echo "END $host =====================================================================\n";
-	        }
-	    }
-	    
 
-	    
-	    
-		return $result;
 	}
 	
 	
-	public function domain2host2check($host_check,$iter){
-        $this->ssTitre(__FUNCTION__);
+	
+	public function domain2host2check4info($host_check,$iter){
+	    $this->ssTitre(__FUNCTION__);
 	    $results = array();
 	    $host_check = trim($host_check);
-
+	    
 	    $iter = intval($iter);
 	    $this->article("Host2CHECK", $host_check);
 	    if (preg_match("/(?<hostname>[0-9a-z_\-\.]{1,})(?<number>[0-9]{1})\.$this->domain/",$host_check,$results))
@@ -340,12 +301,15 @@ class DOMAIN extends ETH{
 	            $this->article("HOST8DOMAIN CHECK", $host_filtred);
 	            $this->pause();
 	            $obj_host_filtred = new HOST($this->eth, $this->domain,$host_filtred);
-	            $obj_host_filtred->host4service();$this->pause();
+	            $obj_host_filtred->host4info();$this->pause();
 	            
 	        }
 	        
 	    }
 	}
+	
+
+	
 	
 
 	public function domain2maltego(){
@@ -605,11 +569,54 @@ class DOMAIN extends ETH{
 	    return $result ;
 	}
 	
-	public function  domain4info(){
+	public function  domain2info(){
 	    
 	    $this->article("ID Domain", $this->domain2id);
 	    $this->article("Domain", $this->domain);
 	}
+	
+	public function  domain4info(){
+	    $this->gtitre(__FUNCTION__);
+	    $hosts = $this->domain2host() ;
+	    echo $this->tab($hosts);$this->pause();
+
+	    
+	    if(!empty($hosts)){
+	        
+	        $tab_tmp_host = array();
+	        
+	        $size = count($hosts);
+	        for($i=0;$i<$size;$i++){
+	            echo "\n$i/$size :$hosts[$i] =======================================================\n";
+	            $host = $hosts[$i];
+	            $obj_host = new HOST($this->eth, $this->domain,$host);
+	            $obj_host->host4info();
+	            
+	            $tmp_host = str_replace(".$this->domain","", $host);
+	            $tab_tmp_host = explode(".", $tmp_host);
+	            if (!empty($tab_tmp_host)){
+	                $tab_hosts_check = array_reverse(array_filter($tab_tmp_host));
+	                $host_check_tmp = "";
+	                foreach ($tab_hosts_check as $prefix_check){
+	                    $prefix_check = trim($prefix_check);
+	                    $host_check_tmp = "$prefix_check.$host_check_tmp";
+	                    $host_check = "$host_check_tmp$this->domain";
+	                    $obj_host2 = new HOST($this->eth, $this->domain,$host_check);
+	                    $this->pause();
+	                    $obj_host2->host4info();
+	                    $this->domain2host2check4info($host_check,10);
+	                    $this->pause();
+	                }
+	            }
+	            echo "END $host =====================================================================\n";
+	        }
+	    }
+	}
+	
+	
+	
+	
+	
 	
 	public function  domain2ns(){
 	    $this->titre(__FUNCTION__);
@@ -687,7 +694,7 @@ class DOMAIN extends ETH{
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->domain2where));
 	    else {
 			$this->requette("cat $this->dico_word | wc -l ");
-			$query = "cat $this->dico_word | parallel --progress -j24 --no-notice  dig +noall {}.$this->domain +answer | grep -v \";;\" ";
+			$query = "cat $this->dico_word | parallel --progress -j24  dig +noall {}.$this->domain +answer | grep -v \";;\" ";
 			$result .= $this->req_ret_str($query);
 		
 		$result = base64_encode($result);

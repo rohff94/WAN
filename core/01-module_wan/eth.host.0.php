@@ -126,7 +126,7 @@ class HOST extends DOMAIN{
                 $max_iter = count($ips);
                 $this->rouge("ITER IP $max_iter");
 
-                $file_path = "/tmp/$this->eth.$this->domain.$this->host.ip4service";
+                $file_path = "/tmp/$this->eth.$this->host.ip4service";
                 $fp = fopen($file_path, 'w+');
                 foreach ($ips as $ip_addr) {
                     if( (!empty($ip_addr)) && (!$this->ip4priv($ip_addr)) ){
@@ -137,12 +137,18 @@ class HOST extends DOMAIN{
                 }
                 fclose($fp);
                 
-                if ( (1<$max_iter) && (20>$max_iter)) $this->requette("cat  $file_path | parallel --progress --no-notice -k php pentest.php IP {} "); // -j$max_iter
+                if ( (1<$max_iter) && (20>$max_iter)) $this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
                 
             }
             
             foreach ($host_ips as $ip){
-                if ($this->ip4priv($ip)) $this->log2error("response IP LOCAL from DNS SERVER ", __FILE__,__CLASS__,__FUNCTION__, __LINE__, "$this->eth:$this->domain:$this->host:$ip", "");
+                if ($this->ip4priv($ip)) {
+                    $query = "dig $this->host a +trace | grep '$this->domain'";
+                    $trace = $this->req_ret_str($query);
+                    echo $trace;
+                    $this->log2error("response IP LOCAL from DNS SERVER $this->eth:$this->host:$ip", __FILE__,__CLASS__,__FUNCTION__, __LINE__, "$this->eth:$this->domain:$this->host:$ip", "$trace");
+                    
+                }
                 if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
                 $obj_ip = new IP($this->eth, $this->domain, $ip);
                 $obj_ip->poc($this->flag_poc);
@@ -154,6 +160,35 @@ class HOST extends DOMAIN{
             
         }
     
+    }
+    
+    
+    
+    public function host4info() {
+        $this->gtitre(__FUNCTION__);
+        
+        $host_ips = $this->host4ip($this->host);
+        if(!empty($host_ips)){
+
+            
+            foreach ($host_ips as $ip){
+                if ($this->ip4priv($ip)) {
+                    $this->rouge("response IP LOCAL from DNS SERVER $this->eth:$this->host:$ip");
+                    
+                }
+                if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
+                    $obj_ip = new IP($this->eth, $this->domain, $ip);
+                    $obj_ip->poc($this->flag_poc);
+                    $obj_ip->ip2host($this->host);
+                    $obj_ip->ip2geoip();
+                    $obj_ip->ip2fw4ack();
+                    //$obj_ip->ip2vhost();
+                }
+            }
+            
+            
+        }
+        
     }
     
 }

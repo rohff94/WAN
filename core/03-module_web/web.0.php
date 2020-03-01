@@ -272,7 +272,7 @@ class WEB extends SERVICE4COM{
                 $query = "gedit $file_path";
                 if ($this->flag_poc) $this->requette($query);
                 
-                //$this->requette("cat $file_path | parallel --progress --no-notice -k -j24 php pentest.php URL {} ");
+                //$this->requette("cat $file_path | parallel --progress -k -j24 php pentest.php URL {} ");
 
                 
                 $tab_urls = $this->req_ret_tab("awk '{print $3}' $file_path ");

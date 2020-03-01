@@ -40,7 +40,7 @@ class com4obj extends com4net {
         while ($start1<$max_iter) {
             $start1 = $end1 ;
             $end1 = $start1+$step_by ;
-            $ob_file->requette("cat $ob_file->file_path | awk 'FNR>$start1 && FNR<=$end1' | parallel --progress --no-notice -k -j$step_by php pentest.php IP {} ");            
+            $ob_file->requette("cat $ob_file->file_path | awk 'FNR>$start1 && FNR<=$end1' | parallel --progress -k -j$step_by php pentest.php IP {} ");            
             $this->pause();
         }
 
@@ -65,7 +65,7 @@ class com4obj extends com4net {
             $end1 = $start1+$iter ;
             echo "\n";
             $ob_file->article("START/END $i/$process $iter (Max Iter $max_iter)", "$start1-$end1");
-            $ob_file->cmd("localhost","php parallel.php \"awk 'FNR>$start1 && FNR<=$end1' $ob_file->file_path | parallel --progress --no-notice -k -j$thread php pentest.php PORT {} \" \"tac $ob_file->file_path | awk 'FNR>$start1 && FNR<=$end1' | parallel --progress --no-notice -k -j$thread php pentest.php PORT {} \" 0 ");
+            $ob_file->cmd("localhost","php parallel.php \"awk 'FNR>$start1 && FNR<=$end1' $ob_file->file_path | parallel --progress --no-notice -k -j$thread php pentest.php PORT {} \" \"tac $ob_file->file_path | awk 'FNR>$start1 && FNR<=$end1' | parallel --progress -k -j$thread php pentest.php PORT {} \" 0 ");
         }
         //$this->requette("gedit $service_file_list");
         $this->note("kill -9 $(ps aux | grep '$ob_file->file_name'  | grep 'php' | awk '{ print $2}')");
@@ -77,7 +77,7 @@ class com4obj extends com4net {
             $end1 = $start1+$iter ;
             echo "\n";
             $ob_file->article("START/END $i/$process $iter (Max Iter $max_iter)", "$start1-$end1");
-            $ob_file->requette("php parallel.php \"awk 'FNR>$start1 && FNR<=$end1' $ob_file->file_path | parallel --progress --no-notice -k -j$thread php pentest.php PORT {} \" \"tac $ob_file->file_path | awk 'FNR>$start1 && FNR<=$end1' | parallel --progress --no-notice -k -j$thread php pentest.php PORT {} \" 0 ");
+            $ob_file->requette("php parallel.php \"awk 'FNR>$start1 && FNR<=$end1' $ob_file->file_path | parallel --progress -k -j$thread php pentest.php PORT {} \" \"tac $ob_file->file_path | awk 'FNR>$start1 && FNR<=$end1' | parallel --progress -k -j$thread php pentest.php PORT {} \" 0 ");
         }
         return $cmd;
     }

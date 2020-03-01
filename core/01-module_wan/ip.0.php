@@ -97,12 +97,14 @@ class IP extends DOMAIN{
 		// ============================================================
 		if ($this->ip4priv($this->ip)) $this->article("Private IP", $this->ip);
 		if (!$this->ip4priv($this->ip)) {
+		    /*
 		    $ip_wan = $this->ip4net();
 		    if (!$this->isIPv4($ip_wan)) {
-		        $chaine = "Lost Connexion to the net";
+		        $chaine = "Lost Connexion to the net $this->ip";
 		        $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 		        exit();
 		    }
+		    */
 		}
 		// ============================================================
 		
@@ -1931,7 +1933,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	        
 	            fclose($fp);
 	            $this->requette("cat $file_path");
-	            if ( (1<$max_iter) && (30>$max_iter) && ($this->ip2fw4enable()) ) $this->requette("cat  $file_path | parallel --progress --no-notice -k php pentest.php PORT {} "); // -j$max_iter 
+	            if ( (1<$max_iter) && (30>$max_iter) && ($this->ip2fw4enable()) ) $this->requette("cat  $file_path | parallel --progress -k php pentest.php PORT {} "); // -j$max_iter 
 	        
 	        foreach ($this->tab_open_ports_all as $port){
 	            if (!empty($port))  {
@@ -2033,7 +2035,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	            
 	                fclose($fp);
 	            $this->requette("cat $file_path");
-	            //if ( (1<$max_iter) && (30>$max_iter) && ($this->ip2fw4enable()) ) $this->requette("php parallel.php \"cat  $file_path | awk 'FNR>0 && FNR<=$gauche_iter' | parallel --progress --no-notice -k -j$gauche_iter php pentest.php PORT {} \" \"cat  $file_path | awk 'FNR>$gauche_iter && FNR<=$max_iter' | parallel --progress --no-notice -k -j$droite_iter php pentest.php PORT {} \" 0 ");
+	            //if ( (1<$max_iter) && (30>$max_iter) && ($this->ip2fw4enable()) ) $this->requette("php parallel.php \"cat  $file_path | awk 'FNR>0 && FNR<=$gauche_iter' | parallel --progress -k -j$gauche_iter php pentest.php PORT {} \" \"cat  $file_path | awk 'FNR>$gauche_iter && FNR<=$max_iter' | parallel --progress -k -j$droite_iter php pentest.php PORT {} \" 0 ");
 	            
 	            foreach ($this->tab_open_ports_all as $port){
 	                if (!empty($port))  {
