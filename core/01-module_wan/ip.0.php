@@ -97,14 +97,14 @@ class IP extends DOMAIN{
 		// ============================================================
 		if ($this->ip4priv($this->ip)) $this->article("Private IP", $this->ip);
 		if (!$this->ip4priv($this->ip)) {
-		    /*
+		    
 		    $ip_wan = $this->ip4net();
 		    if (!$this->isIPv4($ip_wan)) {
 		        $chaine = "Lost Connexion to the net $this->ip";
 		        $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 		        exit();
 		    }
-		    */
+		    
 		}
 		// ============================================================
 		
@@ -1405,12 +1405,9 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	
 	
 	public function ip2tracert4local(){
-	    $result = "";
-	    $result .= $this->ssTitre(__FUNCTION__);
+	    $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S traceroute $this->ip ";
-		$result .= $this->cmd("localhost",$query);
-		return $this->req_ret_str($query);
-		
+		return $this->req_ret_str($query);		
 	}
 
 
@@ -1691,7 +1688,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $this->titre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return "Private IP";
 		$result = $this->ip2vhost4web4online();
-		$result .= $this->ip2vhost4web4bfk();
+		//$result .= $this->ip2vhost4web4bfk();
 		$result .= $this->ip2vhost4web4sameip();
 		$result .= $this->ip2vhost4web4ipadress();
 		$result .= $this->ip2vhost4web4youg();

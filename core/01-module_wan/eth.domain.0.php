@@ -204,10 +204,23 @@ class DOMAIN extends ETH{
 	}
 	    
 	public function domain4pentest(){
-	    $result = "";
 	    $this->gtitre(__FUNCTION__);
 	    
 	    $this->domain4service();
+	    
+
+	    $sql_r = "SELECT ip FROM IP WHERE id8domain = '$this->domain2id'  ";
+	    //echo "$sql_r\n";
+	    $req = $this->mysql_ressource->query($sql_r);
+	    while ($row = $req->fetch_assoc()) {
+	        $ip = $row['ip'];
+	        if(!empty($ip) ){
+	            $obj_ip = new IP($this->eth, $this->domain, $ip);
+	            $obj_ip->poc($this->flag_poc);
+	            $obj_ip->ip4service();
+	            //$obj_ip->ip4pentest();
+	        }
+	    }
 	}
 	
 	
@@ -248,9 +261,9 @@ class DOMAIN extends ETH{
 	
 	public function domain4service(){
 	    $this->gtitre(__FUNCTION__);
+	    
 	    $this->domain4info();
 	    //$result .= $this->domain2asn() ;$this->pause(); // NOT YET 
-
 	    
 	    $sql_r = "SELECT ip FROM IP WHERE id8domain = '$this->domain2id'  ";
 	    //echo "$sql_r\n";
@@ -577,6 +590,9 @@ class DOMAIN extends ETH{
 	
 	public function  domain4info(){
 	    $this->gtitre(__FUNCTION__);
+	    
+	    $this->domain2whois();
+	    
 	    $hosts = $this->domain2host() ;
 	    echo $this->tab($hosts);$this->pause();
 
@@ -652,18 +668,27 @@ class DOMAIN extends ETH{
 	public function domain2trace(){
 		$this->ssTitre(__FUNCTION__);
 		$query = "dig $this->domain a +trace ";
+		
 		return $this->req2BD(__FUNCTION__,__CLASS__,$this->domain2where,$query);
 	}
 	
 	public function domain2whois(){
 		$this->ssTitre(__FUNCTION__);
+		$sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->domain2where AND ".__FUNCTION__." IS NOT NULL";
+		if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->domain2where));
+		else {
+		    
 		$query = "whois $this->domain | grep ':' | grep -v '#' ";
-		return $this->req2BD(__FUNCTION__,__CLASS__,$this->domain2where,$query);
+		$result = $this->req_ret_str($query);
+		$result = base64_encode($result);
+		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,$this->domain2where,$result));
+	}
+
 	}
 	
 	public function domain2asn(){
 		$this->ssTitre(__FUNCTION__);
-		// http://geolite.maxmind.com/download/geoip/database/GeoLite2-ASN-CSV.zip
+		
 		// https://www.tcpiputils.com/browse/as/33779
 		// https://bgpview.io/asn/33779#prefixes-v4
 		$query = " ";

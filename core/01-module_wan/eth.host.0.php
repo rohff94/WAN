@@ -182,7 +182,8 @@ class HOST extends DOMAIN{
                     $obj_ip->ip2host($this->host);
                     $obj_ip->ip2geoip();
                     $obj_ip->ip2fw4ack();
-                    //$obj_ip->ip2vhost();
+                    $obj_ip->ip2vhost();
+                    //$obj_ip->ip2whois(); // cidr 2 whois
                 }
             }
             
