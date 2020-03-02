@@ -165,16 +165,12 @@ class HOST extends DOMAIN{
     
     
     public function host4info() {
-        $this->gtitre(__FUNCTION__);
-        
+        $this->gtitre(__FUNCTION__);        
         $host_ips = $this->host4ip($this->host);
         if(!empty($host_ips)){
-
-            
             foreach ($host_ips as $ip){
                 if ($this->ip4priv($ip)) {
-                    $this->rouge("response IP LOCAL from DNS SERVER $this->eth:$this->host:$ip");
-                    
+                    $this->rouge("response IP LOCAL from DNS SERVER $this->eth:$this->host:$ip");                    
                 }
                 if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
                     $obj_ip = new IP($this->eth, $this->domain, $ip);
@@ -182,15 +178,18 @@ class HOST extends DOMAIN{
                     $obj_ip->ip2host($this->host);
                     $obj_ip->ip2geoip();
                     $obj_ip->ip2fw4ack();
-                    $obj_ip->ip2vhost();
+                    sleep(1);
+                    //$obj_ip->ip2vhost();
                     //$obj_ip->ip2whois(); // cidr 2 whois
                 }
             }
-            
-            
-        }
-        
+        }    
     }
+    
+    
+    
+    
+    
     
 }
 ?>

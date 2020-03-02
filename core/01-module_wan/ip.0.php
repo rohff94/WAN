@@ -97,13 +97,14 @@ class IP extends DOMAIN{
 		// ============================================================
 		if ($this->ip4priv($this->ip)) $this->article("Private IP", $this->ip);
 		if (!$this->ip4priv($this->ip)) {
-		    
+		    /*
 		    $ip_wan = $this->ip4net();
 		    if (!$this->isIPv4($ip_wan)) {
 		        $chaine = "Lost Connexion to the net $this->ip";
 		        $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 		        exit();
 		    }
+		    */
 		    
 		}
 		// ============================================================
@@ -1954,8 +1955,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    return $result;
 	}
 
-	public function ip4info(){ 
-	    
+	public function ip4info(){ 	    
 	    $this->article("ID IP", $this->ip2id);
 	    $this->article("IP", $this->ip);
 	    $ip2geoip = $this->ip2geoip();
@@ -1976,6 +1976,8 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	        $this->article("ALL vHosts", $vhosts);
 	    }
 	}
+	
+	
 	public function ip4pentest(){ // OK
 
 	    $this->gtitre(__FUNCTION__);

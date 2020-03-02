@@ -20,9 +20,8 @@ class lan4linux extends LAN{
     var $tab_users_gid_root;
     
     var $etc_passwd_str ;
-    var $env_path_str ;
     var $shell_version ;
-    var $wget_path ;
+
     
     
     
@@ -183,16 +182,7 @@ class lan4linux extends LAN{
         
         $data = "echo \$DISPLAY ";
         $this->lan2stream4result($data,$this->stream_timeout);
-        
-        
-        $this->note("What development tools/languages are installed/supported?");
-        $data = "which perl php python ruby gcc cc clang java go gdb find";
-        $this->lan2stream4result($data,$this->stream_timeout);
-        
-        
-        $this->note("How can files be uploaded?");
-        $data = "which wget curl elinks w3m lynx fetch lwp-download nc netcat nmap ncat ftp tftp ssh socat tcpdump elinks tcpbind telnet";
-        $this->lan2stream4result($data,$this->stream_timeout);
+
         
         
         
@@ -698,10 +688,18 @@ EOC;
         $this->ssTitre(__FUNCTION__);
         $files_found = "";
         $tmp2 = array();
+        $data = "which $filename ";
+        $tmp = trim($this->lan2stream4result($data,$this->stream_timeout));
+        exec("echo '$tmp' $this->filter_file_path ",$tmp2);
+        if (!empty($tmp2)) if (isset($tmp2[0])) $files_found = trim($tmp2[0]);
+        
+        if( (!empty($files_found)) && (stristr($files_found, $filename)) ){
+            return $files_found ;
+        }
         $data = "locate $filename ";
         $tmp = trim($this->lan2stream4result($data,$this->stream_timeout));
         exec("echo '$tmp' $this->filter_file_path ",$tmp2);
-        if (!empty($tmp2)) if (isset($tmp2[0])) $files_found = $tmp2[0];
+        if (!empty($tmp2)) if (isset($tmp2[0])) $files_found = trim($tmp2[0]);
         
         if( (!empty($files_found)) && (stristr($files_found, $filename)) ){
             return $files_found ;
@@ -710,12 +708,12 @@ EOC;
         $data = "find / -iname $filename -type f -exec ls {} \;";
         $tmp = trim($this->lan2stream4result($data,$this->stream_timeout));
         exec("echo '$tmp' $this->filter_file_path ",$tmp2);
-        if (!empty($tmp2)) if (isset($tmp2[0])) $files_found = $tmp2[0];
+        if (!empty($tmp2)) if (isset($tmp2[0])) $files_found = trim($tmp2[0]);
         
         if( (!empty($files_found)) && (stristr($files_found, $filename)) ){
             return $files_found ;
         }
-        
+        return $files_found;
     }
     
     

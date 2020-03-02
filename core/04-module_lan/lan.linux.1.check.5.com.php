@@ -19,7 +19,7 @@ class check4linux extends check4linux8jobs{
     public function lan2init(){
         
         $this->titre(__FUNCTION__);
-        
+        $tab_tmp = array();
         echo "=============================================================================\n";
         $this->article("Template ID", $this->template_id);
         //$this->article("Template BASE64 ID", $this->templateB64_id);
@@ -39,6 +39,9 @@ class check4linux extends check4linux8jobs{
         unset($tmp2);
         $this->env_path_str = $this->lan2env4path();
         $this->pause();
+        
+        $this->lan2init2app();
+        
         $data = "cat /etc/shadow ";
         $tmp = $this->lan2stream4result($data,$this->stream_timeout);
         exec("echo '$tmp' | grep ':'   ",$tab_tmp);
@@ -47,6 +50,164 @@ class check4linux extends check4linux8jobs{
             $this->lan2root8shadow($shadow_str,$this->etc_passwd_str);
         }
         
+    }
+    
+    
+    public function lan2init2app(){
+        $this->titre(__FUNCTION__);
+        $this->note("What development tools/languages are installed/supported?");
+        $this->lan2init2app8executable();
+        $this->path_compiler_c = $this->lan2init2app8compiler();
+        $this->path_snifer = $this->lan2init2app8snifer();
+        
+        $this->note("How can files be uploaded?");
+        $this->path_webbrowser_cli = $this->lan2init2app8webbrowser();
+        $this->path_compiler_c = $this->lan2init2app8socket();
+
+        
+    }
+    
+    
+    public function lan2init2app8executable(){
+        $this->ssTitre(__FUNCTION__);
+        $filename = "perl";
+        echo $this->lan2file4locate($filename);
+        
+        $filename = "php";
+        echo $this->lan2file4locate($filename);
+        
+        $filename = "python";
+        echo $this->lan2file4locate($filename);
+        
+        $filename = "ruby";
+        echo $this->lan2file4locate($filename);
+        
+        $filename = "java";
+        echo $this->lan2file4locate($filename);
+        
+        $filename = "go";
+        echo $this->lan2file4locate($filename);
+        
+        $filename = "gdb";
+        echo $this->lan2file4locate($filename);
+        
+        $filename = "find";
+        echo $this->lan2file4locate($filename);
+        
+        $filename = "grep";
+        echo $this->lan2file4locate($filename);
+        
+        $filename = "strings";
+        echo $this->lan2file4locate($filename);
+    }
+    
+    public function lan2init2app8snifer(){
+        $this->ssTitre(__FUNCTION__);
+        $filename = "tcpdump";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        $filename = "nmap";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        $filename = "hping";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        $filename = "hping3";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+    }
+    
+    public function lan2init2app8socket(){
+        $this->ssTitre(__FUNCTION__);
+        
+        $filename = "socat";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        
+        $filename = "nc";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        
+        $filename = "netcat";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc) ;
+        
+        $filename = "ncat";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        
+        $filename = "tcpbind";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        
+        $filename = "ssh";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        
+        $filename = "ftp";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc) ;
+        
+        $filename = "tftp";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+                
+        $filename = "telnet";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+ 
+        
+    }
+    
+    
+    public function lan2init2app8webbrowser(){
+        $this->ssTitre(__FUNCTION__);
+        
+        $filename = "wget";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        
+        $filename = "curl";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        
+        $filename = "w3m";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc) ;
+        
+        $filename = "elinks";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        
+        $filename = "lynx";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        
+        $filename = "fetch";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc) ;
+        
+        $filename = "lwp-download";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        
+    }
+    
+    
+    public function lan2init2app8compiler(){
+        $this->ssTitre(__FUNCTION__);
+        
+        $filename = "gcc";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        
+        $filename = "cc";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc);
+        
+        $filename = "clang";
+        $path_gcc = $this->lan2file4locate($filename);
+        if (!empty($path_gcc)) return trim($path_gcc) ;
     }
     
     public function lan4root(){

@@ -136,7 +136,15 @@ class LAN extends SERVICE4COM{
 	var $network_dns;
 	var $network_gw ;
 	var $network_ip_wan ;
+	
+	var $path_webbrowser_cli ;
+	var $path_compiler_c ;
+	var $path_strings ;
+	var $path_snifer ;
+	var $path_socat ;
+	var $env_path_str ;
 
+	
 	
 	
 
