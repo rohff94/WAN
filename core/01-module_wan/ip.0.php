@@ -97,14 +97,14 @@ class IP extends DOMAIN{
 		// ============================================================
 		if ($this->ip4priv($this->ip)) $this->article("Private IP", $this->ip);
 		if (!$this->ip4priv($this->ip)) {
-		    /*
+		    
 		    $ip_wan = $this->ip4net();
 		    if (!$this->isIPv4($ip_wan)) {
 		        $chaine = "Lost Connexion to the net $this->ip";
 		        $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 		        exit();
 		    }
-		    */
+		    
 		    
 		}
 		// ============================================================
@@ -1754,13 +1754,13 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	
 	public function ip2range(){
 	    $result = "";
+	    $this->titre(__FUNCTION__);
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
-	        $result .= $this->titre(__FUNCTION__);
 	    $result .= "LOCAL:\n".$this->ip2range4local();
 		$result .= "\nWHOIS:\n".$this->ip2range4whois();
-		$result .= "\nWEB:\n".$this->ip2range4web();
+		//$result .= "\nWEB:\n".$this->ip2range4web();
 		
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
@@ -1829,26 +1829,18 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	
 	
 	public function ip2vhost4web4online(){
-	    $result = "";
-	    $result .= $this->titre(__FUNCTION__);
-		//$this->net("http://whois.webhosting.info/$this->ip");
-		//$this->net("http://www.bfk.de/bfk_dnslogger.html?query=$this->ip");
-		//$this->net("http://sameip.org/ip/$this->ip");
-		//$this->net("http://www.ip-adress.com/reverse_ip/$this->ip");
-		//$this->net("http://www.dnsdigger.com/hostcollision.php?host=$this->ip");
-		//$this->net("http://www.yougetsignal.com/tools/Web-sites-on-web-server/php/get-web-sites-on-web-server-json-data.php?remoteAddress=$this->ip");
+	    $this->titre(__FUNCTION__);
+				
 		//$this->net("http://www.websiteneighbors.com/results.php?output=php&ip_host=$this->ip");
 		//$this->net("http://www.my-ip-neighbors.com/?domain=$this->ip");
-		//$this->pause();
-		
 	}
 	
 	public function ip2tracert(){
 	    $result = "";
+	    $this->ssTitre(__FUNCTION__);
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
-	        $result .= $this->titre(__FUNCTION__);
 	    $result .= $this->ip2tracert4local();
 		$result .= $this->ip2tracert4online();
 		
@@ -1859,8 +1851,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	
 	
 	public function ip2tracert4online(){
-	    $result = "";
-	    $result .= $this->ssTitre(__FUNCTION__);
+	    $this->ssTitre(__FUNCTION__);
 		
 		// http://www.monitis.com/traceroute/
 		// http://ping.eu/traceroute/
@@ -1952,11 +1943,26 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    return $result;
 	}
 
-	public function ip4info(){ 	    
+	public function ip4info(){ 	 
+	    $this->gtitre(__FUNCTION__);
+	    echo "=============================================================================\n";
+	    
 	    $this->article("ID IP", $this->ip2id);
 	    $this->article("IP", $this->ip);
 	    $ip2geoip = $this->ip2geoip();
 	    $this->article("IP GEOLOC",$ip2geoip);
+	    $ip2asn = $this->ip2asn();
+	    $this->article("IP ASN",$ip2asn);
+	    $ip2range = $this->ip2range();
+	    $this->article("IP RANGE",$ip2range);
+	    $ip2whois = $this->ip2whois();
+	    $this->article("IP WHOIS",$ip2whois);
+	    
+	    $ip2fw = $this->ip2fw4ack();
+	    $this->article("IP FIREWALL",$ip2fw);
+	    $ip2icmp = $this->ip2icmp();
+	    $this->article("IP ICMP",$ip2icmp);
+	    
 	    
 	    $ip2root = $this->ip2root8db($this->ip2id);
 	    $ip2shell = $this->ip2shell8db($this->ip2id);
@@ -1972,6 +1978,11 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	        $vhosts = $this->ip2vhost(); 
 	        $this->article("ALL vHosts", $vhosts);
 	    }
+	    
+	    $ip2tracert = $this->ip2tracert();
+	    $this->article("IP TraceRoute",$ip2tracert);
+	    echo "=============================================================================\n";
+	    
 	}
 	
 	

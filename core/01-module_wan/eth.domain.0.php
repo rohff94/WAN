@@ -206,7 +206,7 @@ class DOMAIN extends ETH{
 	public function domain4pentest(){
 	    $this->gtitre(__FUNCTION__);
 	    
-	    //$this->domain4info();
+	    $this->domain4info();
 	    $this->domain4service();
 	    
 
@@ -218,7 +218,6 @@ class DOMAIN extends ETH{
 	        if(!empty($ip) ){
 	            $obj_ip = new IP($this->eth, $this->domain, $ip);
 	            $obj_ip->poc($this->flag_poc);
-	            $obj_ip->ip4service();
 	            //$obj_ip->ip4pentest();
 	        }
 	    }
@@ -262,7 +261,7 @@ class DOMAIN extends ETH{
 	
 	public function domain4service(){
 	    $this->gtitre(__FUNCTION__);
-	    
+	    $ip="";
 	    
 	    //$result .= $this->domain2asn() ;$this->pause(); // NOT YET 
 	    
@@ -270,14 +269,24 @@ class DOMAIN extends ETH{
 	    //echo "$sql_r\n";
 	    $req = $this->mysql_ressource->query($sql_r);
 	    while ($row = $req->fetch_assoc()) {
-	        $ip = $row['ip'];
+	        if (isset($row['ip'])) $ip = trim($row['ip']);
+	        if(!empty($ip) ){
+	            $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4service FALSE\" ";
+	            $this->requette($query);
+	        }
+	    }
+	        
+	    $sql_r = "SELECT ip FROM IP WHERE id8domain = '$this->domain2id'  ";
+	    //echo "$sql_r\n";
+	    $req = $this->mysql_ressource->query($sql_r);
+	    while ($row = $req->fetch_assoc()) {
+	        if (isset($row['ip'])) $ip = trim($row['ip']);
 	        if(!empty($ip) ){
 	            $obj_ip = new IP($this->eth, $this->domain, $ip);
 	            $obj_ip->poc($this->flag_poc);
 	            $obj_ip->ip4service();
 	        }
 	    }
-	        
 	    
 	    $cidr = $this->domain2cidr() ;
 	    echo $this->tab($cidr);$this->pause();
