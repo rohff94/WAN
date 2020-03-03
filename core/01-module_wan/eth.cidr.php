@@ -27,7 +27,7 @@ class CIDR extends ETH{
             
             $sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->cidr2where ";
             $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_r\"  2>/dev/null \n";
-            $this->requette($query);
+            //$this->requette($query);
             $this->cidr2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
             
             

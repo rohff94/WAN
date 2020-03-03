@@ -859,6 +859,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	}
 	
 	public function ip2asn(){
+	    $this->ssTitre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return "Private IP";
 		$result = "";
 		$sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
@@ -866,10 +867,10 @@ $filenames = explode("\n",$test->req_ret_str($query));
 		    return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 		}
 		else {
-		    $result .= $this->titre(__FUNCTION__);
+		    
 		   
 		// https://www.tcpiputils.com/browse/ip-address/80.88.14.75
-		    $result .= $this->article("BGP Hijacking","Autonomous System Numbers (ASNs) define which IP addresses a router is responsible for.
+		    $this->article("BGP Hijacking","Autonomous System Numbers (ASNs) define which IP addresses a router is responsible for.
 				If there is an overlap between two ASN ranges, routers will route to the more specific ASN
 	• An attacker who either has compromised an ISP or can inject routes (think nation-states) can broadcast malicious routes and reroute
 traffic through their network");
@@ -878,7 +879,7 @@ to and through your network. We recommend running and recording what normal trac
 like by using a service like traceroute.org.
 Please keep in mind that routes do change. However, if you see traffic making a drastic change (i.e. being
 routed halfway around the world) you may want to work with your ISP to investigate.");
-		$result .= $this->ip2asn4db();
+		$result .= $this->ip2asn4db()."\n";
 		$this->pause();
 		$result .= $this->ip2asn4nmap();
 		$this->pause();
@@ -888,21 +889,17 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	}
 	
 	public function ip2asn4db(){
-	    $result = "";
-	    $result .= $this->ssTitre(__FUNCTION__);
+	    $this->ssTitre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
 		$query = "mysql --user=root --password=hacker --database=geoip --execute=\"CALL ip2asn(\\\"$this->ip\\\");\" 2> /dev/null | grep -Po \"AS[0-9]{1,}.*\" ";
-		$result .= $this->cmd("localhost",$query);
 		return $this->req_ret_str($query);
 		
 	}
 	
 	public function ip2asn4nmap(){
-	    $result = "";
-	    $result .= $this->ssTitre(__FUNCTION__);
+	    $this->ssTitre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
-		$query = "nmap --script asn-query $this->ip -Pn -sn -e $this->eth -oX -  ";
-		$result .= $this->cmd("localhost",$query);
+		$query = "nmap --script asn-query $this->ip -Pn -sn -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/hostscript/script/@output | strings  ";
 		return $this->req_ret_str($query);
 		
 	}
@@ -1039,14 +1036,14 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
 	        $this->titre(__FUNCTION__);
-	        $result .= $this->note("Putting all hosts behind a proxy filter will prevent passive OS Fingerprinting.");
-	        $result .= $this->note("In which of the following scanning methods do Windows operating systems send only RST packets irrespective of whether the port is open or closed?
-				TCP FIN");
+	        $this->note("Putting all hosts behind a proxy filter will prevent passive OS Fingerprinting.");
+	        
 		
 		//$result .= $this->ip2os2xprobe();
 		$result .= $this->ip2os2nmap();
 		$this->ip2os4arch($result);
-		//$result .= $this->ip2os4win2fin();	
+		//$this->note("In which of the following scanning methods do Windows operating systems send only RST packets irrespective of whether the port is open or closed? TCP FIN");
+        //$result .= $this->ip2os4win2fin();	
 		
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));

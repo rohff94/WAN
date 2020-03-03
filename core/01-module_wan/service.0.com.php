@@ -762,6 +762,7 @@ class SERVICE extends SERVICE4COM {
 
 	public function service4info(){
 	    $result = "";
+	    $service4cve = "";
 	    echo "\n====START SERVICE4INFO:$this->port=======================================================\n";
 	    $this->titre(__FUNCTION__);
 	    $date_now = date('Y-m-d H:i:s');
@@ -783,8 +784,7 @@ class SERVICE extends SERVICE4COM {
 	    $this->article("extrainfo",$this->service_extrainfo);
 	    $service2banner = trim($this->service2banner());$this->article("Banner",$service2banner);
 	    $service4traceroute = trim($this->port2traceroute());$this->article("Traceroute Port",$service4traceroute);
-	    //$service4cve = trim($this->service4cve());$this->article("CVE",$service4cve);
-	    $service4cve = "";$this->article("CVE",$service4cve);
+	    //$service4cve = trim($this->service4cve());$this->article("CVE",$service4cve);$this->article("CVE",$service4cve);
 	    
 	    
 	    $port2root = $this->port2root8db($this->port2id);

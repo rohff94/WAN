@@ -206,6 +206,7 @@ class DOMAIN extends ETH{
 	public function domain4pentest(){
 	    $this->gtitre(__FUNCTION__);
 	    
+	    //$this->domain4info();
 	    $this->domain4service();
 	    
 
@@ -262,7 +263,7 @@ class DOMAIN extends ETH{
 	public function domain4service(){
 	    $this->gtitre(__FUNCTION__);
 	    
-	    $this->domain4info();
+	    
 	    //$result .= $this->domain2asn() ;$this->pause(); // NOT YET 
 	    
 	    $sql_r = "SELECT ip FROM IP WHERE id8domain = '$this->domain2id'  ";
@@ -380,7 +381,7 @@ class DOMAIN extends ETH{
 	    //echo $this->tab($tab_cidr);
 	    $size = count($tmp);
 	    if($size<20){
-	        //$dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
+	        $dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
 	        exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
 	        $size = count($tab_cidr);
 	        if($size<50){
