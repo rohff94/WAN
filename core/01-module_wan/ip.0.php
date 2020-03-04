@@ -867,9 +867,9 @@ $filenames = explode("\n",$test->req_ret_str($query));
 		    return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 		}
 		else {
-		    
 		   
 		// https://www.tcpiputils.com/browse/ip-address/80.88.14.75
+		    //https://bgp.he.net/ip/213.186.33.4
 		    $this->article("BGP Hijacking","Autonomous System Numbers (ASNs) define which IP addresses a router is responsible for.
 				If there is an overlap between two ASN ranges, routers will route to the more specific ASN
 	• An attacker who either has compromised an ISP or can inject routes (think nation-states) can broadcast malicious routes and reroute
@@ -880,9 +880,8 @@ like by using a service like traceroute.org.
 Please keep in mind that routes do change. However, if you see traffic making a drastic change (i.e. being
 routed halfway around the world) you may want to work with your ISP to investigate.");
 		$result .= $this->ip2asn4db()."\n";
-		$this->pause();
 		$result .= $this->ip2asn4nmap();
-		$this->pause();
+		$result .= $this->ip2whois4asn();
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
 		}
@@ -1481,14 +1480,14 @@ messages from leaving your internal network and 3) use a proxy server instead of
 
 	
 	public function ip2geoip(){
+	    $this->titre(__FUNCTION__);
 	   if ($this->ip4priv($this->ip)) return "Private IP";
 	   $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	   if ($this->checkBD($sql_r_1) ) return  $this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where ");
-	   else {
-	    $this->titre(__FUNCTION__);
+	   else {	    
 	    $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=geoip --execute=\"CALL ip2city(\\\"$this->ip\\\");\"  2>/dev/null | grep -v loc ";
-		//$result .= $this->cmd("localhost",$query);
-	    $result = trim($this->req_ret_str($query));	
+	    $result .= $this->req_ret_str($query);	
+	    $result .= $this->ip2whois4geoip();
 		return $this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result);
 	    }
 	}
@@ -1496,11 +1495,32 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	
 	public function ip2whois(){
 	    $this->titre(__FUNCTION__);
-		if ($this->ip4priv($this->ip)) return "Private IP";
-		$query = "whois $this->ip | grep -v -i -E \"(^Comment|abuse|^%|^#)\" | egrep -i \"(route|Address|PostalCode|City|StateProv|country)\" | sort -u ";
-		return $this->req2BD(__FUNCTION__,__CLASS__,"$this->ip2where ",$query);
+	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
+	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
+	    else {
+	        
+	        $query = "whois $this->ip | grep -v -i -E \"(^Comment|abuse|^%|^#)\"";
+	        $result = $this->req_ret_str($query);
+	        
+	        $result = base64_encode($result);
+	        return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
+	    }
+	    
 	}
 	
+	public function ip2whois4asn(){
+	    $this->titre(__FUNCTION__);
+	    if ($this->ip4priv($this->ip)) return "Private IP";
+	    $query = "echo '".$this->ip2whois()."' | egrep -i \"(NetRange|CIDR|Parent|inetnum)\" ";
+	    return $this->req_ret_str($query);
+	}
+	
+	public function ip2whois4geoip(){
+	    $this->titre(__FUNCTION__);
+	    if ($this->ip4priv($this->ip)) return "Private IP";
+	    $query = "whois $this->ip | egrep -i \"(route|Address|PostalCode|City|StateProv|country)\" ";
+	    return $this->req_ret_str($query);
+	}
 	
 	public function ip2honey(){
 	    $this->ssTitre(__FUNCTION__);
@@ -1664,8 +1684,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
-	        
-	       $result .= $this->ip2vhost4nmap();
+	    $result .= $this->ip2vhost4nmap();
 		$result .= $this->ip2vhost4web();
 		$result = $this->req_ret_str("echo '$result' | grep -Po \"([0-9a-z\-_]{1,}\.)+\.[a-z]{1,5}\" | sort -u  "); // | grep -i -Po \"([0-9a-z\-_]{1,}\.)+$this->domain\"
 		
@@ -1758,34 +1777,16 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
-	    $result .= "LOCAL:\n".$this->ip2range4local();
-		$result .= "\nWHOIS:\n".$this->ip2range4whois();
-		//$result .= "\nWEB:\n".$this->ip2range4web();
+	    $result .= $this->ip2range4local();
 		
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
 		}
 		}
 	
-		public function ip2range4web(){
-		    $result = "";
-		    $result .= $this->ssTitre(__FUNCTION__);
-			if ($this->ip4priv($this->ip)) return $result."Private IP";
-			$query = "  ";
-			
-			return $this->req_ret_str($query);
-			
-		}
+
 		
-	public function ip2range4whois(){
-	    $result = "";
-	    $result .= $this->ssTitre(__FUNCTION__);
-		if ($this->ip4priv($this->ip)) return $result."Private IP";
-		$query = "echo '".$this->ip2whois()."' | egrep -i \"(NetRange|CIDR|Parent|inetnum)\" ";
-		
-		return $this->req_ret_str($query);
-		
-	}
+
 	
 	
 	public function ip2range4local(){
@@ -1831,8 +1832,14 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	public function ip2vhost4web4online(){
 	    $this->titre(__FUNCTION__);
 				
-		//$this->net("http://www.websiteneighbors.com/results.php?output=php&ip_host=$this->ip");
-		//$this->net("http://www.my-ip-neighbors.com/?domain=$this->ip");
+	    //https://tools.tracemyip.org/lookup/213.186.33.4
+	    // https://hackertarget.com/reverse-ip-lookup/
+	    // http://reverseip.domaintools.com/search/?q=213.186.33.4
+	    // http://ip-www.net/213.186.33.4
+	    //http://www.ip-neighbors.com/host/213.186.33.4
+	    //https://www.dnsqueries.com/en/ip_neighbors.php
+	    //https://www.yougetsignal.com/tools/web-sites-on-web-server/
+	    //https://viewdns.info/reverseip/?host=213.186.33.4&t=1
 	}
 	
 	public function ip2tracert(){
@@ -1949,27 +1956,18 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    
 	    $this->article("ID IP", $this->ip2id);
 	    $this->article("IP", $this->ip);
-	    $ip2geoip = $this->ip2geoip();
-	    $this->article("IP GEOLOC",$ip2geoip);
-	    $ip2asn = $this->ip2asn();
-	    $this->article("IP ASN",$ip2asn);
-	    $ip2range = $this->ip2range();
-	    $this->article("IP RANGE",$ip2range);
-	    $ip2whois = $this->ip2whois();
-	    $this->article("IP WHOIS",$ip2whois);
-	    
-	    $ip2fw = $this->ip2fw4ack();
-	    $this->article("IP FIREWALL",$ip2fw);
-	    $ip2icmp = $this->ip2icmp();
-	    $this->article("IP ICMP",$ip2icmp);
-	    
+	    $ip2geoip = $this->ip2geoip();$this->article("IP GEOLOC",$ip2geoip);
+	    $ip2asn = $this->ip2asn();$this->article("IP ASN",$ip2asn);
+	    $ip2range = $this->ip2range();$this->article("IP RANGE",$ip2range);
+	    $ip2whois = $this->ip2whois();$this->article("IP WHOIS",$ip2whois);	    
+	    $ip2fw = $this->ip2fw4ack();$this->article("IP FIREWALL",$ip2fw);
+	    //$ip2icmp = $this->ip2icmp();$this->article("IP ICMP",$ip2icmp);
 	    
 	    $ip2root = $this->ip2root8db($this->ip2id);
 	    $ip2shell = $this->ip2shell8db($this->ip2id);
 	    $ip2write = $this->ip2write8db($this->ip2id);
 	    $ip2read = $this->ip2read8db($this->ip2id);
-	    
-	    
+	    	    
 	    if ($ip2root) $this->article("ip2root",$ip2root);
 	    if ($ip2shell)  $this->article("IP2SHELL",$ip2shell);
 	    if ($ip2write) $this->article("IP2WRITE",$ip2write);
@@ -1979,8 +1977,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	        $this->article("ALL vHosts", $vhosts);
 	    }
 	    
-	    $ip2tracert = $this->ip2tracert();
-	    $this->article("IP TraceRoute",$ip2tracert);
+	    //$ip2tracert = $this->ip2tracert();$this->article("IP TraceRoute",$ip2tracert);
 	    echo "=============================================================================\n";
 	    
 	}
