@@ -12,6 +12,10 @@ class com4display extends INSTALL {
     var $session_log_linux ;
     
     var $filter_file_path ;
+    var $filter_host ;
+    var $filter_ip ;
+    var $filter_domain ;
+    
     var $path_grep ;
     var $path_sort ;
     var $path_strings ;
@@ -20,7 +24,11 @@ class com4display extends INSTALL {
 	
 	function __construct(){
 		parent::__construct();	
-		$this->filter_file_path = " | grep -i -Po \"(/[a-z0-9\-\_\.]{1,})*\"";
+		$this->filter_file_path = " | grep -i -Po \"(/[a-z0-9\-_\.]{1,})*\" | sort -u ";
+		$this->filter_domain = " | grep -Po -i \"[0-9a-z\_\-]{1,}\.[a-z]{2,5}\"  | tr '[:upper:]' '[:lower:]' | sort -u "; 
+		$this->filter_host = " | grep -i -Po \"([0-9a-z\-\_\.]{1,})\.[a-z]{2,5}\" | tr '[:upper:]' '[:lower:]' | sort -u ";
+		$this->filter_ip = " | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | sort -u ";
+		
 	}
 
 	public function log2succes($chaine,$file,$class,$function,$line,$info,$extrainfo){

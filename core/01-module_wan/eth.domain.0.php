@@ -592,8 +592,7 @@ class DOMAIN extends ETH{
 	    return $result ;
 	}
 	
-	public function  domain2info(){
-	    
+	public function  domain2info(){	    
 	    $this->article("ID Domain", $this->domain2id);
 	    $this->article("Domain", $this->domain);
 	}
@@ -613,7 +612,7 @@ class DOMAIN extends ETH{
 	        
 	        $size = count($hosts);
 	        for($i=0;$i<$size;$i++){
-	            echo "\n$i/$size :$hosts[$i] =======================================================\n";
+	            echo "\n$i/$size : $hosts[$i] =======================================================\n";
 	            $host = $hosts[$i];
 	            $obj_host = new HOST($this->eth, $this->domain,$host);
 	            $obj_host->host4info();

@@ -61,7 +61,11 @@ class IP extends DOMAIN{
 			$ip_tab = $this->host4ip($ip_addr);
 			if (!empty($ip_tab)) $ip_tmp = $ip_tab[0];
 			else $ip_tmp = "";
-			if ( (!empty($ip_tmp)) && ($this->isIPv4($ip_tmp)) || ($this->isIPv6($ip_tmp)) ) $this->ip = $ip_tmp;
+			if ( (!empty($ip_tmp)) && ($this->isIPv4($ip_tmp)) || ($this->isIPv6($ip_tmp)) ) {
+
+			    $this->ip = $ip_tmp;
+			    
+			}
 			else {
 			    var_dump($ip_tmp);
 			    $this->article("IP", $ip_addr);
@@ -75,6 +79,16 @@ class IP extends DOMAIN{
 			}
 		    
 		}
+		
+		if ($this->ip4priv($this->ip)) {
+		    $this->article("Private IP", $this->ip);
+		    if (!strstr($this->eth, "vmnet")){
+		        $chaine = "Private IP on NO LAN INTERFACE $this->eth";
+		        $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+		        exit();
+		    }
+		}
+		
 		
 		parent::__construct($eth,$domain);
 		$this->ip2where = "id8eth = $this->eth2id AND ip = '$this->ip'";
@@ -95,7 +109,8 @@ class IP extends DOMAIN{
 		$this->ip2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
 		
 		// ============================================================
-		if ($this->ip4priv($this->ip)) $this->article("Private IP", $this->ip);
+		
+
 		if (!$this->ip4priv($this->ip)) {
 		    
 		    $ip_wan = $this->ip4net();
@@ -889,7 +904,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	
 	public function ip2asn4db(){
 	    $this->ssTitre(__FUNCTION__);
-		if ($this->ip4priv($this->ip)) return $result."Private IP";
+		if ($this->ip4priv($this->ip)) return "Private IP";
 		$query = "mysql --user=root --password=hacker --database=geoip --execute=\"CALL ip2asn(\\\"$this->ip\\\");\" 2> /dev/null | grep -Po \"AS[0-9]{1,}.*\" ";
 		return $this->req_ret_str($query);
 		
@@ -897,7 +912,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	
 	public function ip2asn4nmap(){
 	    $this->ssTitre(__FUNCTION__);
-		if ($this->ip4priv($this->ip)) return $result."Private IP";
+		if ($this->ip4priv($this->ip)) return "Private IP";
 		$query = "nmap --script asn-query $this->ip -Pn -sn -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/hostscript/script/@output | strings  ";
 		return $this->req_ret_str($query);
 		
@@ -1481,6 +1496,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	
 	public function ip2geoip(){
 	    $this->titre(__FUNCTION__);
+	    $result = "";
 	   if ($this->ip4priv($this->ip)) return "Private IP";
 	   $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	   if ($this->checkBD($sql_r_1) ) return  $this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where ");
@@ -1511,15 +1527,19 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	public function ip2whois4asn(){
 	    $this->titre(__FUNCTION__);
 	    if ($this->ip4priv($this->ip)) return "Private IP";
-	    $query = "echo '".$this->ip2whois()."' | egrep -i \"(NetRange|CIDR|Parent|inetnum)\" ";
-	    return $this->req_ret_str($query);
+	    $query = "echo '".$this->ip2whois()."' | egrep -i \"(NetRange|CIDR|Parent|inetnum|NetType|OriginAS|Organization)\" ";
+	    $tmp= array();
+	    exec($query,$tmp);	    
+	    return $this->tab($tmp);
 	}
 	
 	public function ip2whois4geoip(){
 	    $this->titre(__FUNCTION__);
 	    if ($this->ip4priv($this->ip)) return "Private IP";
-	    $query = "whois $this->ip | egrep -i \"(route|Address|PostalCode|City|StateProv|country)\" ";
-	    return $this->req_ret_str($query);
+	    $query = "echo '".$this->ip2whois()."' | egrep -i \"(Organization|route|Address|PostalCode|City|StateProv|country)\" | sort -u";
+	    $tmp= array();
+	    exec($query,$tmp);
+	    return $this->tab($tmp);
 	}
 	
 	public function ip2honey(){
@@ -1677,17 +1697,85 @@ messages from leaving your internal network and 3) use a proxy server instead of
 
 
 
+public function ip2vhost8file(){
+    $this->titre(__FUNCTION__);
+    $result = "";
+    $tmp = "";
+    $file = "$this->dir_tmp/vhosts.all";
+    $tab_vhosts = array();
+    $tab_vhost_ip = array();
+
+    $tab_vhosts = file($file);
+        $size = count($tab_vhosts);
+        for ($i=0;$i<$size;$i++){
+            $vhost = trim($tab_vhosts[$i]);
+            if (!empty($vhost)){
+                $this->article("$i/$size: Found IP from", $vhost);
+                $tab_vhost_ip = $this->host4ip($vhost);
+                if (!empty($tab_vhost_ip)){
+                    foreach ($tab_vhost_ip as $ip){
+                        $ip = trim($ip);
+                        if ($this->isIPv4($ip)){
+                            if ($ip===$this->ip){
+                                $obj_host = new HOST($this->eth, $this->domain, $vhost);
+                                $obj_host->rouge("Compatible IP from $vhost to ".$this->ip2host(""));
+                                $result .= "$vhost\n";
+                                
+                                $url = $this->url2norme($vhost);
+                                $obj_web = new WEB($this->eth, $this->domain, $url);
+                                $obj_web->web2check_200();
+                            }
+                            else {
+                                $this->note("Not Compatible IP from $vhost to ".$this->ip2host(""));
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        }
+        echo $result;
+}
+
 	
 	public function ip2vhost(){
-	    $result = "";
 	    $this->titre(__FUNCTION__);
+	    $result = "";
+	    $tmp = "";
+	   
+	    $tab_vhosts = array();
+	    $tab_vhost_ip = array();
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
-	    $result .= $this->ip2vhost4nmap();
-		$result .= $this->ip2vhost4web();
-		$result = $this->req_ret_str("echo '$result' | grep -Po \"([0-9a-z\-_]{1,}\.)+\.[a-z]{1,5}\" | sort -u  "); // | grep -i -Po \"([0-9a-z\-_]{1,}\.)+$this->domain\"
-		
+	    $tmp .= $this->ip2vhost4nmap();
+	    $tmp .= $this->ip2vhost4web();
+		$tab_vhosts = $this->req_ret_tab("echo '$tmp' $this->filter_host  "); // | grep -i -Po \"([0-9a-z\-_]{1,}\.)+$this->domain\"
+		$size = count($tab_vhosts);
+		for ($i=0;$i<$size;$i++){
+		    $vhost = trim($tab_vhosts[$i]);
+		    if (!empty($vhost)){
+		        $this->article("$i/$size: Found IP from", $vhost);
+		        $tab_vhost_ip = $this->host4ip($vhost);
+		        if (!empty($tab_vhost_ip)){
+		            foreach ($tab_vhost_ip as $ip){
+		                $ip = trim($ip);
+		                if ($this->isIPv4($ip)){
+		                    if ($ip===$this->ip){
+		                        $obj_host = new HOST($this->eth, $this->domain, $vhost);
+		                        $obj_host->rouge("Compatible IP from $vhost to ".$this->ip2host(""));
+		                        $result .= "$vhost\n";
+		                    }
+		                    else {
+		                        $this->note("Not Compatible IP from $vhost to ".$this->ip2host(""));
+		                    }
+		                }
+		                
+		            }
+		        }
+		    }
+		}
+		echo $result;
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
 		}
@@ -1696,79 +1784,58 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	public function ip2vhost4nmap(){
 	    $this->titre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return "Private IP";
-		$query = "nmap --script hostmap-ip2hosts -sn -Pn $this->ip -e $this->eth | grep -v -i \"nmap\" | grep -v -i \"csv.php\" | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\" | grep -v 'huanqiucaipiaotouzhupingtai.com' | sort -u ";
+		$query = "nmap --script hostmap-ip2hosts -sn -Pn $this->ip -e $this->eth | grep -v -i \"nmap\" | grep -v -i \"csv.php\" $this->filter_host | grep -v 'huanqiucaipiaotouzhupingtai.com' | sort -u ";
 		return $this->req_ret_str($query);
 	}
 	
 	public function ip2vhost4web(){
 	    $result = "";
 	    $this->titre(__FUNCTION__);
-		if ($this->ip4priv($this->ip)) return "Private IP";
-		$result = $this->ip2vhost4web4online();
-		//$result .= $this->ip2vhost4web4bfk();
-		$result .= $this->ip2vhost4web4sameip();
-		$result .= $this->ip2vhost4web4ipadress();
-		$result .= $this->ip2vhost4web4youg();
-		//$result .= $this->ip2vhost4web4dnsdigger();
+	    if (!$this->ip4priv($this->ip)) {
+
+	        
+	        $query = "wget  --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"https://tools.tracemyip.org/lookup/$this->ip\" | grep \"lookup\" $this->filter_host ";
+            $result .= $this->req_ret_str($query);
+            $this->pause();
+
+            
+            $query = "wget --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"http://ip-www.net/$this->ip\" $this->filter_host ";
+            $result .= $this->req_ret_str($query);
+            $this->pause();
+            // 
+            $query = "wget --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"http://www.ip-neighbors.com/hostsearch/$this->ip/ipneighbors_page/1\" | grep 'Page:' | grep -Po \"1/[0-9]{1,5}\" | cut -d'/' -f2 ";
+            $max = intval($this->req_ret_str($query));
+            for ($i=2;$i<=$max;$i++){
+            $query = "wget --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"http://www.ip-neighbors.com/hostsearch/$this->ip/ipneighbors_page/$i\" $this->filter_host ";
+            $result .= $this->req_ret_str($query);
+            }
+            $this->pause();
+            
+            $query = "wget -qO- \"https://www.dnsqueries.com/en/ip_neighbors.php\" ";
+            //$result .= $this->req_ret_str($query);
+            $query = "wget -qO- \"https://www.yougetsignal.com/tools/web-sites-on-web-server/\" ";
+            //$result .= $this->req_ret_str($query);
+            $query = "wget -qO- \"https://hackertarget.com/reverse-ip-lookup/\" ";
+            //$result .= $this->req_ret_str($query);
+            $query = "wget --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"http://domains.yougetsignal.com/domains.php\" --post-data \"remoteAddress=$this->ip\" $this->filter_host  ";
+            $result .= $this->req_ret_str($query);
+            $this->pause();
+            $query = "wget --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"https://www.yougetsignal.com/tools/web-sites-on-web-server/\" --post-data \"remoteAddress=$this->ip\" $this->filter_host  ";
+            //$result .= $this->req_ret_str($query);
+            $this->pause();
+	        /*
+	        $query = "wget --no-proxy --save-cookies $this->dir_tmp/$this->ip.dnsdigger.cookie.wget --keep-session-cookies \"http://www.dnsdigger.com/\" > /dev/null
+	        cat $this->dir_tmp/$this->ip.dnsdigger.cookie.wget | grep -Po \"[0-9a-zA-Z]{40}\"  | tee $this->dir_tmp/$this->ip.dnsdigger.cookie.wget.token ;
+		wget --no-proxy --load-cookies $this->dir_tmp/$this->ip.dnsdigger.cookie.wget \"http://www.dnsdigger.com/hostcollision.php?host=$this->ip&token=`cat $this->dir_tmp/$this->ip.dnsdigger.cookie.wget.token`\" -O $this->dir_tmp/$this->ip.ip2vhost.dnsdigger ;
+		elinks -no-numbering --dump \"file://$this->dir_tmp/$this->ip.ip2vhost.dnsdigger\"  | grep '$this->ip'  | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\"  ;	";
+	        */
+
+	    }
 		return $result;
 	}
 	
-	
-	public function ip2vhost4web4bfk(){
-	    $result = "";
-	    $result .= $this->titre(__FUNCTION__);
-		if ($this->ip4priv($this->ip)) return $result."Private IP";
-		$query = "wget -qO- \"http://www.bfk.de/bfk_dnslogger.html?query=$this->ip\" | grep '$this->ip'  | grep '  A  ' | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\"  ";
-		
-		return $this->req_ret_str($query);
-		
-	}
-	
-	public function ip2vhost4web4sameip(){
-	    $result = "";
-	    $result .= $this->titre(__FUNCTION__);
-		if ($this->ip4priv($this->ip)) return $result."Private IP";
-		$query = "wget -qO- \"http://www.sameip.org/$this->ip\" | grep -Po -i \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\" | grep -v -i -E \"(sameip\.org|interserver\.net|bluehost\.com|mltdcoupon\.com|coupondeer\.com)\" | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\"   ";
-		
-		return $this->req_ret_str($query);
-		
-	}
-	
-	public function ip2vhost4web4ipadress(){
-	    $result = "";
-	    $result .= $this->titre(__FUNCTION__);
-		if ($this->ip4priv($this->ip)) return $result."Private IP";
-		$query = "wget -qO- \"http://www.ip-adress.com/reverse_ip/$this->ip\" | grep '\[Whois\]' | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\"  ";
-		
-		return $this->req_ret_str($query);
-		
-	}
-	
-	public function ip2vhost4web4youg(){
-	    $result = "";
-	    $result .= $this->titre(__FUNCTION__);
-		if ($this->ip4priv($this->ip)) return $result."Private IP";
-		$query = "wget -qO- \"http://domains.yougetsignal.com/domains.php\" --post-data \"remoteAddress=$this->ip\" | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\"  ";
-		
-		return $this->req_ret_str($query);
-		
-	}
-	
-	
-	public function ip2vhost4web4dnsdigger(){
-	    $result = "";
-	    $result .= $this->titre(__FUNCTION__);
-		if ($this->ip4priv($this->ip)) return $result."Private IP";
-		$query = "wget --no-proxy --save-cookies $this->dir_tmp/$this->ip.dnsdigger.cookie.wget --keep-session-cookies \"http://www.dnsdigger.com/\" > /dev/null 
-		cat $this->dir_tmp/$this->ip.dnsdigger.cookie.wget | grep -Po \"[0-9a-zA-Z]{40}\"  | tee $this->dir_tmp/$this->ip.dnsdigger.cookie.wget.token ;
-		wget --no-proxy --load-cookies $this->dir_tmp/$this->ip.dnsdigger.cookie.wget \"http://www.dnsdigger.com/hostcollision.php?host=$this->ip&token=`cat $this->dir_tmp/$this->ip.dnsdigger.cookie.wget.token`\" -O $this->dir_tmp/$this->ip.ip2vhost.dnsdigger ;
-		elinks -no-numbering --dump \"file://$this->dir_tmp/$this->ip.ip2vhost.dnsdigger\"  | grep '$this->ip'  | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\"  ;	";
-		
-		return $this->req_ret_str($query);
-		
-	}
-	
 
+	
 
 	
 	public function ip2range(){
@@ -1828,19 +1895,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	}
 
 	
-	
-	public function ip2vhost4web4online(){
-	    $this->titre(__FUNCTION__);
-				
-	    //https://tools.tracemyip.org/lookup/213.186.33.4
-	    // https://hackertarget.com/reverse-ip-lookup/
-	    // http://reverseip.domaintools.com/search/?q=213.186.33.4
-	    // http://ip-www.net/213.186.33.4
-	    //http://www.ip-neighbors.com/host/213.186.33.4
-	    //https://www.dnsqueries.com/en/ip_neighbors.php
-	    //https://www.yougetsignal.com/tools/web-sites-on-web-server/
-	    //https://viewdns.info/reverseip/?host=213.186.33.4&t=1
-	}
+
 	
 	public function ip2tracert(){
 	    $result = "";
@@ -1905,7 +1960,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $this->article("Start ".__FUNCTION__.": $this->ip", "=============================================================================");
 	    $this->gtitre(__FUNCTION__);
 	    if(!$this->ip2honey()){	 
-	        $this->ip4info();
+	        
 	        if (!empty($this->tab_open_ports_all)){
 	        $max_iter = count($this->tab_open_ports_all);
 	        $this->rouge("ITER PORT $max_iter");
@@ -1973,8 +2028,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    if ($ip2write) $this->article("IP2WRITE",$ip2write);
 	    if ($ip2read) $this->article("IP2READ", $ip2read);
 	    if (!$this->ip4priv($this->ip)) {
-	        $vhosts = $this->ip2vhost(); 
-	        $this->article("ALL vHosts", $vhosts);
+	        $vhosts = $this->ip2vhost();$this->article("ALL vHosts", $vhosts);
 	    }
 	    
 	    //$ip2tracert = $this->ip2tracert();$this->article("IP TraceRoute",$ip2tracert);

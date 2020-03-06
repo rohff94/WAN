@@ -126,11 +126,18 @@ class com4net extends com4user {
     public function  host4ip($host){
         $this->ssTitre(__FUNCTION__);
         $host = trim($host);
-        $query = "dig $host a +short 2> /dev/null | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" ";
+        $query = "dig $host a +short 2> /dev/null | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | sort -u";
         return $this->req_ret_tab($query);
     }
     
-    
+    public function  url2norme($url){
+        $this->ssTitre(__FUNCTION__);
+        $url = trim($url);
+        $url = $this->url2add4scheme($url);
+        $url = $this->url2add4port($url);
+        $url = $this->url2add4path($url);
+        return $url;
+    }
     
     
     public function url2code($url){
@@ -141,7 +148,7 @@ class com4net extends com4user {
         
         $url_test = $this->web.$this->url2encode($path);
         //$query ="wget --server-response --no-check-certificate --spider --timeout=5 --tries=2 \"$url\" -qO-  | grep 'HTTP/' | grep -Po \"[0-9]{3}\" | tail -1";
-        $query = "curl -o /dev/null --silent --head --write-out '%{http_code}' --connect-timeout 3 --no-keepalive '$url_test' | grep -Po \"[0-9]{3}\" ";
+        $query = "curl -o /dev/null --silent --head --write-out '%{http_code}' --connect-timeout 5 --no-keepalive '$url_test' | grep -Po \"[0-9]{3}\" ";
         return trim($this->req_ret_str($query));
        }
     

@@ -10,10 +10,18 @@ class HOST extends DOMAIN{
     
     
     public function __construct($eth,$domain,$host) {
+
         parent::__construct($eth,$domain);
         
-        $this->host = trim($host);	
-        if (empty($this->host)) {
+        $host = trim($host);
+        $tmp = array();
+        $query = "echo '$host' $this->filter_host ";
+        exec($query,$tmp);
+        if ( (isset($tmp[0])) && (!empty($tmp)) ){
+            $this->host = $tmp[0];
+        }
+        else {
+            $this->requette($query);
             $this->log2error("Empty Host",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
             exit();
         }
@@ -173,6 +181,8 @@ class HOST extends DOMAIN{
                     $this->rouge("response IP LOCAL from DNS SERVER $this->eth:$this->host:$ip");                    
                 }
                 if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
+                    $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4info FALSE\" ";
+                    $this->requette($query);
                     $obj_ip = new IP($this->eth, $this->domain, $ip);
                     $obj_ip->poc($this->flag_poc);
                     $obj_ip->ip2host($this->host);
