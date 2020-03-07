@@ -26,7 +26,7 @@ class com4display extends INSTALL {
 		parent::__construct();	
 		$this->filter_file_path = " | grep -i -Po \"(/[a-z0-9\-_\.]{1,})*\" | sort -u ";
 		$this->filter_domain = " | grep -Po -i \"[0-9a-z\_\-]{1,}\.[a-z]{2,5}\"  | tr '[:upper:]' '[:lower:]' | sort -u "; 
-		$this->filter_host = " | grep -i -Po \"([0-9a-z\-\_\.]{1,})\.[a-z]{2,5}\" | tr '[:upper:]' '[:lower:]' | sort -u ";
+		$this->filter_host = " | grep -i -Po \"([0-9a-z\-\_\.]{0,})([0-9a-z\-\_]{1,})\.[a-z]{2,5}\" | tr '[:upper:]' '[:lower:]' | sort -u ";
 		$this->filter_ip = " | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | sort -u ";
 		
 	}

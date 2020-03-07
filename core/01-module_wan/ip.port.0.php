@@ -184,9 +184,7 @@ class PORT extends IP{
 	
 	public function port4service(){
 	    $this->titre(__FUNCTION__);
-	    echo $this->port2version();
-	    echo $this->port2traceroute();
-	    
+	    echo $this->port2version();	    
 	}
 	
 
@@ -587,7 +585,7 @@ Linux 	64
 Solaris 	255
 Cisco / Network 	255
 	     */
-	    return $this->port2traceroute();
+
 	}
 
 
@@ -618,26 +616,7 @@ Cisco / Network 	255
 	    return $result;
 	}
 	
-	public function port2traceroute(){
-	    //return "not checked";
-	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->port2where  AND ".__FUNCTION__." IS NOT NULL";
-	    if ($this->checkBD($sql_r_1) ) {
-	        return base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->port2where "));
-	    }
-	    else {
-	        
-	        $this->note("In a traceroute operation, a series of packets gets sent to a destination with very low Time-to-Live (TTL) values, starting at one up incrementing from
-there. As each packet dies, an ICMP Time Exceeded message gets sent back to the sender.
-Thus, the source and destination addresses stay the same, as well
-as the header options; the TTL changes.");
-	        $query = "echo '$this->root_passwd' | sudo -S nmap  --traceroute  --reason  $this->ip -s$this->protocol -p $this->port -e $this->eth -Pn -oX - | grep 'hop'"; // xmlstarlet sel -t -v /nmaprun/host/trace/hop/@ttl
-	        
-	        $result = $this->req_ret_str($query);
-	        $result = $this->parse4traceroute($result);
-	        $result = base64_encode($result);
-	        return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->port2where ",$result));
-	    }
-	}
+
 	
 	
 

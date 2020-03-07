@@ -783,7 +783,6 @@ class SERVICE extends SERVICE4COM {
 	    $this->article("PRODUCT",$this->service_product);
 	    $this->article("extrainfo",$this->service_extrainfo);
 	    $service2banner = trim($this->service2banner());$this->article("Banner",$service2banner);
-	    $service4traceroute = trim($this->port2traceroute());$this->article("Traceroute Port",$service4traceroute);
 	    //$service4cve = trim($this->service4cve());$this->article("CVE",$service4cve);$this->article("CVE",$service4cve);
 	    
 	    

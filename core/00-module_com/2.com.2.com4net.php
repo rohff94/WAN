@@ -107,6 +107,13 @@ class com4net extends com4user {
     }
     
     
+    public function url2add4www($url){
+        $vhost = parse_url($url, PHP_URL_HOST) ;
+        if ($this->isDomain($vhost)) $url = "www.$vhost";
+        else return $vhost;
+        return $url;
+    }
+    
     public function url2add4scheme($url){
         $scheme = 'http://';
         return parse_url($url, PHP_URL_SCHEME) === null ? $scheme.$url : $url;
@@ -131,8 +138,14 @@ class com4net extends com4user {
     }
     
     public function  url2norme($url){
-        $this->ssTitre(__FUNCTION__);
+        //$this->ssTitre(__FUNCTION__);
         $url = trim($url);
+        $vhost = parse_url($url, PHP_URL_HOST) ;
+        //$this->article("hostname", $vhost);var_dump($vhost);
+        $this->pause();
+        if ($vhost===$url) {
+            $url = $this->host2norme($url);
+        }
         $url = $this->url2add4scheme($url);
         $url = $this->url2add4port($url);
         $url = $this->url2add4path($url);
@@ -185,6 +198,68 @@ class com4net extends com4user {
         if(!isset($tmp[0])) $rst = "";
         else $rst = $tmp[0] ;
         return $rst;
+    }
+    
+    public function host2norme($host){
+        //$this->ssTitre(__FUNCTION__);
+        $host = trim($host);
+        if ($this->isHost($host)){
+            //$this->note( "normal ".__FUNCTION__);$this->pause();
+            return $host;
+        }
+        else {
+            if ($this->isDomain($host)){
+                //$this->gras("www ".__FUNCTION__);$this->pause();
+                
+                return "www.$host";
+            }
+            else {
+                $chaine = "$host is not hostname";
+                $this->rouge($chaine);
+                //$this->pause();
+                return FALSE;
+            }
+        }
+    }
+    
+    public function isDomain($domain){
+        $tmp = array();
+        $domain = trim($domain);
+        $query = "echo '$domain' | grep -i -E '[0-9a-z\-\_]{1,}.[a-z]{2,5}$' ";
+        $this->requette($query);
+        exec($query,$tmp);
+        if(isset($tmp[0])) {
+            $test_domain = trim($tmp[0]);
+            if ($domain===$test_domain) {
+                //echo "vrai ".__FUNCTION__."\n";
+                return TRUE ;}
+            else {
+                //echo "faux ".__FUNCTION__."\n";
+                return FALSE ;}
+        }
+        else {
+            //echo "faux ".__FUNCTION__."\n";
+            return FALSE ;}
+    }
+    
+    public function isHost($host){
+        $tmp = array();
+        $host = trim($host);
+        $query = "echo '$host' | grep -i -Po \"[0-9a-z\-\_\.]{1,}\.[0-9a-z\-\_]{1,}\.[a-z]{2,5}$\" ";
+        $this->requette($query);
+        exec($query,$tmp);
+        if(isset($tmp[0])) {
+            $test_host = trim($tmp[0]);
+            if ($host===$test_host) {
+                //echo "vrai ".__FUNCTION__."\n";
+                return TRUE ;}
+            else {
+                //echo "faux ".__FUNCTION__."\n";
+                return FALSE ;}
+        }
+        else {
+            //echo "faux ".__FUNCTION__."\n";
+            return FALSE ;}
     }
     
     public function url2cookies($url){
@@ -278,9 +353,10 @@ class com4net extends com4user {
         $tmp = array();
         $filter = "| grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"";
         $url = "http://ifconfig.me/ip"; 
+        $url = "http://www.pentesting.eu/ip.php";
         $query = "wget --user-agent='$this->user2agent' \"$url\" --timeout=40 --tries=2 --no-check-certificate -qO- $filter 2> /dev/null";
         $ip = exec($query,$tmp);
-        if (isset($tmp[0])) $ip = $tmp[0];
+        if (isset($tmp[0])) {$ip = $tmp[0];}
         return $ip;
 
     }

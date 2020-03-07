@@ -163,7 +163,6 @@ CREATE TABLE `PORT` (
   `port2read` text,
   `port2fw` tinyint(1) DEFAULT NULL,
   `port2version` text,
-  `port2traceroute` text,
   `ladate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

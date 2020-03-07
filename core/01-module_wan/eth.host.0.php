@@ -14,6 +14,7 @@ class HOST extends DOMAIN{
         parent::__construct($eth,$domain);
         
         $host = trim($host);
+        $host = $this->host2norme($host);
         $tmp = array();
         $query = "echo '$host' $this->filter_host ";
         exec($query,$tmp);
