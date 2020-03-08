@@ -161,7 +161,7 @@ class com4net extends com4user {
         
         $url_test = $this->web.$this->url2encode($path);
         //$query ="wget --server-response --no-check-certificate --spider --timeout=5 --tries=2 \"$url\" -qO-  | grep 'HTTP/' | grep -Po \"[0-9]{3}\" | tail -1";
-        $query = "curl -o /dev/null --silent --head --write-out '%{http_code}' --connect-timeout 5 --no-keepalive '$url_test' | grep -Po \"[0-9]{3}\" ";
+        $query = "curl -o /dev/null --silent --head --write-out '%{http_code}' --connect-timeout 30 --no-keepalive '$url_test' | grep -Po \"[0-9]{3}\" | head -1";
         return trim($this->req_ret_str($query));
        }
     
@@ -354,7 +354,8 @@ class com4net extends com4user {
         $filter = "| grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"";
         $url = "http://ifconfig.me/ip"; 
         $url = "http://www.pentesting.eu/ip.php";
-        $query = "wget --user-agent='$this->user2agent' \"$url\" --timeout=40 --tries=2 --no-check-certificate -qO- $filter 2> /dev/null";
+        $query = "curl -s '$url' $filter 2> /dev/null";
+        //$this->requette($query);
         $ip = exec($query,$tmp);
         if (isset($tmp[0])) {$ip = $tmp[0];}
         return $ip;

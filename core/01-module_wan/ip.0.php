@@ -93,12 +93,6 @@ class IP extends DOMAIN{
 		  }
 		    	
 		    	
-		    	
-		    
-		
-		
-		
-	
 		
 		
 		parent::__construct($eth,$domain);
@@ -110,10 +104,6 @@ class IP extends DOMAIN{
 		$this->mysql_ressource->query($sql_w);	
 		echo $this->note("Working on IP:$this->ip for the first time");
 		$this->watching();
-		
-
-		
-		
 		}
 
 		$sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->ip2where ";
@@ -1995,7 +1985,7 @@ public function ip2vhost8tab($tab_vhosts){
 	    $ip2fw = $this->ip2fw4ack();$this->article("IP FIREWALL",$ip2fw);
 	    //$ip2icmp = $this->ip2icmp();$this->article("IP ICMP",$ip2icmp);
 	    
-	    /*
+	    
 	    $ip2root = $this->ip2root8db($this->ip2id);
 	    $ip2shell = $this->ip2shell8db($this->ip2id);
 	    $ip2write = $this->ip2write8db($this->ip2id);
@@ -2006,12 +1996,11 @@ public function ip2vhost8tab($tab_vhosts){
 	    if ($ip2write) $this->article("IP2WRITE",$ip2write);
 	    if ($ip2read) $this->article("IP2READ", $ip2read);
 	    if (!$this->ip4priv($this->ip)) {
-	       // $vhosts = $this->ip2vhost();$this->article("ALL vHosts", $vhosts);
+	       $vhosts = $this->ip2vhost();$this->article("ALL vHosts", $vhosts);
 	    }
 	    
 	    //$ip2tracert = $this->ip2tracert();$this->article("IP TraceRoute",$ip2tracert);
-	     * 
-	     */
+
 	    echo "=============================================================================\n";
 	    
 	}
