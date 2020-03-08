@@ -1729,10 +1729,9 @@ public function ip2vhost8tab($tab_vhosts){
                         $ip = trim($ip);
                         if ($this->isIPv4($ip)){
                             if ($ip===$this->ip){
-                                
-                                $obj_host = new WEB($this->eth, $this->domain, $vhost);
-                                $obj_host->poc($this->flag_poc);
-                                $obj_host->rouge("Compatible IP from $vhost:$ip to ".$this->ip2host("").":$this->ip");
+                                $query = "php pentest.php WEB \"$this->eth $this->domain $vhost web2check_200 FALSE\" ";
+                                $this->requette($query);
+                                $this->rouge("Compatible IP from $vhost:$ip to ".$this->ip2host("").":$this->ip");
                                 $result .= "$vhost\n";
                             }
                             else {
@@ -1761,9 +1760,9 @@ public function ip2vhost8tab($tab_vhosts){
 	    else {
 	    //$tmp .= $this->ip2vhost4nmap();$this->pause(); // not usefull
 	    
-	    //$tmp .= $this->ip2vhost4web();$this->pause();
-		//$tab_vhosts = $this->req_ret_tab("echo '$tmp' $this->filter_host | sort -u "); // | grep -i -Po \"([0-9a-z\-_]{1,}\.)+$this->domain\"
-	    $tab_vhosts = file("$this->dir_tmp/vhosts.all");
+	    $tab_vhosts = $this->ip2vhost4web();$this->pause();
+		//$tab_vhosts = $this->req_ret_tab("echo '$tmp' $this->filter_host "); // | grep -i -Po \"([0-9a-z\-_]{1,}\.)+$this->domain\"
+	    //$tab_vhosts = file("$this->dir_tmp/vhosts.all");
 		$result = $this->ip2vhost8tab($tab_vhosts);
 		echo $result;
 		$result = base64_encode($result);
@@ -1784,16 +1783,18 @@ public function ip2vhost8tab($tab_vhosts){
 	    $this->titre(__FUNCTION__);
 	    if (!$this->ip4priv($this->ip)) {
 
+	        $query = "curl 'https://domains.yougetsignal.com/domains.php' -H 'User-Agent: $this->user2agent' -H 'Accept: text/javascript, text/html, application/xml, text/xml, */*' -H 'Accept-Language: en-GB,en;q=0.5' --compressed -H 'X-Requested-With: XMLHttpRequest' -H 'X-Prototype-Version: 1.6.0' -H 'Content-type: application/x-www-form-urlencoded; charset=UTF-8' -H 'Origin: https://www.yougetsignal.com' -H 'Connection: keep-alive' -H 'Referer: https://www.yougetsignal.com/tools/web-sites-on-web-server/' -H 'TE: Trailers' --data 'remoteAddress=$this->ip&key=' $this->filter_host  ";
+	        $result .= $this->req_ret_str($query);
+	        $this->pause();
+	        
+	        $query = "curl 'https://www.dnsqueries.com/en/ip_neighbors.php' -H 'User-Agent: $this->user2agent' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' -H 'Accept-Language: en-GB,en;q=0.5' --compressed -H 'Content-Type: application/x-www-form-urlencoded' -H 'Origin: https://www.dnsqueries.com' -H 'Connection: keep-alive' -H 'Referer: https://www.dnsqueries.com/en/ip_neighbors.php' -H 'Upgrade-Insecure-Requests: 1' --data 'host=$this->ip' $this->filter_host  ";
+	        $result .= $this->req_ret_str($query);
+	        $this->pause();	        
 	        
 	        $query = "wget  --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"https://tools.tracemyip.org/lookup/$this->ip\" | grep \"lookup\" $this->filter_host ";
             $result .= $this->req_ret_str($query);
             $this->pause();
 
-            
-            $query = "wget --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"http://ip-www.net/$this->ip\" $this->filter_host ";
-            $result .= $this->req_ret_str($query);
-            $this->pause();
-            // 
             $query = "wget --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"http://www.ip-neighbors.com/hostsearch/$this->ip/ipneighbors_page/1\" | grep 'Page:' | grep -Po \"1/[0-9]{1,5}\" | cut -d'/' -f2 ";
             $max = intval($this->req_ret_str($query));
             for ($i=2;$i<=$max;$i++){
@@ -1802,26 +1803,12 @@ public function ip2vhost8tab($tab_vhosts){
             }
             $this->pause();
             
-            $query = "wget -qO- \"https://www.dnsqueries.com/en/ip_neighbors.php\" ";
-            //$result .= $this->req_ret_str($query);
-
-            $query = "wget -qO- \"https://hackertarget.com/reverse-ip-lookup/\" ";
-            //$result .= $this->req_ret_str($query);
-            $query = "wget --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"http://domains.yougetsignal.com/domains.php\" --post-data \"remoteAddress=$this->ip\" $this->filter_host  ";
-            //$result .= $this->req_ret_str($query);
+            $query = "curl -X POST -d \"theinput=$this->ip&thetest=reverseiplookup&name_of_nonce_field=b6b2d9c9ef&_wp_http_referer=%2Freverse-ip-lookup%2F\" \"https://hackertarget.com/reverse-ip-lookup/\" $this->filter_host  ";;
+            $result .= $this->req_ret_str($query);
             $this->pause();
-            $query = "wget --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"https://www.yougetsignal.com/tools/web-sites-on-web-server/\" --post-data \"remoteAddress=$this->ip\" $this->filter_host  ";
-            //$result .= $this->req_ret_str($query);
-            $this->pause();
-	        /*
-	        $query = "wget --no-proxy --save-cookies $this->dir_tmp/$this->ip.dnsdigger.cookie.wget --keep-session-cookies \"http://www.dnsdigger.com/\" > /dev/null
-	        cat $this->dir_tmp/$this->ip.dnsdigger.cookie.wget | grep -Po \"[0-9a-zA-Z]{40}\"  | tee $this->dir_tmp/$this->ip.dnsdigger.cookie.wget.token ;
-		wget --no-proxy --load-cookies $this->dir_tmp/$this->ip.dnsdigger.cookie.wget \"http://www.dnsdigger.com/hostcollision.php?host=$this->ip&token=`cat $this->dir_tmp/$this->ip.dnsdigger.cookie.wget.token`\" -O $this->dir_tmp/$this->ip.ip2vhost.dnsdigger ;
-		elinks -no-numbering --dump \"file://$this->dir_tmp/$this->ip.ip2vhost.dnsdigger\"  | grep '$this->ip'  | grep  -i -Po \"([0-9a-zA-Z\.\-_]{1,})\.[a-zA-Z]{1,4}\"  ;	";
-	        */
-
+ 
 	    }
-		return $result;
+	    return explode("\n", $result);
 	}
 	
 
