@@ -33,7 +33,7 @@ class com4display extends INSTALL {
 
 	public function log2succes($chaine,$file,$class,$function,$line,$info,$extrainfo){
 	    $this->notify($chaine);
-	    $time = date('l jS \of F Y h:i:s A');
+	    $time = date("Y-m-d H:i:s");
 	    $str = "$time,$chaine,$file,$class,$function,$line,$info,$extrainfo";
 	    $this->requette("echo '$str' >>  $this->log_succes_path");
 	}
@@ -41,7 +41,7 @@ class com4display extends INSTALL {
 	
 	public function log2error($chaine,$file,$class,$function,$line,$info,$extrainfo){
 	    $this->notify($chaine);
-	    $time = date('l jS \of F Y h:i:s A');
+	    $time = date("Y-m-d H:i:s");
 	    $str = "$time,$chaine,$file,$class,$function,$line,$info,$extrainfo";
 	    $this->requette("echo '$str' >>  $this->log_error_path");
 	}

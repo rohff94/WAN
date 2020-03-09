@@ -222,6 +222,60 @@ class com4net extends com4user {
         }
     }
     
+    
+    
+    public function ip2port8php(string $ip,array $tab_port2scan,string $protocol) : array
+    {
+  
+        $tab_port2open = array();
+        $protocol = trim($protocol);
+        if (!empty($tab_port2scan)){
+            foreach ($tab_port2scan as $port2scan){
+                if (!empty($port2scan)){
+                    if ($protocol==='T'){
+                        if ($this->isPortOpen4tcp($ip, $port2scan)) $tab_port2open[] = $port2scan;
+                    }
+                    if ($protocol==='U'){
+                        if ($this->isPortOpen4udp($ip, $port2scan)) $tab_port2open[] = $port2scan;
+                    }
+                }
+            }
+        }
+        return $tab_port2open;
+    }
+    
+    public function isPortOpen4udp(string $host, int $port) : bool
+    {
+
+        $socket=socket_create(AF_INET, SOCK_DGRAM, 17);
+        $conn = @socket_connect($socket, $host, $port);
+        
+        
+        if ($conn) {
+            socket_close($socket);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public function isPortOpen4tcp(string $host, int $port) : bool
+    {
+
+        $socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        //$socket=socket_create(AF_INET, SOCK_DGRAM, 17);
+        $conn = @socket_connect($socket, $host, $port);
+        
+        
+        if ($conn) {
+            socket_close($socket);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    
     public function isDomain($domain){
         $tmp = array();
         $domain = trim($domain);

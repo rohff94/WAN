@@ -42,7 +42,7 @@ class SERVICE extends SERVICE4COM {
 	}
 	
 	public function service4cve(){
-	    //return "not checked";
+	    $this->ssTitre(__FUNCTION__);	    
 	    $sql_r_1 = "SELECT service2cve FROM SERVICE WHERE $this->service2where AND service2cve IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) {
 	        return base64_decode($this->req2BD4out("service2cve","SERVICE",$this->service2where ));
@@ -769,12 +769,7 @@ class SERVICE extends SERVICE4COM {
 	    $this->article("Date Now", $date_now);
 	    $this->article("Date Rec", $this->date_rec);
 
-	    //$this->article("HOST", $this->ip2host(""));
-	    
-	    
-	    
-
-	    
+	    $this->article("HOST", $this->ip2host(""));
 	    $this->article("ID PORT", $this->port2id);
 	    $this->article("PORT NUMBER", $this->port);
 	    $this->article("PROTOCOL", $this->protocol);
@@ -783,7 +778,6 @@ class SERVICE extends SERVICE4COM {
 	    $this->article("PRODUCT",$this->service_product);
 	    $this->article("extrainfo",$this->service_extrainfo);
 	    $service2banner = trim($this->service2banner());$this->article("Banner",$service2banner);
-	    //$service4cve = trim($this->service4cve());$this->article("CVE",$service4cve);$this->article("CVE",$service4cve);
 	    
 	    
 	    $port2root = $this->port2root8db($this->port2id);

@@ -25,6 +25,8 @@ class com4user extends com4display {
         return $private_key_file;
     }
     
+    
+   
     public function parse4id($id_result){
         $this->ssTitre(__FUNCTION__);
         $results = array();

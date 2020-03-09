@@ -589,32 +589,6 @@ Cisco / Network 	255
 	}
 
 
-	public  function parse4traceroute($traceroute_str){
-	    $result = "";
-	    $results = array();
-	    
-	    $ttl = array();
-	    $ipaddr = array();
-	    $geoip = array();
-	    
-	    $tab_lines = explode("\n", $traceroute_str);
-	    foreach ($tab_lines as $line){
-	        $line = trim($line);
-	        if (!empty($line)){
-	            $ttl = "";
-	            $ipaddr = "";
-	            $geoip = "";
-	            if (preg_match('#<hop ttl=\"(?<ttl>[0-9]{1,5})\"([[:space:]]{1})ipaddr=\"(?<ipaddr>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})\"([[:space:]]{1})rtt=\"(?<rtt>[[:print:]]{1,})\"/>#',$line,$results))
-	            {
-	                $ttl = $results['ttl'];
-	                $ipaddr  = $results['ipaddr'];
-	                $geoip = $this->ip2geo($ipaddr);
-	                $result .= "ttl=$ttl ipaddr=$ipaddr geoip=$geoip\n";
-	            }
-	        }
-	    }
-	    return $result;
-	}
 	
 
 	

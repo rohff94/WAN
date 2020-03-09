@@ -45,7 +45,8 @@ class IP extends DOMAIN{
     
 
 	
-    public function __construct($eth,$domain,$ip) {	
+    public function __construct(string $eth,string $domain,string $ip) {	
+        $ip = (string)$ip;
 		$ip_addr = trim($ip);
 		$this->tab_open_ports_tcp = array();
 		$this->tab_open_ports_udp = array();
@@ -68,7 +69,7 @@ class IP extends DOMAIN{
 			}
 			else {
 			    var_dump($ip_tmp);
-			    $this->article("IP", $ip_addr);
+			    $this->article("IP", $this->ip);
 			    $this->log2error("No IP",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");	
 			    exit();
 			}
@@ -85,7 +86,7 @@ class IP extends DOMAIN{
 		 
 		if ($this->ip4priv($this->ip)) {
 		    $this->article("Private IP", $this->ip);
-		    if (!strstr($this->eth, "vmnet")){
+		    if (strstr($this->eth, "vmnet"!==FALSE)){
 		        $chaine = "Private IP on NO LAN INTERFACE $this->eth";
 		        $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 		        exit();
@@ -111,13 +112,16 @@ class IP extends DOMAIN{
 		
 		
 		// ============================================================
+		
 		if (!$this->ip4priv($this->ip)) {
+		    if (!$this->flag_poc){
 		    $ip_wan = $this->ip4net();
 		    if (!$this->isIPv4($ip_wan)) {
 		        $chaine = "Lost Connexion to the net $this->domain:$this->ip";
 		        $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 		        exit();
 		    }		    
+		    }
 		}
 		// ============================================================
 		
@@ -358,6 +362,17 @@ class IP extends DOMAIN{
 	public function ip2cidr(){
 		$this->ssTitre(__FUNCTION__);
 		return trim($this->req_ret_str("echo '$this->ip' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" "));
+	}
+	
+	public function ip8ovh(){
+	    $this->gtitre(__FUNCTION__);
+	    $this->ip2port();
+	    $this->ip2whois();
+	    //$this->ip2geoip();
+	    //$this->ip2honey();
+	    //$this->ip2range();
+	    $this->ip2tracert();
+	    $this->ip2vhost();
 	}
 	
 	public function ip2cve(){
@@ -1409,17 +1424,50 @@ messages from leaving your internal network and 3) use a proxy server instead of
 
 
 	
+	public  function parse4traceroute($traceroute_str){
+	    $result = "";
+	    $results = array();
+	    
+	    $ttl = array();
+	    $ipaddr = array();
+	    $geoip = array();
+	    
+	    $tab_lines = explode("\n", $traceroute_str);
+	    foreach ($tab_lines as $line){
+	        $line = trim($line);
+	        if (!empty($line)){
+	            $ttl = "";
+	            $ipaddr = "";
+	            $geoip = "";
+	            if (preg_match('#<hop ttl=\"(?<ttl>[0-9]{1,5})\"([[:space:]]{1})ipaddr=\"(?<ipaddr>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})\"([[:space:]]{1})rtt=\"(?<rtt>[[:print:]]{1,})\"/>#',$line,$results))
+	            {
+	                $ttl = $results['ttl'];
+	                $ipaddr  = $results['ipaddr'];
+	                $geoip = $this->ip2geo($ipaddr);
+	                $result .= "ttl=$ttl ipaddr=$ipaddr geoip=$geoip\n";
+	            }
+	        }
+	    }
+	    return $result;
+	}
+	
 
+	public function ip2tracert4local8traceroute(){
+	    $this->ssTitre(__FUNCTION__);
+	    $query = "traceroute $this->ip "; 
+	    $result = $this->req_ret_str($query);
+
+	    return $result;
+	}
 	
 	
-	
-	public function ip2tracert4local(){
+	public function ip2tracert4local8nmap(){
 	    $this->ssTitre(__FUNCTION__);
 	    $this->note("In a traceroute operation, a series of packets gets sent to a destination with very low Time-to-Live (TTL) values, starting at one up incrementing from
 there. As each packet dies, an ICMP Time Exceeded message gets sent back to the sender.
 Thus, the source and destination addresses stay the same, as well
 as the header options; the TTL changes.");
-	    $query = "echo '$this->root_passwd' | sudo -S nmap  --traceroute  --reason  $this->ip -s$this->protocol -p $this->port -e $this->eth -Pn -oX - | grep 'hop'"; // xmlstarlet sel -t -v /nmaprun/host/trace/hop/@ttl
+	    $query = "echo '$this->root_passwd' | sudo -S nmap --traceroute --reason $this->ip -sn -e $this->eth -Pn -oX - | grep 'hop'"; // xmlstarlet sel -t -v /nmaprun/host/trace/hop/@ttl
 	    
 	    $result = $this->req_ret_str($query);
 	    $result = $this->parse4traceroute($result);
@@ -1711,7 +1759,7 @@ public function ip2vhost8tab($tab_vhosts){
             $vhost = trim($tab_vhosts[$i]);
             if (!empty($vhost)){
                 $vhost = $this->host2norme($vhost);
-                $this->article("$i/$size: Found IP from", $vhost);
+                $this->article("$i/$size: Try to Found IP from", $vhost);
                 $tab_vhost_ip = array();
                 $tab_vhost_ip = $this->host4ip($vhost);
                 if (!empty($tab_vhost_ip)){
@@ -1725,7 +1773,7 @@ public function ip2vhost8tab($tab_vhosts){
                                 $result .= "$vhost\n";
                             }
                             else {
-                                $this->note("Not Compatible IP from $vhost to ".$this->ip2host(""));
+                                $this->note("Not Compatible IP from $vhost:$ip to ".$this->ip2host("").":$this->ip");
                             }
                         }
                         
@@ -1870,7 +1918,8 @@ public function ip2vhost8tab($tab_vhosts){
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
-	    $result .= $this->ip2tracert4local();
+	    $result .= $this->ip2tracert4local8nmap();
+	    $result .= $this->ip2tracert4local8traceroute();
 		$result .= $this->ip2tracert4online();
 		
 		$result = base64_encode($result);
@@ -1978,14 +2027,24 @@ public function ip2vhost8tab($tab_vhosts){
 	    
 	    $this->article("ID IP", $this->ip2id);
 	    $this->article("IP", $this->ip);
+	    if(!$this->ip4priv($this->ip)){
+	        $this->titre("Determining DOMAIN RANGE");
 	    $ip2geoip = $this->ip2geoip();$this->article("IP GEOLOC",$ip2geoip);
 	    $ip2asn = $this->ip2asn();$this->article("IP ASN",$ip2asn);
 	    $ip2range = $this->ip2range();$this->article("IP RANGE",$ip2range);
 	    $ip2whois = $this->ip2whois();$this->article("IP WHOIS",$ip2whois);	    
 	    $ip2fw = $this->ip2fw4ack();$this->article("IP FIREWALL",$ip2fw);
+	    //$this->titre("Determining Firewall Rules");
+	    //$this->ip2fw();$this->pause();
 	    //$ip2icmp = $this->ip2icmp();$this->article("IP ICMP",$ip2icmp);
-	    
-	    
+	    //$this->titre("Searching what happened In the PAST");$this->pause();
+	    //$this->ip2vt();$this->pause();
+	    //$this->ip2malw();$this->pause();
+	    }
+	    $this->titre("Determining IP SERVICES");
+	    $this->ip2protocol();$this->pause();
+	    $this->ip2port();$this->pause();
+	    $this->ip2os();$this->pause();
 	    $ip2root = $this->ip2root8db($this->ip2id);
 	    $ip2shell = $this->ip2shell8db($this->ip2id);
 	    $ip2write = $this->ip2write8db($this->ip2id);
@@ -1998,8 +2057,7 @@ public function ip2vhost8tab($tab_vhosts){
 	    if (!$this->ip4priv($this->ip)) {
 	       $vhosts = $this->ip2vhost();$this->article("ALL vHosts", $vhosts);
 	    }
-	    
-	    //$ip2tracert = $this->ip2tracert();$this->article("IP TraceRoute",$ip2tracert);
+	    $ip2tracert = $this->ip2tracert();$this->article("IP TraceRoute",$ip2tracert);
 
 	    echo "=============================================================================\n";
 	    
@@ -2011,27 +2069,7 @@ public function ip2vhost8tab($tab_vhosts){
 	    $this->gtitre(__FUNCTION__);
 	    $result = "";
 	    echo "=============================================================================\n";
-	    
-	    if(!$this->ip4priv($this->ip)){
-	    $this->titre("Determining DOMAIN RANGE");
-	    $this->ip2asn();$this->pause();
-	    $this->ip2whois();$this->pause();
-	    $this->ip2range();$this->pause();
-	    $this->ip2geoip();$this->pause();
-	    $this->titre("Searching what happened In the PAST");$this->pause();
-	    $this->ip2vt();$this->pause();
-	    $this->ip2malw();$this->pause();
-	    $this->ip2vhost();$this->pause();
-	    }
-	    $this->titre("Determining IP SERVICES");	    
-	    $this->ip2protocol();$this->pause();
-	    $this->ip2port();$this->pause();
-	    $this->ip2os();$this->pause();
-		
-	    $this->titre("Determining Firewall Rules");
-	    $this->ip2fw();$this->pause();
-	    $this->ip2tracert();$this->pause();
-	    //$this->ip2icmp();$this->pause();
+
 	    //$this->ip2cve();$this->pause();
 	    
 	    $this->titre("Enumeration");
