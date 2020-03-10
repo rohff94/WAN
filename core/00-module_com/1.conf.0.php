@@ -31,6 +31,8 @@ class CONFIG {
     var $dico_word;
     var $dico_password;
     var $dico_users;
+    var $dico_ports;
+    
     var $shells;
     var $vm_tmp_win;
     var $vm_tmp_lin;
@@ -65,7 +67,7 @@ class CONFIG {
 	exec("whoami",$tmp2);
 	$this->user2local = trim($tmp2[0]);
 
-	$this->dir_tools = "$this->racine/../tools";
+	$this->dir_tools = "$this->racine/tools";
 	$this->dir_vm = "$this->racine/../Hack.vlan";
 	$this->dir_tmp = "$this->racine/../TMP";
 	$this->dir_c = "$this->racine/cs";
@@ -78,6 +80,7 @@ class CONFIG {
 	$this->dico_word = "$this->dir_tools/dico/word.dico";
 	$this->dico_password = "$this->dir_tools/dico/password.dico";
 	$this->dico_users = "$this->dir_tools/dico/users.dico";
+	$this->dico_ports = "$this->dir_tools/dico/ports.dico";
 	
 	$this->log_error_path = "/tmp/log.error.wan.log";
 	$this->log_succes_path = "/tmp/log.succes.wan.log";

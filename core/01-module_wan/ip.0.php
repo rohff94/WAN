@@ -114,7 +114,8 @@ class IP extends DOMAIN{
 		// ============================================================
 		
 		if (!$this->ip4priv($this->ip)) {
-		    if (!$this->flag_poc){
+		    //var_dump($this->flag_poc);
+		    if ($this->flag_poc!==FALSE){
 		    $ip_wan = $this->ip4net();
 		    if (!$this->isIPv4($ip_wan)) {
 		        $chaine = "Lost Connexion to the net $this->domain:$this->ip";
@@ -1166,22 +1167,18 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	    else {
 	        $result .= "<?xml version='1.0' encoding='UTF-8'?>\n";
 	        $result .= "<".__FUNCTION__.">\n";
-	        //$result .= $this->titre(__FUNCTION__);
 	        if ($this->ip4priv($this->ip)) {
 	            $tab_open_ports_tcp = $this->ip2tcp4select();
 	            $tab_open_ports_udp = $this->ip2udp4top200();
 	            $tab_open_ports_tcp += $this->ip2tcp4first1000();
-	            $tab_open_ports_tcp += $this->ip2tcp4top10000();
-	            
+	            $tab_open_ports_tcp += $this->ip2tcp4top10000();	            
 	            if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4all();
 	        }
 	        else {
-	            //
-	            $tab_open_ports_tcp = $this->ip2tcp4select();	            
-	            $tab_open_ports_udp += $this->ip2udp4top200();
-
+	            $tab_open_ports_tcp = $this->ip2tcp4select();
+	            $tab_open_ports_udp = $this->ip2udp4top200();
 	            if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4top4000();
-	            	    	            
+
 	        }
 	        $rst_tcp = implode(",",$tab_open_ports_tcp);
 	        $rst_udp = implode(",",$tab_open_ports_udp);
@@ -1218,7 +1215,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	
 
 
-	public function ip2tcp4all(){
+	public function ip2tcp4all(): array{
 	    $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --reason -p 1-65535 --open $this->ip -e $this->eth -oX - ";
 		$query = $query." | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
@@ -1227,7 +1224,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	
 
 	
-	public function ip2tcp4top10000(){
+	public function ip2tcp4top10000(): array{
 	    $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --host-timeout 30m --reason --top-ports 10000 --open $this->ip -e $this->eth -oX - ";
 		$query = $query." | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
@@ -1236,21 +1233,39 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	
 	
 	
-	public function ip2tcp4top4000(){
+	public function ip2tcp4top4000(): array{
 	    $this->ssTitre(__FUNCTION__);
 	    $query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --host-timeout 30m --reason --top-ports 4000 --open $this->ip -e $this->eth -oX - ";
 	    $query = $query." | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
 	    return $this->req_ret_tab($query);
+	    $rst = array();
+	    $protocol = 'T';
+	    $this->cmd("localhost", $query);
+	    $filename = "$this->dir_tools/dico/ports.dico.4000";
+	    $tab_port2scan = file($filename);
+	    $rst = $this->ip2port8php($this->ip, $tab_port2scan, $protocol);
+	    
+	    echo $this->tab($rst);
+	    return $rst;
 	}
 	
-	public function ip2tcp4first1000(){
+	public function ip2tcp4first1000(): array{
 	    $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --reason -p1-1024 --open $this->ip --min-parallelism 10 -e $this->eth -oX - ";
 		$query = $query." | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
 		return $this->req_ret_tab($query);
+		$rst = array();
+		$protocol = 'T';
+		$this->cmd("localhost", $query);
+		for ($i=1;$i<=1000;$i++)
+		    $tab_port2scan[] = $i;
+		$rst = $this->ip2port8php($this->ip, $tab_port2scan, $protocol);
+		
+		echo $this->tab($rst);
+		return $rst;
 	} 
 	
-	public function ip2tcp4select(){  // 615 ports
+	public function ip2tcp4select(): array{  // 615 ports
 	    $this->ssTitre(__FUNCTION__);
 
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --reason -p \
@@ -1283,17 +1298,36 @@ routed halfway around the world) you may want to work with your ISP to investiga
 		if (!$firewall) $query = $query." --scan-delay 1 | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
 		else $query = $query." | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
 		
-		
+		return $this->req_ret_tab($query);
 		$rst = array();
-		$rst = $this->req_ret_tab($query);
+		$protocol = 'T';
+		$this->cmd("localhost", $query);
+		$filename = "$this->dir_tools/dico/ports.dico.615";
+		$tab_port2scan = file($filename);
+		$rst = $this->ip2port8php($this->ip, $tab_port2scan, $protocol);
+		
+		echo $this->tab($rst);
 		return $rst;
 	}	
 	
 
-
+	
+	public function ip2port2tcp(): array{  
+	    $this->ssTitre(__FUNCTION__);
+	    
+	    $rst = array();
+	    $protocol = 'T';
+	    $filename = "$this->dir_tools/dico/ports.dico.tcp";
+	    $tab_port2scan = file($filename);
+	    //$tab_port2scan = array(21,22,25,80,443,8080);
+	    $rst = $this->ip2port8php($this->ip, $tab_port2scan, $protocol);
+	    
+	    echo $this->tab($rst);
+	    return $rst;
+	}	
 
 	
-	public function ip2tcp4web(){
+	public function ip2tcp4web(): array{
 	    $this->ssTitre(__FUNCTION__);
 	    $query = "echo '$this->root_passwd' | sudo -S nmap -Pn -n --reason -p http* --open $this->ip -e $this->eth -oX - ";
 	    $firewall = $this->ip2fw4enable();	
@@ -1305,7 +1339,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	}
 	
 
-	public function ip2udp4select(){
+	public function ip2udp4select(): array{
 	    $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sU -Pn -n --reason --open -e $this->eth -p 53,68,69,111,135,137,138,139,161,631,1020,2049,4569,5060,5353,33485,54269 $this->ip -oX - ";
 		$firewall = $this->ip2fw4enable();
@@ -1316,18 +1350,30 @@ routed halfway around the world) you may want to work with your ISP to investiga
 		return $rst;
 	}
 
-	public function ip2udp4top200(){
+	public function ip2udp4top200(): array{
 	    $this->ssTitre(__FUNCTION__);
+	    
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sU -Pn -n --reason --top-ports 200 $this->ip --open -e $this->eth -oX -  ";		
+		/*
 		$firewall = $this->ip2fw4enable();		
 		if (!$firewall) $query = $query." --scan-delay 1 | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
 		else $query = $query." | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";		
 		
 		return $this->req_ret_tab($query);
+		*/
+		$rst = array();
+		$protocol = 'U';
+		$this->cmd("localhost", $query);
+		$filename = "$this->dir_tools/dico/ports.dico.200";
+		$tab_port2scan = file($filename);
+		$rst = $this->ip2port8php($this->ip, $tab_port2scan, $protocol);
+		
+		echo $this->tab($rst);
+		return $rst;
 	}
 	
 	
-	public function ip2udp4top1000(){
+	public function ip2udp4top1000(): array{
 	    $this->ssTitre(__FUNCTION__);
 	    $query = "echo '$this->root_passwd' | sudo -S nmap -sU -Pn -n --reason --top-ports 1000 $this->ip --open -e $this->eth -oX -  ";
 	    $query = $query." | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
@@ -1561,15 +1607,32 @@ as the header options; the TTL changes.");
 	}
 	
 	
-	public function ip2whois(){
+	public function ip2whois(): string{
 	    $this->titre(__FUNCTION__);
+	    $tmp = array();
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
 	        
 	        $query = "whois $this->ip | grep -v -i -E \"(^Comment|abuse|^%|^#)\"";
+	        $this->cmd("localhost", $query);
 	        $result = $this->req_ret_str($query);
 	        
+	        /*
+	        $port = 43;
+	        $timeout = 10;
+	        $fp = @fsockopen("whois.arin.net", $port, $errno, $errstr, $timeout) or die("Socket Error " . $errno . " - " . $errstr);
+	        fputs($fp, "n + $this->ip\r\n");
+	        $out = "";
+	        while(!feof($fp)){
+	            $out .= fgets($fp);
+	        }
+	        fclose($fp);
+	        
+	        exec("echo '$out' | grep -v -i -E \"(^Comment|abuse|^%|^#)\" ",$tmp);
+	        $result = $this->tab($tmp);
+	        */
+	        echo $result;
 	        $result = base64_encode($result);
 	        return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
 	    }
@@ -1622,7 +1685,7 @@ as the header options; the TTL changes.");
 	    return $tab_ports;
 	}
 	
-	public function ip2port4scan($result_scan){
+	public function ip2port4scan(string $result_scan): array{
 	    $this->titre(__FUNCTION__);
 	    $port = array();
 	    $tab_ports = array();
@@ -1919,7 +1982,7 @@ public function ip2vhost8tab($tab_vhosts){
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
 	    $result .= $this->ip2tracert4local8nmap();
-	    $result .= $this->ip2tracert4local8traceroute();
+	    //$result .= $this->ip2tracert4local8traceroute();
 		$result .= $this->ip2tracert4online();
 		
 		$result = base64_encode($result);
@@ -2041,6 +2104,7 @@ public function ip2vhost8tab($tab_vhosts){
 	    //$this->ip2vt();$this->pause();
 	    //$this->ip2malw();$this->pause();
 	    }
+	    /*
 	    $this->titre("Determining IP SERVICES");
 	    $this->ip2protocol();$this->pause();
 	    $this->ip2port();$this->pause();
@@ -2054,13 +2118,14 @@ public function ip2vhost8tab($tab_vhosts){
 	    if ($ip2shell)  $this->article("IP2SHELL",$ip2shell);
 	    if ($ip2write) $this->article("IP2WRITE",$ip2write);
 	    if ($ip2read) $this->article("IP2READ", $ip2read);
+	    */
 	    if (!$this->ip4priv($this->ip)) {
 	       $vhosts = $this->ip2vhost();$this->article("ALL vHosts", $vhosts);
 	    }
 	    $ip2tracert = $this->ip2tracert();$this->article("IP TraceRoute",$ip2tracert);
 
 	    echo "=============================================================================\n";
-	    
+	    $this->pause();
 	}
 	
 	

@@ -1,13 +1,13 @@
 <?php
 
 class com4obj extends com4net {
-    var $stream_timeout ;
+    
     var $path_parallel ;
     
     
     function __construct(){
         parent::__construct();
-        $this->stream_timeout = 5 ;
+        
     }
    
     public function services4pentest($eth,$domain,$service_name,$protocol,$fonction2run){
@@ -24,6 +24,47 @@ class com4obj extends com4net {
     }
     
 
+    
+    function nmap2list(array $tab_ports_nmap): array{
+        $poc = new POC();
+        $filename = "$poc->dir_tmp/ports.lst";
+        $query = "echo '' > $filename";
+        $poc->requette($query);
+        foreach ($tab_ports_nmap as $port2test){
+            $port2test = trim($port2test);
+            if (!empty($port2test)){
+                if (strstr($port2test, "-")!==FALSE){
+                    
+                    $query = "echo '$port2test' | cut -d'-' -f1";
+                    $start = $poc->req_ret_str($query);
+                    $query = "echo '$port2test' | cut -d'-' -f2";
+                    $end = $poc->req_ret_str($query);
+                    $start = intval($start);
+                    $end = intval($end);
+                    for($i=$start;$i<=$end;$i++){
+                        $query = "echo '$i' >> $filename";
+                        $poc->requette($query);
+                    }
+                    
+                }
+                else {
+                    $query = "echo '$port2test' >> $filename";
+                    $poc->requette($query);
+                }
+
+                
+            }
+        }
+        $tab_ports = file($filename);
+        $size = count($tab_ports);
+        $query = "cat $filename";
+        //$poc->requette($query);
+        $query = "wc -l $filename";
+        $poc->requette($query);
+        $query = "gedit $filename ";
+        $poc->requette($query);
+        return $tab_ports;
+    }
     
     
     public function run4split4ip($ip_file_list,$step_by){
