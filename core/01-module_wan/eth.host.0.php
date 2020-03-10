@@ -182,6 +182,7 @@ class HOST extends DOMAIN{
                     $this->rouge("response IP LOCAL from DNS SERVER $this->eth:$this->host:$ip");                    
                 }
                 if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
+
                     $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4info FALSE\" ";
                     $this->requette($query);
                     $obj_ip = new IP($this->eth, $this->domain, $ip);

@@ -887,7 +887,6 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	}
 	
 	public function ip2asn(){
-	    $this->ssTitre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return "Private IP";
 		$result = "";
 		$sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
@@ -1354,13 +1353,13 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	    $this->ssTitre(__FUNCTION__);
 	    
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sU -Pn -n --reason --top-ports 200 $this->ip --open -e $this->eth -oX -  ";		
-		/*
+		
 		$firewall = $this->ip2fw4enable();		
 		if (!$firewall) $query = $query." --scan-delay 1 | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
 		else $query = $query." | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";		
 		
 		return $this->req_ret_tab($query);
-		*/
+		
 		$rst = array();
 		$protocol = 'U';
 		$this->cmd("localhost", $query);
@@ -1593,7 +1592,6 @@ as the header options; the TTL changes.");
 
 	
 	public function ip2geoip(){
-	    $this->titre(__FUNCTION__);
 	    $result = "";
 	   if ($this->ip4priv($this->ip)) return "Private IP";
 	   $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
@@ -1608,7 +1606,6 @@ as the header options; the TTL changes.");
 	
 	
 	public function ip2whois(): string{
-	    $this->titre(__FUNCTION__);
 	    $tmp = array();
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
@@ -1850,7 +1847,6 @@ public function ip2vhost8tab($tab_vhosts){
 
 	
 	public function ip2vhost(){
-	    $this->titre(__FUNCTION__);
 	    $result = "";
 	    $tmp = "";
 	   
@@ -1888,11 +1884,11 @@ public function ip2vhost8tab($tab_vhosts){
 	        $result .= $this->req_ret_str($query);
 	        $this->pause();
 	        
-	        $query = "curl 'https://www.dnsqueries.com/en/ip_neighbors.php' -H 'User-Agent: $this->user2agent' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' -H 'Accept-Language: en-GB,en;q=0.5' --compressed -H 'Content-Type: application/x-www-form-urlencoded' -H 'Origin: https://www.dnsqueries.com' -H 'Connection: keep-alive' -H 'Referer: https://www.dnsqueries.com/en/ip_neighbors.php' -H 'Upgrade-Insecure-Requests: 1' --data 'host=$this->ip' $this->filter_host  ";
-	        $result .= $this->req_ret_str($query);
+	        $query = "curl 'https://www.dnsqueries.com/en/ip_neighbors.php' -H 'User-Agent: $this->user2agent' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' -H 'Accept-Language: en-GB,en;q=0.5' --compressed -H 'Content-Type: application/x-www-form-urlencoded' -H 'Origin: https://www.dnsqueries.com' -H 'Connection: keep-alive' -H 'Referer: https://www.dnsqueries.com/en/ip_neighbors.php' -H 'Upgrade-Insecure-Requests: 1' --data 'host=$this->ip' | grep ' nofollow=\"true\" target=\"_blank\">' $this->filter_host  ";
+	        //$result .= $this->req_ret_str($query);
 	        $this->pause();	        
 	        
-	        $query = "wget  --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"https://tools.tracemyip.org/lookup/$this->ip\" | grep \"lookup\" $this->filter_host ";
+	        $query = "wget  --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"https://tools.tracemyip.org/lookup/$this->ip\" | grep '.tracemyip.org/lookup/' | grep -v -E \"(tracemyip\.org|www\.mobiletracker\.org)\" $this->filter_host ";
             $result .= $this->req_ret_str($query);
             $this->pause();
 
@@ -1904,7 +1900,7 @@ public function ip2vhost8tab($tab_vhosts){
             }
             $this->pause();
             
-            $query = "curl -X POST -d \"theinput=$this->ip&thetest=reverseiplookup&name_of_nonce_field=b6b2d9c9ef&_wp_http_referer=%2Freverse-ip-lookup%2F\" \"https://hackertarget.com/reverse-ip-lookup/\" $this->filter_host  ";;
+            $query = "curl -X POST -d \"theinput=$this->ip&thetest=reverseiplookup&name_of_nonce_field=b6b2d9c9ef&_wp_http_referer=%2Freverse-ip-lookup%2F\" \"https://hackertarget.com/reverse-ip-lookup/\" | grep -v '<' $this->filter_host  ";;
             $result .= $this->req_ret_str($query);
             $this->pause();
  
@@ -1977,7 +1973,6 @@ public function ip2vhost8tab($tab_vhosts){
 	
 	public function ip2tracert(){
 	    $result = "";
-	    $this->ssTitre(__FUNCTION__);
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
@@ -2091,7 +2086,6 @@ public function ip2vhost8tab($tab_vhosts){
 	    $this->article("ID IP", $this->ip2id);
 	    $this->article("IP", $this->ip);
 	    if(!$this->ip4priv($this->ip)){
-	        $this->titre("Determining DOMAIN RANGE");
 	    $ip2geoip = $this->ip2geoip();$this->article("IP GEOLOC",$ip2geoip);
 	    $ip2asn = $this->ip2asn();$this->article("IP ASN",$ip2asn);
 	    $ip2range = $this->ip2range();$this->article("IP RANGE",$ip2range);

@@ -271,7 +271,8 @@ class DOMAIN extends ETH{
 	    while ($row = $req->fetch_assoc()) {
 	        if (isset($row['ip'])) $ip = trim($row['ip']);
 	        if(!empty($ip) ){
-	            $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4service FALSE\" ";
+
+	            $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4service false\" ";
 	            $this->requette($query);
 	        }
 	    }
@@ -603,9 +604,7 @@ class DOMAIN extends ETH{
 	    $this->domain2whois();
 	    
 	    $hosts = $this->domain2host() ;
-	    echo $this->tab($hosts);$this->pause();
-
-	    
+	   	    
 	    if(!empty($hosts)){
 	        
 	        $tab_tmp_host = array();
