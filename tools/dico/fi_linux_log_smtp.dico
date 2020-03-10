@@ -1,0 +1,13 @@
+/var/adm/syslog/mail.log
+/var/log/mail
+/var/log/maillog
+/var/log/mail.log
+/var/log/message
+/var/log/messages
+/var/log/messages.log
+/var/log/qmail/mail.log
+/var/mail/apache
+/var/mail/nobody
+/var/mail/www
+/var/mail/www-data
+/var/log/syslog

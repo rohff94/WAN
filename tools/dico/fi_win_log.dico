@@ -1,0 +1,108 @@
+c:/apache/log/access.log
+c:/apache/log/access_log
+c:/apache/log/error.log
+c:/apache/log/error_log
+c:/apache/logs/access.log
+c:/apache/logs/access_log
+c:/apache/logs/error.log
+c:/apache/logs/error_log
+c:/apache2/log/access.log
+c:/apache2/log/access_log
+c:/apache2/log/error.log
+c:/apache2/log/error_log
+c:/apache2/logs/access.log
+c:/apache2/logs/access_log
+c:/apache2/logs/error.log
+c:/apache2/logs/error_log
+c:/inetpub/logs/logfiles
+c:/log/access.log
+c:/log/access_log
+c:/log/error.log
+c:/log/error_log
+c:/log/httpd/access_log
+c:/log/httpd/error_log
+c:/logs/access.log
+c:/logs/access_log
+c:/logs/error.log
+c:/logs/error_log
+c:/logs/httpd/access_log
+c:/logs/httpd/error_log
+c:/mysql/data/hostname.err
+c:/mysql/data/mysql.err
+c:/mysql/data/mysql.log
+c:/opt/xampp/logs/access.log
+c:/opt/xampp/logs/access_log
+c:/opt/xampp/logs/error.log
+c:/opt/xampp/logs/error_log
+c:/program files (x86)/apache group/apache/logs/access.log
+c:/program files (x86)/apache group/apache/logs/error.log
+c:/program files (x86)/apache group/apache/conf/access.log
+c:/program files (x86)/apache group/apache/conf/error.log
+c:/program files (x86)/mysql/data/hostname.err
+c:/program files (x86)/mysql/data/mysql-bin.log
+c:/program files (x86)/mysql/data/mysql.err
+c:/program files (x86)/mysql/data/mysql.log
+c:/program files/apache group/apache/conf/access.log
+c:/program files/apache group/apache/conf/error.log
+c:/program files/apache group/apache/logs/access.log
+c:/program files/apache group/apache/logs/error.log
+c:/program files/mysql/data/hostname.err
+c:/program files/mysql/data/mysql-bin.log
+c:/program files/mysql/data/mysql.err
+c:/program files/mysql/data/mysql.log
+c:/windows/iis5.log
+c:/windows/iis6.log
+c:/windows/iis7.log
+c:/windows/iis8.log
+c:/xampp/apache/logs/access.log
+c:/xampp/apache/logs/error.log
+c:/xampp/filezillaftp/filezilla server.xml
+c:/xampp/filezillaftp/logs
+c:/xampp/filezillaftp/logs/access.log
+c:/xampp/filezillaftp/logs/error.log
+c:/xampp/mercurymail/logs/access.log
+c:/xampp/mercurymail/logs/error.log
+%WINDIR%\debug\NetSetup.log
+%WINDIR%\system32\logfiles\httperr\httperr1.log
+%WINDIR%\System32\drivers\etc\hosts
+c:\WINDOWS\System32\drivers\etc\hosts
+c:/WINDOWS/system32/win.ini
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

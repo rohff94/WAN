@@ -1,0 +1,13 @@
+/etc/log/ftp.cmd
+/etc/log/ftp.xfer
+/usr/local/psa/var/log/xferlog
+/var/adm/syslog/ftpd.log
+/var/adm/syslog/xferlog
+/var/log/ftp.log
+/var/log/plesk/xferlog
+/var/log/proftpd/controls.log
+/var/log/proftpd/proftpd.log
+/var/log/pureftp.log
+/var/log/sftp.log
+/var/log/vsftpd.log
+/var/log/syslog

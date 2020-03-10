@@ -1,0 +1,10 @@
+/tmp/sess_%ID_SESSION%
+/var/lib/php3/sess_%ID_SESSION%
+/var/lib/php4/sess_%ID_SESSION%
+/var/lib/php5/sess_%ID_SESSION%
+/var/lib/php5/session/sess_%ID_SESSION%
+/var/lib/php6/sess_%ID_SESSION%
+/var/lib/php7/sess_%ID_SESSION%
+/var/lib/php/sess_%ID_SESSION%
+ /var/lib/php/session/sess_%ID_SESSION%
+/var/log/syslog

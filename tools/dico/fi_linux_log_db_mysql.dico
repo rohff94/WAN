@@ -1,0 +1,3 @@
+/var/log/mysqld.log
+/var/log/mysql/error.log
+/var/log/syslog
