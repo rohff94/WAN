@@ -1900,7 +1900,7 @@ public function ip2vhost8tab($tab_vhosts){
             }
             $this->pause();
             
-            $query = "curl -X POST -d \"theinput=$this->ip&thetest=reverseiplookup&name_of_nonce_field=b6b2d9c9ef&_wp_http_referer=%2Freverse-ip-lookup%2F\" \"https://hackertarget.com/reverse-ip-lookup/\" | grep -v '<' $this->filter_host  ";;
+            $query = "curl -X POST -d \"theinput=$this->ip&thetest=reverseiplookup&name_of_nonce_field=b6b2d9c9ef&_wp_http_referer=%2Freverse-ip-lookup%2F\" \"https://hackertarget.com/reverse-ip-lookup/\" | grep -v '<' $this->filter_host | grep -v -E \"a\.async|a\.src|m\.parentnode.inser|s\.creat|s\.getel|www\.google-analytics\.com\"  ";
             $result .= $this->req_ret_str($query);
             $this->pause();
  
@@ -1914,7 +1914,6 @@ public function ip2vhost8tab($tab_vhosts){
 	
 	public function ip2range(){
 	    $result = "";
-	    $this->titre(__FUNCTION__);
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
