@@ -72,7 +72,7 @@ class PORT extends IP{
 	
 
 		
-	public function port2dot(){
+	public function port2dot():string{
 		$this->ssTitre(__FUNCTION__);
 		$file_output = "$this->dir_tmp/$this->ip.$this->port.".__FUNCTION__.".dot";
 		$color_port = "orange";$color_arrow = "darkorange";
@@ -127,7 +127,7 @@ class PORT extends IP{
 	
 
 		
-	public function port2version4run($version_resu_xml){
+	public function port2version4run(string $version_resu_xml):array{
 	    $service_name = "";
 	    $service_version = "";
 	    $service_product = "";
@@ -147,13 +147,13 @@ class PORT extends IP{
 	}
 	
 	
-	public function port2version2check($xml){
+	public function port2version2check(string $xml):bool{
 	    //$this->ssTitre(__FUNCTION__);
 	    if (stristr("</nmaprun>",$xml)===FALSE) return TRUE;
 	    else {$this->log2error("No End Tag nmaprun",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");return FALSE ;}
 	}
 	
-	public function port2version(){
+	public function port2version():string{
 	    //$this->ssTitre(__FUNCTION__);
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->port2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) {
@@ -188,7 +188,7 @@ class PORT extends IP{
 	}
 	
 
-	public function port2fake($version_resu){
+	public function port2fake($version_resu):bool{
 		$this->ssTitre(__FUNCTION__);
 		$resu = array();
 		$resu2 = array();
@@ -219,7 +219,7 @@ class PORT extends IP{
 		return TRUE;
 	}
 	
-	public function port4type8xml($version_resu_xml){
+	public function port4type8xml(string $version_resu_xml):array{
 	    $this->ssTitre(__FUNCTION__);
 	    $service_name = "";
 	    $service_version = "";
@@ -240,7 +240,7 @@ class PORT extends IP{
 	}
 	
 
-	public function port4type8raw($version_resu){
+	public function port4type8raw(string $version_resu):array{
 		$this->ssTitre(__FUNCTION__);
 		$service_name = "";
 		$service_version = "";
@@ -274,7 +274,7 @@ class PORT extends IP{
 	
 
 	
-	public function port4pentest(){
+	public function port4pentest():string{
 	    
 	    $result = "";
 	    $this->gtitre(__FUNCTION__);
@@ -595,37 +595,37 @@ Cisco / Network 	255
 	
 
 
-	public function port2severity($severity){
+	public function port2severity(string $severity):string{
 	    $this->ssTitre(__FUNCTION__);
 	    $severity = trim($severity);
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->port2where",$severity);
 	}
 	
-	public function port2refs($severity){
+	public function port2refs(string $severity):string{
 	    $this->ssTitre(__FUNCTION__);
 	    $severity = trim($severity);
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->port2where",$severity);
 	}
 	
-	public function port2confirmed($severity){
+	public function port2confirmed(string $severity):string{
 	    $this->ssTitre(__FUNCTION__);
 	    $severity = trim($severity);
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->port2where",$severity);
 	}
 	
-	public function port2resolution($severity){
+	public function port2resolution(string $severity):string{
 	    $this->ssTitre(__FUNCTION__);
 	    $severity = trim($severity);
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->port2where",$severity);
 	}
 	
-	public function port2status($severity){
+	public function port2status(string $severity):string{
 	    $this->ssTitre(__FUNCTION__);
 	    $severity = trim($severity);
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->port2where",$severity);
 	}
 	
-	public function port2policy_violation($severity){
+	public function port2policy_violation(string $severity):string{
 	    $this->ssTitre(__FUNCTION__);
 	    $severity = trim($severity);
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->port2where",$severity);

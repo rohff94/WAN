@@ -29,7 +29,7 @@ class HOST extends DOMAIN{
     }
     
     
-    public function host2dot4port(){
+    public function host2dot4port():string{
         $this->gtitre(__FUNCTION__);
         $dot = "";
         $ips = array();
@@ -73,7 +73,7 @@ class HOST extends DOMAIN{
     }
     
     
-    public function host2dot(){
+    public function host2dot():string{
         $this->gtitre(__FUNCTION__);
         
         $file_output = "$this->dir_tmp/$this->host.".__FUNCTION__.".dot";
@@ -111,87 +111,58 @@ class HOST extends DOMAIN{
     
     
     
-    public function host2malw(){
+    public function host2malw():string{
         $this->ssTitre(__FUNCTION__);
         $query = "dmitry -n $this->host";
         return $this->req2BD(__FUNCTION__,__CLASS__,"host = '$this->host'",$query);
     }
     
     
-    public function host2host(){
+    public function host2host():string{
         $this->ssTitre(__FUNCTION__);
         // update HOST set host2host = NULL where host2host IS NOT NULL ;
         $query = "nslookup -query=ptr ".gethostbyname($this->host)."  | cut -d'=' -f2 | grep -v '$this->host' | grep -Po \"[a-z0-9_\-]{1,}\.[a-z_\-]{1,}\.[a-z]{1,5}\"  ";
         return $this->req2BD(__FUNCTION__,__CLASS__,"host = '$this->host'",$query);
     }
-    
-    public function host4service() {
-        $this->gtitre(__FUNCTION__);
-       
-        $host_ips = $this->host4ip($this->host);
-        if(!empty($host_ips)){
-            $ips = $host_ips;
-            if (!empty($ips)) {
-                $max_iter = count($ips);
-                $this->rouge("ITER IP $max_iter");
+ 
 
-                $file_path = "/tmp/$this->eth.$this->host.ip4service";
-                $fp = fopen($file_path, 'w+');
-                foreach ($ips as $ip_addr) {
-                    if( (!empty($ip_addr)) && (!$this->ip4priv($ip_addr)) ){
-                        $data = "$this->eth $this->domain $ip_addr ip4service FALSE";
-                        $data = $data."\n";
-                        fputs($fp,$data);
-                    }
-                }
-                fclose($fp);
-                
-                if ( (1<$max_iter) && (20>$max_iter)) $this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
-                
-            }
-            
-            foreach ($host_ips as $ip){
-                if ($this->ip4priv($ip)) {
-                    $query = "dig $this->host a +trace | grep '$this->domain'";
-                    $trace = $this->req_ret_str($query);
-                    echo $trace;
-                    $this->log2error("response IP LOCAL from DNS SERVER $this->eth:$this->host:$ip", __FILE__,__CLASS__,__FUNCTION__, __LINE__, "$this->eth:$this->domain:$this->host:$ip", "$trace");
-                    
-                }
-                if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
-                $obj_ip = new IP($this->eth, $this->domain, $ip);
-                $obj_ip->poc($this->flag_poc);
-                $obj_ip->ip2host($this->host);
-                $obj_ip->ip4service();
-                }
-            }
-            
-            
-        }
-    
-    }
-    
-    
     
     public function host4info() {
         $this->gtitre(__FUNCTION__);        
         $host_ips = $this->host4ip($this->host);
         if(!empty($host_ips)){
+            
+            $max_iter = count($host_ips);
+                    $this->rouge("ITER IP $max_iter");
+                    
+                    $file_path = "/tmp/$this->eth.$this->host.ip4info";
+                    $fp = fopen($file_path, 'w+');
+                    foreach ($host_ips as $ip_addr) {
+                        if( (!empty($ip_addr)) && (!$this->ip4priv($ip_addr)) ){
+                            $data = "$this->eth $this->domain $ip_addr ip4info FALSE";
+                            $data = $data."\n";
+                            fputs($fp,$data);
+                        }
+                    }
+                    fclose($fp);
+                    
+                    if ( (1<$max_iter) && (20>$max_iter)) $this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
+                    
+                }
+            
+            
             foreach ($host_ips as $ip){
                 if ($this->ip4priv($ip)) {
                     $this->rouge("response IP LOCAL from DNS SERVER $this->eth:$this->host:$ip");                    
                 }
                 if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
-
-                    $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4info FALSE\" ";
-                    $this->requette($query);
                     $obj_ip = new IP($this->eth, $this->domain, $ip);
                     $obj_ip->poc($this->flag_poc);
                     $obj_ip->ip2host($this->host);
                     $obj_ip->ip4info();
                 }
             }
-        }    
+            
     }
     
     

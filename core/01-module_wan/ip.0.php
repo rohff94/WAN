@@ -169,7 +169,7 @@ class IP extends DOMAIN{
 	    $this->cmd("localhost", $query);
 	}
 	
-	public function ip2dot4port(){
+	public function ip2dot4port():string{
 	    $this->ssTitre(__FUNCTION__);
 	    $this->ip2port();
 	    $dot = "";
@@ -217,7 +217,7 @@ class IP extends DOMAIN{
 	
 	
 	
-	public function ip2dot4port2(){
+	public function ip2dot4port2():string{
 	    $this->ssTitre(__FUNCTION__);
 	    $this->ip2port();
 	    $dot = "";
@@ -260,7 +260,7 @@ class IP extends DOMAIN{
 	   return $dot;
 	}
 	
-	public function ip2dot(){
+	public function ip2dot():string{
 	    $this->gtitre(__FUNCTION__);
 	    
 	    $file_output = "$this->dir_tmp/$this->ip.".__FUNCTION__.".dot";
@@ -346,7 +346,7 @@ class IP extends DOMAIN{
 	
 	
 	
-	public function ip2port4service($service){
+	public function ip2port4service(string $service):string{
 	    $this->ssTitre("Searching service $service recorded on Database for this IP");
 	    $port = "";
 	    $service = trim($service);
@@ -360,23 +360,14 @@ class IP extends DOMAIN{
 	}
 	
 	
-	public function ip2cidr(){
+	public function ip2cidr():string{
 		$this->ssTitre(__FUNCTION__);
 		return trim($this->req_ret_str("echo '$this->ip' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" "));
 	}
 	
-	public function ip8ovh(){
-	    $this->gtitre(__FUNCTION__);
-	    $this->ip2port();
-	    $this->ip2whois();
-	    //$this->ip2geoip();
-	    //$this->ip2honey();
-	    //$this->ip2range();
-	    $this->ip2tracert();
-	    $this->ip2vhost();
-	}
+
 	
-	public function ip2cve(){
+	public function ip2cve():string{
 	    $result = "";
 	    //msf5 > search cve:2019 
 	    // msf > search cve:2011 author:jduck platform:linux
@@ -396,7 +387,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	
 
 	
-	public function ip2cve4nmap(){
+	public function ip2cve4nmap():string{
 	    $this->ssTitre(__FUNCTION__);
 	    // https://null-byte.wonderhowto.com/how-to/easily-detect-cves-with-nmap-scripts-0181925/
 	    $filename = "/usr/share/nmap/scripts/vulners.nse";
@@ -828,7 +819,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	
 
 
-	public function ip2vt(){
+	public function ip2vt():string{
 	    $result = "";
 	    $result .= $this->titre(__FUNCTION__);
 	    if ($this->ip4priv($this->ip)) return $result."Private IP";
@@ -840,7 +831,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	}
 	
 	
-	public function ip2malw4blacklist(){
+	public function ip2malw4blacklist():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
@@ -853,7 +844,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	
 
 	
-	public function ip2crack($unshadow_file,$dico){
+	public function ip2crack(string $unshadow_file,string $dico){
 	    $this->titre(__FUNCTION__);
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." <> 0";
 	    if ($this->checkBD($sql_r_1) ) return $this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where ");
@@ -862,7 +853,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	        $unshadow_file = trim($unshadow_file);
 	        $obj_file = new FILE($unshadow_file);
 	        
-	        //$this->requette("john $obj_file->file_path --wordlist:\",$dico\" ");
+	        $this->requette("john $obj_file->file_path --wordlist:\",$dico\" ");
 	        
 	        $tab_user2pass = $this->req_ret_tab("john --show $obj_file->file_path | grep ':' ");
 	        if (!empty($tab_user2pass))
@@ -875,18 +866,18 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	                }
 	        }
 	        
-	      return 1;
+
 	        
 	    }
 	}
 	
-	public function ip2crack4check(){
+	public function ip2crack4check(): bool{
 	    $this->titre(__FUNCTION__);
 	    $sql_r_1 = "SELECT ip2crack FROM ".__CLASS__." WHERE $this->ip2where  AND ip2crack <> 0";
 	    return $this->checkBD($sql_r_1) ;
 	}
 	
-	public function ip2asn(){
+	public function ip2asn():string{
 		if ($this->ip4priv($this->ip)) return "Private IP";
 		$result = "";
 		$sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
@@ -914,7 +905,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 		}
 	}
 	
-	public function ip2asn4db(){
+	public function ip2asn4db():string{
 	    $this->ssTitre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return "Private IP";
 		$query = "mysql --user=root --password=hacker --database=geoip --execute=\"CALL ip2asn(\\\"$this->ip\\\");\" 2> /dev/null | grep -Po \"AS[0-9]{1,}.*\" ";
@@ -922,7 +913,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 		
 	}
 	
-	public function ip2asn4nmap(){
+	public function ip2asn4nmap():string{
 	    $this->ssTitre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return "Private IP";
 		$query = "nmap --script asn-query $this->ip -Pn -sn -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/hostscript/script/@output | strings  ";
@@ -931,14 +922,14 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	}
 	
 
-	public function ip2cidr4range(){
+	public function ip2cidr4range():string{
 		$this->ssTitre(__FUNCTION__);
 		$query = "echo \"`echo '$this->ip' | grep -Po \\\"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\\\"`.0-255\" ";
 		return $this->req_ret_str($query);
 	}
 	
 	
-	public function ip2os4arch($result){
+	public function ip2os4arch(string $result):string{
 	    $this->ssTitre(__FUNCTION__);
 	    $sql_r = "SELECT ip2os4arch FROM IP WHERE $this->ip2where AND ip2os4arch IS NOT NULL";
 	    
@@ -1056,7 +1047,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	}
 	
 	
-	public function ip2os(){
+	public function ip2os():string{
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
@@ -1079,7 +1070,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	
 
 
-	public function ip2os4win2fin(){
+	public function ip2os4win2fin():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | echo '$this->root_passwd' | sudo -S -S nmap -sF -Pn -n --reason --top-ports 5 $this->ip -e $this->eth  ";
@@ -1088,7 +1079,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 		
 	}
 	
-	public function ip2os2xprobe(){
+	public function ip2os2xprobe():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S xprobe2 $this->ip  | grep -v 'Xprobe2' ";
@@ -1098,7 +1089,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	}
 	
 	
-	public function ip2os2nmap(){
+	public function ip2os2nmap():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S nmap -n --reason -O --osscan-guess $this->ip -F -sSU -Pn -e $this->eth -oX - ";
@@ -1109,7 +1100,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 
 	
 	
-	public function ip2geoip4country(){
+	public function ip2geoip4country():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
@@ -1122,7 +1113,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 
 	
 		
-	public function ip2port(){	 
+	public function ip2port():string{	 
 	    $this->ssTitre(__FUNCTION__);
 	    $result = "";
 	    $tab_open_ports_tcp = array();
@@ -1352,7 +1343,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	public function ip2udp4top200(): array{
 	    $this->ssTitre(__FUNCTION__);
 	    
-		$query = "echo '$this->root_passwd' | sudo -S nmap -sU -Pn -n --reason --top-ports 200 $this->ip --open -e $this->eth -oX -  ";		
+		$query = "echo '$this->root_passwd' | sudo -S nmap -sU -Pn -n --reason --top-ports 60 $this->ip --open -e $this->eth -oX -  ";		
 		
 		$firewall = $this->ip2fw4enable();		
 		if (!$firewall) $query = $query." --scan-delay 1 | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
@@ -1382,7 +1373,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 
 	
 	
-	public function ip2fw4nmap2fk(){
+	public function ip2fw4nmap2fk():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$this->article("Defense Firewalk","Disallow ICMP Time Exceeded messages
@@ -1394,7 +1385,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		
 	}
 	
-	public function ip2fw4nmap2fw(){
+	public function ip2fw4nmap2fw():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S nmap --script=\"firewall-bypass\" -Pn -n --top-ports 5 --reason  $this->ip -e $this->eth -oX -  | xmlstarlet sel -t -v /nmaprun/host/ports/port/state/@state";
@@ -1403,7 +1394,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	}
 	
 	
-	public function ip2fw4sw(){
+	public function ip2fw4sw():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sW -Pn -n --reason --top-ports 5 $this->ip -e $this->eth -oX -  | xmlstarlet sel -t -v /nmaprun/host/ports/port/state/@state";
@@ -1412,7 +1403,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		
 	}
 	
-	public function ip2fw4ack(){
+	public function ip2fw4ack():string{
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) {
@@ -1433,13 +1424,13 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    }
 	}
 	
-	public function ip2fw4enable(){
+	public function ip2fw4enable(): bool{
 	    $this->ssTitre(__FUNCTION__);
 	    if(stristr($this->ip2fw4ack(),"unfiltered")) return TRUE;
 	    else return FALSE ;
 	}
 	
-	public function ip2protocol(){
+	public function ip2protocol():string{
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sO -n --reason -F $this->ip -e $this->eth -oX -";
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->ip2where ",$query);
 	}
@@ -1452,7 +1443,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		
 	}
 	
-	public function  ip2host($hostname){
+	public function  ip2host($hostname):string{
 	    $result = "";
 	    //$this->titre(__FUNCTION__);
 	    $hostname = trim($hostname);
@@ -1469,7 +1460,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 
 
 	
-	public  function parse4traceroute($traceroute_str){
+	public  function parse4traceroute(string $traceroute_str):string{
 	    $result = "";
 	    $results = array();
 	    
@@ -1497,7 +1488,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	}
 	
 
-	public function ip2tracert4local8traceroute(){
+	public function ip2tracert4local8traceroute():string{
 	    $this->ssTitre(__FUNCTION__);
 	    $query = "traceroute $this->ip "; 
 	    $result = $this->req_ret_str($query);
@@ -1506,7 +1497,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	}
 	
 	
-	public function ip2tracert4local8nmap(){
+	public function ip2tracert4local8nmap():string{
 	    $this->ssTitre(__FUNCTION__);
 	    $this->note("In a traceroute operation, a series of packets gets sent to a destination with very low Time-to-Live (TTL) values, starting at one up incrementing from
 there. As each packet dies, an ICMP Time Exceeded message gets sent back to the sender.
@@ -1521,7 +1512,7 @@ as the header options; the TTL changes.");
 
 
 	// #################################### ICMP ECHO ##############################
-	public function ip2icmpECHO() {
+	public function ip2icmpECHO():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$this->note("ICMP: ECHO 		(Request (Type 08), Reply (Type 00)) " );
@@ -1533,7 +1524,7 @@ as the header options; the TTL changes.");
 	// ##############################################################################
 	
 	// ####################################### ICMP TIME ############################
-	public function ip2icmpTIME() {
+	public function ip2icmpTIME():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$this->note("IDEAL INTO LAN - ICMP: Time Stamp 	(Request (Type 13), Reply (Type 14))" );
@@ -1545,7 +1536,7 @@ as the header options; the TTL changes.");
 	// ##############################################################################
 	
 	// ##################################### ICMP INFO #############################
-	public function ip2icmpINFO() {
+	public function ip2icmpINFO():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__); // echo '$this->root_passwd' | sudo -S icmpush -vv  -info
 		$this->note("ICMP: Information	(Request (Type 15), Reply (Type 16))" );
@@ -1557,7 +1548,7 @@ as the header options; the TTL changes.");
 	// ##############################################################################
 	
 	// ###################################### ICMP MASK #############################
-	public function ip2icmpMASK() {
+	public function ip2icmpMASK():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		$this->note("ICMP: Address Mask 	(Request (Type 17), Reply (Type 18))" );
@@ -1569,7 +1560,7 @@ as the header options; the TTL changes.");
 	// #############################################################################
 	
 	// ######################################IP 2 ICMP  #############################
-	public function ip2icmp() {
+	public function ip2icmp():string {
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
@@ -1591,7 +1582,7 @@ as the header options; the TTL changes.");
 	
 
 	
-	public function ip2geoip(){
+	public function ip2geoip():string{
 	    $result = "";
 	   if ($this->ip4priv($this->ip)) return "Private IP";
 	   $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
@@ -1636,7 +1627,7 @@ as the header options; the TTL changes.");
 	    
 	}
 	
-	public function ip2whois4asn(){
+	public function ip2whois4asn():string{
 	    $this->titre(__FUNCTION__);
 	    if ($this->ip4priv($this->ip)) return "Private IP";
 	    $query = "echo '".$this->ip2whois()."' | egrep -i \"(NetRange|CIDR|Parent|inetnum|NetType|OriginAS|Organization)\" ";
@@ -1645,7 +1636,7 @@ as the header options; the TTL changes.");
 	    return $this->tab($tmp);
 	}
 	
-	public function ip2whois4geoip(){
+	public function ip2whois4geoip():string{
 	    $this->titre(__FUNCTION__);
 	    if ($this->ip4priv($this->ip)) return "Private IP";
 	    $query = "echo '".$this->ip2whois()."' | egrep -i \"(Organization|route|Address|PostalCode|City|StateProv|country)\" | sort -u";
@@ -1654,7 +1645,7 @@ as the header options; the TTL changes.");
 	    return $this->tab($tmp);
 	}
 	
-	public function ip2honey(){
+	public function ip2honey():bool{
 	    $this->ssTitre(__FUNCTION__);
 
 	    $this->ip2port();$this->pause();
@@ -1664,7 +1655,7 @@ as the header options; the TTL changes.");
 	    else return false ;
 	}
 	
-	public function ip2port4scan8xml($result_scan_xml){
+	public function ip2port4scan8xml(string $result_scan_xml):array{
 	    $this->titre(__FUNCTION__);
 	    $port = array();
 	    $tab_ports = array();
@@ -1707,7 +1698,7 @@ as the header options; the TTL changes.");
 	
 
 	
-	public function ip2vuln(){
+	public function ip2vuln():string{
 	    // https://github.com/radenvodka/SVScanner
 
 		$this->titre(__FUNCTION__);
@@ -1809,7 +1800,7 @@ as the header options; the TTL changes.");
 
 
 
-public function ip2vhost8tab($tab_vhosts){
+public function ip2vhost8tab(array $tab_vhosts):string{
     $this->titre(__FUNCTION__);
     $result = "";
     $tmp = "";
@@ -1846,7 +1837,7 @@ public function ip2vhost8tab($tab_vhosts){
 }
 
 	
-	public function ip2vhost(){
+public function ip2vhost():string{
 	    $result = "";
 	    $tmp = "";
 	   
@@ -1867,7 +1858,7 @@ public function ip2vhost8tab($tab_vhosts){
 		}
 	}
 	
-	public function ip2vhost4nmap(){
+	public function ip2vhost4nmap():string{
 	    $this->titre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return "Private IP";
 		//$query = "nmap --script hostmap-ip2hosts -sn -Pn $this->ip -e $this->eth | grep -v -i \"nmap\" | grep -v -i \"csv.php\" $this->filter_host | grep -v 'huanqiucaipiaotouzhupingtai.com' | sort -u ";
@@ -1875,7 +1866,7 @@ public function ip2vhost8tab($tab_vhosts){
 		return $this->req_ret_str($query);
 	}
 	
-	public function ip2vhost4web(){
+	public function ip2vhost4web():array{
 	    $result = "";
 	    $this->titre(__FUNCTION__);
 	    if (!$this->ip4priv($this->ip)) {
@@ -1912,7 +1903,7 @@ public function ip2vhost8tab($tab_vhosts){
 	
 
 	
-	public function ip2range(){
+	public function ip2range():string{
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
@@ -1929,7 +1920,7 @@ public function ip2vhost8tab($tab_vhosts){
 
 	
 	
-	public function ip2range4local(){
+		public function ip2range4local():string{
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 		if ($this->ip4priv($this->ip)) return $result."Private IP";
@@ -1940,7 +1931,7 @@ public function ip2vhost8tab($tab_vhosts){
 	}
 	
 	
-	public function ip2malw(){
+	public function ip2malw():string{
 	    // https://kalilinuxtutorials.com/sipi-simple-ip-information-tools/
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
@@ -1970,14 +1961,14 @@ public function ip2vhost8tab($tab_vhosts){
 	
 
 	
-	public function ip2tracert(){
+	public function ip2tracert():string{
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
 	    $result .= $this->ip2tracert4local8nmap();
 	    //$result .= $this->ip2tracert4local8traceroute();
-		$result .= $this->ip2tracert4online();
+		//$result .= $this->ip2tracert4online();
 		
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
@@ -1985,7 +1976,7 @@ public function ip2vhost8tab($tab_vhosts){
 	}
 	
 	
-	public function ip2tracert4online(){
+	public function ip2tracert4online():string{
 	    $this->ssTitre(__FUNCTION__);
 		
 		// http://www.monitis.com/traceroute/
@@ -2008,7 +1999,7 @@ public function ip2vhost8tab($tab_vhosts){
 	}
 	
 	
-	public function ip2fw(){
+	public function ip2fw():string{
 	    $this->titre(__FUNCTION__);
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
@@ -2028,138 +2019,121 @@ public function ip2vhost8tab($tab_vhosts){
 		}
 	}
 	
-	public function ip4service(){
-	    $result = "";
-	    $this->article("Start ".__FUNCTION__.": $this->ip", "=============================================================================");
-	    $this->gtitre(__FUNCTION__);
-	    if(!$this->ip2honey()){	 
-	        
+	public function ip4service2display(){
+	    $this->titre("Determining IP SERVICES");
+	    if(!$this->ip2honey()){	 	        
 	        if (!empty($this->tab_open_ports_all)){
 	        $max_iter = count($this->tab_open_ports_all);
 	        $this->rouge("ITER PORT $max_iter");
-
-	        $file_path = "/tmp/$this->eth.$this->domain.$this->ip.port4service";
-	        $fp = fopen($file_path, 'w+');
-	        
-	        foreach ($this->tab_open_ports_all as $port){
-	            if (!empty($port))  {	                
-	                foreach ($port as $port_num => $protocol){                    
-                    $data = "$this->eth $this->domain $this->ip $port_num $protocol port4service FALSE";
-	                $data = $data."\n";
-	                fputs($fp,$data);
-	                         }
-	                
-	                }
-	            }
-	        
-	            fclose($fp);
-	            $this->requette("cat $file_path");
-	            if ( (1<$max_iter) && (30>$max_iter) && ($this->ip2fw4enable()) ) $this->requette("cat  $file_path | parallel --progress -k php pentest.php PORT {} "); // -j$max_iter 
-	        
 	        foreach ($this->tab_open_ports_all as $port){
 	            if (!empty($port))  {
 	                foreach ($port as $port_num => $protocol)
 	                    if (!empty($port_num)) {
 	                        $obj_port = new PORT($this->eth,$this->domain,$this->ip,$port_num, $protocol);
-	                        $obj_port->poc($this->flag_poc);
 	                        list($service_name,$service_version,$service_product,$service_extrainfo) = $obj_port->port2version4run($obj_port->port2version());
 	                        $obj_service = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip,$obj_port->port, $obj_port->protocol,$service_name,$service_version,$service_product,$service_extrainfo);
-	                        $obj_service->poc($this->flag_poc);
 	                        $obj_service->service4info();
 	                    }
 	            }
 	        }
-
 	        }
 
 	    }
 	    $this->article("END ".__FUNCTION__.": $this->ip", "=============================================================================");
-	    $this->pause();
-	    return $result;
 	}
 
-	public function ip4info(){ 	 
-	    $this->gtitre(__FUNCTION__);
-	    echo "=============================================================================\n";
-	    
+	
+	
+	public function ip4info2display(){ 
 	    $this->article("ID IP", $this->ip2id);
 	    $this->article("IP", $this->ip);
 	    if(!$this->ip4priv($this->ip)){
-	    $ip2geoip = $this->ip2geoip();$this->article("IP GEOLOC",$ip2geoip);
-	    $ip2asn = $this->ip2asn();$this->article("IP ASN",$ip2asn);
-	    $ip2range = $this->ip2range();$this->article("IP RANGE",$ip2range);
-	    $ip2whois = $this->ip2whois();$this->article("IP WHOIS",$ip2whois);	    
-	    $ip2fw = $this->ip2fw4ack();$this->article("IP FIREWALL",$ip2fw);
-	    //$this->titre("Determining Firewall Rules");
-	    //$this->ip2fw();$this->pause();
-	    //$ip2icmp = $this->ip2icmp();$this->article("IP ICMP",$ip2icmp);
-	    //$this->titre("Searching what happened In the PAST");$this->pause();
-	    //$this->ip2vt();$this->pause();
-	    //$this->ip2malw();$this->pause();
+	        $ip2geoip = trim($this->ip2geoip());$this->article("IP GEOLOC",$ip2geoip);
+	        $ip2asn = trim($this->ip2asn());$this->article("IP ASN",$ip2asn);
+	        $ip2range = trim($this->ip2range());$this->article("IP RANGE",$ip2range);
+	        $ip2whois = trim($this->ip2whois());$this->article("IP WHOIS",$ip2whois);
+	        $ip2fw = $this->ip2fw4ack();$this->article("IP FIREWALL",$ip2fw);
+	        //$this->titre("Determining Firewall Rules");
+	        //$this->ip2fw();$this->pause();
+	        //$ip2icmp = $this->ip2icmp();$this->article("IP ICMP",$ip2icmp);
+	        //$this->titre("Searching what happened In the PAST");$this->pause();
+	        //$this->ip2vt();$this->pause();
+	        //$this->ip2malw();$this->pause();
 	    }
-	    /*
-	    $this->titre("Determining IP SERVICES");
-	    $this->ip2protocol();$this->pause();
-	    $this->ip2port();$this->pause();
-	    $this->ip2os();$this->pause();
+	    
+
 	    $ip2root = $this->ip2root8db($this->ip2id);
 	    $ip2shell = $this->ip2shell8db($this->ip2id);
 	    $ip2write = $this->ip2write8db($this->ip2id);
 	    $ip2read = $this->ip2read8db($this->ip2id);
-	    	    
+	    
 	    if ($ip2root) $this->article("ip2root",$ip2root);
 	    if ($ip2shell)  $this->article("IP2SHELL",$ip2shell);
 	    if ($ip2write) $this->article("IP2WRITE",$ip2write);
 	    if ($ip2read) $this->article("IP2READ", $ip2read);
-	    */
+	    
 	    if (!$this->ip4priv($this->ip)) {
-	       $vhosts = $this->ip2vhost();$this->article("ALL vHosts", $vhosts);
+	        $vhosts = trim($this->ip2vhost());$this->article("ALL vHosts", $vhosts);
 	    }
-	    $ip2tracert = $this->ip2tracert();$this->article("IP TraceRoute",$ip2tracert);
-
+	    $ip2tracert = trim($this->ip2tracert());$this->article("IP TraceRoute",$ip2tracert);
+	    
+	}
+	public function ip4info(){ 	 
+	    echo " =============================================================================\n";
+	    $this->gtitre(__FUNCTION__);
+	    if  (!$this->ip4info8db($this->ip2id) ) {	    
+	        $this->ip4info2display();
+	    $sql_ip = "UPDATE IP SET ip4info=1 WHERE id = $this->ip2id  ";
+	    $this->mysql_ressource->query($sql_ip);
+	    }
+	    else  {
+	     if ($this->flag_poc)  $this->ip4info2display();
+	    }
+	    echo "End ".__FUNCTION__.":$this->domain:$this->ip =============================================================================\n";	    
+	}
+	
+	public function ip4service(){
 	    echo "=============================================================================\n";
-	    $this->pause();
+	    $this->gtitre(__FUNCTION__);
+	    if  (!$this->ip4service8db($this->ip2id) ) {
+	        $this->ip4service2display();
+	        $sql_ip = "UPDATE IP SET ip4service=1 WHERE id = $this->ip2id  ";
+	        $this->mysql_ressource->query($sql_ip);
+	    }
+	    else  {
+	        if ($this->flag_poc)  $this->ip4service2display();
+	    }
+	    echo "End ".__FUNCTION__.":$this->domain:$this->ip =============================================================================\n";
 	}
 	
 	
-	public function ip4pentest(){ // OK
-
-	    $this->gtitre(__FUNCTION__);
-	    $result = "";
+	public function ip4pentest(){
 	    echo "=============================================================================\n";
-
+	    $this->gtitre(__FUNCTION__);
+	    if  (!$this->ip4pentest8db($this->ip2id) ) {
+	        $this->ip4pentest2display();
+	        $sql_ip = "UPDATE IP SET ip4pentest=1 WHERE id = $this->ip2id  ";
+	        $this->mysql_ressource->query($sql_ip);
+	    }
+	    else  {
+	        if ($this->flag_poc)  $this->ip4pentest2display();
+	    }
+	    echo "End ".__FUNCTION__.":$this->domain:$this->ip =============================================================================\n";
+	}
+	
+	public function ip4pentest2display(){ // OK
+	    echo "=============================================================================\n";
+	    $this->gtitre(__FUNCTION__);
+	    //$this->ip4info();$this->pause();
+	    //$this->ip4service();$this->pause();
+	    //$this->ip2os();$this->pause();
 	    //$this->ip2cve();$this->pause();
-	    
-	    $this->titre("Enumeration");
-
-	    
+		//$result .=  $this->ip2auth();$this->pause();
+		//$result .=  $this->ip2vuln();$this->pause();
 	    
 	    if(!$this->ip2honey()){
 	        if (!empty($this->tab_open_ports_all)){
-	            $max_iter = count($this->tab_open_ports_all);
-	            $this->rouge("ITER PORT $max_iter");
-	            $gauche_iter = intval($max_iter/2);
-	            $droite_iter = intval($max_iter-$gauche_iter);
-	            $file_path = "/tmp/$this->eth.$this->domain.$this->ip.".__FUNCTION__;
-	            $fp = fopen($file_path, 'w+');
-	            
-	                foreach ($this->tab_open_ports_all as $port){
-	                    if (!empty($port))  {
-	                        
-	                        foreach ($port as $port_num => $protocol){
-	                            
-	                            $data = "$this->eth $this->domain $this->ip $port_num $protocol port4pentest FALSE";
-	                            $data = $data."\n";
-	                            fputs($fp,$data);
-	                        }
-	                        
-	                    }
-	                }
-	            
-	                fclose($fp);
-	            $this->requette("cat $file_path");
-	            //if ( (1<$max_iter) && (30>$max_iter) && ($this->ip2fw4enable()) ) $this->requette("php parallel.php \"cat  $file_path | awk 'FNR>0 && FNR<=$gauche_iter' | parallel --progress -k -j$gauche_iter php pentest.php PORT {} \" \"cat  $file_path | awk 'FNR>$gauche_iter && FNR<=$max_iter' | parallel --progress -k -j$droite_iter php pentest.php PORT {} \" 0 ");
-	            
+	          
 	            foreach ($this->tab_open_ports_all as $port){
 	                if (!empty($port))  {
 	                    foreach ($port as $port_num => $protocol)
@@ -2168,8 +2142,6 @@ public function ip2vhost8tab($tab_vhosts){
 	                            $obj_port->poc($this->flag_poc);
 	                            list($service_name,$service_version,$service_product,$service_extrainfo) = $obj_port->port2version4run($obj_port->port2version());
 	                            $obj_service = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip,$obj_port->port, $obj_port->protocol,$service_name,$service_version,$service_product,$service_extrainfo);
-	                            $obj_service->poc($obj_port->flag_poc);
-	                            $obj_service->service4info();
 	                            $obj_service->port4pentest();
 	                        }
 	                }
@@ -2178,17 +2150,10 @@ public function ip2vhost8tab($tab_vhosts){
 	        }
 	        
 	    }
-	     
-		
+	    
 
-		
-
-		//$result .=  $this->ip2auth();$this->pause();
-		//$result .=  $this->ip2vuln();$this->pause();
-        echo $result;
+	    
 		echo "END IP4PENTEST:$this->ip =============================================================================\n";
-		$this->pause();
-		return $result;
 		
 	}
 	
@@ -2197,7 +2162,7 @@ public function ip2vhost8tab($tab_vhosts){
 	
 	
 	
-	public function ip2users4shell(){
+	public function ip2users4shell():array{
 	    $this->ssTitre(__FUNCTION__);
 	    $tab_ip2users4shell = array("root");
 	    $sql_r_2 = "SELECT distinct(user2name) FROM USERS WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' AND user2methode = 'cat /etc/passwd' AND ( from_base64(user2infos) LIKE \"%/bin/sh%\" OR from_base64(user2infos) LIKE \"%/bin/bash%\") ) ORDER by user2name ASC ";
@@ -2211,7 +2176,7 @@ public function ip2vhost8tab($tab_vhosts){
 	    return $tab_ip2users4shell;
 	}
 	
-	public function ip2users4passwd(){
+	public function ip2users4passwd():array{
 	    $this->ssTitre(__FUNCTION__);
 	    $tab_ip2users4passwd = array();
 	    $sql_r_2 = "SELECT distinct(user2name),user2pass FROM AUTH WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' AND user2pass != '' )  ";
@@ -2233,7 +2198,7 @@ public function ip2vhost8tab($tab_vhosts){
 	
 	
 	
-	public function ip2users(){
+	public function ip2users():array{
 	    $this->ssTitre(__FUNCTION__);
 	    $tab_ip2users = array();
 	    $sql_r_2 = "SELECT distinct(user2name) FROM USERS WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' ) ORDER by user2name ASC ";

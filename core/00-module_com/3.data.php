@@ -41,6 +41,8 @@ public function poc($flag_poc){
     if (!$flag_poc) return $this->flag_poc = FALSE;
     if ($flag_poc==1) return $this->flag_poc = TRUE;
     if (!$flag_poc==0) return $this->flag_poc = FALSE;
+    if ($flag_poc==="1") return $this->flag_poc = TRUE;
+    if (!$flag_poc==="0") return $this->flag_poc = FALSE;
 }
 
 public function  req2BD($colonne,$table,$where,$query){
@@ -111,8 +113,21 @@ public function  req2BD4in($colonne,$table,$where,$result){
 
 
 
+public function  ip4info8db($ip2id){
+    $sql_w = "SELECT ip4info FROM IP WHERE id = $ip2id AND ip4info = 1 ";
+    return $this->checkBD($sql_w);
+}
+
+public function  ip4service8db($ip2id){
+    $sql_w = "SELECT ip4service FROM IP WHERE id = $ip2id AND ip4service = 1 ";
+    return $this->checkBD($sql_w);
+}
 
 
+public function  ip4pentest8db($ip2id){
+    $sql_w = "SELECT ip4pentest FROM IP WHERE id = $ip2id AND ip4pentest = 1 ";
+    return $this->checkBD($sql_w);
+}
 
 public function  ip2backdoor8db($ip2id){
     $sql_w = "SELECT ip2backdoor FROM IP WHERE id = $ip2id AND ip2backdoor = 1 ";
@@ -184,9 +199,6 @@ public function checkBD($sql){
 	$result = $this->mysql_ressource->query("SELECT EXISTS($sql)");
 	if (is_bool($result)) return FALSE ;
 	$row = $result->fetch_array(MYSQLI_NUM);
-	
-
-	
 	if ($row[0]==1) {return TRUE;}
 	else return FALSE;
 }

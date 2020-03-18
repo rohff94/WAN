@@ -38,7 +38,7 @@ class CIDR extends ETH{
     
     
     
-    public function cidr2ns(){
+    public function cidr2ns(): string{
         $this->titre("Searching Hostname with resolution DNS on $this->cidr");
         $result = "";
         
@@ -58,7 +58,7 @@ class CIDR extends ETH{
     
     
     
-    public function cidr2live(){
+    public function cidr2live(): string{
         $this->titre(__FUNCTION__);
         $result = "";
         $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->cidr2where AND ".__FUNCTION__." IS NOT NULL";
@@ -73,7 +73,7 @@ class CIDR extends ETH{
     }
     
     
-    public function cidr2owner(){
+    public function cidr2owner(): string{
         $this->titre(__FUNCTION__);
         $result = "";
         $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->cidr2where AND ".__FUNCTION__." IS NOT NULL";
@@ -87,7 +87,7 @@ class CIDR extends ETH{
     }
     
     
-    public function cidr2range(){
+    public function cidr2range(): string{
         $this->titre(__FUNCTION__);
         $result = "";
         $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->cidr2where AND ".__FUNCTION__." IS NOT NULL";

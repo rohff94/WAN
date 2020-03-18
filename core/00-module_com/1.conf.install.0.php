@@ -39,20 +39,21 @@ class INSTALL extends CONFIG{
 	function __construct() {
 	    parent::__construct();
 	   //$this->article("RACINE", $this->racine);
-	    if (!file_exists("$this->racine/config.xml")) $this->requette("php ./install.php");
+	    if (!file_exists("$this->racine/config.php")) $this->requette("php ./install.php");
 
-	    $config_data = simplexml_load_file("$this->racine/config.xml");
 	    
-	    $this->user2email = $config_data->email; 
-	    $this->user2agent = $config_data->user_agent; 
-	    $this->mysql_host = $config_data->mysql_host; 
-	    $this->mysql_login  = $config_data->mysql_login; 
-	    $this->mysql_passwd = $config_data->mysql_passwd; 
-	    $this->openvas_login  = $config_data->openvas_login;
-	    $this->openvas_passwd = $config_data->openvas_passwd; 
-	    $this->root_passwd = $config_data->root_passwd;
-	    $this->faraday_workspace_name = $config_data->faraday_workspace_name;
-	    $this->proxychains = $config_data->proxychains;
+	    include("./config.php");
+	    
+
+	    
+	    
+	    $this->user2email = $user2email; 
+	    $this->user2agent = $user2agent; 
+	    $this->mysql_host = $mysql_host; 
+	    $this->mysql_login  = $mysql_login; 
+	    $this->mysql_passwd = $mysql_passwd; 
+	    $this->root_passwd = $root_passwd;
+
 	
 
 	
@@ -393,16 +394,16 @@ class INSTALL extends CONFIG{
 	    $this->gtitre(__FUNCTION__);
 	    
 	    $this->ssTitre("Upgrade on Host");$this->update_dep();$this->pause();
-	    $this->install_soft();$this->pause();
+	    $this->install_soft();$this->pause(); // OK 
 		$this->install_labs();$this->pause();
 		$this->install_scanner();$this->pause();
 		$this->ssTitre("Upgrade on Host");$this->update_dep();$this->pause();
-		$this->install_malware();$this->pause();
-		$this->install_bof();$this->pause();
+		//$this->install_malware();$this->pause();
+		//$this->install_bof();$this->pause();
 		 
 		 
 		$this->install_exploit();$this->pause();
-		$this->install_for();$this->pause();
+		//$this->install_for();$this->pause();
 		$this->ssTitre("Upgrade on Host");$this->update_dep();$this->pause();		
 	}
 	
@@ -757,17 +758,7 @@ DATABASE_PASS: hacker");
 	    
 	}
 	
-	function install_labs_bot2(){
-	    $this->ssTitre(__FUNCTION__);
-	    $this->ssTitre("Create bot DATABASE");
-	    $this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --execute=\"CREATE DATABASE IF NOT EXISTS bot;\" 2>/dev/null ");$this->pause();
-	    $this->ssTitre("SHOW ALL DATABASES");
-	    $this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --execute=\"SHOW DATABASES;\" 2>/dev/null");$this->pause();
-	    $this->ssTitre("Install TABLES");
-	    //$this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --database=bot --execute=\"source $this->dir_install/bot.sql\" 2>/dev/null ");$this->pause();
-	    $this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --database=bot --execute=\"source $this->dir_install/localhost/port.sql\" 2>/dev/null ");$this->pause();
-	    
-	}
+
 	
 	function upgrade_geoip(){
 		$this->remarque("rename GeoLiteCity-Blocks.csv/GeoLiteCity-Location.csv/GeoIPASNum2.csv to geoipBlock.csv/geoipLoc.csv/asn.csv ");
@@ -1046,14 +1037,15 @@ deb-src http://ppa.launchpad.net/nicolas-zin/ossec-ubuntu/ubuntu trusty main ";
 	
 	public function install_labs(){
 		$this->titre(__FUNCTION__);
-		$this->install_labs_ide_eclipse();$this->pause();
-		$this->install_labs_vmware_workstation();$this->pause();
+		//$this->install_labs_ide_eclipse();$this->pause();
+		//$this->install_labs_vmware_workstation();$this->pause();
 		$this->install_labs_egypt();$this->pause();
 		$this->install_labs_frageroute();$this->pause();
 		$this->install_labs_geoip();$this->pause();
+		$this->install_labs_bot();$this->pause();
 		$this->install_labs_theharvester();$this->pause();
-		//$this->install_labs_bot();$this->pause();
-		//$this->install_labs_sip();$this->pause();
+		$this->install_labs_sublist3r();$this->pause();
+		$this->install_labs_sip();$this->pause();
 		//$this->install_labs_git();$this->pause();
 		//$this->install_labs_metasm();$this->pause(); // not yet
 		//$this->install_labs_openldap();$this->pause();
@@ -1077,7 +1069,7 @@ deb-src http://ppa.launchpad.net/nicolas-zin/ossec-ubuntu/ubuntu trusty main ";
 		
 		
 		
-		$this->install_malware_bamcompile();$this->pause();
+		//$this->install_malware_bamcompile();$this->pause();
 		$this->install_malware_code_injector();$this->pause();
 		$this->install_malware_elf_poison();$this->pause();
 		$this->install_malware_elfy_master();$this->pause();
@@ -1145,8 +1137,7 @@ deb-src http://ppa.launchpad.net/nicolas-zin/ossec-ubuntu/ubuntu trusty main ";
 	
 	function install_malware_code_injector(){
 		$this->ssTitre(__FUNCTION__);
-		$this->requette("git clone https://github.com/oblique/code-injector.git");
-		$this->requette("echo '$this->root_passwd' | sudo -S mv -v ./code-injector /opt/");
+		$this->requette("echo '$this->root_passwd' | sudo -S git clone https://github.com/oblique/code-injector.git /opt/code-injector ");
 		$this->requette("cd /opt/code-injector/; make");
 	
 	}
@@ -1418,7 +1409,7 @@ deb-src http://ppa.launchpad.net/nicolas-zin/ossec-ubuntu/ubuntu trusty main ";
 		$this->titre(__FUNCTION__);
 		
 		//$this->install_exploit_armitage();
-		$this->install_exploit_automater();
+		//$this->install_exploit_automater();
 		//$this->install_exploit_console_openvas();
 		
 		$this->install_exploit_exploitdb();
@@ -1663,7 +1654,7 @@ URI	ldap://ldap.hack.vlan
 	    }
 			
 	
-		if(!$this->check_soft_exist("/opt/pylibemu/setup.py")) {
+		if(!file_exist("/opt/pylibemu/setup.py")) {
 			$this->requette("echo '$this->root_passwd' | sudo -S git clone https://github.com/buffer/pylibemu.git /opt/pylibemu ");
 			$this->requette("echo '$this->root_passwd' | sudo -S chown -R $this->user2local:$this->user2local  /opt/pylibemu");
 			$this->requette("cd /opt/pylibemu;python setup.py build; echo '$this->root_passwd' | sudo -S -H python setup.py install");}	
