@@ -191,7 +191,7 @@ class com4display extends INSTALL {
 	}
 	
 	
-	public function req_ret_str($query){
+	public function req_ret_str($query):string{
 	    $tmp = array();
 	    if (empty($query)) return "";
 	    $display = str_replace("echo '$this->root_passwd' | sudo -S", "sudo", $query);

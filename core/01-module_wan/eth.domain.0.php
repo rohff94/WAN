@@ -428,26 +428,26 @@ class DOMAIN extends ETH{
 	    return $result ;
 	}
 	
-	public function domain2search4web8hackertarget():string{
+	public function domain2search4web8hackertarget(){
 	    $this->ssTitre(__FUNCTION__);
 		$query = "wget -qO- \"https://api.hackertarget.com/hostsearch/?q=$this->domain\" --timeout=60 --tries=2 --no-check-certificate | grep '\.$this->domain' | sed 's/ /\\n/g' | sort -u";
 		return $this->req_ret_str($query);
 	}
 	
 	
-	public function domain2search4web8censys():string{
+	public function domain2search4web8censys(){
 	    $this->ssTitre(__FUNCTION__);
 	    $query = "wget -qO- \"https://censys.io/ipv4?q=$this->domain\" --timeout=60 --tries=2 --no-check-certificate | grep '\.$this->domain' | grep -Po -i \"([a-z0-9\-\_\.]{1,})\.$this->domain\" | sed 's/ /\\n/g' | sort -u";
 	    return $this->req_ret_str($query);
 	}
 	
-	public function domain2search4web8netcraft():string{
+	public function domain2search4web8netcraft(){
 	    $this->ssTitre(__FUNCTION__);
 	    $query = "wget -qO- \"https://searchdns.netcraft.com/?restriction=site+contains&host=$this->domain\" --timeout=60 --tries=2 --no-check-certificate  | grep '\.$this->domain' | grep -Po -i \"([a-z0-9\-\_\.]{1,})\.$this->domain\" | sed 's/ /\\n/g' | sort -u";
 	    return $this->req_ret_str($query);
 	}
 	
-	public function domain2search4web8spyse():string{
+	public function domain2search4web8spyse(){
 	    $this->ssTitre(__FUNCTION__);
 	    $query = "wget -qO- \"https://spyse.com/search/subdomain?q=$this->domain\" --timeout=60 --tries=2 --no-check-certificate  | grep '\.$this->domain' | grep -Po -i \"([a-z0-9\-\_\.]{1,})\.$this->domain\" | sed 's/ /\\n/g' | sed 's#c-domain__target--##g' | sort -u";
 	    return $this->req_ret_str($query);

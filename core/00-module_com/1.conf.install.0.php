@@ -744,7 +744,7 @@ DATABASE_PASS: hacker");
 		$this->ssTitre("SHOW ALL DATABASES");
 		$this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --execute=\"SHOW DATABASES;\" 2>/dev/null");$this->pause();
 		$this->ssTitre("Install TABLES");
-		$this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --database=geoip --execute=\"source $this->dir_install/localhost/geoip/geoip_max.sql\" 2>/dev/null ");$this->pause();
+		$this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --database=geoip --execute=\"source $this->dir_install/geoip_max.sql\" 2>/dev/null ");$this->pause();
 	}
 	
 	function install_labs_bot(){
@@ -754,7 +754,7 @@ DATABASE_PASS: hacker");
 	    $this->ssTitre("SHOW ALL DATABASES");
 	    $this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --execute=\"SHOW DATABASES;\" 2>/dev/null");$this->pause();
 	    $this->ssTitre("Install TABLES");
-	    $this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --database=bot --execute=\"source $this->dir_install/localhost/bot.sql\" 2>/dev/null ");$this->pause();
+	    $this->requette("mysql -h $this->mysql_host --user=$this->mysql_login --password='$this->mysql_passwd' --database=bot --execute=\"source $this->dir_install/bot.sql\" 2>/dev/null ");$this->pause();
 	    
 	}
 	
