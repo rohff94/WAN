@@ -29,7 +29,7 @@ class HOST extends DOMAIN{
     }
     
     
-    public function host2dot4port():string{
+    public function host2dot4port(){
         $this->gtitre(__FUNCTION__);
         $dot = "";
         $ips = array();
@@ -73,7 +73,7 @@ class HOST extends DOMAIN{
     }
     
     
-    public function host2dot():string{
+    public function host2dot(){
         $this->gtitre(__FUNCTION__);
         
         $file_output = "$this->dir_tmp/$this->host.".__FUNCTION__.".dot";
@@ -111,14 +111,14 @@ class HOST extends DOMAIN{
     
     
     
-    public function host2malw():string{
+    public function host2malw(){
         $this->ssTitre(__FUNCTION__);
         $query = "dmitry -n $this->host";
         return $this->req2BD(__FUNCTION__,__CLASS__,"host = '$this->host'",$query);
     }
     
     
-    public function host2host():string{
+    public function host2host(){
         $this->ssTitre(__FUNCTION__);
         // update HOST set host2host = NULL where host2host IS NOT NULL ;
         $query = "nslookup -query=ptr ".gethostbyname($this->host)."  | cut -d'=' -f2 | grep -v '$this->host' | grep -Po \"[a-z0-9_\-]{1,}\.[a-z_\-]{1,}\.[a-z]{1,5}\"  ";
@@ -142,11 +142,14 @@ class HOST extends DOMAIN{
                             $data = "$this->eth $this->domain $ip_addr ip4info FALSE";
                             $data = $data."\n";
                             fputs($fp,$data);
+                            $query = "php pentest.php IP \"$this->eth $this->domain $ip_addr ip4info FALSE\" ";
+                            $this->requette($query);
                         }
                     }
                     fclose($fp);
                     
-                    if ( (1<$max_iter) && (20>$max_iter)) $this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
+                   
+                    //if ( (1<$max_iter) && (20>$max_iter)) $this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
                     
                 }
             

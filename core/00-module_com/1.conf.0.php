@@ -114,10 +114,10 @@ public function pdf($file,$page){
 // notification fenetre -> comme MSN
 public function notify($chaine) {
 	
-	system("espeak  \"Look screen\" ");	
+	//system("espeak  \"Look screen\" ");	
 	//system("flite -t '$chaine' 2> /dev/null");
 	$this->rouge($chaine);
-	system("notify-send -i $this->dir_img/hacker.png \"$chaine\"");
+	//system("notify-send -i $this->dir_img/hacker.png \"$chaine\"");
 	sleep(1);	
 	//system("zenity --notification --text '$chaine' --window-icon=$this->dir_img/hacker.png 2> /dev/null");
 }

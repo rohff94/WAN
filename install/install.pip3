@@ -15,7 +15,6 @@ distorm3
 django
 flask
 future
-gdbgui
 gprof2dot
 gvm-tools
 ibm-db

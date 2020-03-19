@@ -72,7 +72,7 @@ class PORT extends IP{
 	
 
 		
-	public function port2dot():string{
+	public function port2dot(){
 		$this->ssTitre(__FUNCTION__);
 		$file_output = "$this->dir_tmp/$this->ip.$this->port.".__FUNCTION__.".dot";
 		$color_port = "orange";$color_arrow = "darkorange";
@@ -153,7 +153,7 @@ class PORT extends IP{
 	    else {$this->log2error("No End Tag nmaprun",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");return FALSE ;}
 	}
 	
-	public function port2version():string{
+	public function port2version(){
 	    //$this->ssTitre(__FUNCTION__);
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->port2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) {
@@ -274,7 +274,7 @@ class PORT extends IP{
 	
 
 	
-	public function port4pentest():string{
+	public function port4pentest(){
 	    
 	    $result = "";
 	    $this->gtitre(__FUNCTION__);
@@ -595,37 +595,37 @@ Cisco / Network 	255
 	
 
 
-	public function port2severity(string $severity):string{
+	public function port2severity(string $severity){
 	    $this->ssTitre(__FUNCTION__);
 	    $severity = trim($severity);
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->port2where",$severity);
 	}
 	
-	public function port2refs(string $severity):string{
+	public function port2refs(string $severity){
 	    $this->ssTitre(__FUNCTION__);
 	    $severity = trim($severity);
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->port2where",$severity);
 	}
 	
-	public function port2confirmed(string $severity):string{
+	public function port2confirmed(string $severity){
 	    $this->ssTitre(__FUNCTION__);
 	    $severity = trim($severity);
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->port2where",$severity);
 	}
 	
-	public function port2resolution(string $severity):string{
+	public function port2resolution(string $severity){
 	    $this->ssTitre(__FUNCTION__);
 	    $severity = trim($severity);
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->port2where",$severity);
 	}
 	
-	public function port2status(string $severity):string{
+	public function port2status(string $severity){
 	    $this->ssTitre(__FUNCTION__);
 	    $severity = trim($severity);
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->port2where",$severity);
 	}
 	
-	public function port2policy_violation(string $severity):string{
+	public function port2policy_violation(string $severity){
 	    $this->ssTitre(__FUNCTION__);
 	    $severity = trim($severity);
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->port2where",$severity);

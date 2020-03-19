@@ -27,8 +27,8 @@ class CIDR extends ETH{
             
             $sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->cidr2where ";
             $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_r\"  2>/dev/null \n";
-            //$this->requette($query);
-            $this->cidr2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
+            $this->cidr2id = $this->req_ret_str($query);
+            //$this->cidr2id = $this->mysql_ressource->query($sql_r)->fetch_assoc()['id'];
             
             
         }
@@ -38,15 +38,13 @@ class CIDR extends ETH{
     
     
     
-    public function cidr2ns(): string{
+    public function cidr2ns(){
         $this->titre("Searching Hostname with resolution DNS on $this->cidr");
         $result = "";
         
         $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->cidr2where AND ".__FUNCTION__." IS NOT NULL";
         if ($this->checkBD($sql_r_1) ) {
-            $cidr2ns =  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->cidr2where));
-            echo $cidr2ns;
-            return $cidr2ns;
+            return   base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->cidr2where));
         }
         else {
             $result = $this->cidr2scan4nmap($this->cidr,$this->eth);
@@ -58,7 +56,7 @@ class CIDR extends ETH{
     
     
     
-    public function cidr2live(): string{
+    public function cidr2live(){
         $this->titre(__FUNCTION__);
         $result = "";
         $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->cidr2where AND ".__FUNCTION__." IS NOT NULL";
@@ -73,7 +71,7 @@ class CIDR extends ETH{
     }
     
     
-    public function cidr2owner(): string{
+    public function cidr2owner(){
         $this->titre(__FUNCTION__);
         $result = "";
         $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->cidr2where AND ".__FUNCTION__." IS NOT NULL";
@@ -87,7 +85,7 @@ class CIDR extends ETH{
     }
     
     
-    public function cidr2range(): string{
+    public function cidr2range(){
         $this->titre(__FUNCTION__);
         $result = "";
         $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->cidr2where AND ".__FUNCTION__." IS NOT NULL";

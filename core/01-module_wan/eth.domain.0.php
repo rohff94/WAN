@@ -58,13 +58,13 @@ class DOMAIN extends ETH{
 	}
 
 	
-	public function domain2dot4service(): string{
+	public function domain2dot4service(){
 	    $this->gtitre(__FUNCTION__);
 	    // twopi 
 	}
 	
 	
-	public function domain2dot(): string{
+	public function domain2dot(){
 	    $this->gtitre(__FUNCTION__);
 	    // twopi 
 	    
@@ -243,7 +243,7 @@ class DOMAIN extends ETH{
 	}
 	
 	
-	public function domain2dot4host(): string{
+	public function domain2dot4host(){
 	    $result = "";
 	    $this->titre(__FUNCTION__);
 	    $dot = "";
@@ -289,13 +289,23 @@ class DOMAIN extends ETH{
 	            $data = "$this->eth $this->domain $ip ip4service FALSE";
 	            $data = $data."\n";
 	            fputs($fp,$data);
+	            $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4service FALSE\" ";
+	            $this->requette($query);
 	        }
 	    }
 	    fclose($fp);
 	    
 	    $this->requette("wc -l  $file_path");$this->pause();
-	    $this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
+	    //$this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
 
+	    foreach ($tab_ips as $ip){
+	        $ip = trim($ip);
+	        if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
+	            $obj_ip = new IP($this->eth, $this->domain, $ip);
+	            $obj_ip->poc($this->flag_poc);
+	            //$obj_ip->ip4service();
+	        }
+	    }
 	}
 	
 	
@@ -335,7 +345,7 @@ class DOMAIN extends ETH{
 		$this->pause();
 	}
 	
-	public function domain2file(): string{
+	public function domain2file(){
 	    $this->titre(__FUNCTION__);
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->domain2where AND ".__FUNCTION__." IS NOT NULL";
@@ -367,10 +377,11 @@ class DOMAIN extends ETH{
 	return $tab_hosts;
 	}
 	
-	public function domain2search():string{
+	public function domain2search(){
 	    $this->titre(__FUNCTION__);
 	    $result = "";
 	    $tab_cidr = array();
+	    $tmp = array();
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->domain2where AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->domain2where));
 	    else {
@@ -384,12 +395,13 @@ class DOMAIN extends ETH{
 	    //echo $this->tab($tab_cidr);
 	    $size = count($tmp);
 	    if($size<20){
-	        $dico = $this->domain2dico();echo $dico;$result .= $dico ;$this->pause();
+	        //$dico = $this->domain2dico();echo $dico;     $result .= $dico ;$this->pause();
 	        exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
 	        $size = count($tab_cidr);
 	        if($size<50){
 	    for ($i=0;$i<$size;$i++){
-	        $cidr = $tab_cidr[$i];
+	        $cidr = trim($tab_cidr[$i]);
+	        
 	        if (!empty($cidr)){
                 $obj_cidr = new CIDR($cidr,$this->eth);
                 $result .=	$obj_cidr->cidr2ns();
@@ -416,13 +428,13 @@ class DOMAIN extends ETH{
 		return array_filter($this->req_ret_tab($query));
 	}
 	
-	public function domain2search4web():string{
+	public function domain2search4web(){
 	    $this->titre(__FUNCTION__);
 	    // https://dnsdumpster.com/
 	    // https://www.nmmapper.com/sys/tools/subdomainfinder/
 	    $result = "";
 	    $result .= $this->domain2search4web8hackertarget();$this->pause();
-	    $result .= $this->domain2search4web8spyse();$this->pause();
+	    //$result .= $this->domain2search4web8spyse();$this->pause();
 	    $result .= $this->domain2search4web8netcraft();$this->pause();
 	    $result .= $this->domain2search4web8censys();$this->pause();
 	    return $result ;
@@ -456,7 +468,7 @@ class DOMAIN extends ETH{
 	
 	
 	
-	public function domain2search4sublister():string{
+	public function domain2search4sublister(){
 	    $this->ssTitre(__FUNCTION__);
 		$query = "python3 /opt/sublist3r/sublist3r.py -d $this->domain --no-color  2> /dev/null  | grep -Po -i \"([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|([0-9a-z\-\_\.]{1,}\.$this->domain)\" | sort -u ";
 		return $this->req_ret_str($query);		
@@ -467,7 +479,7 @@ class DOMAIN extends ETH{
 
 	
 	
-	public function domain2file2search4pdf(): string{
+	public function domain2file2search4pdf(){
 	    $result = "";
 	    $this->ssTitre(__FUNCTION__);
 	    $query = "";
@@ -477,7 +489,7 @@ class DOMAIN extends ETH{
 		
 	}
 	
-	public function domain2file2search4doc(): string{
+	public function domain2file2search4doc(){
 	    $result = "";
 	    $this->ssTitre(__FUNCTION__);
 	    $query = "";
@@ -488,7 +500,7 @@ class DOMAIN extends ETH{
 		
 
 
-	public function domain2search4harvest():string{
+	public function domain2search4harvest(){
 	    $this->ssTitre(__FUNCTION__);
 		$query = "python3.8 /opt/theharvester/theHarvester.py -d $this->domain -l 200 -b all -v 2> /dev/null | grep -E \"([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|[0-9a-zA-Z\-_]{1,}\.$this->domain)\"  | sort -u ";
 		return $this->req_ret_str($query);
@@ -498,14 +510,14 @@ class DOMAIN extends ETH{
 
 	
 	
-	public function domain2mail4msf():string{
+	public function domain2mail4msf(){
 	    $this->ssTitre(__FUNCTION__);
 		system("echo  \"db_status\nuse gather/search_email_collector\nset DOMAIN $this->domain\nrun\nexit\n\" > $this->dir_tmp/".__FUNCTION__.".rc");
 		$query = "msfconsole -q -r $this->dir_tmp/".__FUNCTION__.".rc | grep -Po -i \"([0-9a-zA-Z\.\-_]{1,})@$this->domain\" ";
 		return $this->req_ret_str($query);
 	}
 
-	public function domain2mail4harvest():string{
+	public function domain2mail4harvest(){
 	    $this->ssTitre(__FUNCTION__);
 		$file_path = "$this->dir_tmp/$this->domain.search";
 		if(!file_exists($file_path)){
@@ -518,7 +530,7 @@ class DOMAIN extends ETH{
 	}
 
 	
-	public function domain2mail():string{
+	public function domain2mail(){
 	    $this->ssTitre(__FUNCTION__);
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->domain2where AND ".__FUNCTION__." IS NOT NULL";
@@ -537,7 +549,7 @@ class DOMAIN extends ETH{
 	}
 	}
 	
-	public function dns4service(string $dns): string{
+	public function dns4service(string $dns){
 	    $result = "";
 	    $tmp = array();
 	    $dns = trim($dns);
@@ -654,7 +666,7 @@ class DOMAIN extends ETH{
 	
 	
 	
-	public function  domain2ns():string{
+	public function  domain2ns(){
 	    $this->titre(__FUNCTION__);
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->domain2where AND ".__FUNCTION__." IS NOT NULL";
@@ -685,14 +697,14 @@ class DOMAIN extends ETH{
 	}
 	
 
-	public function domain2trace(): string{
+	public function domain2trace(){
 		$this->ssTitre(__FUNCTION__);
 		$query = "dig $this->domain a +trace ";
 		
 		return $this->req2BD(__FUNCTION__,__CLASS__,$this->domain2where,$query);
 	}
 	
-	public function domain2whois(): string{
+	public function domain2whois(){
 		$this->ssTitre(__FUNCTION__);
 		$sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->domain2where AND ".__FUNCTION__." IS NOT NULL";
 		if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->domain2where));
@@ -706,7 +718,7 @@ class DOMAIN extends ETH{
 
 	}
 	
-	public function domain2asn(): string{
+	public function domain2asn(){
 		$this->ssTitre(__FUNCTION__);
 		
 		// https://www.tcpiputils.com/browse/as/33779
@@ -732,7 +744,7 @@ class DOMAIN extends ETH{
 	
 
 	
-	public function domain2dico(): string{
+	public function domain2dico(){
 	    $this->titre(__FUNCTION__);
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->domain2where AND ".__FUNCTION__." IS NOT NULL";

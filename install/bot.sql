@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 21, 2020 at 10:46 PM
+-- Generation Time: Mar 19, 2020 at 10:45 AM
 -- Server version: 5.7.29-0ubuntu0.16.04.1
 -- PHP Version: 7.0.33-0ubuntu0.16.04.12
 
@@ -101,28 +101,31 @@ CREATE TABLE `IP` (
   `ip` varchar(40) NOT NULL,
   `ip2host` varchar(256) DEFAULT NULL,
   `ip2geoip` text,
+  `ip2rootkit` text,
+  `ip2backdoor` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `ip2root` tinyint(1) UNSIGNED DEFAULT '0',
   `ip2shell` tinyint(1) UNSIGNED DEFAULT '0',
   `ip2read` tinyint(1) DEFAULT '0',
   `ip2write` tinyint(1) DEFAULT '0',
-  `ip2backdoor` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-  `ip2rootkit` text,
-  `ip2fw4ack` text,
+  `ip2crack` tinyint(1) UNSIGNED DEFAULT '0',
   `ip2port` text,
+  `ip2fw4ack` text,
   `ip2os4arch` varchar(200) DEFAULT NULL,
   `ip2os` text,
   `ip2auth` text,
-  `ip2crack` text,
   `ip2asn` text,
   `ip2fw` text,
   `ip2protocol` text,
   `ip2icmp` text,
-  `ip2vt` varchar(64) DEFAULT NULL,
   `ip2whois` text,
   `ip2range` text,
   `ip2tracert` text,
   `ip2vhost` text,
   `ip2malw` text,
+  `ip2vt` varchar(64) DEFAULT NULL,
+  `ip4info` tinyint(1) NOT NULL DEFAULT '0',
+  `ip4service` tinyint(1) NOT NULL DEFAULT '0',
+  `ip4pentest` tinyint(1) NOT NULL DEFAULT '0',
   `ladate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
