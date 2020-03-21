@@ -142,8 +142,7 @@ class HOST extends DOMAIN{
                             $data = "$this->eth $this->domain $ip_addr ip4info FALSE";
                             $data = $data."\n";
                             fputs($fp,$data);
-                            $query = "php pentest.php IP \"$this->eth $this->domain $ip_addr ip4info FALSE\" ";
-                            $this->requette($query);
+
                         }
                     }
                     fclose($fp);
@@ -159,6 +158,8 @@ class HOST extends DOMAIN{
                     $this->rouge("response IP LOCAL from DNS SERVER $this->eth:$this->host:$ip");                    
                 }
                 if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
+                    $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4info FALSE\" ";
+                    $this->requette($query);
                     $obj_ip = new IP($this->eth, $this->domain, $ip);
                     $obj_ip->poc($this->flag_poc);
                     $obj_ip->ip2host($this->host);

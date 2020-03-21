@@ -1168,7 +1168,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	            
 	            $tab_open_ports_tcp = $this->ip2tcp4select();
 	            $tab_open_ports_udp = $this->ip2udp4top200();
-	            if(empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4top4000();
+	            if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4top4000();
 
 	        }
 	        $rst_tcp = implode(",",$tab_open_ports_tcp);
@@ -2040,8 +2040,7 @@ public function ip2vhost(){
 	        }
 
 	    }
-	    $this->article("END ".__FUNCTION__.": $this->ip", "=============================================================================");
-	}
+	 }
 
 	
 	

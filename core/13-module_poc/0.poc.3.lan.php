@@ -205,13 +205,11 @@ class poc4lan extends poc4web {
         $ip = "10.60.10.140"; // Matrix1
         $port = "22";
         $protocol = "T";
-        $user_name_created = "guest" ;
-        $user_name_pass = "k1ll0r7n";
-        
-        $login = "";
-        $pass = "";
+        $login = "guest" ;
+        $pass = "k1ll0r7n";
+
         $titre = "";
-        $fonction2exec = "";
+        $fonction2exec = "users";
         $vm = "";
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         
@@ -423,8 +421,15 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
-        $login = "";
-        $pass = "";
+        
+        
+        $ip = "10.60.10.147"; // fowsniff-1
+        $port = "22";
+        $protocol = "T";
+        $login = "baksteen" ;
+        $pass = "S1ck3nBluff+secureshell";
+        
+
         $titre = "";
         $fonction2exec = "";
         $vm = "";

@@ -289,8 +289,7 @@ class DOMAIN extends ETH{
 	            $data = "$this->eth $this->domain $ip ip4service FALSE";
 	            $data = $data."\n";
 	            fputs($fp,$data);
-	            $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4service FALSE\" ";
-	            $this->requette($query);
+
 	        }
 	    }
 	    fclose($fp);
@@ -301,9 +300,11 @@ class DOMAIN extends ETH{
 	    foreach ($tab_ips as $ip){
 	        $ip = trim($ip);
 	        if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
+	            $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4service FALSE\" ";
+	            $this->requette($query);
 	            $obj_ip = new IP($this->eth, $this->domain, $ip);
 	            $obj_ip->poc($this->flag_poc);
-	            //$obj_ip->ip4service();
+	            $obj_ip->ip4service();
 	        }
 	    }
 	}

