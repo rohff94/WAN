@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Mar 19, 2020 at 10:45 AM
+-- Generation Time: Apr 02, 2020 at 01:29 PM
 -- Server version: 5.7.29-0ubuntu0.16.04.1
 -- PHP Version: 7.0.33-0ubuntu0.16.04.12
 
@@ -182,6 +182,8 @@ CREATE TABLE `SERVICE` (
   `service2version` varchar(64) DEFAULT NULL,
   `service2product` varchar(64) DEFAULT NULL,
   `service2extrainfo` varchar(256) DEFAULT NULL,
+  `service2hostname` varchar(256) DEFAULT NULL,
+  `service2conf` int(3) DEFAULT NULL,
   `service2banner` varchar(512) DEFAULT NULL,
   `service2cve` longtext,
   `service2vuln` longtext,
@@ -253,9 +255,13 @@ CREATE TABLE `WEB` (
   `id8port` int(10) NOT NULL,
   `vhost` varchar(64) DEFAULT NULL,
   `web2urls` longtext,
+  `web2dico` longtext,
   `web2enum` text,
   `web2cms` text,
   `web2scan4cli` text,
+  `web4info` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `web4service` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `web4pentest` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `ladate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -352,7 +358,7 @@ ALTER TABLE `WEB`
 -- AUTO_INCREMENT for table `AUTH`
 --
 ALTER TABLE `AUTH`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 --
 -- AUTO_INCREMENT for table `CIDR`
 --
@@ -362,32 +368,32 @@ ALTER TABLE `CIDR`
 -- AUTO_INCREMENT for table `DOMAIN`
 --
 ALTER TABLE `DOMAIN`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `ETH`
 --
 ALTER TABLE `ETH`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `IP`
 --
 ALTER TABLE `IP`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 --
 -- AUTO_INCREMENT for table `LAN`
 --
 ALTER TABLE `LAN`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 --
 -- AUTO_INCREMENT for table `PORT`
 --
 ALTER TABLE `PORT`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 --
 -- AUTO_INCREMENT for table `SERVICE`
 --
 ALTER TABLE `SERVICE`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 --
 -- AUTO_INCREMENT for table `URI`
 --
@@ -397,7 +403,7 @@ ALTER TABLE `URI`
 -- AUTO_INCREMENT for table `USERS`
 --
 ALTER TABLE `USERS`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=535;
 --
 -- AUTO_INCREMENT for table `VULN`
 --
@@ -407,7 +413,7 @@ ALTER TABLE `VULN`
 -- AUTO_INCREMENT for table `WEB`
 --
 ALTER TABLE `WEB`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- Constraints for dumped tables
 --
