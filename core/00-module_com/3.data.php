@@ -113,50 +113,6 @@ public function  req2BD4in($colonne,$table,$where,$result){
 
 
 
-public function  ip4info8db($ip2id){
-    $sql_w = "SELECT ip4info FROM IP WHERE id = $ip2id AND ip4info = 1 ";
-    return $this->checkBD($sql_w);
-}
-
-public function  ip4service8db($ip2id){
-    $sql_w = "SELECT ip4service FROM IP WHERE id = $ip2id AND ip4service = 1 ";
-    return $this->checkBD($sql_w);
-}
-
-
-public function  ip4pentest8db($ip2id){
-    $sql_w = "SELECT ip4pentest FROM IP WHERE id = $ip2id AND ip4pentest = 1 ";
-    return $this->checkBD($sql_w);
-}
-
-public function  ip2backdoor8db($ip2id){
-    $sql_w = "SELECT ip2backdoor FROM IP WHERE id = $ip2id AND ip2backdoor = 1 ";
-    return $this->checkBD($sql_w);
-}
-
-public function  ip2root8db($ip2id){
-    $sql_w = "SELECT ip2root FROM IP WHERE id = $ip2id AND ip2root = 1 ";
-    //return $this->checkBD($sql_w);
-    return FALSE;
-}
-
-
-public function  ip2shell8db($ip2id){
-    $sql_w = "SELECT ip2shell FROM IP WHERE id = $ip2id AND ip2shell = 1 ";
-    return $this->checkBD($sql_w);
-}
-
-public function  ip2read8db($ip2id){
-    $sql_w = "SELECT ip2read FROM IP WHERE id = $ip2id AND ip2read = 1 ";
-    return $this->checkBD($sql_w);
-}
-
-public function  ip2write8db($ip2id){
-    $sql_w = "SELECT ip2write FROM IP WHERE id = $ip2id AND ip2write = 1 ";
-    return $this->checkBD($sql_w);
-}
-
-
 public function  port2root8db($port2id){
     $sql_w = "SELECT port2root FROM PORT WHERE id = $port2id AND port2root IS NOT NULL ";
     if ($this->checkBD($sql_w)!==FALSE){
@@ -190,12 +146,14 @@ public function  port2write8db($port2id){
     return FALSE;
 }
 
-public function checkBD($sql){
-	//echo "$sql;\n";
-	//echo "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"SELECT EXISTS($sql);\"  2>/dev/null \n";
-	//echo "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql;\"  2>/dev/null \n";
-	//$this->pause();
-	
+public function checkBD($sql):bool{
+    
+/*
+	echo "$sql;\n";
+	echo "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"SELECT EXISTS($sql);\"  2>/dev/null \n";
+	echo "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql;\"  2>/dev/null \n";
+	$this->pause();
+	*/
 	$result = $this->mysql_ressource->query("SELECT EXISTS($sql)");
 	if (is_bool($result)) return FALSE ;
 	$row = $result->fetch_array(MYSQLI_NUM);

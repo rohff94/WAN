@@ -7,15 +7,7 @@ class com4net extends com4user {
         parent::__construct();
     }
     
-    
-    public function web2cms($vhost,$port){
-        $this->ssTitre(__FUNCTION__);
-        $vhost = trim($vhost);
-        $port = trim($port);
-        $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --script=\"http-generator\" $vhost -p $port -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/script/@output | strings "; //
-        return $this->req_ret_str($query);
-    }
-    
+
     
     public function cidr2scan($cidr,$eth){
         $this->titre(__FUNCTION__);
@@ -96,7 +88,7 @@ class com4net extends com4user {
     
     public function url2search($user2agent,$url,$filter){
         $this->ssTitre(__FUNCTION__);
-        $query = "wget --user-agent='$user2agent' \"$url\" --timeout=40 --tries=2 --no-check-certificate -qO- $filter 2> /dev/null";
+        $query = "wget --user-agent='$user2agent' \"$url\" --timeout=40 --tries=2 --no-check-certificate -qO- | strings $filter 2> /dev/null";
         return $this->req_ret_str($query);
     }
     

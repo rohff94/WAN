@@ -48,14 +48,11 @@ class check4linux8suid extends check4linux8exploits{
         $lines .= $this->lan2stream4result($data,$this->stream_timeout*3);
         $this->pause();
         $this->note("exec group root file");
-        $data = "find / -perm -o=wx -gid 0 -type f -maxdepth 5 -exec ls -al {} \; 2> /dev/null | grep \".\" ";
+        $data = "find / -perm -o=wx -gid 0 -type f -maxdepth 5 -exec ls -al {} \; 2> /dev/null  ";
         $lines .= $this->lan2stream4result($data,$this->stream_timeout*3);
         $this->pause();
         $this->note("Sticky Bits");
-        $data = "find / -perm -u=s -gid 0 -type f -maxdepth 5 -exec ls -al {} \; 2> /dev/null";
-        $lines .= $this->lan2stream4result($data,$this->stream_timeout*3);
-        $this->pause();
-        $data = "find / -perm -u=s -uid 0 -type f -maxdepth 5 -exec ls -al {} \; 2> /dev/null";
+        $data = "find / -perm -u=s -type f -maxdepth 5 -exec ls -al {} \; 2> /dev/null";
         $lines .= $this->lan2stream4result($data,$this->stream_timeout*3);
         $this->pause();
 
@@ -63,18 +60,22 @@ class check4linux8suid extends check4linux8exploits{
 /home would contains the users present on the system. Also, viewable by checking /etc/passwd.
 Many times, we do want to see if there are any files owned by those users outside their home directory.");
         
+        $query = "echo '".base64_encode($lines)."' | base64 -d $this->filter_file_path  | grep -v \":\" ";
+        $this->requette($query);
+        exec($query,$tmp);
         
-        exec("echo '".base64_encode($lines)."' | base64 -d | awk '{print $9}' | grep -Po \"/[a-z0-9\-_]{1,}/[[:print:]]{1,}\" | grep -v \":\" $this->filter_file_path ",$tmp);
-        $tab_suid = array_reverse(array_unique($tmp));
+        $tab_suid = array_filter(array_unique($tmp));
+        if (!empty($tab_suid)) sort($tab_suid);
         unset($tmp);
         $this->pause();
         
         //$tab_suid = array("/usr/local/bin/whoisme");
         //$tab_suid = array("/usr/bin/bwrap");
-        //$tab_suid = array("/usr/bin/sky");
-        
         
         $this->suids4all($tab_suid);
+        
+
+        
     }
     
 
@@ -97,7 +98,7 @@ Many times, we do want to see if there are any files owned by those users outsid
     
     public function suids4all($tab_suid){
         $this->titre(__FUNCTION__);
-        $this->article("SUID", $this->tab($tab_suid));
+        $this->article("SUID", "\n".$this->tab($tab_suid));
         
         //$tab_suid = array("/home/user5/script","/home/user3/shell","/home/user3/.script.sh");
         //$tab_suid = array("/home/user5/script");

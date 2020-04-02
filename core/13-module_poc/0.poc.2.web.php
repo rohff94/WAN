@@ -12,7 +12,19 @@ class poc4web extends poc4service{
         
     }
     
-
+    
+    public function poc4web2shell8exploit8cms(){ // OK
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.152"; // Lampio
+        $port = "1898";
+        $protocol = "T";
+        $web = "http://$ip:$port/";
+        $obj_web = new WEB($eth, $domain, $web);
+        $obj_web->web4pentest8cms();
+    }
     
     
     public function poc4web4rfi(){

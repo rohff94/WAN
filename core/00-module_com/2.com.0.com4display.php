@@ -67,8 +67,10 @@ class com4display extends INSTALL {
 	    exec($chaine,$tmp);
 	    //$resu = trim($tmp[0]);unset($tmp);
 	    if (empty($tmp)) {$this->note("Empty Result");return $tmp;}
+	    $tmp = array_filter($tmp);
 	    echo $this->tab($tmp);
-	    return array_filter($tmp);
+	    var_dump($tmp);
+	    return $tmp;
 	}
 	
 	public function req_str($stream,$data,$timeout){
@@ -116,6 +118,7 @@ class com4display extends INSTALL {
 	                
 	                
 	        case "stream" :
+	        
 	            
 	            fflush($stream);
 	            //var_dump($stream);

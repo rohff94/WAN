@@ -28,7 +28,7 @@ class root4linux extends tunnel4linux{
         }
         
         
-        $this->root2backdoor();
+        //$this->root2backdoor();
         
         
         return $result;

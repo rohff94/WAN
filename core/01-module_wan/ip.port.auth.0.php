@@ -25,7 +25,7 @@ class AUTH extends PORT{
 	    $result .= $this->ssTitre(__FUNCTION__.": $service://'$username':Dico");
 	    $service = trim($service);
 	    $username = trim($username);
-	    $query_hydra = "hydra -l \"$username\" -P \"$this->dico_password.1000\" $this->ip $service -f -t 12 -e sr -s $this->port -w 5s -c 5 -I 2>/dev/null  | grep -i 'login:'   ";
+	    $query_hydra = "hydra -l \"$username\" -P \"$this->dico_password.1000\" $this->ip $service -f -t 8 -e sr -s $this->port -w 5s -c 5 -I 2>/dev/null  | grep -i 'login:'   ";
 	    $result .= $this->cmd("localhost",$query_hydra);
 	    return  $result.$this->auth2login4hydra($this->req_ret_str($query_hydra));
 	}
@@ -35,7 +35,7 @@ class AUTH extends PORT{
 	    $result .= $this->ssTitre(__FUNCTION__.": $service://'$username':Dico");
 	    $service = trim($service);
 	    $username = trim($username);
-	    $query_medusa = "medusa -u \"$username\" -P \"$this->dico_password.1000\" -h '$this->ip' -M $service -f -t 1 -e s -n $this->port  2>/dev/null | grep '\[SUCCESS\]' ";
+	    $query_medusa = "medusa -u \"$username\" -P \"$this->dico_password.1000\" -h '$this->ip' -M $service -f -t 8 -e s -n $this->port  2>/dev/null | grep '\[SUCCESS\]' ";
 	    $result .= $this->cmd("localhost",$query_medusa);
 	    return  $result.$this->auth2login4medusa($this->req_ret_str($query_medusa));
 	}
@@ -54,7 +54,7 @@ class AUTH extends PORT{
 	    $this->ssTitre(__FUNCTION__.": $service://'$username':'$userpass'");
 	    $service = trim($service);
 	    $username = trim($username);
-	    $query_hydra = "hydra -l \"$username\" -p \"$userpass\" $this->ip $service -f -t 3 -e sr -s $this->port -w 5s 2>/dev/null  | grep -i 'login:'  ";
+	    $query_hydra = "hydra -l \"$username\" -p \"$userpass\" $this->ip $service -f -t 8 -e sr -s $this->port -w 5s 2>/dev/null  | grep -i 'login:'  ";
 	    return  $this->auth2login4hydra($this->req_ret_str($query_hydra));
 	    
 	}
@@ -64,7 +64,7 @@ class AUTH extends PORT{
 	    $result .= $this->ssTitre(__FUNCTION__.": $service://'$username':'$userpass'");
 	    $service = trim($service);
 	    $username = trim($username);
-	    $query_medusa = "medusa -u \"$username\" -p \"$userpass\" -h '$this->ip' -M $service -f -t 1 -e s -n $this->port  2>/dev/null | grep '\[SUCCESS\]' ";
+	    $query_medusa = "medusa -u \"$username\" -p \"$userpass\" -h '$this->ip' -M $service -f -t 8 -e s -n $this->port  2>/dev/null | grep '\[SUCCESS\]' ";
 	    $result .= $this->cmd("localhost",$query_medusa);
 	    return  $result.$this->auth2login4medusa($this->req_ret_str($query_medusa));
 	    
@@ -100,20 +100,24 @@ class AUTH extends PORT{
 	    $user2info = $fonction ;
 	    $user2name = "";
 	    $user2pass = "";
+	    $state = "";
 	    $xml=simplexml_load_string($results_xml);
 	    /*
-	     var_dump($xml);
-	     var_dump($xml->host->ports->port->script->table) ;
-	     echo $xml->host->ports->port->script->table->table->elem[0]['key'];
-	     echo $xml->host->ports->port->script->table->table->elem[1]['key'];
-	     echo $xml->host->ports->port->script->table->table->elem[2]['key'];
+	    //var_dump($xml);$this->pause();
+	    var_dump($xml->host->ports->port->script->table) ;$this->pause();
+	    echo $xml->host->ports->port->script->table->table->elem[0]['key'];$this->pause();
+	    echo $xml->host->ports->port->script->table->table->elem[1]['key'];$this->pause();
+	    echo $xml->host->ports->port->script->table->table->elem[2]['key'];$this->pause();
 	     $this->pause();
-	     */
+	    */
 	    if (isset($xml->host->ports->port->script->table->table)){
 	        foreach ($xml->host->ports->port->script->table->children() as $elem){
-	            if (isset($elem->elem[2])) { if($elem->elem[2]['key']='username') $user2name = $elem->elem[2];}
-	            if (isset($elem->elem[0])) { if($elem->elem[0]['key']='password') $user2pass = $elem->elem[0];}
+	            if (isset($elem->elem[1])) { if($elem->elem[1]['key']=='username') $user2name = $elem->elem[1];}
+	            if (isset($elem->elem[2])) { if($elem->elem[2]['key']=='password') $user2pass = $elem->elem[2];}
+	            if (isset($elem->elem[0])) { if($elem->elem[0]['key']=='state') $state = $elem->elem[0];}
+	            
 	            if (!empty($user2name)){
+	                $this->article("state", $state);
 	                $this->article("USERNAME", $user2name);
 	                $this->article("USERPASS", $user2pass);
 	                $this->article("USERINFO", $user2info);
@@ -121,27 +125,7 @@ class AUTH extends PORT{
 	            }
 	        }
 	    }
-	    
-	    
-	    /*
-	     $user2name = "";
-	     $user2pass = "";
-	     if (isset($xml->host->ports->port->script)){
-	     foreach ($xml->host->ports->port->script->children() as $elem){
-	     if (isset($elem->table->elem[0]))  $user2name = $elem->table->elem[0];
-	     if (isset($elem->table->elem[2]))  $user2pass = $elem->table->elem[2];
-	     if (!empty($user2name)){
-	     $this->article("USERNAME", $user2name);
-	     $this->article("USERPASS", $user2pass);
-	     $this->article("USERINFO", $user2info);
-	     $this->pause();
-	     //$this->yesAUTH($this->port2id, $user2name, $user2pass, NULL, NULL, NULL, NULL, NULL, $user2info, $this->ip2geoip());
-	     }
-	     }
-	     }
-	     
-	     */
-	    
+    
 	}
 	
 	public function auth2login4nmap8tmp($results,$fonction){
@@ -295,7 +279,7 @@ class AUTH extends PORT{
 	    $command = trim($command);
 	    $user2pass = trim($user2pass);
 	    $user2name = trim($user2name);
-	    $result .= $this->ssTitre(__FUNCTION__.": ftp '$user2name':'$user2pass'@$this->ip -p $this->port '$command' ");
+	    $this->ssTitre(__FUNCTION__.": ftp '$user2name':'$user2pass'@$this->ip -p $this->port '$command' ");
 	    $connexion = @ftp_connect($this->ip,$this->port) ;
 	    if(@ftp_login($connexion, $user2name, $user2pass)){
 	    //$result .= ftp_pwd($connexion);
@@ -304,6 +288,7 @@ class AUTH extends PORT{
 	    $result_cmd = $this->chaine(ftp_raw($connexion, $command));
 
 	    $result .= "$result_cmd\n";
+	    echo $result;
 	    ftp_close($connexion);
 	    }
 	    
@@ -533,11 +518,13 @@ class AUTH extends PORT{
 	    $this->ssTitre(__FUNCTION__.": sid '$user2name':'$user2pass'@$this->ip -p $this->port ");
 	    $result = "";
 	    $this->article("SID", $sid);
-	    $check = $this->req_ret_str("rpcclient -c 'lookupsids $sid-500' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep \"NT_STATUS_ACCESS_DENIED\" ");
-	    $check = trim($check);
-	    if (empty($check)){
-	    for ($rid = 1;$rid<=3050;$rid++) $result .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep -v \"NT_STATUS_ACCESS_DENIED\" | grep -v \"*unknown*\" |  sed \"s/(1)/(Local User)/g\" | sed \"s/(2)/(Domain Group)/g\" | sed \"s/(3)/(Domain User)/g\" | sed \"s/(4)/(Local Group)/g\" | grep '(Local User)' | cut -d'\' -f2 | cut -d'(' -f1 ")."\n";
-	    }
+
+	    for ($rid = 0;$rid<=55;$rid++) $result .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep -v \"NT_STATUS_ACCESS_DENIED\" | grep -v \"*unknown*\" |  sed \"s/(1)/(Local User)/g\" | sed \"s/(2)/(Domain Group)/g\" | sed \"s/(3)/(Domain User)/g\" | sed \"s/(4)/(Local Group)/g\" | grep '(Local User)' | cut -d'\' -f2 | cut -d'(' -f1 ")."\n";
+	    for ($rid = 495;$rid<=555;$rid++) $result .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep -v \"NT_STATUS_ACCESS_DENIED\" | grep -v \"*unknown*\" |  sed \"s/(1)/(Local User)/g\" | sed \"s/(2)/(Domain Group)/g\" | sed \"s/(3)/(Domain User)/g\" | sed \"s/(4)/(Local Group)/g\" | grep '(Local User)' | cut -d'\' -f2 | cut -d'(' -f1 ")."\n";
+	    for ($rid = 995;$rid<=1055;$rid++) $result .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep -v \"NT_STATUS_ACCESS_DENIED\" | grep -v \"*unknown*\" |  sed \"s/(1)/(Local User)/g\" | sed \"s/(2)/(Domain Group)/g\" | sed \"s/(3)/(Domain User)/g\" | sed \"s/(4)/(Local Group)/g\" | grep '(Local User)' | cut -d'\' -f2 | cut -d'(' -f1 ")."\n";
+	    
+	    
+	    $result = trim($result);
 	         return $result;                  
 	}
 	

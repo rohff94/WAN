@@ -834,6 +834,21 @@ Can be used to determine where other interesting files might be located");
     
     public function users4root($user_name,$user_pass){
         $this->ssTitre(__FUNCTION__);
+        /*
+#!/usr/bin/expect -f
+#Usage: runas.sh cmd user pass
+
+set cmd [lindex $argv 0];
+set user [lindex $argv 1];
+set pass [lindex $argv 2];
+
+log_user 0
+spawn su -c $cmd - $user
+expect "Password: "
+log_user 1
+send "$pass\r"
+expect "$ "
+         */
         $user_name = trim($user_name);
         $user_pass = trim($user_pass);
         $attacker_ip = $this->ip4addr4target($this->ip);

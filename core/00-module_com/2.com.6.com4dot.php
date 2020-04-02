@@ -273,8 +273,7 @@ class com4dot extends com4bin{
 		fputs($fp,$diagram);
 		fclose($fp);
 		// echo "graph G {Hello--World}" | neato -Tpng >hello2.png
-		// requette("dot -Tjpg $this->dir_tmp/$titre.dot -o $this->dir_tmp/$titre.jpg");
-	//$this->dot2xdot($fileout_path);
+		$this->dot2xdot($fileout_path);
 		$this->dot2png($fileout_path);
 	
 	}

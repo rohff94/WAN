@@ -272,6 +272,13 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
                     $this->req_str($stream,$data,10);
                     return "/tmp/$obj_file->file_name.elf" ;
                     
+                case ($obj_file->file_ext==".cpp") :
+                    $option_compile = trim($obj_file->req_ret_str("grep -i -E \"(gcc |cc |clang |g\+\+ |compile )\" $obj_file->file_path | grep -Po \"(gcc |cc |clang |g\+\+ |compile )[[:print:]]{1,}\" "));
+                    $this->article("OPT G++",$option_compile);
+                    $data = "g++ /tmp/$obj_file->file_name$obj_file->file_ext -o /tmp/$obj_file->file_name.elf $options_compiler && chmod +x /tmp/$obj_file->file_name.elf"; //
+                    $this->req_str($stream,$data,10);
+                    return "/tmp/$obj_file->file_name.elf" ;
+                    
                 case ($obj_file->file_ext==".py") :
                     return "python /tmp/$obj_file->file_name$obj_file->file_ext" ;
                 case ($obj_file->file_ext==".pl") :
@@ -283,7 +290,7 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
                 case ($obj_file->file_ext==".rb") :
                     $query = "cat $obj_file->file_path | grep \"Name\" | cut -d '>' -f2 | cut -d',' -f1";
                     $search_msf = $this->req_ret_str($query);
-                    if(!empty($search_msf)) echo $obj_file->msf2search2info($search_msf);
+                    //if(!empty($search_msf)) echo $obj_file->msf2search2info($search_msf);
                     return "ruby /tmp/$obj_file->file_name$obj_file->file_ext" ;
 
                 case ($obj_file->file_ext=="") :
@@ -1069,17 +1076,32 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
     public function msf2search($cve){
         $this->ssTitre(__FUNCTION__);
         $cve = trim($cve);
-        $query = "msfconsole -q -x \"search type:exploit -S $cve;exit\" | grep -i \"exploit/\" | awk '{print $2}' | grep \"exploit/\" " ;
+        $query = "msfconsole -q -x \"search type:exploit -name $cve;exit\" 2> /dev/null  | grep -i \"exploit/\" | awk '{print $2}' | grep \"exploit/\" " ;
         return $this->req_ret_tab($query);        
     } 
     
 
-    
+    public function msf2cve($cve,$name,$platform,$app){
+        $this->ssTitre(__FUNCTION__);
+        $cve = trim($cve);
+        $name = trim($name);
+        $platform = trim($platform);
+        $app = trim($app);
+        $query = "";
+        $result = array();
+        if ( !empty($cve) && !empty($name) && !empty($platform) && !empty($app) ) $query = "msfconsole -q -x \"search type:exploit cve:$cve name:$name app:$app platform:$platform;exit\" 2> /dev/null  | grep -i \"exploit/\" | awk '{print $2}' | grep \"exploit/\" " ;
+        if ( empty($cve) && !empty($name) && !empty($platform) && !empty($app) ) $query = "msfconsole -q -x \"search type:exploit name:$name app:$app platform:$platform;exit\" 2> /dev/null  | grep -i \"exploit/\" | awk '{print $2}' | grep \"exploit/\" " ;
+        if ( !empty($cve) && empty($name) && !empty($platform) && !empty($app) ) $query = "msfconsole -q -x \"search type:exploit cve:$cve app:$app platform:$platform;exit\" 2> /dev/null  | grep -i \"exploit/\" | awk '{print $2}' | grep \"exploit/\" " ;
+       
+        
+        if (!empty($query)) return $this->req_ret_tab($query);
+        return $result ;
+    } 
 
     
     public function msf2info($file_exploit){
         $this->ssTitre(__FUNCTION__);
-        $query = "msfconsole -q -x 'info $file_exploit;exit'" ;
+        $query = "msfconsole -q -x 'info $file_exploit;exit' 2> /dev/null " ;
         return $this->req_ret_str($query);
     }
     

@@ -42,7 +42,7 @@ class com4user extends com4display {
         $context = "";
         $id_result = trim($id_result);
         $this->article("RAW ID", $id_result);$this->pause();
-        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})egid=(?<egid>[0-9]{1,5})\((?<egid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=([0-9]{1,5})\((?<groups>[[:print:]]{1,})\)([[:space:]]{1})context=(?<context>[[:print:]]{1,})/',$id_result,$results))
+        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})egid=(?<egid>[0-9]{1,5})\((?<egid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})\(([[:print:]]{1,})\)([[:space:]]{1})context=(?<context>[[:print:]]{1,})/',$id_result,$results))
         {
             $this->rouge("Found EUID with context");
 
@@ -72,7 +72,7 @@ class com4user extends com4display {
         }
         
         
-        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=([0-9]{1,5})\((?<groups>[[:print:]]{1,})\)/',$id_result,$results))
+        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})/',$id_result,$results))
         {
             
             $chaine = "Found EUID Without EGID & CONTEXT";
@@ -102,7 +102,7 @@ class com4user extends com4display {
             
         }
         
-        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})egid=(?<egid>[0-9]{1,5})\((?<egid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=([0-9]{1,5})\((?<groups>[[:print:]]{1,})\)/',$id_result,$results))
+        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})egid=(?<egid>[0-9]{1,5})\((?<egid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})/',$id_result,$results))
         {
             
             $chaine = "Found EUID Without context";
@@ -133,7 +133,7 @@ class com4user extends com4display {
         }
         
         
-        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=([0-9]{1,5})\((?<groups>[[:print:]]{1,})\)([[:space:]]{1})context=(?<context>[[:print:]]{1,})/',$id_result,$results))
+        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})([[:space:]]{1})context=(?<context>[[:print:]]{1,})/',$id_result,$results))
         {
             $chaine = "Found UID With context";
             $this->rouge($chaine);
@@ -153,7 +153,7 @@ class com4user extends com4display {
         }
 
         
-        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=([0-9]{1,5})\((?<groups>[[:print:]]{1,})\)/',$id_result,$results))
+        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})/',$id_result,$results))
         {
             $chaine = "Found UID Without context";
             $this->rouge($chaine);

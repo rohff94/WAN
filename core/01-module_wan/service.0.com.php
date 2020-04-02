@@ -9,24 +9,28 @@ class SERVICE extends SERVICE4COM {
     var $service_extrainfo ;
     var $service_banner ;
     var $service2where ;
+    var $service_hostname ;
+    var $service_conf ;
     
     var $path_patator ;
     var $path_ident_user_enum ;
     var $path_OracleScanner ;
     var $path_sidguess ;
 	
-    public function __construct($eth,$domain,$ip,$port,$protocol,$service_name,$service_version,$service_product,$service_extrainfo) {
+    public function __construct($eth,$domain,$ip,$port,$protocol,$service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf) {
             parent::__construct($eth,$domain,$ip,$port,$protocol);	
             $this->service_name = trim($service_name);
             $this->service_version = trim($service_version);
             $this->service_product = trim($service_product);
             $this->service_extrainfo = trim($service_extrainfo);
+            $this->service_hostname = trim($service_hostname); 
+            $this->service_conf = trim($service_conf);
             
-            $this->service2where = "id8port = '$this->port2id' AND service2name = '$this->service_name' AND service2version = '$this->service_version' AND service2product = '$this->service_product' AND service2extrainfo = '$this->service_extrainfo' ";
+            $this->service2where = "id8port = '$this->port2id' AND service2name = '$this->service_name' AND service2version = '$this->service_version' AND service2product = '$this->service_product' AND service2extrainfo = '$this->service_extrainfo' AND service2hostname = '$this->service_hostname' AND service2conf = '$this->service_conf' ";
             
-            $sql_r = "SELECT service2name,service2version,service2product,service2extrainfo FROM ".__CLASS__." WHERE $this->service2where ";
+            $sql_r = "SELECT service2name,service2version,service2product,service2extrainfo,service2hostname,service2conf FROM ".__CLASS__." WHERE $this->service2where ";
             if (!$this->checkBD($sql_r)) {
-                $sql_w = "INSERT  INTO ".__CLASS__." (id8port,service2name,service2version,service2product,service2extrainfo) VALUES ('$this->port2id','$this->service_name','$this->service_version','$this->service_product','$this->service_extrainfo'); ";
+                $sql_w = "INSERT  INTO ".__CLASS__." (id8port,service2name,service2version,service2product,service2extrainfo,service2hostname,service2conf) VALUES ('$this->port2id','$this->service_name','$this->service_version','$this->service_product','$this->service_extrainfo','$this->service_hostname','$this->service_conf'); ";
                 $this->mysql_ressource->query($sql_w);
                 //$this->cmd("localhost","echo '$this->root_passwd' | sudo -S tshark -i $this->eth_wlan  host $this->ip -w $this->dir_tmp/$this->ip.pcap");
                 echo $this->note("Working on SERVICE for the first time");
@@ -62,53 +66,53 @@ class SERVICE extends SERVICE4COM {
 	}
 		
 	public function service2vpn(){
-	    $obj = new service2vpn($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo);
+	    $obj = new service2vpn($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo,$this->service_hostname,$this->service_conf);
 	        $obj->poc($this->flag_poc);
 	    return $obj->service2vpn4exec();
 	}
 	public function service2ssh(){
-	    $obj = new service2ssh($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo);
+	    $obj = new service2ssh($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo,$this->service_hostname,$this->service_conf);
 	        $obj->poc($this->flag_poc);
 	    return $obj->service2ssh4exec();
 	}
 	public function service2ssl(){
-	    $obj = new service2ssl($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo);
+	    $obj = new service2ssl($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo,$this->service_hostname,$this->service_conf);
 	        $obj->poc($this->flag_poc);
 	    return $obj->service2ssl4exec();
 	}
 	public function service2sip(){
-	    $obj = new service2sip($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo);
+	    $obj = new service2sip($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo,$this->service_hostname,$this->service_conf);
 	        $obj->poc($this->flag_poc);
 	    return $obj->service2sip4exec();
 	}
 	public function service2asterisk(){
-	    $obj = new service2asterisk($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo);
+	    $obj = new service2asterisk($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo,$this->service_hostname,$this->service_conf);
 	        $obj->poc($this->flag_poc);
 	    return $obj->service2asterisk4exec();
 	}
 	public function service2ftp(){
-	    $obj = new service2ftp($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo);
+	    $obj = new service2ftp($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo,$this->service_hostname,$this->service_conf);
 	        $obj->poc($this->flag_poc);
 	    return $obj->service2ftp4exec();
 	}
 	public function service2nfs(){
-	    $obj = new service2nfs($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo);
+	    $obj = new service2nfs($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo,$this->service_hostname,$this->service_conf);
 	    $obj->poc($this->flag_poc);
 	    return $obj->service2nfs4exec();
 	}
 	public function service2smtp(){
-	    $obj = new service2smtp($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo);
+	    $obj = new service2smtp($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo,$this->service_hostname,$this->service_conf);
 	        $obj->poc($this->flag_poc);
 	    return $obj->service2smtp4exec();
 	}
 	public function service2smb(){
-	    $obj = new service2smb($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo);
+	    $obj = new service2smb($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo,$this->service_hostname,$this->service_conf);
 	        $obj->poc($this->flag_poc);
 	    return $obj->service2smb4exec();
 	}
 	public function service2exploitdb(){
 	    $this->ssTitre(__FUNCTION__);
-	    $obj = new service2exploitdb($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo);
+	    $obj = new service2exploitdb($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$this->service_name,$this->service_version,$this->service_product,$this->service_extrainfo,$this->service_hostname,$this->service_conf);
 	        $obj->poc($this->flag_poc);
 	    return $obj->service2exploitdb4exec();
 	}
@@ -734,9 +738,8 @@ class SERVICE extends SERVICE4COM {
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
 	    $query = "echo '$this->root_passwd' | sudo -S nmap  -Pn -n --script msrpc-enum.nse -s$this->protocol -p $this->port $this->ip -e $this->eth -oX -";
-	    $result .= $this->cmd("localhost",$query);
-	    $result .= $this->req_ret_str($query);
-	    return $result;
+
+	    return $this->req_ret_str($query);
 	}
 	
 	
@@ -777,6 +780,8 @@ class SERVICE extends SERVICE4COM {
 	    $this->article("VERSION",$this->service_version);
 	    $this->article("PRODUCT",$this->service_product);
 	    $this->article("extrainfo",$this->service_extrainfo);
+	    $this->article("hostname",$this->service_hostname);
+	    $this->article("Indice confiance",$this->service_conf."/10");
 	    $service2banner = trim($this->service2banner());$this->article("Banner",$service2banner);
 	    
 	    

@@ -77,8 +77,8 @@ class PORT extends IP{
 		$file_output = "$this->dir_tmp/$this->ip.$this->port.".__FUNCTION__.".dot";
 		$color_port = "orange";$color_arrow = "darkorange";
 		
-		list($service_name,$service_version,$service_product,$service_extrainfo) = $this->port2version4run($this->port2version());
-		$service = new SERVICE($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$service_name,$service_version,$service_product,$service_extrainfo);
+		list($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf) = $this->port2version4run($this->port2version());
+		$service = new SERVICE($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf);
 		$service->poc($this->flag_poc);
 		list ($date_rec,$service2banner,$service4cve,$port2root,$port2shell,$port2write,$port2read,$tab_whois8lan) = $service->service4info();
 		
@@ -132,6 +132,8 @@ class PORT extends IP{
 	    $service_version = "";
 	    $service_product = "";
 	    $service_extrainfo = "";
+	    $service_hostname = "";
+	    $service_conf = "";
 	    //$this->article("XML", $version_resu_xml);
 	    if(!empty($version_resu_xml)){
 	        if ($this->port2version2check($version_resu_xml)==TRUE){
@@ -140,10 +142,12 @@ class PORT extends IP{
 	    if (isset($xml->host->ports->port->service['version'])) $service_version = $xml->host->ports->port->service['version'];
 	    if (isset($xml->host->ports->port->service['product'])) $service_product = $xml->host->ports->port->service['product'];
 	    if (isset($xml->host->ports->port->service['extrainfo'])) $service_extrainfo = $xml->host->ports->port->service['extrainfo'];
-	}
+	    if (isset($xml->host->ports->port->service['hostname'])) $service_hostname = $xml->host->ports->port->service['hostname'];
+	    if (isset($xml->host->ports->port->service['conf'])) $service_conf = $xml->host->ports->port->service['conf'];
+	        }
 	    }
 	    
-	    return array($service_name,$service_version,$service_product,$service_extrainfo);
+	    return array($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf);
 	}
 	
 	
@@ -288,8 +292,8 @@ class PORT extends IP{
 	    else {
 	        
 	    
-	    list($service_name,$service_version,$service_product,$service_extrainfo) = $this->port2version4run($this->port2version());
-	    $service = new SERVICE($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$service_name,$service_version,$service_product,$service_extrainfo);
+	        list($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf) = $this->port2version4run($this->port2version());
+	        $service = new SERVICE($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf);
 	    $service->poc($this->flag_poc);
 
 	    

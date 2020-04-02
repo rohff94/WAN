@@ -28,10 +28,12 @@ class CONFIG {
     var $dir_install ;
     var $dico_web;
     var $dico_web_file;
+    var $dico_web_directories;
     var $dico_word;
     var $dico_password;
     var $dico_users;
     var $dico_ports;
+    
     
     var $shells;
     var $vm_tmp_win;
@@ -76,6 +78,7 @@ class CONFIG {
 	$this->dir_install = "$this->racine/install";
 	
 	$this->dico_web = "$this->dir_tools/dico/web.dico";
+	$this->dico_web_directories = "$this->dir_tools/dico/web.directories.dico";
 	$this->dico_web_file = "$this->dir_tools/dico/web.file.dico";
 	$this->dico_word = "$this->dir_tools/dico/word.dico";
 	$this->dico_password = "$this->dir_tools/dico/password.dico";
@@ -151,7 +154,7 @@ public function screenshot($seconde){
 	    $display_cli = "\t\t\033[37;41;1;1m".$chaine."\033[0m\n";
 	    $display_xml = "<rouge>$chaine</rouge>\n";
 	    echo $display_cli;
-	    //if ($this->flag_poc) sleep(2);
+	    if ($this->flag_poc) sleep(1);
 	    //return $display_xml;
 	}
 	
@@ -293,6 +296,12 @@ public function screenshot($seconde){
 		return $display;
 	}
 
+	
+	// jaune gras
+	public function jaune($chaine){
+	    echo  "\t\033[33;40;1;1m$chaine\033[0m\n";
+	}
+	
 	// bleu gras
 	public function question($chaine){
 	    $display = "\t\033[31;47;1;5mQuestion:\033[0m \033[30;47;1;5m$chaine\033[0m \n";
@@ -309,7 +318,7 @@ public function screenshot($seconde){
 	public function note($chaine){
 	    $display = "\t\033[33;46;1;5mNote:\033[0m \033[37;46;1;5m$chaine\033[0m \n";//pause();
 		echo  $display;
-		if ($this->flag_poc) sleep(1);
+		//if ($this->flag_poc) sleep(1);
 		//return $display;
 	}
 
