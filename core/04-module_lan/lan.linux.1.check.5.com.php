@@ -9,8 +9,8 @@ class check4linux extends check4linux8jobs{
     
     
     
-    public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context) {
-        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context);
+    public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64) {
+        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64);
         $this->lan2init();
     }
   
@@ -254,8 +254,8 @@ class check4linux extends check4linux8jobs{
             }
         }
         else {
-            //
-            if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}   
+            if (!$this->ip2root8db($this->ip2id)) {$this->misc2keys4add();$this->pause();}
+            //if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}   
             //if (!$this->ip2root8db($this->ip2id)) {$this->misc();$this->pause();}
             //if (!$this->ip2root8db($this->ip2id)) {$this->users();$this->pause();}
             //if (!$this->ip2root8db($this->ip2id)) {$this->jobs();$this->pause();}

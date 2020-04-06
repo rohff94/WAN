@@ -73,125 +73,108 @@ class com4display extends INSTALL {
 	    return $tmp;
 	}
 	
-	public function req_str($stream,$data,$timeout){
-	    if (empty($data)) return "";
-
-	    if(!is_resource($stream)) return $this->req_ret_str($data);
-	    
+	
+	public function stream4result($stream,$data,$timeout){
 	    $result = "";
-	    $stdin = posix_ttyname(STDIN);
-	    $stdout = posix_ttyname(STDOUT);
-	    $stderr = posix_ttyname(STDERR);
-	    
-	    var_dump($stdin);
-	    var_dump($stdout);
-	    var_dump($stderr);
-	    
+	    //$this->ssTitre(__FUNCTION__.": $this->ip");
+	    $data = trim($data);
+	    //var_dump( posix_ttyname(STDIN) );var_dump( posix_ttyname(STDOUT) );
 	    //echo "\n";
 	    $this->article("Stream Type",get_resource_type($stream));
-
-	    $this->article("CMD", $data);
-	    $this->article("TIMEOUT", $timeout);
-	    $data = "echo '".base64_encode($data)."' | base64 -d | sh - ";
 	    
+	    $this->article("TIMEOUT", $timeout."s");
+	    $this->article("DATA", $data);
+	    $data = "echo '".base64_encode($data)."' | base64 -d | bash - "; // 2> /dev/null
+	    $this->article("CMDLINE", $data);
+	    //$this->article("CMD BASE64", $data);
 	    if(is_resource($stream)){
 	        
 	        switch (get_resource_type($stream)){
+	            // https://www.php.net/manual/fr/resource.php
 	            
 	            case "SSH2 Session":
-	                $stream_ssh = ssh2_exec($stream, $data);
-	                //$stream = ssh2_shell($con, 'vt102', null, 80, 24, SSH2_TERM_UNIT_CHARS);
+	                $stream = ssh2_exec($stream, $data);
+	                //$stream = ssh2_shell($stream, 'vt102', null, 80, 24, SSH2_TERM_UNIT_CHARS);
 	                //$stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
-	                // OK
-	                $tmp = '';
-	                stream_set_timeout($stream_ssh, $timeout);
-	                stream_set_blocking($stream_ssh, TRUE);
 	                
-	                $info = stream_get_meta_data($stream_ssh);
-	                var_dump($info);
-	                $tmp = stream_get_contents($stream_ssh);
-	                echo $tmp;
-	                $result .= $tmp ;
+	                
+	                // OK
+	                $tmp = "";
+	                stream_set_blocking($stream, TRUE);
+	                stream_set_timeout($stream, $timeout);
+	                //$status = stream_get_meta_data($stream);
+	                fgets($stream);
+	                $result = "";
+	                $result = @stream_get_contents($stream);
+	                while ( strstr($result, "[sudo] password for ")!==FALSE || strstr($result, "s password:")!==FALSE){
+	                    $chaine = "Asking Password";
+	                    $this->rouge($chaine);
+	                    $data = "";
+	                    fputs($stream, "$data\n");
+	                    $result = @stream_get_contents($stream);
+	                    
+	                }
+	                echo $result;
 	                //$result .= $this->article("CMD", $data); $this->pause();
 	                //  }
 	                break;
 	                
 	                
 	        case "stream" :
-	        
 	            
 	            fflush($stream);
-	            //var_dump($stream);
+	            //var_dump($this->stream);
+	            
 	            fputs($stream, "$data\n");
-	            stream_set_timeout($stream,$timeout);
+	            //stream_socket_sendto($stream, $data,STREAM_OOB,"$this->ip");
+	            fflush($stream);
 	            stream_set_blocking($stream, TRUE);
-	            
-	            $info = stream_get_meta_data($stream);
-	            //var_dump($info);
-	            
+	            stream_set_timeout($stream,$timeout);
 	            //sleep(1);
-	            $result = stream_get_contents($stream);
-	            echo $result;
+	            //$result = fgetss($stream, 9182);
+	            //$fgets = "";$fgets = fgets($stream);$this->rouge($fgets);
+	            fgets($stream);
+	            $result = "";
+	            $result = @stream_get_contents($stream);
+
+	            
+	            
+	            while ( strstr($result, "[sudo] password for ")!==FALSE || strstr($result, "s password:")!==FALSE){
+	                $chaine = "Asking Password";
+	                $this->rouge($chaine);
+	                $data = "";
+	                fputs($stream, "$data\n");
+	                $result = @stream_get_contents($stream);
+	                
+	            }
+	            
+	            $tmp = explode("\n", $result);
+	            array_pop($tmp);
+	            $result = $this->tab($tmp);
+	            
+	            echo $result."\n";
 	            break;
 	            
 	        case "Unknown":
-	            $this->log2error("unknown stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+	            $this->log2error("unknown stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"$this->ip","");
 	            break;
 	            
-	        case "process":
-	            $this->rouge("Process stream");
-	            $stream_o = popen($stream, "w");
-	            var_dump($stream);
-	            fwrite($stream_o, "$data\n");
-	            stream_set_timeout($stream_o,$timeout);
-	            stream_set_blocking($stream_o, TRUE);
-	            
-	            $info = stream_get_meta_data($stream_o);
-	            var_dump($info);
-	            
-	            //sleep(1);
-	            $result = stream_get_contents($stream_o);
-	            echo $result;
-	            break;
-	            $descriptorspec = array(
-	                0 => array("pipe", "r"),  // // stdin est un pipe où le processus va lire
-	                1 => array("pipe", "w"),  // stdout est un pipe où le processus va écrire
-	                2 => array("file", "/tmp/error-output.txt", "a") // stderr est un fichier
-	            );
-	            
-	            $cwd = '.';
-	            $env = array('quelques_options' => '-i');
-	            
-	            $process = proc_open('/bin/sh', $descriptorspec, $pipes, $cwd, $env);
-	            
-	            if (is_resource($process)) {
-	                // $pipes ressemble à :
-	                // 0 => fichier accessible en écriture, connecté à l'entrée standard du processus fils
-	                // 1 => fichier accessible en lecture, connecté à la sortie standard du processus fils
-	                // Toute erreur sera ajoutée au fichier /tmp/error-output.txt
-	                
-	                fwrite($pipes[0], 'ls -al');
-	                fclose($pipes[0]);
-	                
-	                echo stream_get_contents($pipes[1]);
-	                fclose($pipes[1]);
-	                
-	                // Il est important que vous fermiez les pipes avant d'appeler
-	                // proc_close afin d'éviter un verrouillage.
-	                //$return_value = proc_close($process);
-	                
-	                echo "La commande a retourné $return_value\n";
-	            }
+	        default:
+	            $this->log2error("unknown default stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
 	            break;
 	            
-	            
+	        }
+	        
 	    }
 	    
+	    return $result;
 	}
 	
-	return $result;
 	
-	}
+	public function req_str($stream,$data,$timeout){
+	    if (is_resource($stream)) return $this->stream4result($stream, $data, $timeout);
+	    else return $this->req_ret_str($data);
+	    }
 	
 	
 	public function req_ret_str($query){

@@ -16,8 +16,8 @@ class check4linux8misc extends check4linux8enum{
  
      * 
      */
-    public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context) {
-        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context);
+    public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64) {
+        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64);
         $this->created_user_name = "syslog_admin";
         $this->created_user_pass = "admin123456789";
     }
@@ -160,6 +160,10 @@ lxc launch SomeAlias MyMachine
     public function misc(){
         $this->titre(__FUNCTION__);
 
+        
+        if (!$this->ip2root8db($this->ip2id))  $this->misc2keys();$this->pause();
+        return 0;
+        
         if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_sudoers();$this->pause();
         if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_exports();$this->pause();
         if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_shadow();$this->pause();
@@ -257,6 +261,26 @@ lxc launch SomeAlias MyMachine
 
  
     
+    public function misc2keys2authorized_keys_file($authorized_keys_filepath){
+        $this->ssTitre(__FUNCTION__);
+        //===============================================================
+
+            if (!empty($authorized_keys_filepath)){
+                $query = "cat $authorized_keys_filepath";
+                $authorized_keys_str = trim($this->req_ret_str($query));
+                $stream = $this->stream ;
+                $local_username = "";
+                $local_home_user = "";
+                $ip2users = $this->ip2users4passwd();
+                foreach ($ip2users as $remote_username => $remote_userpass)
+                    $this->service4authorized_keys($stream, $authorized_keys_filepath, $authorized_keys_str, $remote_username, $remote_userpass, $local_username, $local_home_user);
+            
+        }
+        //===============================================================
+        
+    }
+    
+    
     public function misc2keys4authorized_keys_file(){
         $this->ssTitre(__FUNCTION__);
         //===============================================================
@@ -269,22 +293,39 @@ lxc launch SomeAlias MyMachine
         $this->pause();
         
         foreach ($public_key_ssh_rsa_file_tab_remote as $authorized_keys_filepath){
-            if (!empty($authorized_keys_filepath)){
-                $query = "cat $authorized_keys_filepath";
-                $authorized_keys_str = trim($this->req_ret_str($query));
-                $stream = $this->stream ;
-                $local_username = "";
-                $local_home_user = "";
-                $ip2users = $this->ip2users4passwd();
-                foreach ($ip2users as $remote_username => $remote_userpass)
-                    $this->service4authorized_keys($stream, $authorized_keys_filepath, $authorized_keys_str, $remote_username, $remote_userpass, $local_username, $local_home_user);
-            }
+           $this->misc2keys2authorized_keys_file($authorized_keys_filepath);
         }
         //===============================================================
         
     }
     
-
+    public function misc2keys4add(){
+        $this->ssTitre(__FUNCTION__);
+        $tab_home = array();
+        $this->note("home user");
+        $data = "ls -l /home/* 2>/dev/null ";
+        $rst_home = $this->lan2stream4result($data,$this->stream_timeout);
+        exec("echo '$rst_home' | grep ':' | cut -d':' -f1 $this->filter_file_path ",$tab_home);
+        if (isset($tab_home[0])){
+            foreach ($tab_home as $home_user){
+                $home_user = trim($home_user);
+                if (!empty($home_user)) $this->misc2keys2add($home_user);
+            }
+        }
+        
+    }
+    
+    public function misc2keys2add($home_user){
+        $this->ssTitre(__FUNCTION__);
+        $this->article("home user",$home_user);
+        $ip2users = $this->ip2users4shell();
+        $authorized_keys_filepath = "";
+        $authorized_keys_str = "";
+        foreach ($ip2users as $remote_username ){
+            $this->service4authorized_keys($this->stream, $authorized_keys_filepath, $authorized_keys_str, $remote_username, "", $remote_username, $home_user);
+        }
+        
+    }
     
     public function misc2keys4info(){
         $this->ssTitre(__FUNCTION__);

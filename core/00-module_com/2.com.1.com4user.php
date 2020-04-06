@@ -30,6 +30,7 @@ class com4user extends com4display {
     public function parse4id($id_result){
         $this->ssTitre(__FUNCTION__);
         $results = array();
+        $id_tst = "";
         $uid = "";
         $uid_name = "";
         $gid = "";
@@ -41,11 +42,16 @@ class com4user extends com4display {
         $groups = "";
         $context = "";
         $id_result = trim($id_result);
-        $this->article("RAW ID", $id_result);$this->pause();
-        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})egid=(?<egid>[0-9]{1,5})\((?<egid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})\(([[:print:]]{1,})\)([[:space:]]{1})context=(?<context>[[:print:]]{1,})/',$id_result,$results))
+        $query = "echo '$id_result'|  grep -Po \"uid=[[:print:]]{1,}$\" ";
+        exec($query,$tmp);
+        if (isset($tmp[0])) $id_tst = $tmp[0];
+        $chaine = "===========================================================================================================";
+        $this->jaune($chaine);
+        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})egid=(?<egid>[0-9]{1,5})\((?<egid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})\(([[:print:]]{1,})\)([[:space:]]{1})context=(?<context>[[:print:]]{1,})/',$id_tst,$results))
         {
+            
+            $this->jaune( $id_tst);          
             $this->rouge("Found EUID with context");
-
             $uid = $results['uid'];
             $this->article("UID",$uid);
             $uid_name = $results['uid_name'];
@@ -53,8 +59,7 @@ class com4user extends com4display {
             $gid = $results['gid'];
             $this->article("GID",$gid);
             $gid_name = $results['gid_name'];
-            $this->article("GID NAME",$gid_name);
-            
+            $this->article("GID NAME",$gid_name);            
             $euid = $results['euid'];
             $this->article("EUID",$euid);
             $euid_name = $results['euid_name'];
@@ -67,14 +72,14 @@ class com4user extends com4display {
             $this->article("GROUPS",$groups);
             $context = $results['context'];
             $this->article("context",$context);
-            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context);
+            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id_tst);
             
         }
         
         
-        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})/',$id_result,$results))
+        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})/',$id_tst,$results))
         {
-            
+            $this->jaune( $id_tst);
             $chaine = "Found EUID Without EGID & CONTEXT";
             $this->rouge($chaine);
             $uid = $results['uid'];
@@ -98,13 +103,13 @@ class com4user extends com4display {
             $this->article("GROUPS",$groups);
             $context = "";
             $this->article("context",$context);
-            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context);
+            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id_tst);
             
         }
         
-        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})egid=(?<egid>[0-9]{1,5})\((?<egid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})/',$id_result,$results))
+        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})egid=(?<egid>[0-9]{1,5})\((?<egid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})/',$id_tst,$results))
         {
-            
+            $this->jaune( $id_tst);
             $chaine = "Found EUID Without context";
             $this->rouge($chaine);
             $uid = $results['uid'];
@@ -128,13 +133,14 @@ class com4user extends com4display {
             $this->article("GROUPS",$groups);
             $context = "";
             $this->article("context",$context);
-            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context);
+            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id_tst);
             
         }
         
         
-        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})([[:space:]]{1})context=(?<context>[[:print:]]{1,})/',$id_result,$results))
+        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})([[:space:]]{1})context=(?<context>[[:print:]]{1,})/',$id_tst,$results))
         {
+            $this->jaune( $id_tst);
             $chaine = "Found UID With context";
             $this->rouge($chaine);
             $uid = $results['uid'];
@@ -149,12 +155,13 @@ class com4user extends com4display {
             $this->article("GROUPS",$groups);
             $context = $results['context'];
             $this->article("context",$context);
-            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context);
+            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id_tst);
         }
 
         
-        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})/',$id_result,$results))
+        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})/',$id_tst,$results))
         {
+            $this->jaune( $id_tst);
             $chaine = "Found UID Without context";
             $this->rouge($chaine);
             $uid = $results['uid'];
@@ -169,12 +176,13 @@ class com4user extends com4display {
             $this->article("GROUPS",$groups);
             $context = "";
             $this->article("context",$context);
-            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context);
+            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id_tst);
         }
         
         
-        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})/',$id_result,$results))
+        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})/',$id_tst,$results))
         {
+            $this->jaune( $id_tst);
             $chaine = "Found UID Without context";
             $this->rouge($chaine);
             $uid = $results['uid'];
@@ -189,7 +197,7 @@ class com4user extends com4display {
             $this->article("GROUPS",$groups);
             $context = "";
             $this->article("context",$context);
-            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context);
+            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id_tst);
         }
         
     }

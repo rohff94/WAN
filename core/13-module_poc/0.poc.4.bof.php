@@ -182,7 +182,8 @@ TJAwpCifrLpx1myEg4kz4OhvWk5cL9qV8SP48T0aBoXHtUZFHa6KBNUpoV8QMhyI
 	        
 	        $data = "id";
 	        $rst_id = $test->stream4result($stream, $data, 10);
-	        list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $test->parse4id($rst_id);
+	        list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $test->parse4id($rst_id);
+	        $id8b64 = base64_encode($id);
 	        $this->article("CREATE Template ID", $template_id);
 	        $this->article("CREATE Template BASE64 ID", $templateB64_id);
 	        $this->article("CREATE Template CMD", $template_cmd);
@@ -193,7 +194,7 @@ TJAwpCifrLpx1myEg4kz4OhvWk5cL9qV8SP48T0aBoXHtUZFHa6KBNUpoV8QMhyI
 	        $this->article("CREATE Template BASE64 SHELL", $templateB64_shell);
 	        
 	        $user_name_pass = "";
-	        $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$uid,$uid_name,$gid,$gid_name,$context,$user_name_pass);
+	        $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64,$user_name_pass);
 	        $obj_lan->poc($test->flag_poc);
 	        
 	        
