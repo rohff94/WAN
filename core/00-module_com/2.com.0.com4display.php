@@ -95,64 +95,22 @@ class com4display extends INSTALL {
 	            case "SSH2 Session":
 	                $stream = ssh2_exec($stream, $data);
 	                //$stream = ssh2_shell($stream, 'vt102', null, 80, 24, SSH2_TERM_UNIT_CHARS);
-	                //$stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
-	                
-	                
-	                // OK
-	                $tmp = "";
+	                //$stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);	                
 	                stream_set_blocking($stream, TRUE);
 	                stream_set_timeout($stream, $timeout);
 	                //$status = stream_get_meta_data($stream);
-	                fgets($stream);
-	                $result = "";
-	                $result = @stream_get_contents($stream);
-	                while ( strstr($result, "[sudo] password for ")!==FALSE || strstr($result, "s password:")!==FALSE){
-	                    $chaine = "Asking Password";
-	                    $this->rouge($chaine);
-	                    $data = "";
-	                    fputs($stream, "$data\n");
-	                    $result = @stream_get_contents($stream);
-	                    
-	                }
-	                echo $result;
-	                //$result .= $this->article("CMD", $data); $this->pause();
-	                //  }
+	                $result = $this->stream2norme($stream);
 	                break;
 	                
 	                
-	        case "stream" :
-	            
+	        case "stream" :	            
 	            fflush($stream);
 	            //var_dump($this->stream);
-	            
 	            fputs($stream, "$data\n");
-	            //stream_socket_sendto($stream, $data,STREAM_OOB,"$this->ip");
 	            fflush($stream);
 	            stream_set_blocking($stream, TRUE);
 	            stream_set_timeout($stream,$timeout);
-	            //sleep(1);
-	            //$result = fgetss($stream, 9182);
-	            //$fgets = "";$fgets = fgets($stream);$this->rouge($fgets);
-	            fgets($stream);
-	            $result = "";
-	            $result = @stream_get_contents($stream);
-
-	            
-	            
-	            while ( strstr($result, "[sudo] password for ")!==FALSE || strstr($result, "s password:")!==FALSE){
-	                $chaine = "Asking Password";
-	                $this->rouge($chaine);
-	                $data = "";
-	                fputs($stream, "$data\n");
-	                $result = @stream_get_contents($stream);
-	                
-	            }
-	            
-	            $tmp = explode("\n", $result);
-	            array_pop($tmp);
-	            $result = $this->tab($tmp);
-	            
-	            echo $result."\n";
+	            $result = $this->stream2norme($stream);
 	            break;
 	            
 	        case "Unknown":
@@ -170,6 +128,30 @@ class com4display extends INSTALL {
 	    return $result;
 	}
 	
+	public function stream2norme($stream){
+	    $this->ssTitre(__FUNCTION__);
+	    fgets($stream);
+	    $result = "";
+	    $result = @stream_get_contents($stream);
+	    
+	    
+	    // "must be run from a terminal"
+	    while ( strstr($result, "[sudo] password for ")!==FALSE || strstr($result, "s password:")!==FALSE){
+	        $chaine = "Asking Password";
+	        $this->rouge($chaine);
+	        $data = "";
+	        fputs($stream, "$data\n");
+	        $result = @stream_get_contents($stream);
+	        
+	    }
+	    
+	    $tmp = explode("\n", $result);
+	    array_pop($tmp);
+	    $result = $this->tab($tmp);
+	    
+	    echo $result."\n";
+	    return $result;
+	}
 	
 	public function req_str($stream,$data,$timeout){
 	    if (is_resource($stream)) return $this->stream4result($stream, $data, $timeout);

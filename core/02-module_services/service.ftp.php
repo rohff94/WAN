@@ -18,7 +18,8 @@ class service2ftp extends SERVICE {
 
         $this->titre(__FUNCTION__);
         
-        /*
+        return $this->ftp2pentest("matt", "cheese");
+        
            $user2name = "user_doesnt_exist";
             $user2pass = "pass_doesnt_exist" ; 
             $query_medusa = "medusa -u \"$user2name\" -p \"$user2pass\" -h '$this->ip' -M ftp -f -t 1 -e s -n $this->port  2>/dev/null | grep '\[SUCCESS\]' ";
@@ -59,13 +60,12 @@ class service2ftp extends SERVICE {
                 $result .= $this->port2auth4dico4medusa("ftp",$user2name_shell);
             }
                         
-            */
+            
             $users_passwd = $this->ip2users4passwd();
             foreach ($users_passwd as $user2name => $user2pass){
                 if (!empty($user2name)){
                     $check = $this->auth2login_ftp4exec($user2name, $user2pass, "help");
                     $this->ftp2pentest($user2name, $user2pass);
-                    exit();
                     
                 }
             }

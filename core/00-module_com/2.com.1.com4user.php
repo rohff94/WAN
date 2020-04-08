@@ -26,6 +26,22 @@ class com4user extends com4display {
     }
     
     
+    function exec_parallel($cmd1, $cmd2, $time) {
+        $cmd1 = base64_encode($cmd1);
+        $cmd2 = base64_encode($cmd2);
+        
+        $filename = "/tmp/exec_para";
+        if (!file_exists($filename)) $this->requette("gcc $this->dir_c/exec_para.c -o $filename");
+        $this->requette("$filename $cmd1 $cmd2 $time");
+    }
+    
+    function exec_parallel_proc($cmd1, $cmd2, $time) {
+        $cmd1 = base64_encode($cmd1);
+        $cmd2 = base64_encode($cmd2);
+        $query = "php parallel_proc.php '$cmd1' '$cmd2' $time ";
+        system ( $query );
+    }
+    
    
     public function parse4id($id_result){
         $this->ssTitre(__FUNCTION__);
@@ -75,37 +91,7 @@ class com4user extends com4display {
             return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id_tst);
             
         }
-        
-        
-        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})/',$id_tst,$results))
-        {
-            $this->jaune( $id_tst);
-            $chaine = "Found EUID Without EGID & CONTEXT";
-            $this->rouge($chaine);
-            $uid = $results['uid'];
-            $this->article("UID",$uid);
-            $uid_name = $results['uid_name'];
-            $this->article("UID NAME",$uid_name);
-            $gid = $results['gid'];
-            $this->article("GID",$gid);
-            $gid_name = $results['gid_name'];
-            $this->article("GID NAME",$gid_name);
-            
-            $euid = $results['euid'];
-            $this->article("EUID",$euid);
-            $euid_name = $results['euid_name'];
-            $this->article("EUID NAME",$euid_name);
-            $egid = "";
-            $this->article("EGID",$egid);
-            $egid_name = "";
-            $this->article("EGID NAME",$egid_name);
-            $groups = $results['groups'];
-            $this->article("GROUPS",$groups);
-            $context = "";
-            $this->article("context",$context);
-            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id_tst);
-            
-        }
+
         
         if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})egid=(?<egid>[0-9]{1,5})\((?<egid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})/',$id_tst,$results))
         {
@@ -200,6 +186,38 @@ class com4user extends com4display {
             return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id_tst);
         }
         
+        
+        
+        
+        if (preg_match('/uid=(?<uid>[0-9]{1,5})\((?<uid_name>[[:print:]]{1,})\)([[:space:]]{1})gid=(?<gid>[0-9]{1,5})\((?<gid_name>[[:print:]]{1,})\)([[:space:]]{1})euid=(?<euid>[0-9]{1,5})\((?<euid_name>[[:print:]]{1,})\)([[:space:]]{1})groups=(?<groups>[0-9]{1,5})([[:print:]]{1,})/',$id_tst,$results))
+        {
+            $this->jaune( $id_tst);
+            $chaine = "Found EUID Without EGID & CONTEXT";
+            $this->rouge($chaine);
+            $uid = $results['uid'];
+            $this->article("UID",$uid);
+            $uid_name = $results['uid_name'];
+            $this->article("UID NAME",$uid_name);
+            $gid = $results['gid'];
+            $this->article("GID",$gid);
+            $gid_name = $results['gid_name'];
+            $this->article("GID NAME",$gid_name);
+            
+            $euid = $results['euid'];
+            $this->article("EUID",$euid);
+            $euid_name = $results['euid_name'];
+            $this->article("EUID NAME",$euid_name);
+            $egid = "";
+            $this->article("EGID",$egid);
+            $egid_name = "";
+            $this->article("EGID NAME",$egid_name);
+            $groups = $results['groups'];
+            $this->article("GROUPS",$groups);
+            $context = "";
+            $this->article("context",$context);
+            return array($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id_tst);
+            
+        }
     }
     
     

