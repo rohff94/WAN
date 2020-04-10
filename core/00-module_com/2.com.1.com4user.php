@@ -14,6 +14,17 @@ class com4user extends com4display {
         
     }
     
+    public function salt2check8password($salt,$password):bool{
+        $this->ssTitre(__FUNCTION__);
+        print_r( password_get_info( $salt ) );
+        if (password_verify($password, $salt)) {
+            $this->rouge('Password is valid!');
+            return TRUE;
+        } else {
+            $this->rouge('Invalid password.');
+            return FALSE;
+        }
+    }
     
     public function keypriv2pem($private_key_file,$private_key_passwd){
         $query = "file $private_key_file";
@@ -35,12 +46,7 @@ class com4user extends com4display {
         $this->requette("$filename $cmd1 $cmd2 $time");
     }
     
-    function exec_parallel_proc($cmd1, $cmd2, $time) {
-        $cmd1 = base64_encode($cmd1);
-        $cmd2 = base64_encode($cmd2);
-        $query = "php parallel_proc.php '$cmd1' '$cmd2' $time ";
-        system ( $query );
-    }
+
     
    
     public function parse4id($id_result){

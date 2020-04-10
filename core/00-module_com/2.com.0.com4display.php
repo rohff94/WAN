@@ -136,7 +136,8 @@ class com4display extends INSTALL {
 	    
 	    
 	    // "must be run from a terminal"
-	    while ( strstr($result, "[sudo] password for ")!==FALSE || strstr($result, "s password:")!==FALSE){
+/*
+ 	    while ( strstr($result, "[sudo] password for ")!==FALSE || strstr($result, "s password:")!==FALSE){
 	        $chaine = "Asking Password";
 	        $this->rouge($chaine);
 	        $data = "";
@@ -144,6 +145,7 @@ class com4display extends INSTALL {
 	        $result = @stream_get_contents($stream);
 	        
 	    }
+ */
 	    
 	    $tmp = explode("\n", $result);
 	    array_pop($tmp);

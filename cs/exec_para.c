@@ -11,14 +11,15 @@ int main(int argc, char**argv) {
 	char query2[2048];
 	char command1[2048];
 	char command2[2048];
+
 	char* time2sleep;
         int laps ;
 
 if (argc != 4) {
-	printf("\033[01;31m Usage: %s cmd1 cmd2 time2sleep \033[0m\n",argv [0]);
+	printf("\t\t\033[37;41;1;1m Usage: %s cmd1 cmd2 time2sleep \033[0m\n",argv [0]);
 	exit ( 0 );
 }
-  printf("I am process %d. My PPID: %d\n", getpid(), getppid()); 
+  printf("\t\033[37;45;1;7m I am process %d. My PPID: %d \033[0m\n", getpid(), getppid());
 
   
   cmd1 = argv[1] ;
@@ -31,7 +32,7 @@ if (argc != 4) {
 
   sprintf(query1,"echo '%s' | base64 -d | bash ",cmd1);
   sprintf(query2,"echo '%s' | base64 -d | bash ",cmd2);
- 
+
   sprintf(command1,"xterm -T 'CMD1' -e '%s' 2> /dev/null",query1);
   sprintf(command2,"xterm -T 'CMD2' -e '%s' 2> /dev/null",query2);
   
@@ -39,14 +40,14 @@ if (argc != 4) {
   pid_t ret_val = fork(); 
   if(ret_val == 0) { 
     //printf("I’m the child process. PID=%d, PPID=%d\n", getpid(), getppid()); 
-    printf("1:%s\n", query1);
+    printf("\t\033[36;40;1;1m 1: \033[0m \033[33;40;1;1m %s \033[0m\n", query1);
     system(query1);
     //system(command1);
 
   } else if (ret_val>0) { 
     sleep(laps);
     //printf("I’m the parent process. PID=%d, PPID=%d\n", getpid(), getppid()); 
-    printf("2:%s\n", query2);
+    printf("\t\033[36;40;1;1m 2: \033[0m \033[33;40;1;1m %s \033[0m\n", query2);
     system(query2);
     //system(command2);
 
@@ -62,7 +63,7 @@ if (argc != 4) {
             }
         }
 
-        printf("Child exited with %d\n", WEXITSTATUS(status));
+        printf("\t\033[37;45;1;7m Child exited with %d \033[0m\n", WEXITSTATUS(status));
 
 
 

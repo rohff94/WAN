@@ -862,8 +862,8 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	                if (preg_match('|^(?<user2name>[a-zA-Z0-9\-\_]{1,}):(?<user2cpw>[[:print:]]{1,}):(?<user2uid>[0-9]{1,}):(?<user2gid>[0-9]{1,}):(?<user2full_name>[[:print:]]{0,}):(?<user2home>[[:print:]]{1,}):(?<user2shell>[[:print:]]{1,})|',$user2tmp,$user))
 	                {
 	                   $this->yesAUTH($this->port2id, $user['user2name'], $user['user2cpw'],$user['user2uid'],$user['user2gid'],$user['user2full_name'],$user['user2home'],$user['user2shell'],"crack etc_passwd and shadow with john ");
-	                   $this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",1);
-	                   $this->ip2auth();
+	                   //$this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",1);
+	                   //$this->ip2auth();
 	                }
 	        }
 
@@ -2169,7 +2169,7 @@ public function ip2vhost(){
 	    $this->ssTitre(__FUNCTION__);
 	    $tab_ip2users4shell = array("root");
 	    $sql_r_2 = "SELECT distinct(user2name) FROM USERS WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' AND user2methode = 'cat /etc/passwd' AND ( from_base64(user2infos) LIKE \"%/bin/sh%\" OR from_base64(user2infos) LIKE \"%/bin/bash%\") ) ORDER by user2name ASC ";
-	    //echo "$sql_r_2\n";
+	    echo "$sql_r_2\n";
 	    $conn = $this->mysql_ressource->query($sql_r_2);
 	    while($row = $conn->fetch_assoc()){
 	        $user2name = trim($row["user2name"]);
@@ -2182,7 +2182,7 @@ public function ip2vhost(){
 	public function ip2users4passwd():array{
 	    $this->ssTitre(__FUNCTION__);
 	    $tab_ip2users4passwd = array();
-	    $sql_r_2 = "SELECT distinct(user2name),user2pass FROM AUTH WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' AND user2pass != '' )  ";
+	    $sql_r_2 = "SELECT distinct(user2name),user2pass FROM AUTH WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' )  ";
 	    echo "$sql_r_2\n";
 	    $conn = $this->mysql_ressource->query($sql_r_2);
 	    $j=1;
@@ -2195,7 +2195,8 @@ public function ip2vhost(){
 	        $j++;
 	        }
 	    }
-	    $tab_ip2users4passwd = array_filter(array_unique($tab_ip2users4passwd));
+	    $tab_ip2users4passwd = array_unique($tab_ip2users4passwd);
+	    var_dump($tab_ip2users4passwd);
 	    return $tab_ip2users4passwd;
 	}
 	

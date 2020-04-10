@@ -8,6 +8,19 @@ class com4net extends com4user {
     }
     
 
+    public function shadow2crack8online($shadow_str){
+        $this->ssTitre(__FUNCTION__);
+        // https://project-rainbowcrack.com/table.htm
+        $result = "";
+        $salt = '$6$JNHsN5GY.jc9CiTg$MjYL9NyNc4GcYS2zNO6PzQNHY2BE/YODBUuqsrpIlpS9LK3xQ6coZs6lonzURBJUDjCRegMHSF5JwCMG1az8k.';
+        $password = "miguel2";
+        
+        $this->salt2check8password($salt,$password);
+
+        return $result;
+    }
+    
+    
     
     public function cidr2scan($cidr,$eth){
         $this->titre(__FUNCTION__);

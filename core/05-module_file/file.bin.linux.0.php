@@ -1821,7 +1821,8 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	    $this->ssTitre(__FUNCTION__);
 	    $file2read = trim($file2read);
 
-	    $via_sudo = "echo '$userpass' | sudo -S ";
+	    if (!empty($userpass)) $via_sudo = "echo '$userpass' | sudo -S ";
+	    else $via_sudo = "sudo ";
 	    $data = "";
 	    $data_sudo = "";
 	    $data_rst = "";
@@ -2019,7 +2020,9 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	    $cmd = trim($cmd);
 
 	    
-	    $via_sudo = "echo '$userpass' | sudo -S ";
+	    if (!empty($userpass)) $via_sudo = "echo '$userpass' | sudo -S ";
+	    else $via_sudo = "sudo ";
+	    
 	    $via_suid = "/bin/bash -p";
 	    $data = "";
 	    $data_sudo = "";

