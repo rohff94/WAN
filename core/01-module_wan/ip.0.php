@@ -2169,7 +2169,7 @@ public function ip2vhost(){
 	    $this->ssTitre(__FUNCTION__);
 	    $tab_ip2users4shell = array("root");
 	    $sql_r_2 = "SELECT distinct(user2name) FROM USERS WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' AND user2methode = 'cat /etc/passwd' AND ( from_base64(user2infos) LIKE \"%/bin/sh%\" OR from_base64(user2infos) LIKE \"%/bin/bash%\") ) ORDER by user2name ASC ";
-	    echo "$sql_r_2\n";
+	    //echo "$sql_r_2\n";
 	    $conn = $this->mysql_ressource->query($sql_r_2);
 	    while($row = $conn->fetch_assoc()){
 	        $user2name = trim($row["user2name"]);
@@ -2183,7 +2183,7 @@ public function ip2vhost(){
 	    $this->ssTitre(__FUNCTION__);
 	    $tab_ip2users4passwd = array();
 	    $sql_r_2 = "SELECT distinct(user2name),user2pass FROM AUTH WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' )  ";
-	    echo "$sql_r_2\n";
+	    //echo "$sql_r_2\n";
 	    $conn = $this->mysql_ressource->query($sql_r_2);
 	    $j=1;
 	    while($row = $conn->fetch_assoc()){	     	        
@@ -2196,7 +2196,7 @@ public function ip2vhost(){
 	        }
 	    }
 	    $tab_ip2users4passwd = array_unique($tab_ip2users4passwd);
-	    var_dump($tab_ip2users4passwd);
+	    //var_dump($tab_ip2users4passwd);
 	    return $tab_ip2users4passwd;
 	}
 	

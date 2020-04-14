@@ -74,7 +74,7 @@ Many times, we do want to see if there are any files owned by those users outsid
         $this->pause();
         
         //$tab_suid = array("/usr/local/bin/whoisme");
-        $tab_suid = array("/scripts/find");
+        //$tab_suid = array("/scripts/find");
         
         $this->suids4all($tab_suid);
         
@@ -119,7 +119,7 @@ Many times, we do want to see if there are any files owned by those users outsid
             $this->pause();
         }
         
-        return 0;
+        
         
         $data = "find /tmp -type f -maxdepth 5 -mmin -60 -exec ls -al {} \; 2> /dev/null";
         $this->lan2stream4result($data,$this->stream_timeout);

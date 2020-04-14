@@ -454,7 +454,7 @@ class SERVICE4COM extends AUTH {
             //stream_set_timeout($stream,60);
             
             $this->article("STDIN",posix_ttyname(STDIN));
-            $this->article("STDOUTt",posix_ttyname(STDOUT));
+            $this->article("STDOUT",posix_ttyname(STDOUT));
             var_dump(stream_get_meta_data($stream));
             
             
@@ -492,7 +492,9 @@ class SERVICE4COM extends AUTH {
 
                     
                     $obj_lan = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64);
+                    var_dump($this->flag_poc);
                     $obj_lan->poc($this->flag_poc);
+                    var_dump($obj_lan->flag_poc);
                     $obj_lan->lan4root();
                     break ;
             }
@@ -1061,7 +1063,7 @@ class SERVICE4COM extends AUTH {
         $id8port = trim($id8port);
         $user2name = trim($user2name);
         $user2methode = trim($user2methode);
-        $user2infos = trim($user2infos);
+        $user2infosB64 = base64_encode($user2infos);
         $user = array();
         
         if (preg_match('/(?<user2name>[[:print:]]{1,})/',$user2name,$user))
@@ -1070,17 +1072,17 @@ class SERVICE4COM extends AUTH {
             
         }
         else return $this->log2error("No User : $user2name",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"IP:$this->ip PORT:$this->port","");
-        $chaine = "YES USERS = $id8port:$user2name:$user2methode:$user2infos";
         
-        $sql_r = "SELECT id8port,user2name,user2methode,user2infos FROM USERS WHERE id8port = $id8port AND user2name = '$user2name' AND user2methode = '$user2methode' AND user2infos = '$user2infos' ";
+        $sql_r = "SELECT id8port,user2name,user2methode,user2infos FROM USERS WHERE id8port = $id8port AND user2name = '$user2name' AND user2methode = '$user2methode' AND user2infos = '$user2infosB64' ";
         //echo "$sql_r\n";
         if (!$this->checkBD($sql_r)) {
-            $sql_w = "INSERT INTO USERS (id8port,user2name,user2methode,user2infos) VALUES ($id8port,'$user2name','$user2methode','".base64_encode($user2infos)."');";
+            $sql_w = "INSERT INTO USERS (id8port,user2name,user2methode,user2infos) VALUES ($id8port,'$user2name','$user2methode','$user2infosB64');";
             $this->mysql_ressource->query($sql_w);
+            $chaine = "YES USERS = $id8port:$user2name:$user2methode:$user2infos";
+            $this->note($chaine) ;
             //$this->notify($chaine);
             //echo "$sql_w\n";$this->pause();
         }
-        return $this->note($chaine) ;
     }
     
 

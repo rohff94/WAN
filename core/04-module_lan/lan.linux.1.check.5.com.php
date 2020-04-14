@@ -236,6 +236,8 @@ class check4linux extends check4linux8jobs{
         fgets(STDIN);
         return $this->checkBD($sql_w); 
     }
+    
+    
     public function lan4root(){
         /*
          https://guide.offsecnewbie.com/privilege-escalation/linux-pe
@@ -257,56 +259,57 @@ class check4linux extends check4linux8jobs{
         $this->pause();
 
         $this->rouge($this->id8str);
-        
-
-
-        
-        
+       
         if ( $this->uid_name==="root" ) {
+            $this->rouge("YES ROOT PAWNED");
+            
             if (!$this->ip2backdoor8db($this->ip2id)) {
                 $obj_root = new root4linux($this->eth, $this->domain, $this->ip, $this->port, $this->protocol, $this->stream, $this->templateB64_id, $this->templateB64_cmd, $this->templateB64_shell, $this->uid, $this->uid_name, $this->gid, $this->gid_name, $this->context, $this->uid_pass);
+                var_dump($this->flag_poc);
+                $obj_root->poc($this->flag_poc);
+                var_dump($obj_root->flag_poc);
                 $obj_root->lan4pentest();$this->pause();               
             }
         }
         else {
-            
+                if (!$this->ip2root8db($this->ip2id)) {$this->misc();$this->pause();}
+                if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}                
                 if (!$this->ip2root8db($this->ip2id)) {$this->users();$this->pause();}
-                
-                //if (!$this->ip2root8db($this->ip2id)) {$this->misc();$this->pause();}
-                //if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}                
-                //if (!$this->ip2root8db($this->ip2id)) {$this->users();$this->pause();}
-                //if (!$this->ip2root8db($this->ip2id)) {$this->jobs();$this->pause();}
-                //if (!$this->ip2root8db($this->ip2id)) {$this->exploits();$this->pause();}
-                $this->lan2done();
+                if (!$this->ip2root8db($this->ip2id)) {$this->jobs();$this->pause();}
+                if (!$this->ip2root8db($this->ip2id)) {$this->exploits();$this->pause();}
+             }
 
-            }
-
-        
-        
-        $this->rouge("Brief");
-        $sql = "select uid_name,from_base64(templateB64_id),from_base64(templateB64_cmd),from_base64(templateB64_shell),ladate FROM LAN where id8port=$this->port2id ORDER BY ladate ASC ;";
-
-        $req = $this->mysql_ressource->query($sql);
-        $chaine = "===========================================================================================================";
-        $this->jaune($chaine);
-        while ($row = $req->fetch_assoc()) {
-            echo "\n";
-            $this->jaune($row['uid_name']);
-            $date = $row['ladate'];
-            $this->article("Date", $date);
-            $this->article("Username", $row['uid_name']);
-            $this->article("ID", $row['from_base64(templateB64_id)']);
-            $this->article("CMD", $row['from_base64(templateB64_cmd)']);
-            $this->article("SHELL", $row['from_base64(templateB64_shell)']);
-            
-        }
-        $this->rouge("END of ".__FUNCTION__);
-        $this->jaune($chaine);
-        
-        $this->pause();
+        $this->lan2brief();
    }
     
    
+   
+   
+   
+   
+   public function lan2brief(){
+       $this->rouge("Brief");
+       $sql = "select uid_name,from_base64(templateB64_id),from_base64(templateB64_cmd),from_base64(templateB64_shell),ladate FROM LAN where id8port=$this->port2id ORDER BY ladate ASC ;";
+       
+       $req = $this->mysql_ressource->query($sql);
+       $chaine = "===========================================================================================================";
+       $this->jaune($chaine);
+       while ($row = $req->fetch_assoc()) {
+           echo "\n";
+           $this->jaune($row['uid_name']);
+           $date = $row['ladate'];
+           $this->article("Date", $date);
+           $this->article("Username", $row['uid_name']);
+           $this->article("ID", $row['from_base64(templateB64_id)']);
+           $this->article("CMD", $row['from_base64(templateB64_cmd)']);
+           $this->article("SHELL", $row['from_base64(templateB64_shell)']);
+           
+       }
+       $this->rouge("END of ".__FUNCTION__);
+       $this->jaune($chaine);
+       
+       $this->pause();
+   }
 
    public function lan2done(){
        $sql = "UPDATE LAN set lan2done = 1 where $this->lan2where";

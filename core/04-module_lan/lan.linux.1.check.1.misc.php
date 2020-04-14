@@ -846,10 +846,11 @@ Can be used to determine where other interesting files might be located");
         $this->titre("Linux Privilege Escalation using Sudo Rights");
         $result = "";
         $this->ssTitre("sudo -l – Prints the commands which we are allowed to run as SUDO ");
-        $data = "sudo -l -U '$user_name' "; // su --login '$user_name'
-        $result .= $this->lan2stream4result($data,$this->stream_timeout*3);
+
         $data = "echo '$user_pass' | sudo -l -S -U '$user_name' "; // su --login '$user_name'
-        $result .=  $this->lan2stream4result($data,$this->stream_timeout*3);
+        $result .=  $this->req_str($this->stream,$data,$this->stream_timeout*3);
+        $data = "sudo -l -U '$user_name' "; // su --login '$user_name'
+        //$result .= $this->req_str($this->stream,$data,$this->stream_timeout*3);
         return $result;
     }
     

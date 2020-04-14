@@ -42,6 +42,26 @@ class FILE extends DATA{
 	
 	
 	}	
+	
+	
+
+	
+	
+	public function crack_ssh2john($file_privkey_path){
+	    /*
+	     python ssh2john.py id_rsa > id_rsa.hash
+	     john id_rsa.hash --wordlist:/usr/share/wordlists/rockyou.txt
+	     */
+	}
+	
+	public function crack_7z2john($file_7z_path){
+	    /*
+	    ./7z2john.pl loot.7z > 7zhash
+john 7zhash --wordlist:/usr/share/wordlists/rockyou.txt
+	     */
+	}
+	
+	
 	public function file_html2search($search) {
 		$this->ssTitre(__FUNCTION__);
 		$query = "wget --no-proxy --user-agent='<?phpinfo()?>' '$this->file_path' | grep '$search'";

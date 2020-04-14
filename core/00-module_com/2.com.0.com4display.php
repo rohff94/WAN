@@ -78,15 +78,15 @@ class com4display extends INSTALL {
 	    $result = "";
 	    //$this->ssTitre(__FUNCTION__.": $this->ip");
 	    $data = trim($data);
-	    //var_dump( posix_ttyname(STDIN) );var_dump( posix_ttyname(STDOUT) );
-	    //echo "\n";
+
+	    
 	    $this->article("Stream Type",get_resource_type($stream));
 	    
 	    $this->article("TIMEOUT", $timeout."s");
 	    $this->article("DATA", $data);
 	    $data = "echo '".base64_encode($data)."' | base64 -d | bash - "; // 2> /dev/null
 	    $this->article("CMDLINE", $data);
-	    //$this->article("CMD BASE64", $data);
+
 	    if(is_resource($stream)){
 	        
 	        switch (get_resource_type($stream)){
@@ -94,8 +94,6 @@ class com4display extends INSTALL {
 	            
 	            case "SSH2 Session":
 	                $stream = ssh2_exec($stream, $data);
-	                //$stream = ssh2_shell($stream, 'vt102', null, 80, 24, SSH2_TERM_UNIT_CHARS);
-	                //$stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);	                
 	                stream_set_blocking($stream, TRUE);
 	                stream_set_timeout($stream, $timeout);
 	                //$status = stream_get_meta_data($stream);
@@ -103,7 +101,9 @@ class com4display extends INSTALL {
 	                break;
 	                
 	                
-	        case "stream" :	            
+	        case "stream" :	 
+
+	            
 	            fflush($stream);
 	            //var_dump($this->stream);
 	            fputs($stream, "$data\n");
@@ -137,7 +137,7 @@ class com4display extends INSTALL {
 	    
 	    // "must be run from a terminal"
 /*
- 	    while ( strstr($result, "[sudo] password for ")!==FALSE || strstr($result, "s password:")!==FALSE){
+ 	    while ( strstr($result, "[sudo] password for ")!==FALSE || strstr($result, "s password:")!==FALSE || strstr($result, "Sorry, try again.")!==FALSE ){
 	        $chaine = "Asking Password";
 	        $this->rouge($chaine);
 	        $data = "";
