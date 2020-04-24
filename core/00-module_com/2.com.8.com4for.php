@@ -411,7 +411,7 @@ class com4for extends com4code{
 	    $this->file_dir = "$this->file_dir/$this->file_name";
 	    if(!file_exists("/opt/volatility/vol.py")) $this->install_for_volatility();
 	    $check = $this->vol2info("-i Profile | grep -Po $profile ");
-	    if(empty($check)) return $this->log2error("Profile $profile DOES NOT EXIST",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+	    if(empty($check)) return $this->log2error("Profile $profile DOES NOT EXIST");
 	    
 	}
 	
@@ -643,7 +643,7 @@ Dead system
 	exec("echo '$cmd' | cut -d ' ' -f1 ",$tmp1);
 	$cmd_left = trim($tmp1[0]);
 	$check = $this->vol2info($cmd_left);
-	if(empty($check)) {$this->log2error("$cmd_left DOES NOT EXIST MAYBE YOU DO NOT HAVE SCRIPT",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");return "";}
+	if(empty($check)) {$this->log2error("$cmd_left DOES NOT EXIST MAYBE YOU DO NOT HAVE SCRIPT");return "";}
 	$file_output = "$this->file_dir/$this->file_name.$cmd_left";
 	  
 	$query = "vol.py --location=file://$this->file_path --profile=$profile $cmd | tee $file_output ";

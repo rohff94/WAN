@@ -32,7 +32,7 @@ class PORT extends IP{
 
 
     public function __construct($eth,$domain,$ip,$port,$protocol) {
-        if(empty($port)) return $this->log2error("EMPTY PORT",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+        if(empty($port)) return $this->log2error("EMPTY PORT");
 
 	// /usr/share/nmap/scripts/
 	    if($this->isIPv4($ip)) parent::__construct($eth,$domain,$ip);
@@ -43,7 +43,7 @@ class PORT extends IP{
 	        $this->port = trim($port);
 	    }
 	    else {
-	        $this->log2error("Error on Port Numer",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+	        $this->log2error("Error on Port Numer");
 	    }
 	    
     
@@ -134,6 +134,7 @@ class PORT extends IP{
 	    $service_extrainfo = "";
 	    $service_hostname = "";
 	    $service_conf = "";
+	    $service_ostype = "";
 	    //$this->article("XML", $version_resu_xml);
 	    if(!empty($version_resu_xml)){
 	        if ($this->port2version2check($version_resu_xml)==TRUE){
@@ -144,17 +145,18 @@ class PORT extends IP{
 	    if (isset($xml->host->ports->port->service['extrainfo'])) $service_extrainfo = $xml->host->ports->port->service['extrainfo'];
 	    if (isset($xml->host->ports->port->service['hostname'])) $service_hostname = $xml->host->ports->port->service['hostname'];
 	    if (isset($xml->host->ports->port->service['conf'])) $service_conf = $xml->host->ports->port->service['conf'];
+	    if (isset($xml->host->ports->port->service['ostype'])) $service_ostype = $xml->host->ports->port->service['ostype'];
 	        }
 	    }
 	    
-	    return array($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf);
+	    return array($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf,$service_ostype);
 	}
 	
 	
 	public function port2version2check(string $xml):bool{
 	    //$this->ssTitre(__FUNCTION__);
 	    if (stristr("</nmaprun>",$xml)===FALSE) return TRUE;
-	    else {$this->log2error("No End Tag nmaprun",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");return FALSE ;}
+	    else {$this->log2error("No End Tag nmaprun");return FALSE ;}
 	}
 	
 	public function port2version(){
@@ -292,14 +294,13 @@ class PORT extends IP{
 	    else {
 	        
 	    
-	        list($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf) = $this->port2version4run($this->port2version());
-	        $service = new SERVICE($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf);
+	        $service = new SERVICE($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,"");
 	    $service->poc($this->flag_poc);
 
 	    
 	    if ($service->protocol==='T') {
 	        if ($service->tcp2open($service->ip, $service->port)===FALSE){
-	            return $this->log2error("Port Not Open, Maybe User Desktop OR Server using redondancy in Cloud",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+	            return $this->log2error("Port Not Open, Maybe User Desktop OR Server using redondancy in Cloud");
 	        }
 	    }
 	    
@@ -386,15 +387,13 @@ class PORT extends IP{
 				    $result .= $service->service2rpc();$this->pause();
 				    $result .= $service->service2nfs();$this->pause();
 	               break ;
-				//case 135 :
-					
+	               
+				case 135 :					
 				case 137 :
-				case 138 :
-				    $result .= $service->service2netbios();$this->pause();
-                    break ;
-                    
+				case 138 :                    
 				case 139 :
 				case 445 :
+				    $result .= $service->service2netbios();$this->pause();
 				    $result .= $service->service2smb();$this->pause();
 					break ;
 

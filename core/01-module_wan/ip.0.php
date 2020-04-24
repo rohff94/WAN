@@ -53,7 +53,7 @@ class IP extends DOMAIN{
 		$this->tab_open_ports_all = array();
 		$this->tab_cve_source = array();
 
-		if (empty($ip)) return $this->log2error("EMPTY IP",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+		if (empty($ip)) return $this->log2error("EMPTY IP");
 		if ( ($this->isIPv4($ip_addr)) || ($this->isIPv6($ip_addr)) ) {
 		    $this->ip = $ip_addr;
 		   }
@@ -70,12 +70,12 @@ class IP extends DOMAIN{
 			else {
 			    var_dump($ip_tmp);
 			    $this->article("IP", $this->ip);
-			    $this->log2error("No IP",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");	
+			    $this->log2error("No IP");	
 			    exit();
 			}
 			
 			if ( ($this->ip ==="127.0.0.1") && ($this->eth !== "lo") ) {
-			    $this->log2error("localhost IP from $this->eth interface",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+			    $this->log2error("localhost IP from $this->eth interface");
 			    exit();
 			}
 		    
@@ -88,7 +88,7 @@ class IP extends DOMAIN{
 		    $this->article("Private IP", $this->ip);
 		    if (strstr($this->eth, "vmnet"!==FALSE)){
 		        $chaine = "Private IP on NO LAN INTERFACE $this->eth";
-		        $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+		        $this->log2error($chaine);
 		        exit();
 		    }
 		  }
@@ -119,7 +119,7 @@ class IP extends DOMAIN{
 		    $ip_wan = $this->ip4net();
 		    if (!$this->isIPv4($ip_wan)) {
 		        $chaine = "Lost Connexion to the net $this->domain:$this->ip";
-		        $this->log2error($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+		        $this->log2error($chaine);
 		        exit();
 		    }		    
 		    }
@@ -349,17 +349,22 @@ class IP extends DOMAIN{
 	
 	
 	
-	public function ip2port4service(string $service){
+	public function ip2ports4service(string $service){
 	    $this->ssTitre("Searching service $service recorded on Database for this IP");
-	    $port = "";
+	    $this->ip4service();
+	    $ports = array();
+
 	    $service = trim($service);
 	    //$this->ip4service();
 	    $sql_r = "SELECT port FROM PORT WHERE id8ip = '$this->ip2id' AND id IN (SELECT id8port FROM SERVICE WHERE service2name LIKE \"%$service%\") ";
 	    $conn = $this->mysql_ressource->query($sql_r);
+	    echo "$sql_r\n";
+	    while ($row = $conn->fetch_assoc()) {
+	        $ports[] = trim($row["port"]);
+	    }
+
 	    
-	    $row = $conn->fetch_assoc();
-	    if (isset($row["port"])) $port = trim($row["port"]);
-	    return $port;
+	    return $ports;
 	}
 	
 	
@@ -447,7 +452,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	    while($row = $conn->fetch_assoc()){
 	        $user2name = trim($row["user2name"]);
 	        $user2pass = trim($row["user2pass"]);
-	        $port_ssh = $this->ip2port4service("ssh");
+	        $ports_ssh = $this->ip2ports4service("ssh");
 	        $creds_ssh_uuid = $this->ip2cve4openvas2creds4ssh_uuid($user2name,$user2pass);
 	        //var_dump($this->ip2cve4openvas2creds4ssh_uuid());  $this->pause();
 	        $result .= $this->article("SSH UUID", $creds_ssh_uuid);
@@ -516,7 +521,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	        $this->ip2cve4openvas2report2result($report_uuid_result_xml);
 	        $this->pause();
 	        if(!empty($check_done)){
-	            $this->log2succes("ALL DONE",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+	            $this->log2succes("ALL DONE");
 	            $this->pause();
 	            
 	            //$this->requette("omp -u rohff -w hacker --delete-task $task_uuid ");
@@ -637,7 +642,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	        $query = "omp -u $this->openvas_login -w $this->openvas_passwd -X \"<create_port_list><name>Open Port List $this->ip</name><comment>Open Ports</comment><port_range>T:".implode(",",$this->tab_open_ports_tcp)." U:".implode(",",$this->tab_open_ports_udp)."</port_range></create_port_list>\" | xmlstarlet sel -t -v /create_port_list_response/@id";
 	        $this->cmd("localhost",$query);
 	        
-	        if( (empty($this->tab_open_ports_tcp)) AND (empty($this->tab_open_ports_udp)) ) return $this->log2error("No PORT open found ",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+	        if( (empty($this->tab_open_ports_tcp)) AND (empty($this->tab_open_ports_udp)) ) return $this->log2error("No PORT open found ");
 	        while ( TRUE )   {
 	            if (!empty($port_list_uuid = $this->ip2cve4openvas2port_list2check())) break;
 	            if (!empty($port_list_uuid = trim($this->req_ret_str($query))) ) break;
@@ -1264,7 +1269,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 512-515,524,540,548,554,563,585,587,591,593,617,623,626,631,636,647,655,689,705,771,783,831,873,875,888,902,910,912,921,969,990,\
 993,995,998-1000,1024-1043,1067,1080,1090,1098-1103,1128-1129,1158,1194,1199,1211,1220,1221,1234,1241,\
 1270,1300,1311,1337,1352,1433-1435,1440,1471,1494,1521,1530,1533,1581-1582,1604,1670,1720,1723,1745,1755,1801,1811,1863,1900,\
-1944,2000-2002,2010,2049,2067,2100,2101,2103,2105,2107,2121,2171-2173,2175,2199,2207,2221-2222,2280,2301,2323,2362,2380-2381,2394,\
+1944,2000-2002,2010,2049,2067,2100,2101,2103,2105,2107,2121,2171-2173,2175,2199,2207,2221-2222,2280,2301,2323,2362,2375,2380-2381,2394,\
 2401,2525,2533,2598,2638,2701,2702,2725,2869,2809,2905,2906,2947,2967,3000,3001,3037,3050,3057,3128,3200,3217,3268,3269,\
 3273,3299,3306,3310,3333,3343,3372,3389,3460,3465,3500,3628,3632,3690,3780,3790,3817,3847,3872,3900,4000-4002,4016,4020,4100,\
 4322,4333,4353,4355,4422,4433,4444-4445,5000,5009,5038,5040,5051,5060-5061,5093,5168,5222,5227,5247,5250,5351,5353,5355,5400,5405,\
@@ -1651,7 +1656,7 @@ as the header options; the TTL changes.");
 	    $this->ip2port();$this->pause();
 	    $port_sum = count($this->tab_open_ports_all);
 	    $this->article("ALL PORT SUM",$port_sum);
-	    if ($port_sum > 50 ) { $this->log2error("HONEYPOT DETECTED",__FILE__,__CLASS__,__FUNCTION__,__LINE__.$this->ip,$this->ip2os());return true ;}
+	    if ($port_sum > 50 ) { $this->log2error("HONEYPOT DETECTED");return true ;}
 	    else return false ;
 	}
 	
@@ -2031,8 +2036,8 @@ public function ip2vhost(){
 	                foreach ($port as $port_num => $protocol)
 	                    if (!empty($port_num)) {
 	                        $obj_port = new PORT($this->eth,$this->domain,$this->ip,$port_num, $protocol);
-	                        list($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf) = $obj_port->port2version4run($obj_port->port2version());
-	                        $obj_service = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip,$obj_port->port, $obj_port->protocol,$service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf);
+	                        $stream = "";
+	                        $obj_service = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip,$obj_port->port, $obj_port->protocol,$stream);
 	                        $obj_service->service4info();
 	                    }
 	            }
@@ -2042,6 +2047,41 @@ public function ip2vhost(){
 	    }
 	 }
 
+	 
+	 public function ip4enum2users(){
+	     $this->titre(__FUNCTION__);
+	     $tab_users = array();
+	     $this->ip2port();
+	     foreach ($this->tab_open_ports_all as $port){
+	         if (!empty($port))  {
+	             foreach ($port as $port_num => $protocol)
+	                 if (!empty($port_num)) {
+	                     $stream = "";
+	                     $obj_service = new SERVICE($this->eth,$this->domain,$this->ip,$port_num, $protocol,$stream);
+	                     //$obj_service->service4info();
+	                     switch ($obj_service->service_name) {
+	                         case "ssh" :
+	                             $obj_service->ssh2enum($this->dico_users);
+	                             break ;
+	                         case "netbios-ssn" :
+	                             // auxiliary/scanner/smb/smb_enumusers
+	                             $obj_service->service2smb4enum2users();
+	                             break ;
+	                         case "smtp" :
+	                             $obj_service->service2smtp2users();
+	                             break ;
+	                         case "snmp" : 
+	                             //auxiliary/scanner/snmp/snmp_enumusers
+	                             break ;
+	                             
+	                     }
+	                 }
+	         }
+	     }
+	     
+	    $tab_users = $this->ip2users();
+	    $this->article("All Users Found", $this->parchment($this->tab($tab_users)));
+	 }
 	
 	
 	public function ip4info2display(){ 
@@ -2100,6 +2140,7 @@ public function ip2vhost(){
 	    $this->gtitre(__FUNCTION__);
 	    if  (!$this->ip4service8db($this->ip2id) ) {
 	        $this->ip4service2display();
+	        $this->ip4enum2users();
 	        $sql_ip = "UPDATE IP SET ip4service=1 WHERE id = $this->ip2id  ";
 	        $this->mysql_ressource->query($sql_ip);
 	    }
@@ -2127,11 +2168,11 @@ public function ip2vhost(){
 	public function ip4pentest2display(){ // OK
 	    echo "=============================================================================\n";
 	    $this->gtitre(__FUNCTION__);
-	    //$this->ip4info();$this->pause();
-	    //$this->ip4service();$this->pause();
-	    //$this->ip2os();$this->pause();
+	    $this->ip4info();$this->pause();
+	    $this->ip4service();$this->pause();
+	    $this->ip2os();$this->pause();
 	    //$this->ip2cve();$this->pause();
-		//$result .=  $this->ip2auth();$this->pause();
+		$this->ip2auth();$this->pause();
 		//$result .=  $this->ip2vuln();$this->pause();
 	    
 	    if(!$this->ip2honey()){
@@ -2143,8 +2184,8 @@ public function ip2vhost(){
 	                        if (!empty($port_num)) {
 	                            $obj_port = new PORT($this->eth,$this->domain,$this->ip,$port_num, $protocol);
 	                            $obj_port->poc($this->flag_poc);
-	                            list($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf) = $obj_port->port2version4run($obj_port->port2version());
-	                            $obj_service = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip,$obj_port->port, $obj_port->protocol,$service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf);
+	                            $stream = "";
+	                            $obj_service = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip,$obj_port->port, $obj_port->protocol,$stream);
 	                            $obj_service->port4pentest();
 	                        }
 	                }

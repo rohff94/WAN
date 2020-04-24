@@ -169,11 +169,12 @@ class AUTH extends PORT{
 	    $sql_r = "SELECT user2name,user2pass FROM AUTH WHERE id8port = $id8port AND user2name= '$user2name' AND user2pass= '$user2passe' ";
 	    //echo "$sql_r\n";
 	    if (!$this->checkBD($sql_r)) {
+	        $this->log2succes($chaine);
 	        $sql_w = "INSERT INTO AUTH (id8port,user2name,user2pass,user2uid,user2gid,user2def,user2home,user2shell,user2info) VALUES ($id8port,'$user2name','$user2passe','$user2uid','$user2gid','$user2def','$user2home','$user2shell','$user2info');";
 	        $this->mysql_ressource->query($sql_w);
 	        echo "$sql_w\n";$this->pause();
 	    }
-	    $this->log2succes($chaine,__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","") ;
+	    $this->log2succes($chaine) ;
 	}
 	
 	

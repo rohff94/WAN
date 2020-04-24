@@ -23,7 +23,7 @@ class HOST extends DOMAIN{
         }
         else {
             $this->requette($query);
-            $this->log2error("Empty Host",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+            $this->log2error("Empty Host");
             exit();
         }
     }

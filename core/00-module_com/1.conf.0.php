@@ -99,15 +99,20 @@ public function pdf($file,$page){
 }
 
 
+public function parchment($chaine){
+    $query = "echo '$chaine' | boxes -d parchment -a c";
+    system($query);
+}
 
 // notification fenetre -> comme MSN
 public function notify($chaine) {
 	
 	//system("espeak  \"Look screen\" ");	
 	//system("flite -t '$chaine' 2> /dev/null");
-	$this->rouge($chaine);
-	//system("notify-send -i $this->dir_img/hacker.png \"$chaine\"");
-	sleep(1);	
+    $this->rouge($chaine);
+	system("notify-send -i $this->dir_img/hacker.png \"$chaine\"");
+    //$query = "echo '".$this->rouge($chaine)."' | boxes -d parchment -a c";
+	//system($query);	sleep(1);	
 	//system("zenity --notification --text '$chaine' --window-icon=$this->dir_img/hacker.png 2> /dev/null");
 }
 
@@ -124,7 +129,9 @@ public function screenshot($seconde){
 	public function start($chaine,$sommaire){
 		system("clear");
 		echo("\n\t\t[#] Title: $chaine\n\t\t[#] Version: 0.8\n\t\t[#] Date: ".date('l jS \of F Y h:i:s A')."\n\t\t[#] Author: Mr. Rafik GUEHRIA\n\t\t[#] Job: Trainer Ethical Hacking.\n\t\t[#] \t( CEH, ECSA, LPT, CHFI, SEC760 )\n\t\t[#] CV: https://www.linkedin.com/in/rguehria/\n\t\t[#] VDO: https://www.youtube.com/user/rof94\n\t\t[#] Website Perso: http://www.pentesting.eu\n\t\t[#] Email Perso: r.guehria@pentesting.eu\n\t\t[#] GitHub: https://github.com/rohff94/WAN.git\n");
-		system("/usr/games/cowsay -f '/usr/share/cowsay/cows/ghostbusters.cow' \"\033[36;1;1m".strtoupper($chaine)."\033[0m\n$sommaire\"");
+		//system("figlet '\033[36;1;1m".strtoupper($chaine)."\033[0m' | /usr/games/cowsay -f '/usr/share/cowsay/cows/ghostbusters.cow' ");
+		//$display = "\n\t\t[#] Title: $chaine\n\t\t[#] Version: 0.8\n\t\t[#] Date: ".date('l jS \of F Y h:i:s A')."\n\t\t[#] Author: Mr. Rafik GUEHRIA\n\t\t[#] Job: Trainer Ethical Hacking.\n\t\t[#] \t( CEH, ECSA, LPT, CHFI, SEC760 )\n\t\t[#] CV: https://www.linkedin.com/in/rguehria/\n\t\t[#] VDO: https://www.youtube.com/user/rof94\n\t\t[#] Website Perso: http://www.pentesting.eu\n\t\t[#] Email Perso: r.guehria@pentesting.eu\n\t\t[#] GitHub: https://github.com/rohff94/WAN.git\n";
+		//system(" /usr/games/cowsay -f '/usr/share/cowsay/cows/ghostbusters.cow' \"$display\" ");
 		echo "\n";
 	}
 
@@ -140,8 +147,10 @@ public function screenshot($seconde){
 	    $display_cli = "\t\t\033[37;41;1;1m".$chaine."\033[0m\n";
 	    $display_xml = "<rouge>$chaine</rouge>\n";
 	    echo $display_cli;
-	    if ($this->flag_poc) sleep(1);
-	    //return $display_xml;
+	    //system("echo '$display_cli' | pv -qL 10 ");
+	    //if ($this->flag_poc) sleep(1);
+	     
+	    //return $display_cli;
 	}
 	
 
@@ -186,9 +195,9 @@ public function screenshot($seconde){
 
 	// Blanc gras sur fond rouge sousligné
 	public function gtitre($chaine){
-	    $display = "\n".system("figlet \"$chaine\" ");
-	    echo $display."\n";
-	    
+	    //$display = "\n".system("figlet \"$chaine\" ");
+	    //echo $display."\n";
+	    system("echo '$chaine' | toilet -f mono12 -F metal -t ");
 	    if ($this->flag_poc) sleep(1);
 		//	echo  "\t\t\t\033[36;40;1;1m".strtoupper($chaine)."\033[0m\n";	    
 	}
@@ -304,6 +313,7 @@ public function screenshot($seconde){
 	public function note($chaine){
 	    $display = "\t\033[33;46;1;5mNote:\033[0m \033[37;46;1;5m$chaine\033[0m \n";//pause();
 		echo  $display;
+
 		//if ($this->flag_poc) sleep(1);
 		//return $display;
 	}

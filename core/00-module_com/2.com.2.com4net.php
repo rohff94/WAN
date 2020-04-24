@@ -175,7 +175,7 @@ class com4net extends com4user {
     
     public function ip2domain($ip){
         $ip = trim($ip);
-        if (empty($ip)) $this->log2error("Empty IP",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+        if (empty($ip)) $this->log2error("Empty IP");
         
         $tab_hosts = $this->ip2host4nslookup($ip);
         if(!empty($tab_hosts)){
@@ -353,7 +353,7 @@ class com4net extends com4user {
             $query = "ip -o route get to $target_ip 2> /dev/null | grep -Po \"src [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"";
             return trim(exec($query));
         }
-        else $this->log2error("$target_ip IS NOT IPv4",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+        else $this->log2error("$target_ip IS NOT IPv4");
     }
     
     public function ip4eth4target($target_ip){
@@ -363,13 +363,13 @@ class com4net extends com4user {
             exec($query,$tmp);
             return trim($tmp[0]);
         }
-        else $this->log2error("$target_ip IS NOT IPv4",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+        else $this->log2error("$target_ip IS NOT IPv4");
     }
     
     public function tcp2open4server($ip,$port){
         $open_server = "cd $this->dir_tmp; python -m SimpleHTTPServer $port "; 
         while (!$this->tcp2open($ip, $port)) {
-            $this->log2error("Port:$port not Open",__FILE__,__CLASS__,__FUNCTION__,__LINE__,"","");
+            $this->log2error("Port:$port not Open");
             $this->cmd("localhost",$open_server );           
             sleep(10);
         }
