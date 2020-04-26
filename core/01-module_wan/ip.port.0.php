@@ -78,7 +78,7 @@ class PORT extends IP{
 		$color_port = "orange";$color_arrow = "darkorange";
 		
 		list($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf) = $this->port2version4run($this->port2version());
-		$service = new SERVICE($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,$service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf);
+		$service = new SERVICE($this->eth,$this->domain,$this->ip,$this->port,$this->protocol);
 		$service->poc($this->flag_poc);
 		list ($date_rec,$service2banner,$service4cve,$port2root,$port2shell,$port2write,$port2read,$tab_whois8lan) = $service->service4info();
 		
@@ -294,7 +294,7 @@ class PORT extends IP{
 	    else {
 	        
 	    
-	        $service = new SERVICE($this->eth,$this->domain,$this->ip,$this->port,$this->protocol,"");
+	        $service = new SERVICE($this->eth,$this->domain,$this->ip,$this->port,$this->protocol);
 	    $service->poc($this->flag_poc);
 
 	    

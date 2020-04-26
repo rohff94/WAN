@@ -105,13 +105,20 @@ class URL extends WEB{
     var $url;
     var $uri_path;
     var $uri_dirname_path;
+    var $url_query ;
+
 	
+
+    
 	public function __construct($eth,$domain,$url) {	
 	    $this->url = trim($url);
 	    if (empty($this->url)) return $this->log2error("EMPTY URL");
 	    parent::__construct($eth,$domain,$url);		
 	    $this->uri_path = parse_url( $this->url, PHP_URL_PATH);
 	    $this->uri_path_dirname = dirname($this->url);
+	    $this->url_query = parse_url( $this->url, PHP_URL_QUERY);
+
+	    
 	    $this->article("URL", $this->url);
 	}
 

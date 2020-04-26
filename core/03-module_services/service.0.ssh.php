@@ -4,8 +4,8 @@
 class service2ssh extends service2snmp {
 
 
-    public function __construct($eth,$domain,$ip,$port,$service_protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$service_protocol,$stream);
+    public function __construct($eth,$domain,$ip,$port,$service_protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$service_protocol);
     }
 
  
@@ -19,7 +19,7 @@ class service2ssh extends service2snmp {
         $users_test = file($dico);
         foreach ($users_test as $user_test){
             $user_test = trim($user_test); 
-           $check_user = trim($this->req_ret_str("python $this->dir_tools/ssh/ssh_enum.py -p $this->port $this->ip $user_test 2> /dev/null | grep 'is a valid username' | sed \"s/is a valid username//g\" "));
+           $check_user = trim(exec("python $this->dir_tools/ssh/ssh_enum.py -p $this->port $this->ip $user_test 2> /dev/null | grep 'is a valid username' | sed \"s/is a valid username//g\" "));
            if (!empty($check_user)) $this->yesUSERS($this->port2id, $check_user, "SSH Enum via openssh less 7.7", "");
         }
     }

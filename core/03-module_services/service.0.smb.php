@@ -61,8 +61,8 @@ class service2smb extends service2sip {
    https://www.hackingarticles.in/smb-penetration-testing-port-445/
    
  */
-    public function __construct($eth,$domain,$ip,$port,$service_protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$service_protocol,$stream);
+    public function __construct($eth,$domain,$ip,$port,$service_protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$service_protocol);
     }
 
     function service2smb2ms08_067_netapi2nmap(){

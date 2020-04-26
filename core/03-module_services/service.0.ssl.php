@@ -4,8 +4,8 @@
 class service2ssl extends service2ssh {
 
 
-    public function __construct($eth,$domain,$ip,$port,$service_protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$service_protocol,$stream);
+    public function __construct($eth,$domain,$ip,$port,$service_protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$service_protocol);
     }
 
 

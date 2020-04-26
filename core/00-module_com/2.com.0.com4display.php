@@ -30,7 +30,7 @@ class com4display extends INSTALL {
 		$this->filter_domain = " | grep -Po -i \"[0-9a-z\_\-]{1,}\.[a-z]{2,5}\"  | tr '[:upper:]' '[:lower:]' | grep -v -E \"(\.png$|\.js$|\.html$|\.css$|\.php$|\.xml$|\.asp$|\.jsp$|\.htm$|\.jpg$|\.jpeg$|\.gif$|\.ico$|this\.)\" | sort -u "; 
 		$this->filter_host = " | grep -i -Po \"([0-9a-z\-\_\.]{0,})([0-9a-z\-\_]{1,})\.[a-z]{2,5}\" | tr '[:upper:]' '[:lower:]' | grep -v -E \"(\.png$|\.js$|\.html$|\.css$|\.php$|\.xml$|\.asp$|\.jsp$|\.htm$|\.jpg$|\.jpeg$|\.gif$|\.ico$|this\.)\" | sort -u ";
 		$this->filter_ip = " | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | sort -u ";
-		$this->stream_timeout = 5 ;
+		$this->stream_timeout = 2 ;
 	}
 
 	public function log2succes($chaine){
@@ -80,9 +80,9 @@ class com4display extends INSTALL {
 	    //var_dump(stream_socket_get_name($stream,TRUE));
 	    
 	}
-	public function stream4result($stream,$data,$timeout){
+	public function stream4result($stream,$data,$timeout,$filter):array{
 	    $result = "";
-	    //$this->ssTitre(__FUNCTION__.": $this->ip");
+	    $tab_rst = array();
 	    $data = trim($data);
 
 	    

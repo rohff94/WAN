@@ -181,7 +181,7 @@ TJAwpCifrLpx1myEg4kz4OhvWk5cL9qV8SP48T0aBoXHtUZFHa6KBNUpoV8QMhyI
 	        $templateB64_cmd = base64_encode($template_cmd);
 	        
 	        $data = "id";
-	        $rst_id = $test->stream4result($stream, $data, 10);
+	        $rst_id = $test->req_str($stream, $data, 10,"");
 	        list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $test->parse4id($rst_id);
 	        $id8b64 = base64_encode($id);
 	        $this->article("CREATE Template ID", $template_id);

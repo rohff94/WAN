@@ -8,8 +8,8 @@ class service2sip extends service2nfs {
      https://github.com/OlivierLaflamme/Cheatsheet-God/blob/master/Cheatsheet_VOIP.txt
      */
 
-    public function __construct($eth,$domain,$ip,$port,$service_protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$service_protocol,$stream);
+    public function __construct($eth,$domain,$ip,$port,$service_protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$service_protocol);
     }
 
 

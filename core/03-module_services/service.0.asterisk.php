@@ -4,13 +4,13 @@
 class service2asterisk extends check4linux {
 
 
-    public function __construct($eth,$domain,$ip,$port,$service_protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$service_protocol,$stream);
+    public function __construct($eth,$domain,$ip,$port,$service_protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$service_protocol);
     }
 
 
 
-public function service2asterisk2auth($user2name){
+public function service2asterisk2auth($stream,$user2name){
     $result = "";
     $result .= $this->ssTitre(__FUNCTION__);
     $users_pass = file("$this->dico_password.1000");
@@ -40,7 +40,7 @@ public function service2asterisk2auth($user2name){
 }
 
 
-public function service2asterisk4exec(){
+public function service2asterisk4exec($stream){
     $result = "";
 
         $result .= $this->ssTitre(__FUNCTION__);
@@ -48,7 +48,7 @@ public function service2asterisk4exec(){
         $users_test = array("root","admin","administrator","guest","user","test","voip");
         foreach ($users_test as $user_test){
             $result .= $this->port2auth4dico4hydra("asterisk",$user_test);
-            $result .=  $this->service2asterisk2auth($user_test);
+            $result .=  $this->service2asterisk2auth($stream,$user_test);
         }
         
         

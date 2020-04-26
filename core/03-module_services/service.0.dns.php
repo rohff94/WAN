@@ -5,8 +5,8 @@
 class service2dns extends service2asterisk {
 
 
-    public function __construct($eth,$domain,$ip,$port,$service_protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$service_protocol,$stream);
+    public function __construct($eth,$domain,$ip,$port,$service_protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$service_protocol);
     }
 
 
@@ -157,21 +157,21 @@ public function dns2nsid(){
     return $this->req2BD(__FUNCTION__,__CLASS__,"domain = '$this->domain' AND dns = '$this->dns'",$query);
 }
 
-public function dns4pentest(){ // OK
+public function dns4pentest($stream){ // OK
     $result = "";
     $result .= $this->gtitre(__FUNCTION__);
-    $result .= $this->dns2a();
-    $result .= $this->dns2aaaa();
-    $result .= $this->dns2axfr();
-    $result .= $this->dns2cname();
-    $result .= $this->dns2hinfo();
-    $result .= $this->dns2mx();
-    $result .= $this->dns2nsid();
-    $result .= $this->dns2ptr();
-    $result .= $this->dns2rp();
-    $result .= $this->dns2soa();
-    $result .= $this->dns2srv();
-    $result .= $this->dns2txt();
+    $result .= $this->dns2a($stream);
+    $result .= $this->dns2aaaa($stream);
+    $result .= $this->dns2axfr($stream);
+    $result .= $this->dns2cname($stream);
+    $result .= $this->dns2hinfo($stream);
+    $result .= $this->dns2mx($stream);
+    $result .= $this->dns2nsid($stream);
+    $result .= $this->dns2ptr($stream);
+    $result .= $this->dns2rp($stream);
+    $result .= $this->dns2soa($stream);
+    $result .= $this->dns2srv($stream);
+    $result .= $this->dns2txt($stream);
     return $result;
 }
 

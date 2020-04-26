@@ -9,8 +9,8 @@ class check4linux extends check4linux8jobs{
     
     
     
-    public function __construct($eth,$domain,$ip,$port,$protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream);
+    public function __construct($eth,$domain,$ip,$port,$protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$protocol);
         
     }
   

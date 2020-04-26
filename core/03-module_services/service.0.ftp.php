@@ -4,8 +4,8 @@
 class service2ftp extends service2exploitdb {
 
 
-    public function __construct($eth,$domain,$ip,$port,$service_protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$service_protocol,$stream);
+    public function __construct($eth,$domain,$ip,$port,$service_protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$service_protocol);
     }
 
     // https://www.jpsecnetworks.com/week-8-oscp-preparation-post-exploitation/

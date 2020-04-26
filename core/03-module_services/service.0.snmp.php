@@ -4,8 +4,8 @@
 class service2snmp extends service2smtp {
 
 
-    public function __construct($eth,$domain,$ip,$port,$service_protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$service_protocol,$stream);
+    public function __construct($eth,$domain,$ip,$port,$service_protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$service_protocol);
     }
 /*
  auxiliary/scanner/snmp/snmp_enum                                                          normal  Yes    SNMP Enumeration Module

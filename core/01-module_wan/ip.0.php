@@ -129,46 +129,7 @@ class IP extends DOMAIN{
     
 	}
 	
-	
-	public function watching(){
-	    $chaine = "Monitors your environment";
-	    $this->rouge($chaine);
-	    if ($this->ip4priv($this->ip)){
-	        $cidr = trim($this->ip2cidr());
-	        $query = "echo '$this->root_passwd' | sudo -S arpwatch -dN -i $this->eth -a -n $cidr.0/24";
-	        $this->cmd("localhost", $query);
-	        $query = "echo '$this->root_passwd' | sudo -S nmap -sn --reason $cidr.0/24 -e $this->eth ";
-	        $this->cmd("localhost", $query);
-	        $query = "echo '$this->root_passwd' | sudo -S arp -av -i $this->eth";
-	        $this->cmd("localhost", $query);
-	    }
-	    
-	    $query = "echo '$this->root_passwd' | sudo -S top";
-	    $this->cmd("localhost", $query);
-	    $query = "echo '$this->root_passwd' | sudo -S ps axjf";
-	    $this->cmd("localhost", $query);
-	    $query = "echo '$this->root_passwd' | sudo -S snort -A console -q -c /etc/snort/snort.conf -i $this->eth  'not host $this->ip'";
-	    $this->cmd("localhost", $query);	    
-	    $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=bot";
-	    $this->cmd("localhost", $query);
-	    $query = "cd $this->dir_tmp; php -S $this->ip:$this->port_rfi";
-	    $this->cmd("localhost", $query);
-	    $query = "tail -f /var/log/syslog";
-	    $this->cmd("localhost", $query);
-	    $query = "tail -f /var/log/auth.log";
-	    $this->cmd("localhost", $query);
-	    $query = "tail -f /var/log/kern.log";
-	    $this->cmd("localhost", $query);
-	    $query = "tail -f /var/log/mail.log";
-	    $this->cmd("localhost", $query);
-	    $query = "watch -n 5 -e \"grep -i segfault /var/log/kern.log\"";
-	    $this->cmd("localhost", $query);
-	    $query = "tail -f $this->log_error_path";
-	    $this->cmd("localhost", $query);
-	    $query = "tail -f $this->log_succes_path";
-	    $this->cmd("localhost", $query);
-	}
-	
+
 	public function ip2dot4port(){
 	    $this->ssTitre(__FUNCTION__);
 	    $this->ip2port();
@@ -1279,14 +1240,14 @@ routed halfway around the world) you may want to work with your ISP to investiga
 7777-7778,7787,7800-7801,7878-7879,7890,7902,7980,8000-8001,8008-8009,8014,8020,8023,8028,8030,8050-8051,8080-8082,\
 8085-8088,8090-8091,8095,8098,8101,8118,8161,8180,8205,8222,8300,8303,8333,8400,8443-8444,8503,8642,8686,8701,8787,\
 8799,8800,8812,8834,8880,8888-8890,8899,8901-8903,8980,8999-9005,9010,9050,9080-9081,9084,9090,9099-9100,9111,9152,\
-9160,9200-9201,9256,9300,9389,9390-9391,9443,9495,9500,9711,9788,9809-9815,9855,9875,9910,9991,9999-10001,10008,10021,\
+9160,9200-9201,9256,9300,9389,9390-9391,9443,9495,9500,9711,9788,9809-9815,9855,9875,9910,9991,9999-10002,10008,10021,\
 10050-10051,10080,10098-10099,10162,10202-10203,10443,10616,10628,11000-11001,11099,11211,11234,11333,11460,12000,12174,\
 12203,12221,12345,12346,12397,12401,13013,13364,13500,13838,14000,14330,15000-15001,15200,16000,16102,16959,17185,17200,\
 17300,18881,18980,19300,19810,20000,20010,20031,20034,20101,20111,20171,20222,22222,23472,23791,23943,25000,25025,26000,\
 26122,26256,27000,27015,27017,27374,27888,27900,27960,28222,28784,30000,30718,30821,31001,31099,32764,32913,33000,34205,\
 34443,37337,37718,37777,38080,38292,40007,41025,41080,41523-41524,42424,44444,44334,44818,45230,46823-46824,47001-47002,48080,\
 48899,49152-49159,50000-50004,50013,50050,50500-50504,52302,52869,53413,53770,55553,55555,57399,57772,62078,62514,65301,65535\
- --open $this->ip -e $this->eth -oX -"; // --scan-delay 1
+ --open $this->ip -e $this->eth  -oX -"; // --scan-delay 1
 		
 		$firewall = $this->ip2fw4enable();
 		
@@ -1415,7 +1376,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	        $result = $this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where ");
 	        echo $result."\n";
 	        if ($result=="filtered") { $chaine = "This Host is Protected By Firewall";$this->note($chaine);}
-	        if ($result=="unfiltered") {$chaine = "This Host is not Protected By Firewall";$this->rouge($chaine);}
+	        if ($result=="unfiltered") {$chaine = "This Host is not Protected By Firewall Statefull Rules";$this->rouge($chaine);}
 	        
 	        return $result;
 	    }
@@ -1423,7 +1384,7 @@ messages from leaving your internal network and 3) use a proxy server instead of
 		$query = "echo '$this->root_passwd' | sudo -S nmap -sA -Pn -n --reason -p 80 $this->ip -e $this->eth -oX - | xmlstarlet sel -t -v /nmaprun/host/ports/port/state/@state";
         $result = trim($this->req_ret_str($query));
         if ($result=="filtered") { $chaine = "This Host is Protected By Firewall";$this->note($chaine);}
-        if ($result=="unfiltered") {$chaine = "This Host is not Protected By Firewall";$this->rouge($chaine);}
+        if ($result=="unfiltered") {$chaine = "This Host is not Protected By Firewall Statefull Rules";$this->rouge($chaine);}
         
         return $this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result);
 	    }
@@ -1464,34 +1425,6 @@ messages from leaving your internal network and 3) use a proxy server instead of
 
 
 
-	
-	public  function parse4traceroute(string $traceroute_str){
-	    $result = "";
-	    $results = array();
-	    
-	    $ttl = array();
-	    $ipaddr = array();
-	    $geoip = array();
-	    
-	    $tab_lines = explode("\n", $traceroute_str);
-	    foreach ($tab_lines as $line){
-	        $line = trim($line);
-	        if (!empty($line)){
-	            $ttl = "";
-	            $ipaddr = "";
-	            $geoip = "";
-	            if (preg_match('#<hop ttl=\"(?<ttl>[0-9]{1,5})\"([[:space:]]{1})ipaddr=\"(?<ipaddr>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})\"([[:space:]]{1})rtt=\"(?<rtt>[[:print:]]{1,})\"/>#',$line,$results))
-	            {
-	                $ttl = $results['ttl'];
-	                $ipaddr  = $results['ipaddr'];
-	                $geoip = $this->ip2geo($ipaddr);
-	                $result .= "ttl=$ttl ipaddr=$ipaddr geoip=$geoip\n";
-	            }
-	        }
-	    }
-	    return $result;
-	}
-	
 
 	public function ip2tracert4local8traceroute(){
 	    $this->ssTitre(__FUNCTION__);
@@ -1779,7 +1712,7 @@ as the header options; the TTL changes.");
 		                        $templateB64_shell = base64_encode($template_shell);
 		                        
 		                        $data = "/usr/bin/id";
-		                        $rst_id = $test->stream4result($stream, $data, 10);
+		                        $rst_id = $test->req_str($stream, $data, 10," | grep 'uid=' ");
 		                        list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $test->parse4id($rst_id);
 		                        $id8b64 = base64_encode($id);
 		                        $this->article("CREATE Template ID", $template_id);
@@ -2035,9 +1968,7 @@ public function ip2vhost(){
 	            if (!empty($port))  {
 	                foreach ($port as $port_num => $protocol)
 	                    if (!empty($port_num)) {
-	                        $obj_port = new PORT($this->eth,$this->domain,$this->ip,$port_num, $protocol);
-	                        $stream = "";
-	                        $obj_service = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip,$obj_port->port, $obj_port->protocol,$stream);
+	                        $obj_service = new SERVICE($this->eth,$this->domain,$this->ip,$port_num, $protocol);
 	                        $obj_service->service4info();
 	                    }
 	            }
@@ -2057,7 +1988,7 @@ public function ip2vhost(){
 	             foreach ($port as $port_num => $protocol)
 	                 if (!empty($port_num)) {
 	                     $stream = "";
-	                     $obj_service = new SERVICE($this->eth,$this->domain,$this->ip,$port_num, $protocol,$stream);
+	                     $obj_service = new SERVICE($this->eth,$this->domain,$this->ip,$port_num, $protocol);
 	                     //$obj_service->service4info();
 	                     switch ($obj_service->service_name) {
 	                         case "ssh" :
@@ -2137,7 +2068,7 @@ public function ip2vhost(){
 	
 	public function ip4service(){
 	    echo "=============================================================================\n";
-	    $this->gtitre(__FUNCTION__);
+	    
 	    if  (!$this->ip4service8db($this->ip2id) ) {
 	        $this->ip4service2display();
 	        $this->ip4enum2users();
@@ -2182,10 +2113,8 @@ public function ip2vhost(){
 	                if (!empty($port))  {
 	                    foreach ($port as $port_num => $protocol)
 	                        if (!empty($port_num)) {
-	                            $obj_port = new PORT($this->eth,$this->domain,$this->ip,$port_num, $protocol);
-	                            $obj_port->poc($this->flag_poc);
-	                            $stream = "";
-	                            $obj_service = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip,$obj_port->port, $obj_port->protocol,$stream);
+	                            $obj_service = new SERVICE($this->eth,$this->domain,$this->ip,$port_num, $protocol);
+	                            $obj_service->poc($this->flag_poc);
 	                            $obj_service->port4pentest();
 	                        }
 	                }

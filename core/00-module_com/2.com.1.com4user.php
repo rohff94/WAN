@@ -3,14 +3,16 @@
 class com4user extends com4display {
     var $tab_sudo8app2shell;
     var $tab_sudo8app2read;
+    var $tab_sudo8app2write;
+    
     var $path_ssh ;
     var $path_sshpass ;
     
     function __construct(){
         parent::__construct();
         $this->tab_sudo8app2shell = array("apt","apt-get","aria2c","ash","awk","bash","busybox","chsh","convert","cpan","cpulimit","crontab","csh","curl","dash","dmesg","dmsetup","dnf","docker","dpkg","easy_install","ed","elinks","emacs","env","env_keep","except","exec","expect","facter","fifo","find","finger","flock","ftp","gawk","gdb","gimp","git","go","ht","ionice","irb","java","jjs","journalctl","jrunscript","ksh","ldconfig","LD_PRELOAD","ld.so","less","logsave","ltrace","lua","lynx","mail","make","man","media_android","media_ios","more","mount","mssql","mv","mysql","nano","nc","ncat","netcat","nice","nmap","node","nodejs","ocaml","openssl","opt","oracle","path","perl","php","pic","pico","pinfo","pip","powershell","puppet","python","python1","python2","python3","red","rlogin","rlwrap","rpm","rpmquery","rsync","ruby","ruby1","run-parts","rvim","scp","screen","script","sed","service","setarch","sftp","sh","smbclient","socat","sqlite3","ssh","start-stop-daemon","stdbuf","strace","stty","su","systemctl","tar","taskset","tclsh","tcpdump","tee","telnet","tftp","time","timeout","tmux","unexpand","unshare","vi","vim","watch","wget","whoami","whois","wine","wish","xargs","xterm","yum","zip","zsh","zypper");
-        //$this->tab_sudo8app2shell = array("curl");
-        $this->tab_sudo8app2read = array("arp","base64","cancel","cat","chmod","chown","cp","cut","date","dd","diff","expand","file","fmt","fold","grep","head","ip","jq","mtr","nl","od","pg","readelf","run-mailcap","shuf","sort","tail","ul","uniq","xxd");
+        $this->tab_sudo8app2read = array("arp","base64","cancel","chmod","chown","cp","cut","date","dd","diff","expand","file","fmt","fold","grep","head","ip","jq","mtr","nl","od","pg","readelf","run-mailcap","shuf","sort","tail","ul","uniq","xxd");
+        $this->tab_sudo8app2write = array("cat");
         
     }
     
@@ -226,6 +228,73 @@ class com4user extends com4display {
         }
     }
     
+    
+    public function watching($ip){
+        $chaine = "Monitors your environment";
+        $this->rouge($chaine);
+        if ($this->ip4priv($this->ip)){
+            $cidr = trim($this->ip2cidr());
+            $query = "echo '$this->root_passwd' | sudo -S arpwatch -dN -i $this->eth -a -n $cidr.0/24";
+            $this->cmd("localhost", $query);
+            $query = "echo '$this->root_passwd' | sudo -S nmap -sn --reason $cidr.0/24 -e $this->eth ";
+            $this->cmd("localhost", $query);
+            $query = "echo '$this->root_passwd' | sudo -S arp -av -i $this->eth";
+            $this->cmd("localhost", $query);
+        }
+        
+        $query = "echo '$this->root_passwd' | sudo -S top";
+        $this->cmd("localhost", $query);
+        $query = "echo '$this->root_passwd' | sudo -S ps axjf";
+        $this->cmd("localhost", $query);
+        $query = "echo '$this->root_passwd' | sudo -S snort -A console -q -c /etc/snort/snort.conf -i $this->eth  'not host $this->ip'";
+        $this->cmd("localhost", $query);
+        $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=bot";
+        $this->cmd("localhost", $query);
+        $query = "cd $this->dir_tmp; php -S $this->ip:$this->port_rfi";
+        $this->cmd("localhost", $query);
+        $query = "tail -f /var/log/syslog";
+        $this->cmd("localhost", $query);
+        $query = "tail -f /var/log/auth.log";
+        $this->cmd("localhost", $query);
+        $query = "tail -f /var/log/kern.log";
+        $this->cmd("localhost", $query);
+        $query = "tail -f /var/log/mail.log";
+        $this->cmd("localhost", $query);
+        $query = "watch -n 5 -e \"grep -i segfault /var/log/kern.log\"";
+        $this->cmd("localhost", $query);
+        $query = "tail -f $this->log_error_path";
+        $this->cmd("localhost", $query);
+        $query = "tail -f $this->log_succes_path";
+        $this->cmd("localhost", $query);
+    }
+    
+    
+    public  function parse4traceroute(string $traceroute_str){
+        $result = "";
+        $results = array();
+        
+        $ttl = array();
+        $ipaddr = array();
+        $geoip = array();
+        
+        $tab_lines = explode("\n", $traceroute_str);
+        foreach ($tab_lines as $line){
+            $line = trim($line);
+            if (!empty($line)){
+                $ttl = "";
+                $ipaddr = "";
+                $geoip = "";
+                if (preg_match('#<hop ttl=\"(?<ttl>[0-9]{1,5})\"([[:space:]]{1})ipaddr=\"(?<ipaddr>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})\"([[:space:]]{1})rtt=\"(?<rtt>[[:print:]]{1,})\"/>#',$line,$results))
+                {
+                    $ttl = $results['ttl'];
+                    $ipaddr  = $results['ipaddr'];
+                    $geoip = $this->ip2geo($ipaddr);
+                    $result .= "ttl=$ttl ipaddr=$ipaddr geoip=$geoip\n";
+                }
+            }
+        }
+        return $result;
+    }
     
 
     

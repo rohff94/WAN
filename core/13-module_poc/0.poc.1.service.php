@@ -23,7 +23,7 @@ class poc4service extends poc4net {
         $remote_userpass_ftp = 'kautilya';
         
         
-        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T',"");
+        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T');
         $ftp_stream = @ftp_connect($ip,$port) ;
         if(@ftp_login($ftp_stream, $remote_username_ftp, $remote_userpass_ftp))
             $obj_service->ftp2cmd($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);
@@ -39,7 +39,7 @@ class poc4service extends poc4net {
         $remote_userpass_ftp = 'bankbank';
         
         
-        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T',"");
+        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T');
         $ftp_stream = @ftp_connect($ip,$port) ;
         if(@ftp_login($ftp_stream, $remote_username_ftp, $remote_userpass_ftp))            
             $obj_service->ftp2upload($ftp_stream);
@@ -55,7 +55,7 @@ class poc4service extends poc4net {
         $remote_username_ftp = "anonymous";
         $remote_userpass_ftp = 'anonymous';
         
-        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T',"");
+        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T');
         $ftp_stream = @ftp_connect($ip,$port) ;
         if(@ftp_login($ftp_stream, $remote_username_ftp, $remote_userpass_ftp))
             $obj_service->ftp2keys($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);
@@ -68,7 +68,7 @@ class poc4service extends poc4net {
         $remote_username_ftp = "ashoka";
         $remote_userpass_ftp = 'kautilya';
         
-        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T',"");
+        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T');
         $ftp_stream = @ftp_connect($ip,$port) ;
         if(@ftp_login($ftp_stream, $remote_username_ftp, $remote_userpass_ftp))
             $obj_service->ftp2keys($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);
@@ -81,7 +81,7 @@ class poc4service extends poc4net {
         $remote_username_ftp = "matt"; 
         $remote_userpass_ftp = 'cheese';
         
-        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T',"");
+        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T');
         $ftp_stream = @ftp_connect($ip,$port) ;
         if(@ftp_login($ftp_stream, $remote_username_ftp, $remote_userpass_ftp))
             $obj_service->ftp2keys($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);
@@ -137,7 +137,7 @@ class poc4service extends poc4net {
         
         
         $ip = "10.60.10.128"; // msf2
-        $msf_service_smb = new SERVICE($ip,445, 'T');
+        $msf_service_smb = new SERVICE($eth,$domain,$ip,445, 'T');
         $msf_service_smb->service2smb();$this->pause();
         
         
@@ -257,6 +257,7 @@ class poc4service extends poc4net {
         $this->chapitre(__FUNCTION__);
         
         $flag_poc = TRUE ;
+        //$flag_poc = FALSE ;
         $eth = "vmnet6";
         $domain = "hack.vlan";
         
@@ -264,7 +265,7 @@ class poc4service extends poc4net {
         $ip = "10.60.10.130"; // msf2
         $port = 2049 ;
         
-        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T',"");
+        $obj_service = new SERVICE($eth,$domain,$ip,$port, 'T');
         $obj_service->poc($flag_poc);
         $obj_service->service2nfs();
     }
@@ -282,20 +283,18 @@ class poc4service extends poc4net {
     
     public function poc4voip(){ // OK
         $this->titre("Hacking VOIP");
+        $eth = "vmnet6";
+        $domain = "hack.vlan";
+        
         $this->voip = "10.60.10.150";
         $voip_ip = new IP($this->voip);
         $voip_ip->ip2port();
         $this->pause();
         
         
-        $voip_port_sip = new PORT($this->voip,5060,'U');
-        //$voip_vm = new VM($this->voip_vmx);
-        $voip_port_sip->port4pentest();
-        $version_resu = $voip_port_sip->port2version();
-        list($service_name,$service_version) = $voip_port_sip->port4type($version_resu);
-        $this->pause();
+
         // sip:username:password@host:port
-        $voip_service = new SERVICE($voip_port_sip->ip, $voip_port_sip->port, $voip_port_sip->service_protocol);
+        $voip_service = new SERVICE($eth,$domain,$this->voip,5060,'U');
         $voip_service->service2sip();
         $this->pause();
         

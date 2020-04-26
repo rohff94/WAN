@@ -19,7 +19,7 @@ if (argc != 4) {
 	printf("\t\t\033[37;41;1;1m Usage: %s cmd1 cmd2 time2sleep \033[0m\n",argv [0]);
 	exit ( 0 );
 }
-  printf("\t\033[37;45;1;7m I am process %d. My PPID: %d \033[0m\n", getpid(), getppid());
+
 
   
   cmd1 = argv[1] ;
@@ -39,14 +39,14 @@ if (argc != 4) {
 
   pid_t ret_val = fork(); 
   if(ret_val == 0) { 
-    //printf("I’m the child process. PID=%d, PPID=%d\n", getpid(), getppid()); 
+    printf("I’m the child process. PID=%d, PPID=%d\n", getpid(), getppid());
     printf("\t\033[36;40;1;1m 1: \033[0m \033[33;40;1;1m %s \033[0m\n", query1);
     system(query1);
     //system(command1);
 
   } else if (ret_val>0) { 
     sleep(laps);
-    //printf("I’m the parent process. PID=%d, PPID=%d\n", getpid(), getppid()); 
+    printf("I’m the parent process. PID=%d, PPID=%d\n", getpid(), getppid());
     printf("\t\033[36;40;1;1m 2: \033[0m \033[33;40;1;1m %s \033[0m\n", query2);
     system(query2);
     //system(command2);

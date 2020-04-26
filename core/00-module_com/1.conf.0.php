@@ -330,10 +330,11 @@ public function screenshot($seconde){
 	    $time = $end - $start;
 	    
 	    $sec = intval($time);
-	    $micro = $time - $sec;
+	    //$micro = $time - $sec;
 
-	    $final = strftime('%T', mktime(0, 0, $sec)) . str_replace('0.', '.', sprintf('%.3f', $micro));
-
+	    //$final = strftime('%T', mktime(0, 0, $sec)) . str_replace('0.', '.', sprintf('%.3f', $micro));
+	    $final = strftime('%T', mktime(0, 0, $sec));
+	    
 	    $this->note("Spending Time $final");
 	}
 	

