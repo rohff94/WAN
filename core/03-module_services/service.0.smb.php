@@ -334,7 +334,7 @@ class service2smb extends service2sip {
                 for($i=0;$i<count($tmp_users) ;$i++){
                     $tmp_user = trim($tmp_users[$i]);
                     if (!empty($tmp_user)) {
-                        $this->yesUSERS($this->port2id, $tmp_user, __FUNCTION__,"querydispinfo: ".$tmp_users_info[$i]);
+                        $this->yesUSERS($this->port2id, $tmp_user,"querydispinfo: ".$tmp_users_info[$i],"/bin/sh");
                         $users_found[] = $tmp_user;
                     }
                 }
@@ -362,7 +362,7 @@ class service2smb extends service2sip {
                 foreach ($tmp_users as $tmp_user){
                     $tmp_user = trim($tmp_user);
                     if (!empty($tmp_user)) {
-                        $this->yesUSERS($this->port2id, $tmp_user,__FUNCTION__, "enumdomusers");
+                        $this->yesUSERS($this->port2id, $tmp_user,"enumdomusers","/bin/sh");
                         $users_found[] = $tmp_user;
                     }
             }
@@ -392,7 +392,7 @@ class service2smb extends service2sip {
         foreach ($tmp_users_found as $user_found){
             $user_found = trim($user_found);
             if(!empty($user_found)) {
-                $this->yesUSERS($this->port2id, $user_found,__FUNCTION__,  "net rpc group members");
+                $this->yesUSERS($this->port2id, $user_found,"net rpc group members","/bin/sh");
                 $users_found[] = $user_found;
             }
         }
@@ -420,7 +420,7 @@ class service2smb extends service2sip {
             $users_found = array_unique(explode("\n", $tmp));
             foreach ($users_found as $user_found )
                 if (!empty($user_found))  {
-                    //$this->yesUSERS($this->port2id, $user_found,__FUNCTION__,"query user with rid ");
+                    $this->yesUSERS($this->port2id, $user_found,"query user with rid ","/bin/sh");
                 }
         
         $users_found = array_unique($users_found);
@@ -505,7 +505,7 @@ class service2smb extends service2sip {
         if (!empty($users_found))
             foreach ($users_found as $user_found )
                 if (!empty($user_found))  {
-                    //$this->yesUSERS($this->port2id, $user_found, __FUNCTION__,"lookupnames");
+                    $this->yesUSERS($this->port2id, $user_found,"lookupnames","/bin/sh");
                 }
             
             
@@ -539,7 +539,7 @@ class service2smb extends service2sip {
         if (!empty($users_found))
             foreach ($users_found as $user_found )
                 if (!empty($user_found))  {
-                    $this->yesUSERS($this->port2id, $user_found, __FUNCTION__,"lookupsids");
+                    $this->yesUSERS($this->port2id, $user_found,"lookupsids","/bin/sh");
                 }
             
             

@@ -22,12 +22,12 @@ class AUTH extends PORT{
 	
 	public function port2auth4dico4hydra($service,$username){
 	    $result = "";
-	    $result .= $this->ssTitre(__FUNCTION__.": $service://'$username':Dico");
+	    
+	    $this->ssTitre(__FUNCTION__.": $service://'$username':Dico");
 	    $service = trim($service);
 	    $username = trim($username);
-	    $query_hydra = "hydra -l \"$username\" -P \"$this->dico_password.1000\" $this->ip $service -f -t 8 -e sr -s $this->port -w 5s -c 5 -I 2>/dev/null  | grep -i 'login:'   ";
-	    $result .= $this->cmd("localhost",$query_hydra);
-	    return  $result.$this->auth2login4hydra($this->req_ret_str($query_hydra));
+	    $query_hydra = "hydra -l \"$username\" -P \"$this->dico_password.1000\" $this->ip $service -f -t 8 -e sr -s $this->port -w 5s 2>/dev/null  | grep -i 'login:'   ";
+	    return  $this->auth2login4hydra($this->req_ret_str($query_hydra));
 	}
 	
 	public function port2auth4dico4medusa($service,$username){

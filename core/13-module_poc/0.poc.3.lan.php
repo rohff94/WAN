@@ -63,7 +63,7 @@ class poc4lan extends poc4web {
     }
     
     
-    public function poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm){
+    public function poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$fonction2param,$vm){
         $this->start(__FUNCTION__, $titre);
         $this->gtitre(__FUNCTION__);
         
@@ -84,7 +84,7 @@ class poc4lan extends poc4web {
         //$victime->vm2upload("$this->dir_tools/Malware/ISHELL-v0.2.tar.gz","$this->vm_tmp_lin/ISHELL-v0.2.tar.gz");
         
         $flag_poc = FALSE;
-        //$flag_poc = "no";
+        //$flag_poc = TRUE;
         
         $test = new SERVICE($eth,$domain,$ip, $port, $protocol);
         $test->poc($flag_poc);
@@ -113,7 +113,7 @@ class poc4lan extends poc4web {
             $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_shell,$id8b64,$pass);
             $obj_lan->poc($test->flag_poc);
             var_dump($obj_lan->flag_poc);
-            $obj_lan->$fonction2exec($obj_lan->stream);
+            $obj_lan->$fonction2exec($obj_lan->stream,$fonction2param);
             $obj_lan->lan2brief();
         }
     }
@@ -469,6 +469,13 @@ class poc4lan extends poc4web {
         $pass = "armando";
         
         
+        $titre = "";
+        $fonction2exec = "misc2keys";
+        $fonction2param = "/";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$fonction2param,$vm);
+        
+        exit();
         $ip = "10.60.10.162"; // Moria 1.1 OK 
         $port = "22";
         $protocol = "T";
@@ -478,7 +485,7 @@ class poc4lan extends poc4web {
         $titre = "";
         $fonction2exec = "misc2keys";
         $vm = "";
-        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$fonction2param,$vm);
         
     }
     

