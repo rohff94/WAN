@@ -17,6 +17,7 @@ class check4linux8enum extends STREAM4COM{
     
     
     
+    
     public function bins($stream){
         
         $this->titre(__FUNCTION__);

@@ -42,9 +42,9 @@ class CE extends PARAM4COM{
     public function ce2shell8param($OS){ // OK
         $this->titre(__FUNCTION__);
         $cmd = "id";
-        $filter = "| grep 'uid=' | grep 'gid=' ";
+        $filter = "| grep 'uid='  ";
         $template = $this->param2template($cmd,$filter);
-        $this->param2rce($this->user2agent,$template,$cmd,$filter);$this->pause();
+        $this->param2rce($template);$this->pause();
     }
     
     public function ce2shell8post($OS){ // OK

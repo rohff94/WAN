@@ -186,15 +186,13 @@ TJAwpCifrLpx1myEg4kz4OhvWk5cL9qV8SP48T0aBoXHtUZFHa6KBNUpoV8QMhyI
 	        $id8b64 = base64_encode($id);
 	        $this->article("CREATE Template ID", $template_id);
 	        $this->article("CREATE Template BASE64 ID", $templateB64_id);
-	        $this->article("CREATE Template CMD", $template_cmd);
-	        $this->article("CREATE Template BASE64 CMD",$templateB64_cmd);
-	        $template_shell = str_replace("%CMD%", "%SHELL%", $template_cmd);
+	        $template_shell = str_replace("%ID%", "%SHELL%", $template_id);
 	        $templateB64_shell = base64_encode($template_shell);
 	        $this->article("CREATE Template SHELL", $template_shell);
 	        $this->article("CREATE Template BASE64 SHELL", $templateB64_shell);
 	        
 	        $user_name_pass = "";
-	        $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64,$user_name_pass);
+	        $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_shell,$id8b64,$user_name_pass);
 	        $obj_lan->poc($test->flag_poc);
 	        
 	        

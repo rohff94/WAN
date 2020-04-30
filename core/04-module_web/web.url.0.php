@@ -105,7 +105,7 @@ class URL extends WEB{
     var $url;
     var $uri_path;
     var $uri_dirname_path;
-    var $url_query ;
+    var $uri_query ;
 
 	
 
@@ -116,7 +116,7 @@ class URL extends WEB{
 	    parent::__construct($eth,$domain,$url);		
 	    $this->uri_path = parse_url( $this->url, PHP_URL_PATH);
 	    $this->uri_path_dirname = dirname($this->url);
-	    $this->url_query = parse_url( $this->url, PHP_URL_QUERY);
+	    $this->uri_query = parse_url( $this->url, PHP_URL_QUERY);
 
 	    
 	    $this->article("URL", $this->url);

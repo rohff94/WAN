@@ -8,51 +8,7 @@ class com4code extends com4dot {
     }
   
 
-    
-    public function rootkit8puszek($sbin_path_hidden,$attacker_ip,$attacker_port){
-        $this->ssTitre(__FUNCTION__);
-        //https://github.com/Eterna1/puszek-rootkit
-        $filename = "$this->dir_c/rootkit_puszek.c";
-        $rev_id = file_get_contents($filename);      
-        return $rev_id;
-    }
-    
-    
-    public function backdoor8c2udp($sbin_path_hidden,$attacker_ip,$attacker_port){
-        $filename = "$this->dir_c/backdoor_udp.c";
-        $rev_id = file_get_contents($filename);  
-        $rev_id = str_replace("%FILE%", $sbin_path_hidden, $rev_id);
-        $rev_id = str_replace("%IP%", $attacker_ip, $rev_id);
-        $rev_id = str_replace("%PORT%", $attacker_port, $rev_id);
-        return $rev_id;
-    }
-    
-    
-    public function backdoor8c2tcp($sbin_path_hidden,$attacker_ip,$attacker_port){
-        $filename = "$this->dir_c/backdoor_tcp.c";
-        $rev_id = file_get_contents($filename);  
-        $rev_id = str_replace("%FILE%", $sbin_path_hidden, $rev_id);
-        $rev_id = str_replace("%IP%", $attacker_ip, $rev_id);
-        $rev_id = str_replace("%PORT%", $attacker_port, $rev_id);
-        return $rev_id;
-    }
- 
-    public function backdoor8c2tcp2prism($sbin_path_hidden,$attacker_ip,$attacker_port){
-        $filename = "$this->dir_c/backdoor_prism.c";
-        $rev_id = file_get_contents($filename);
-        $rev_id = str_replace("%FILE%", $sbin_path_hidden, $rev_id);
-        $rev_id = str_replace("%IP%", $attacker_ip, $rev_id);
-        $rev_id = str_replace("%PORT%", $attacker_port, $rev_id);
-        return $rev_id;
-    }
-    
-    
-    public function backdoor8c2tcp2passwd(){
-        $filename = "$this->dir_c/backdoor_passwd.c";
-        $rev_id = file_get_contents($filename);
-        return $rev_id;
-    }
-    
+
     function asm2hex($shellcode_asm) {
         $this->ssTitre("Shellcode ASM to HEX" );
         // if (!check_soft_exist("~/metasm/metasm.rb")) $this->install_labs_metasm();

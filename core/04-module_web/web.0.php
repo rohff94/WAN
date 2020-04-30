@@ -15,6 +15,24 @@ class WEB extends SERVICE4COM{
 	https://hackingresources.com/web-application-penetration-testing-course/
 	 */
 	
+	public function url2wget($user2agent,$header, $url2get,$methode_http){
+	    $data = "";
+	    $http_type = parse_url($url2get, PHP_URL_SCHEME);
+	    $vhost = parse_url( $this->web, PHP_URL_HOST);
+	    $port = parse_url($url2get, PHP_URL_PORT);
+	    $uri_path = parse_url($url2get, PHP_URL_PATH);
+	    $uri_dirname_path = dirname($url2get);
+	    $uri_query = parse_url($url2get, PHP_URL_QUERY);
+	    
+	    if ($methode_http==="GET") $data = "wget  \"$url2get\" --timeout=30 --tries=2 --no-check-certificate --user-agent='$user2agent' --header='$header' -qO- 2> /dev/null  "; // --user-agent='$user2agent' --header=\"Referer: $user2agent\"
+	    if ($methode_http==="POST") $data = "wget  \"$http_type://$vhost:$port$uri_path\" --post-data \"$uri_query\" --timeout=30 --tries=2 --no-check-certificate --user-agent='$user2agent' --header='$header' -qO- 2> /dev/null  "; // --user-agent='$user2agent' --header=\"Referer: $user2agent\"
+	    
+	    //$data = "curl --silent  \"$http_type://$vhost:$port$uri_path\" --data \"$uri_query\" --connect-timeout 30 --no-keepalive 2> /dev/null "; //--user-agent='$user2agent' --header='$header' --header=\"Referer: $user2agent\"
+	    
+	    
+	    return $data ;
+	}
+	
 	public function __construct($eth,$domain,$web) {		
 	    if (empty($web)) return $this->log2error("EMPTY WEB");
 	    $this->web = $this->url2norme($web);

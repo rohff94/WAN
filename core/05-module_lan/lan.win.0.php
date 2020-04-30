@@ -71,7 +71,7 @@ public function __construct($ip,$port,$protocol,$stream,$service) {
 
 
 
-public function lan4pentest(){
+public function root4pentest(){
     $result = "";
     $result .= $this->titre(__FUNCTION__);
     $result .= $this->lan2id();

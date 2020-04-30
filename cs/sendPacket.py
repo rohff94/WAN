@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     args = sys.argv
 
-    if len(args) != 5:
+    if len(args) != 6:
         usage(args[0])
 
     icmp_send(args[1], args[2], args[3], args[4])

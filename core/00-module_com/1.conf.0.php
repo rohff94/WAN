@@ -109,7 +109,9 @@ public function notify($chaine) {
 	
 	//system("espeak  \"Look screen\" ");	
 	//system("flite -t '$chaine' 2> /dev/null");
+    
     $this->rouge($chaine);
+    $chaine = addcslashes($chaine,'"');
 	system("notify-send -i $this->dir_img/hacker.png \"$chaine\"");
     //$query = "echo '".$this->rouge($chaine)."' | boxes -d parchment -a c";
 	//system($query);	sleep(1);	
@@ -144,6 +146,7 @@ public function screenshot($seconde){
 	}
 
 	public function rouge($chaine){
+	    $chaine = addcslashes($chaine,'"');
 	    $display_cli = "\t\t\033[37;41;1;1m".$chaine."\033[0m\n";
 	    $display_xml = "<rouge>$chaine</rouge>\n";
 	    echo $display_cli;

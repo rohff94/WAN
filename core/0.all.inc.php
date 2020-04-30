@@ -32,7 +32,13 @@ include_once("./core/02-module_stream/lan.linux.1.check.1.misc.php");
 include_once("./core/02-module_stream/lan.linux.1.check.2.exploits.php");
 include_once("./core/02-module_stream/lan.linux.1.check.3.suid.php");
 include_once("./core/02-module_stream/lan.linux.1.check.4.jobs.php");
-include_once("./core/02-module_stream/lan.linux.1.check.5.com.php");
+include_once("./core/02-module_stream/lan.linux.2.root.1.backdoor.php");
+include_once("./core/02-module_stream/lan.linux.2.root.2.injected.php");
+include_once("./core/02-module_stream/lan.linux.2.root.3.trojan.php");
+include_once("./core/02-module_stream/lan.linux.2.root.4.rootkit.php");
+include_once("./core/02-module_stream/lan.linux.2.root.5.pivot.php");
+include_once("./core/02-module_stream/lan.linux.2.root.6.tunnel.php");
+include_once("./core/02-module_stream/lan.linux.3.check.5.com.php");
 include_once("./core/03-module_services/service.0.asterisk.php");
 include_once("./core/03-module_services/service.0.dns.php");
 include_once("./core/03-module_services/service.0.exploitdb.php");
@@ -70,14 +76,6 @@ include_once("./core/05-module_file/file.vm.php");
 include_once("./core/05-module_lan/lan.0.php");
 include_once("./core/05-module_lan/lan.linux.0.com.php");
 include_once("./core/05-module_lan/lan.linux.1.check.6.users.php");
-include_once("./core/05-module_lan/lan.linux.2.root.0.com.php");
-include_once("./core/05-module_lan/lan.linux.2.root.1.backdoor.php");
-include_once("./core/05-module_lan/lan.linux.2.root.2.injected.php");
-include_once("./core/05-module_lan/lan.linux.2.root.3.trojan.php");
-include_once("./core/05-module_lan/lan.linux.2.root.4.rootkit.php");
-include_once("./core/05-module_lan/lan.linux.2.root.5.pivot.php");
-include_once("./core/05-module_lan/lan.linux.2.root.6.tunnel.php");
-include_once("./core/05-module_lan/lan.linux.3.root.0.com.php");
 include_once("./core/05-module_lan/lan.win.0.php");
 include_once("./core/06-module_bof4linux/bof4linux.01.ret2code.php");
 include_once("./core/06-module_bof4linux/bof4linux.02.ret2int.php");
@@ -118,8 +116,6 @@ include_once("./core/13-module_poc/0.poc.5.root.php");
 include_once("./core/13-module_poc/0.poc.6.malware.php");
 include_once("./core/13-module_poc/1.poc.php");
 include_once("./core/13-module_poc/2.tp.php");
-
-
 
 
 

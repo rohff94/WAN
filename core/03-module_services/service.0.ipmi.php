@@ -69,7 +69,7 @@ public function service2ipmi4exec(){
               if ( is_resource($stream)){
                   $result .= $this->yesAUTH($this->port2id, $user2name_created, $user2name_pass, "", "", "", "", "", __FUNCTION__." create SSH user $user via IPMI ", $this->ip2geoip());
                   $obj_lan = new lan4linux($this->port2id, $stream,__FUNCTION__." IPMI2SSH4user:$user:$user2name_created/$user2name_pass");
-                  $result .=  $obj_lan->lan4root();
+                  $result .=  $obj_lan->lan2root();
                   $result .=  $obj_lan->lan2pivot($user2name_created, $user2name_pass);
               }
               

@@ -40,7 +40,7 @@ class POC extends poc4malware{
 		$query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql\"  2>/dev/null \n";
 		$this->requette($query);
 		$this->pause();
-		$sql = "select uid_name,from_base64(templateB64_id),from_base64(templateB64_cmd),from_base64(templateB64_shell) FROM LAN ;";
+		$sql = "select uid_name,from_base64(templateB64_id),from_base64(templateB64_shell) FROM LAN ;";
 		$query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql\"  2>/dev/null \n";
 		//$this->requette($query);
 		$this->pause();
