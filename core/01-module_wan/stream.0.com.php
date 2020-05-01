@@ -9,6 +9,105 @@ class STREAM4COM extends SERVICE4COM {
     
   
     
+    public function stream4key8priv4str($stream,$host,$port,$login,$private_key_str,$private_key_file){
+        $this->ssTitre(__FUNCTION__);
+        $this->str2file($private_key_str, $private_key_file);
+        $obj_file = new FILE($private_key_file);
+        $public_key_file = "$obj_file->file_dir/$obj_file->file_name.pub";
+        if (!file_exists($public_key_file)) {
+            $this->key2gen4priv("",10,$private_key_file, $public_key_file);
+        }
+        return $this->stream4key8public($stream,$host,$port,$login,$public_key_file,$private_key_file, "");
+        
+    }
+    public function stream8ssh2key8priv4str($host,$port,$login,$private_key_str,$private_key_file,$private_key_passwd){
+        $this->ssTitre(__FUNCTION__);
+        $this->str2file($private_key_str, $private_key_file);
+        $obj_file = new FILE($private_key_file);
+        $public_key_file = "$obj_file->file_dir/$obj_file->file_name.pub";
+        if (!file_exists($public_key_file)) {
+            $this->key2gen4priv("",10,$private_key_file, $private_key_passwd);
+            $this->key2gen4public("",10, $private_key_file, $public_key_file,$private_key_passwd);
+        }
+        return $this->stream8ssh8key8public($host,$port,$login,$public_key_file,$private_key_file, $private_key_passwd);
+    }
+    
+    public function stream8ssh2key8priv4file($host,$port,$login,$private_key_file,$private_key_passwd){
+        /*
+         https://medium.com/tsscyber/multiple-security-vulnerabilities-in-dell-emc-avamar-e114c16425d0
+         */
+        $this->ssTitre(__FUNCTION__);
+        
+        $obj_file = new FILE($private_key_file);
+        $public_key_file = "$obj_file->file_dir/$obj_file->file_name.pub";
+        
+        
+        if (!file_exists($public_key_file)) {
+            $this->key2gen4priv("",10,$private_key_file, $public_key_file);
+        }
+        return $this->stream8ssh8key8public($host,$port,$login,$public_key_file,$private_key_file, $private_key_passwd);
+    }
+    
+    
+    public function stream8ssh8key8public($host,$port,$login,$public_key_file,$private_key_file,$private_key_passwd){
+        $this->ssTitre(__FUNCTION__);
+        $login = trim($login);
+        
+        $query = "file $private_key_file";
+        $check_pem = trim($this->req_ret_str($query));
+        if (strstr($check_pem, "PEM RSA private key")!==FALSE){
+            $this->log2succes("Convert PEM for libssh - PHP");
+            $private_key_file = $this->key2gen4priv2pem("", 10, $private_key_file,$private_key_passwd);
+        }
+        $query = "head -5 $private_key_file";
+        $priv_keys = trim($this->req_ret_str($query));
+        if (empty($priv_keys)) return $this->log2error("Empty Private Key");
+        $query = "head -5 $public_key_file";
+        $pub_keys = trim($this->req_ret_str($query));
+        if (empty($pub_keys)) return $this->log2error("Empty Public Key");
+        $cmd = "id";
+        $this->requette("chmod 600 $private_key_file");
+        $this->requette("head -5 $private_key_file");
+        $query = "ssh -i $private_key_file $login@$this->ip -p $port -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null  -C id";
+        $this->cmd("localhost",$query);
+        
+        
+        $con = @ssh2_connect( $host, $port,array('hostkey'=>'ssh-rsa') );
+        if($con===FALSE) {
+            $chaine = "Failed Connection";
+            $this->log2error($chaine);
+            return FALSE ;
+        }
+        $infos = "Public Key:$public_key_file\nPrivate Key:$private_key_file\nPass Key: $private_key_passwd";
+        $this->note($infos);
+        
+        
+        $this->requette("ls -al $public_key_file");
+        $this->requette("file $public_key_file");
+        $this->requette("head -5 $public_key_file");
+        
+        $this->requette("ls -al $private_key_file");
+        $this->requette("file $private_key_file");
+        $this->requette("head -5 $private_key_file");
+        if (@ssh2_auth_pubkey_file($con,$login,$public_key_file,"$private_key_file.pem",$private_key_passwd)!==FALSE) {
+            
+            $this->yesAUTH($this->port2id, $login, "", "", "", "", "", "", $infos, $this->ip2geoip());
+            $this->log2succes("Identification réussie en utilisant une clé publique");
+            $this->port2shell(base64_encode($infos));
+            $this->pause();
+            return $con ;
+        } else {
+            $chaine = "Failed Public Key Authentication";
+            $this->log2error($chaine);
+            return FALSE ;
+        }
+        
+        // $stream = ssh2_shell($con, 'vt102', null, 80, 24, SSH2_TERM_UNIT_CHARS);
+        // $stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
+        
+    }
+    
+    
     
     public function stream8ssh8passwd($host,$port,$login,$mdp) {
         $this->ssTitre(__FUNCTION__);
@@ -949,22 +1048,21 @@ This can also be used to determine local IPs, as well as gain a better understan
         if( !empty($files_found)) return $files_found ;
     }
     
-    public function file4search($stream,$filename,$search_data):bool{
+    public function file4search8path($stream,$file_path,$search_data):bool{
         $this->ssTitre(__FUNCTION__);
         $search_data = trim($search_data);
         $obj_filename = new FILE($filename);
         
         $data = "cat $obj_filename->file_path";
-        $lines_tab = $this->req_tab($stream,$data,$this->stream_timeout,"| grep '$search_data' ");
+        $lines_str = $this->req_str($stream,$data,$this->stream_timeout,"| grep '$search_data' ");
 
-        foreach ($lines_tab as $line){
-            if (strstr($line, $search_data)!==FALSE)
+            if (strstr($lines_str, $search_data)!==FALSE)
             {
                 $this->article("Searching", "Found ");
                 return TRUE ;
             }
             
-        }
+        
         
         $this->article("Searching", "Not Found");
         return FALSE;

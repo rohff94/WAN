@@ -60,7 +60,7 @@ public function service2nfs2check4mount($path){
         $authorized_keys_str = trim($this->req_ret_str($query));
         $remote_userpass = "";
         
-        $result .= $this->service4authorized_keys($stream, $authorized_keys_filepath, $authorized_keys_str, $remote_username, $remote_userpass, $local_username, $local_home_user);
+        $result .= $this->key2run($stream, $authorized_keys_filepath, $authorized_keys_str, $remote_username, $remote_userpass, $local_username, $local_home_user);
         }
         return $result;
     }
@@ -193,7 +193,7 @@ EOC;
          if($this->service2nfs2check4mount($path_user))  {
              $uid_name = $this->service2nfs4mount2start($local_home_user);
              
-             $this->misc2keys4add($this->stream8service,$local_home_user);
+             $this->key4add($this->stream8service,$local_home_user);
              $this->pause();
        }
        $this->pause();
