@@ -91,7 +91,7 @@ class poc4lan extends poc4web {
         var_dump($test->flag_poc);
         $stream = $test->stream8ssh8passwd($test->ip, $test->port, $login,$pass);
         
-        $template_shell = "sshpass -p '$pass' ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $login@$test->ip -p $test->port -C  '%SHELL%' ";
+        $template_shell = "sshpass -p '$pass' ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $login@$test->ip -p $test->port -C  \"%SHELL%\" ";
         list($stream,$template_id,$template_shell) = $test->stream4check($stream,$template_shell,$login,$pass);
         
         if (is_resource($stream)){
@@ -470,7 +470,7 @@ class poc4lan extends poc4web {
         
         
         $titre = "";
-        $fonction2exec = "misc2keys";
+        $fonction2exec = "key4users";
         $fonction2param = "/";
         $vm = "";
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$fonction2param,$vm);

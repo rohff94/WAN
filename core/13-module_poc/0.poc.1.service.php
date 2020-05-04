@@ -483,7 +483,7 @@ This is the same password used for the phone");
         
         $this->ssTitre("Crack root Password");
         $this->cmd("localhost","./unshadow <passwd file> <shadow file> > combined.txt");
-        $this->cmd("localhost","./john combined.txt");
+        $this->cmd("localhost","/opt/john/john combined.txt");
         
         
         /*

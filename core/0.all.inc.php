@@ -28,6 +28,7 @@ include_once("./core/01-module_wan/ip.port.auth.0.php");
 include_once("./core/01-module_wan/port.0.com.php");
 include_once("./core/01-module_wan/stream.0.com.php");
 include_once("./core/02-module_stream/lan.linux.1.check.0.enum.php");
+include_once("./core/02-module_stream/lan.linux.1.check.1.key.php");
 include_once("./core/02-module_stream/lan.linux.1.check.1.misc.php");
 include_once("./core/02-module_stream/lan.linux.1.check.2.exploits.php");
 include_once("./core/02-module_stream/lan.linux.1.check.3.suid.php");

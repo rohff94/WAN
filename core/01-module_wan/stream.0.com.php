@@ -20,15 +20,18 @@ class STREAM4COM extends SERVICE4COM {
         return $this->stream4key8public($stream,$host,$port,$login,$public_key_file,$private_key_file, "");
         
     }
-    public function stream8ssh2key8priv4str($host,$port,$login,$private_key_str,$private_key_file,$private_key_passwd){
+    public function stream8ssh2key8priv4str($host,$port,$login,$private_key_str){
         $this->ssTitre(__FUNCTION__);
-        $this->str2file($private_key_str, $private_key_file);
-        $obj_file = new FILE($private_key_file);
-        $public_key_file = "$obj_file->file_dir/$obj_file->file_name.pub";
-        if (!file_exists($public_key_file)) {
-            $this->key2gen4priv("",10,$private_key_file, $private_key_passwd);
-            $this->key2gen4public("",10, $private_key_file, $public_key_file,$private_key_passwd);
+        $hash = sha1($private_key_str);
+        
+        $this->str2file($private_key_str, "/tmp/$hash.tmp");
+        $query = "file /tmp/$hash.tmp";
+        $check_pem = trim($this->req_ret_str($query));
+        if (strstr($check_pem, "PEM RSA private key")!==FALSE){
+            $this->log2succes("Convert PEM for libssh - PHP");
+            $private_key_file = $this->key2gen4priv2pem("", 10, $private_key_file,$private_key_passwd);
         }
+        
         return $this->stream8ssh8key8public($host,$port,$login,$public_key_file,$private_key_file, $private_key_passwd);
     }
     
@@ -1001,7 +1004,7 @@ This can also be used to determine local IPs, as well as gain a better understan
         
     }
 
-    public function file4exist8name($stream,$filename){
+    public function file4exist8name($stream,$filename):bool{
         $this->ssTitre(__FUNCTION__);
         $filepath = $this->file4locate($stream,$filename);
         if (!empty($filepath)){
@@ -1010,7 +1013,7 @@ This can also be used to determine local IPs, as well as gain a better understan
         ELSE return FALSE;
     }
     
-    public function file4exist8path($stream,$filepath){
+    public function file4exist8path($stream,$filepath):bool{
         $this->ssTitre(__FUNCTION__);
         $filepath_found = "";
         $data = "ls -al $filepath";

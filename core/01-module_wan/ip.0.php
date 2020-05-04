@@ -820,9 +820,9 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	        $unshadow_file = trim($unshadow_file);
 	        $obj_file = new FILE($unshadow_file);
 	        
-	        $this->requette("john $obj_file->file_path --wordlist:\"$dico\" ");
+	        $this->requette("/opt/john/john $obj_file->file_path --wordlist:\"$dico\" ");
 	        
-	        $tab_user2pass = $this->req_ret_tab("john --show $obj_file->file_path | grep ':' ");
+	        $tab_user2pass = $this->req_ret_tab("/opt/john/john --show $obj_file->file_path | grep ':' ");
 	        if (!empty($tab_user2pass))
 	            foreach ($tab_user2pass as $user2tmp){
 	                if (preg_match('|^(?<user2name>[a-zA-Z0-9\-\_]{1,}):(?<user2cpw>[[:print:]]{1,}):(?<user2uid>[0-9]{1,}):(?<user2gid>[0-9]{1,}):(?<user2full_name>[[:print:]]{0,}):(?<user2home>[[:print:]]{1,}):(?<user2shell>[[:print:]]{1,})|',$user2tmp,$user))

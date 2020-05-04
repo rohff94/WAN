@@ -38,7 +38,8 @@ class com4display extends INSTALL {
 	    $this->notify($chaine);
 	    $time = date("Y-m-d H:i:s");
 	    $str = "$time,$chaine";
-	    $this->str2file($str, $this->log_succes_path);
+	    $str = addcslashes($str, "'");$str = addcslashes($str, "%");
+	    $this->requette("echo '$str' >>  $this->log_succes_path");
 	   
 	}
 	
@@ -47,6 +48,7 @@ class com4display extends INSTALL {
 	    $this->notify($chaine);
 	    $time = date("Y-m-d H:i:s");
 	    $str = "$time,$chaine";
+	    $str = addcslashes($str, "'");
 	    $this->requette("echo '$str' >>  $this->log_error_path");
 	}
 	
@@ -207,8 +209,13 @@ class com4display extends INSTALL {
 		return file($file_path);
 		}
 	
-		public function str2file($str,$file_path){
-		    file_put_contents($file_path, $str);
+		public function str2file($stream,$str,$file_path){
+		    if (empty($stream))   file_put_contents($file_path, $str);
+		    else {
+		        $input = addcslashes($str, "'");
+		        $data = "echo '$input' >  $file_path";
+		        $this->req_str($stream, $data, $this->stream_timeout, "");
+		    }
 		}
 
 

