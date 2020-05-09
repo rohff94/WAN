@@ -18,6 +18,9 @@ or
  */
 
 #define DATA "Hello.  Please place semicolons after commands in shell mode :P\n---\n"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <signal.h>
