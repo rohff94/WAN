@@ -57,8 +57,15 @@ include_once("./core/05-module_service/service.1.all.php");
 include_once("./core/06-module_lan/lan.0.php");
 include_once("./core/06-module_lan/lan.linux.0.com.php");
 include_once("./core/06-module_lan/lan.linux.1.check.6.users.php");
-
-
+include_once("./core/13-module_poc/0.poc.0.enum.php");
+include_once("./core/13-module_poc/0.poc.1.service.php");
+include_once("./core/13-module_poc/0.poc.2.web.php");
+include_once("./core/13-module_poc/0.poc.3.lan.php");
+include_once("./core/13-module_poc/0.poc.4.bof.php");
+include_once("./core/13-module_poc/0.poc.5.root.php");
+include_once("./core/13-module_poc/0.poc.6.malware.php");
+include_once("./core/13-module_poc/1.poc.php");
+include_once("./core/13-module_poc/2.tp.php");
 
 
 

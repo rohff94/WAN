@@ -613,9 +613,6 @@ class DOMAIN extends ETH{
 	    $mails = $this->domain2mail() ;
 	    echo $mails;$this->pause();
 	    
-	    $files = $this->domain2file() ;
-	    echo $files;$this->pause();
-	    
 	    $traces = $this->domain2trace() ;
 	    echo $traces;$this->pause();
 	    

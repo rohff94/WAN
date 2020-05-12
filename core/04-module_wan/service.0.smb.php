@@ -488,10 +488,10 @@ class service2smb extends service2asterisk {
             if (!empty($sid)) {
                 $this->article("SID", $sid);
                 
-                for ($rid = 0;$rid<=55;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v '*unknown*'  | grep -v '\\\\$rid'  "); // | cut -d'\' -f2  | cut -d'(' -f1
-                for ($rid = 100;$rid<=155;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v '*unknown*'  | grep -v '\\\\$rid'  "); // | cut -d'\' -f2  | cut -d'(' -f1
-                for ($rid = 495;$rid<=555;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep -v '*unknown*' ");
-                for ($rid = 995;$rid<=1055;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v '*unknown*' ");
+                for ($rid = 0;$rid<=55;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v \"Error was NT_STATUS\" | grep -v \"Cannot connect to server\" | grep -v '*unknown*'  | grep -v '\\\\$rid'  "); // | cut -d'\' -f2  | cut -d'(' -f1
+                for ($rid = 100;$rid<=155;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v \"Error was NT_STATUS\" | grep -v \"Cannot connect to server\" | grep -v '*unknown*'  | grep -v '\\\\$rid'  "); // | cut -d'\' -f2  | cut -d'(' -f1
+                for ($rid = 495;$rid<=555;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v \"Error was NT_STATUS\" | grep -v \"Cannot connect to server\" | grep -v '*unknown*' ");
+                for ($rid = 995;$rid<=1055;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v \"Error was NT_STATUS\" | grep -v \"Cannot connect to server\" | grep -v '*unknown*' ");
                 
             }
         }
@@ -528,8 +528,8 @@ class service2smb extends service2asterisk {
         $tmp2 = "";
         $users_found = array();
 
-        for ($rid = 500;$rid<=550;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids S-1-22-1-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v '*unknown*'  | grep -v '\\\\$rid' | cut -d'\' -f2  | cut -d'(' -f1"); // | cut -d'\' -f2  | cut -d'(' -f1
-        for ($rid = 1000;$rid<=1050;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids S-1-22-1-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v '*unknown*'  | grep -v '\\\\$rid' | cut -d'\' -f2  | cut -d'(' -f1"); // | cut -d'\' -f2  | cut -d'(' -f1
+        for ($rid = 500;$rid<=550;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids S-1-22-1-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v \"Error was NT_STATUS\" | grep -v \"Cannot connect to server\" | grep -v '*unknown*'  | grep -v '\\\\$rid' | cut -d'\' -f2  | cut -d'(' -f1"); // | cut -d'\' -f2  | cut -d'(' -f1
+        for ($rid = 1000;$rid<=1050;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids S-1-22-1-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v \"Error was NT_STATUS\" | grep -v \"Cannot connect to server\" | grep -v '*unknown*'  | grep -v '\\\\$rid' | cut -d'\' -f2  | cut -d'(' -f1"); // | cut -d'\' -f2  | cut -d'(' -f1
         var_dump($tmp2);
         $this->pause();
         $tmp2 = trim($tmp2);
@@ -549,12 +549,7 @@ class service2smb extends service2asterisk {
             if(!empty($users_found)) return $users_found;
         }
             
-        if(!empty($users_found)) return $users_found;
-        else $users_found = $this->service2smb4users4method5($work_group, $user2name, $user2pass);
-        $this->pause();
-        
-        
-        
+       
         $users_found =  $this->service2smb4users4method1($work_group, $user2name, $user2pass);
         $this->pause();
         
@@ -588,7 +583,7 @@ class service2smb extends service2asterisk {
         $work_group = trim($work_group);
         $user2name = trim($user2name);
         $user2pass = trim($user2pass);
-        return $this->req_ret_str("echo '$this->root_passwd' | sudo -S rpcclient -W '$work_group' -U '$user2name'%'$user2pass' -c '$query'  '$this->ip' -p $this->port 2> /dev/null  $filter   ");
+        return $this->req_ret_str("echo '$this->root_passwd' | sudo -S rpcclient -W '$work_group' -U '$user2name'%'$user2pass' -c '$query'  '$this->ip' -p $this->port 2> /dev/null  $filter  | grep -v \"Error was NT_STATUS\" | grep -v \"Cannot connect to server\"  ");
     }
     
     function service2smb4groups($work_group,$user2name, $user2pass){

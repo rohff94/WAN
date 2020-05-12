@@ -29,18 +29,7 @@ class com4user extends DATA {
     }
 
     
-    
-    function exec_parallel($cmd1, $cmd2, $time) {
-        $cmd1 = base64_encode($cmd1);
-        $cmd2 = base64_encode($cmd2);
-        
-        $filename = "/tmp/exec_para";
-        if (!file_exists($filename)) $this->requette("gcc $this->dir_c/exec_para.c -o $filename");
-        $this->requette("$filename $cmd1 $cmd2 $time");
-    }
-    
 
-    
    
     public function parse4id($id_result){
         $this->ssTitre(__FUNCTION__);

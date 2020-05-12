@@ -251,7 +251,6 @@ class IP extends DOMAIN{
 		<TR><TD>IP NEIGHBORDS</TD><TD PORT=\"ip2vhost\" ALIGN=\"LEFT\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->ip2vhost()))."</TD></TR>
 		<TR><TD>ISP</TD><TD PORT=\"ip2asn\" ALIGN=\"LEFT\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->ip2asn()))."</TD></TR>
 		<TR><TD>NET RANGE</TD><TD PORT=\"ip2range\" ALIGN=\"LEFT\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->ip2range()))."</TD></TR>
-		<TR><TD>GEOIP</TD><TD PORT=\"ip2geoip\" ALIGN=\"LEFT\"  > ".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->ip2geoip()))."</TD></TR>
 		<TR><TD>FIREWALL</TD><TD PORT=\"ip2fw\" ALIGN=\"LEFT\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->ip2fw()))."</TD></TR>
 		<TR><TD>USERS</TD><TD PORT=\"ip2users\" ALIGN=\"LEFT\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->ip2users()))."</TD></TR>
 		<TR><TD>OS</TD><TD PORT=\"ip2os\" ALIGN=\"LEFT\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->ip2os()))."</TD></TR>		
@@ -260,12 +259,10 @@ class IP extends DOMAIN{
 
 	    
 	    $ip2root = $this->ip2root8db($this->ip2id);
-	    $ip2shell = $this->ip2shell8db($this->ip2id);
-	    $ip2write = $this->ip2write8db($this->ip2id);
-	    $ip2read = $this->ip2read8db($this->ip2id);
+
 	    
 	    $ip2dot_ip = "\"$this->ip\" [label=<<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" ALIGN=\"LEFT\" >";
-	    if ( ($ip2root) || ($ip2shell) || ($ip2write) || ($ip2read) ) {
+	    if ( ($ip2root) ) {
 	        $ip2dot_ip .= "<TR><TD PORT=\"ip\"><IMG SRC=\"$this->dir_img/ico/ip.png\" /></TD><TD bgcolor=\"red\" >$this->ip</TD></TR>";	        
 	    }
 	    else $ip2dot_ip .= "<TR><TD PORT=\"ip\"><IMG SRC=\"$this->dir_img/ico/ip.png\" /></TD><TD bgcolor=\"$color_ip\" >$this->ip</TD></TR>";
@@ -275,9 +272,6 @@ class IP extends DOMAIN{
 		<TR><TD>HONEY</TD><TD PORT=\"ip2honey\" ALIGN=\"LEFT\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->ip2honey()))."</TD></TR>
 ";
 	    if ($ip2root) $ip2dot_ip .= "<TR><TD>ROOT</TD><TD  bgcolor=\"red\" PORT=\"ip2root\" ALIGN=\"LEFT\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$ip2root))."</TD></TR>";
-	    if ($ip2shell) $ip2dot_ip .= "<TR><TD>SHELL</TD><TD  bgcolor=\"red\" PORT=\"ip2shell\" ALIGN=\"LEFT\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$ip2shell))."</TD></TR>";
-	    if ($ip2write) $ip2dot_ip .= "<TR><TD>WRITE</TD><TD  bgcolor=\"red\" PORT=\"ip2write\" ALIGN=\"LEFT\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$ip2write))."</TD></TR>";
-	    if ($ip2read) $ip2dot_ip .= "<TR><TD>READ</TD><TD  bgcolor=\"red\" PORT=\"ip2read\" ALIGN=\"LEFT\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$ip2read))."</TD></TR>";
 	    
 	    $ip2dot_ip .= "</TABLE>>];\n";
 	    
@@ -357,7 +351,6 @@ $query = "grep -l -i \"$search\" $test->dir_tmp/*.xml ";
 $filenames = explode("\n",$test->req_ret_str($query));
 	     */
 	    $this->ssTitre(__FUNCTION__);
-	    // mysql -u rohff --password=hacker -b bot -e "select ip,port,from_base64(service2vuln) FROM PORT where from_base64(service2vuln) LIKE \"%VULNERABLE%\" ;" | grep -v -i "not bulnerable" | grep -A5 -B5 -i "vulnerable" | sed "s/\\\n/\n/g" | more
 	    $result .= $this->ip2cve4openvas($this->ip);$this->pause();
 	    $result .= $this->ip2cve4nmap();$this->pause();
 	    return $result;
@@ -972,7 +965,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	            foreach ($tab_user2pass as $user2tmp){
 	                if (preg_match('|^(?<user2name>[a-zA-Z0-9\-\_]{1,}):(?<user2cpw>[[:print:]]{1,}):(?<user2uid>[0-9]{1,}):(?<user2gid>[0-9]{1,}):(?<user2full_name>[[:print:]]{0,}):(?<user2home>[[:print:]]{1,}):(?<user2shell>[[:print:]]{1,})|',$user2tmp,$user))
 	                {
-	                   $this->yesAUTH($this->port2id, $user['user2name'], $user['user2cpw'],$user['user2uid'],$user['user2gid'],$user['user2full_name'],$user['user2home'],$user['user2shell'],"crack etc_passwd and shadow with john ");
+	                   $this->yesAUTH($this->port2id, $user['user2name'], $user['user2cpw'],"crack etc_passwd and shadow with john ");
 	                   //$this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",1);
 	                   //$this->ip2auth();
 	                }
@@ -1780,53 +1773,6 @@ as the header options; the TTL changes.");
 	
 	
 
-	
-	public function ip2vuln(){
-	    // https://github.com/radenvodka/SVScanner
-
-		$this->titre(__FUNCTION__);
-		$result = "";
-		$resu = "";
-		$this->requette("mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"select service2vuln from PORT where service2vuln like '%vulnerable%' AND ip = '$this->ip' ;\"  2>/dev/null   | sed \"s/\\\\\\n/\\n/g\" | grep -i -E \"vulnerable\" -A1 | grep 'IDs' | cut -d':' -f3 ");
-		
-		$sql_r = "SELECT vuln2cve FROM VULN WHERE ip = '$this->ip' AND vuln2cve IS NOT NULL";
-		$sql_r2 = "SELECT vuln2cve FROM VULN WHERE ip = '$this->ip' ";
-
-		
-		if (!$this->checkBD($sql_r2)) {
-		    $sql_w = "INSERT INTO VULN (ip) VALUES ('$this->ip'); ";
-		    $this->mysql_ressource->query($sql_w);
-		}
-		
-		
-		if ($this->checkBD($sql_r)) {
-			$ip2auth = $this->mysql_ressource->query($sql_r);
-			$rows = $ip2auth->fetch_array(MYSQLI_NUM);
-			mysqli_free_result($ip2auth);
-			foreach ($rows as $row)
-				$resu .= "$row\n";
-				echo $resu;
-		
-		}
-		else {
-   
-		$sql_r = "SELECT port,protocol,service2vuln FROM PORT WHERE service2vuln LIKE '%vulnerable%' AND ip = '$this->ip' ;";
-		if ($service2vuln = $this->mysql_ressource->query($sql_r)) {
-			while ($row = $service2vuln->fetch_assoc()) {
-				$query = "echo '".$row['service2vuln']."' | grep -i -E \"vulnerable\" -A1 | grep 'IDs' | cut -d':' -f3 | grep -Po \"(CVE-[0-9]{4}-[0-9]{4}|OSVDB-[0-9]{3-5})\" ";
-				exec($query,$cves);
-				if (!empty($cves))
-				foreach ($cves as $cve){
-					$result .= $this->exploitdb($cve)."\n";
-					$result .= $this->ip2cve8msf($cve)."\n";
-				}
-			}
-		}
-		
-		return $this->req2BD4in("vuln2cve","VULN","$this->ip2where ",$result);
-		}
-	}
-	
 	public function ip2auth(){
 	    $this->titre(__FUNCTION__);
 	$sql_service = "select id8port,service2name FROM SERVICE WHERE id8port IN (SELECT id FROM PORT WHERE id8ip= '$this->ip2id') AND (service2name = 'asterisk' OR service2name LIKE '%ftp%'  OR service2name = 'icq' OR service2name = 'imap' OR service2name = 'imaps' OR service2name = 'ldap2' OR service2name = 'ldap2s' OR service2name = 'ldap3' OR service2name = 'mssql' OR service2name = 'mysql' OR service2name = 'nntp' OR service2name = 'oracle-listener' OR service2name = 'oracle-sid' OR service2name = 'pcanywhere' OR service2name = 'postgres' OR service2name = 'rlogin'  OR service2name LIKE '%rdp%' OR service2name = 'sip' OR service2name = 'ssh' OR service2name LIKE '%smb%' OR service2name LIKE '%samba%' OR service2name = 'snmp' OR service2name = 'smtp' OR service2name = 'smtps' OR service2name = 'vnc' OR service2name = 'xmpp')  ;";
@@ -2131,7 +2077,6 @@ public function ip2vhost(){
 	         if (!empty($port))  {
 	             foreach ($port as $port_num => $protocol)
 	                 if (!empty($port_num)) {
-	                     $stream = "";
 	                     $obj_service = new SERVICE($this->stream,$this->eth,$this->domain,$this->ip,$port_num, $protocol);
 	                     //$obj_service->service4info();
 	                     switch ($obj_service->service_name) {
@@ -2143,7 +2088,7 @@ public function ip2vhost(){
 	                             $obj_service->service2smb4enum2users();
 	                             break ;
 	                         case "smtp" :
-	                             $obj_service->service2smtp2users();
+	                           //  $obj_service->service2smtp2users();
 	                             break ;
 	                         case "snmp" : 
 	                             //auxiliary/scanner/snmp/snmp_enumusers
@@ -2178,14 +2123,8 @@ public function ip2vhost(){
 	    
 
 	    $ip2root = $this->ip2root8db($this->ip2id);
-	    $ip2shell = $this->ip2shell8db($this->ip2id);
-	    $ip2write = $this->ip2write8db($this->ip2id);
-	    $ip2read = $this->ip2read8db($this->ip2id);
-	    
 	    if ($ip2root) $this->article("ip2root",$ip2root);
-	    if ($ip2shell)  $this->article("IP2SHELL",$ip2shell);
-	    if ($ip2write) $this->article("IP2WRITE",$ip2write);
-	    if ($ip2read) $this->article("IP2READ", $ip2read);
+
 	    
 	    if (!$this->ip4priv($this->ip)) {
 	        $vhosts = trim($this->ip2vhost());$this->article("ALL vHosts", $vhosts);
@@ -2216,9 +2155,9 @@ public function ip2vhost(){
 	    
 	    if  (!$this->ip4service8db($this->ip2id) ) {
 	        $this->ip4service2display();
-	        $this->ip4enum2users();
+	        //$this->ip4enum2users();
 	        $this->ip2os();$this->pause();	        
-	        $this->ip2auth();$this->pause();
+	        //$this->ip2auth();$this->pause();
 	        $sql_ip = "UPDATE IP SET ip4service=1 WHERE id = $this->ip2id  ";
 	        $this->mysql_ressource->query($sql_ip);
 	    }
@@ -2362,24 +2301,7 @@ public function ip2vhost(){
 	    return $this->checkBD($sql_w);
 	}
 	
-	
-	public function  ip2shell8db():bool{
-	    $sql_w = "SELECT ip2shell FROM IP WHERE $this->ip2where AND ip2shell = 1 ";
-	    return $this->checkBD($sql_w);
-	}
-	
-	public function  ip2read8db():bool{
-	    $sql_w = "SELECT ip2read FROM IP WHERE $this->ip2where AND ip2read = 1 ";
-	    return $this->checkBD($sql_w);
-	}
-	
-	public function  ip2write8db():bool{
-	    $sql_w = "SELECT ip2write FROM IP WHERE $this->ip2where AND ip2write = 1 ";
-	    return $this->checkBD($sql_w);
-	}
-	
-	
-	
+
 	
 	
 	

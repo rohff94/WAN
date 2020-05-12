@@ -33,6 +33,31 @@ class com4display extends INSTALL {
 		
 	}
 
+	function exec_para4print($cmd1, $cmd2, $time) {
+	    $this->article("CMD1", $cmd1);
+	    $this->article("CMD2", $cmd2);
+	    
+	    $cmd1 = base64_encode($cmd1);
+	    $cmd2 = base64_encode($cmd2);
+	    
+	    $filename = "/tmp/exec_para";
+	    if (!file_exists($filename)) $this->requette("gcc $this->dir_c/exec_para.c -o $filename");
+	    //echo "$filename $cmd1 $cmd2 $time\n\n";
+	    return "$filename $cmd1 $cmd2 $time";
+	}
+	
+	function exec_parallel($cmd1, $cmd2, $time) {
+	    $cmd1 = base64_encode($cmd1);
+	    $cmd2 = base64_encode($cmd2);
+	    
+	    $filename = "/tmp/exec_para";
+	    if (!file_exists($filename)) $this->requette("gcc $this->dir_c/exec_para.c -o $filename");
+	    $this->requette("$filename $cmd1 $cmd2 $time");
+	}
+	
+	
+	
+	
 	public function log2succes($chaine){
 	    
 	    $this->notify($chaine);
@@ -145,19 +170,7 @@ class com4display extends INSTALL {
 	    fgets($stream);
 	    $result = "";
 	    $result = @stream_get_contents($stream);
-	    
-	    
-	    // "must be run from a terminal"
-/*
- 	    while ( strstr($result, "[sudo] password for ")!==FALSE || strstr($result, "s password:")!==FALSE || strstr($result, "Sorry, try again.")!==FALSE ){
-	        $chaine = "Asking Password";
-	        $this->rouge($chaine);
-	        $data = "";
-	        fputs($stream, "$data\n");
-	        $result = @stream_get_contents($stream);
-	        
-	    }
- */
+
 	    
 	    $tmp = explode("\n", $result);
 	    array_pop($tmp);

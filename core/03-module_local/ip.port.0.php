@@ -141,7 +141,6 @@ class PORT extends IP{
 		list($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf) = $this->port2version4run($this->port2version());
 		$service = new SERVICE($this->stream,$this->eth,$this->domain,$this->ip,$this->port,$this->protocol);
 		$service->poc($this->flag_poc);
-		list ($date_rec,$service2banner,$service4cve,$port2root,$port2shell,$port2write,$port2read,$tab_whois8lan) = $service->service4info();
 		
 		
 		$port2dot_header = "digraph structs {
@@ -163,11 +162,7 @@ class PORT extends IP{
         <TR><TD PORT=\"service2version\" >SERVICE VERSION</TD><TD>$service->service_version</TD></TR>
         <TR><TD PORT=\"service2product\" >SERVICE PRODUCT</TD><TD>$service->service_product</TD></TR>
         <TR><TD PORT=\"service2extrainfo\" >SERVICE EXTRA INFOS</TD><TD>$service->service_extrainfo</TD></TR>                
-        <TR><TD PORT=\"port2root\" >PORT ROOT</TD><TD>".$this->dot2diagram(str_replace("\n","<BR/>\n",base64_encode($port2root)))."</TD></TR>
-        <TR><TD PORT=\"port2shell\" >PORT SHELL</TD><TD>".$this->dot2diagram(str_replace("\n","<BR/>\n",base64_encode($port2shell)))."</TD></TR>
-        <TR><TD PORT=\"port2write\" >PORT WRITE</TD><TD>".$this->dot2diagram(str_replace("\n","<BR/>\n",base64_encode($port2write)))."</TD></TR>
-        <TR><TD PORT=\"port2read\" >PORT READ</TD><TD>".$this->dot2diagram(str_replace("\n","<BR/>\n",base64_encode($port2read)))."</TD></TR>
-";			
+        ";			
 		$size = count($tab_whois8lan);
 		for ($i=0;$i<$size;$i++)
 		    if (!empty($tab_whois8lan[$i]))
@@ -345,14 +340,7 @@ class PORT extends IP{
 	    
 	    $result = "";
 	    $this->gtitre(__FUNCTION__);
-		    
-           
-	    $sql_r_1 = "SELECT service2vuln FROM SERVICE WHERE id8port=$this->port2id  AND service2vuln IS NOT NULL";
-	    if ($this->checkBD($sql_r_1) ) {
-	        
-	        return  base64_decode($this->req2BD4out("service2vuln","SERVICE","id8port = $this->port2id "));
-	    }
-	    else {
+		
 	        
 	    
 	        $service = new SERVICE($this->stream,$this->eth,$this->domain,$this->ip,$this->port,$this->protocol);
@@ -634,9 +622,8 @@ class PORT extends IP{
 	
 		echo $result;
 		return $result;
-		$result = base64_encode($result);
-		//return base64_decode($this->req2BD4in("service2vuln","SERVICE","id8port = $this->port2id ",$result));
-	    }
+
+	    
 	}
 	
 	public function port2os4ttl(){

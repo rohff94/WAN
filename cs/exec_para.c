@@ -7,10 +7,10 @@
 int main(int argc, char**argv) { 
 	char* cmd1;
         char* cmd2 ;
-	char query1[2048];
-	char query2[2048];
-	char command1[2048];
-	char command2[2048];
+	char query1[200048];
+	char query2[200048];
+	char command1[200048];
+	char command2[200048];
 
 	char* time2sleep;
         int laps ;

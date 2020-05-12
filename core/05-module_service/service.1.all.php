@@ -110,47 +110,6 @@ class SERVICE extends service2ssh {
 	
 	
 	
-	public function  port2root($template_b64){
-	    $this->ssTitre(__FUNCTION__);
-	    $chaine = base64_decode($template_b64);
-	    $this->log2succes($chaine);
-	    $sql_ip = "UPDATE IP SET ip2root=1 WHERE $this->ip2where  ";
-	    $this->mysql_ressource->query($sql_ip);
-	    $this->port2shell($template_b64);
-	}
-	
-	public function  port2read($template_b64){
-	    $this->ssTitre(__FUNCTION__);
-	    $chaine = base64_decode($template_b64);
-	    $this->log2succes($chaine);
-	    $sql_ip = "UPDATE IP SET ip2read=1 WHERE $this->ip2where  ";
-	    $this->mysql_ressource->query($sql_ip);
-	}
-	
-	public function  port2write($template_b64){
-	    $this->ssTitre(__FUNCTION__);
-	    $chaine = base64_decode($template_b64);
-	    $this->log2succes($chaine);
-	    $sql_ip = "UPDATE IP SET ip2write=1 WHERE $this->ip2where  ";
-	    $this->mysql_ressource->query($sql_ip);
-	    $this->port2read($template_b64);
-	}
-	
-	
-	public function  port2shell($template_b64){
-	    $this->ssTitre(__FUNCTION__);
-	    
-	    $chaine = base64_decode($template_b64);
-	    $this->log2succes($chaine);
-	    $sql_ip = "UPDATE IP SET ip2shell=1 WHERE $this->ip2where  ";
-	    $this->mysql_ressource->query($sql_ip);
-	    //$this->port2write($template_b64);
-	    
-	    
-	}
-	
-	
-	
 	
 	
 	public function service4lan($cmd_rev,$templateB64_shell,$lport,$lprotocol,$type){
@@ -227,7 +186,7 @@ class SERVICE extends service2ssh {
 	    $cmd = "id";
 	    $this->requette("chmod 600 $private_key_file");
 	    $this->requette("head -5 $private_key_file");
-	    $query = "ssh -i $private_key_file $login@$this->ip -p $port -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null  -C id";
+	    $query = "ssh -i $private_key_file $login@$this->ip -p $port -o PasswordAuthentication=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null  -C id";
 	    $this->cmd("localhost",$query);
 	    
 	    
@@ -252,7 +211,6 @@ class SERVICE extends service2ssh {
 	        
 	        //$this->yesAUTH($this->port2id, $login,$infos);
 	        $this->log2succes("Identification réussie en utilisant une clé publique");
-	        $this->port2shell(base64_encode($infos));
 	        $this->pause();
 	        return $con ;
 	    } else {
@@ -301,8 +259,7 @@ class SERVICE extends service2ssh {
 	            
 	            if (is_resource($stream)){
 	                $this->note("Success Established Connexion");
-	                $this->yesAUTH($this->port2id, $login, $mdp,"","", "", "", "",__FUNCTION__);
-	                $this->port2shell(base64_encode($template_shell));
+	                $this->yesAUTH($this->port2id, $login, $mdp,__FUNCTION__);
 	                return $stream ;
 	            }
 	            else {
@@ -1362,18 +1319,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 	    return trim($this->req2BD(__FUNCTION__,__CLASS__,"$this->service2where",$query));
 	}
 	
-	public function service4cve(){
-	    $this->ssTitre(__FUNCTION__);	    
-	    $sql_r_1 = "SELECT service2cve FROM SERVICE WHERE $this->service2where AND service2cve IS NOT NULL";
-	    if ($this->checkBD($sql_r_1) ) {
-	        return base64_decode($this->req2BD4out("service2cve","SERVICE",$this->service2where ));
-	    }
-	    else {
-	        $result = $this->service2exploitdb();
-	        $result = base64_encode($result);
-	        return base64_decode($this->req2BD4in("service2cve","SERVICE",$this->service2where,$result));
-	    }
-	}
+
 	
 
 	public function service2afp(){
@@ -1929,8 +1875,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 	
 	public function service2oracle(){
 	    $result = "";
-	    
-	    $result .= $this->ssTitre(__FUNCTION__);
+	    $this->ssTitre(__FUNCTION__);
 	    
 	    $query = "echo '$this->root_passwd' | sudo -S nmap -n  -Pn --reason --script \"oracle-*\" $this->ip -s$this->protocol -p $this->port -e $this->eth -oX - ";
 	    $result .= $this->cmd("localhost",$query);
@@ -1989,8 +1934,6 @@ This can also be used to determine local IPs, as well as gain a better understan
 	
 
 	public function service4info(){
-	    $result = "";
-	    $service4cve = "";
 	    echo "\n====START SERVICE4INFO:$this->port=======================================================\n";
 	    $this->titre(__FUNCTION__);
 	    $date_now = date('Y-m-d H:i:s');
@@ -2008,38 +1951,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 	    $this->article("hostname",$this->service_hostname);
 	    $this->article("Indice confiance",$this->service_conf."/10");
 	    $service2banner = trim($this->service2banner());$this->article("Banner",$service2banner);
-	    
-	    
-	    $port2root = $this->port2root8db($this->port2id);
-	    if ($port2root) $this->article("port2root",$port2root );
-	    	    
-	    $port2shell = $this->port2shell8db($this->port2id);
-	    if ($port2shell) $this->article("port2shell",$port2shell );
-	    
-	    $port2write = $this->port2write8db($this->port2id);
-	    if ($port2write) $this->article("port2write",$port2write );
-	    	    
-	    $port2read = $this->port2read8db($this->port2id);
-	    if ($port2read) $this->article("port2read",$port2read );
-	    
-	    $tab_whois8lan = array();
-	    
-	    if ( ($port2root) || ($port2shell) || ($port2write) || ($port2read) ) {
-	       // var_dump($tab_whois8lan);
-	        $tab_whois8lan = $this->service8lan();
-	        $size = count($tab_whois8lan);
-	        for ($i=0;$i<$size;$i++)
-	            if (!empty($tab_whois8lan[$i]))
-	            foreach ($tab_whois8lan[$i] as $lan2whois => $templateB64_id ){
-	            //var_dump($lan2whois);
-	            //var_dump($templateB64_id);
-	            $this->article($lan2whois, base64_decode($templateB64_id));
-	        }
-	        
-	    }
-	    echo "====END SERVICE4INFO:$this->port=======================================================\n\n";
-	    return array($this->date_rec,$service2banner,$service4cve,$port2root,$port2shell,$port2write,$port2read,$tab_whois8lan);
-	    
+	    echo "====END SERVICE4INFO:$this->port=======================================================\n\n";	    
 	    	} 
 
 
@@ -2048,7 +1960,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 	    // https://kalilinuxtutorials.com/metateta-scanning-exploiting-network/
 	    
 	    $result = "";
-	    $result .= $this->ssTitre(__FUNCTION__);
+	    $this->ssTitre(__FUNCTION__);
 		
 	    $service = "tftp";
 	    if((stristr($this->service_name,$service )) || (stristr($this->service_version,$service))) return $result .= $this->service2tftp();
@@ -2153,67 +2065,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 	
 	
 
-	
-	public function service2vpn(){
-	    return $this->service2vpn4exec();
-	}
-	public function service2ssh(){
-	    return $this->service2ssh4exec();
-	}
-	public function service2ssl(){
-	    return $this->service2ssl4exec();
-	}
-	public function service2sip(){
-	    return $this->service2sip4exec();
-	}
-	public function service2asterisk(){
-	    return $this->service2asterisk4exec();
-	}
-	public function service2ftp(){
-	    return $this->service2ftp4exec();
-	}
-	public function service2nfs(){
-	    return $this->service2nfs4exec();
-	}
-	public function service2smtp(){
-	    return $this->service2smtp4exec();
-	}
-	public function service2smb(){
-	    return $this->service2smb4exec();
-	}
-	public function service2exploitdb(){
-	    return $this->service2exploitdb4exec();
-	}
-	
-	
-	public function service2snmp(){
-	    return $this->service2snmp4exec();
-	}
-	
-	
-	
-	
-	public function service2vnc(){
-	    return $this->service2vnc4exec();
-	}
-	
-	
 
-	
-	
-	
-	public function service2ipmi(){
-	    return $this->service2ipmi4exec();
-	}
-	
-	
-	
-	public function service2netbios(){
-	    return $this->service2netbios4exec();
-	}
-	
-	
-	
 	
     
 

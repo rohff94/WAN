@@ -11,8 +11,7 @@ class AUTH extends PORT{
     var $path_ncrack ;
     var $path_smbclient ;
     
-	// mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute="select service2vuln from PORT where service2vuln like '%valid%';"  2>/dev/null | grep -i -E "(Valid credentials|password)"o
-    public function __construct($stream,$eth,$domain,$ip,$port,$service_protocol) {
+	public function __construct($stream,$eth,$domain,$ip,$port,$service_protocol) {
 		// /usr/share/nmap/scripts/
         parent::__construct($stream,$eth,$domain,$ip,$port,$service_protocol);
 
@@ -61,7 +60,7 @@ class AUTH extends PORT{
 	                $this->article("USERNAME", $user2name);
 	                $this->article("USERPASS", $user2pass);
 	                $this->article("USERINFO", $user2info);
-	                $this->yesAUTH($this->port2id, $user2name, $user2pass, NULL, NULL,NULL, NULL,NULL,$user2info);
+	                $this->yesAUTH($this->port2id, $user2name, $user2pass,$user2info);
 	            }
 	        }
 	    }
@@ -165,13 +164,7 @@ class AUTH extends PORT{
 	                    $result .= $this->yesAUTH($this->port2id,$afficheUSER['login'], $afficheUSER['pass'], __FUNCTION__);
 	                }
 	            }
-	            /*
-	             if (preg_match("/login: (?<login>[[:print:]]\w+)([[:space:]]{1,})$/", $result, $afficheUSER) ) {
-	             if (isset($afficheUSER['login'])){ // faire pour plusieurs resultat
-	             $result .= $this->yesAUTH($this->port2id,$afficheUSER['login'],__FUNCTION__);
-	             }
-	             }
-	             */
+
 	            
 	        }
 	    }
@@ -410,15 +403,7 @@ class AUTH extends PORT{
 		else return FALSE;
 	}
 	
-	public	function auth2login_ssh4pubkeyfile($cmd,$user2name,$private_key_ssh_rsa_file,$pass_phrase,$port) {
-		$this->ssTitre(__FUNCTION__);
-		$cmd = addslashes($cmd);
-		$result .= $this->ssTitre(__FUNCTION__);
-		$query = "ssh -i $private_key_ssh_rsa_file -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null $user2name@$this->ip -p $port \"$cmd\" ";
-		$result .= $this->cmd("localhost",$query);
-		$result .= $this->req_ret_str($query);	
-		return 	$result;	
-	}
+
 
 	
 	
@@ -440,9 +425,9 @@ class AUTH extends PORT{
 	    $result = "";
 	    $this->article("SID", $sid);
 
-	    for ($rid = 0;$rid<=55;$rid++) $result .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep -v \"NT_STATUS_ACCESS_DENIED\" | grep -v \"*unknown*\" |  sed \"s/(1)/(Local User)/g\" | sed \"s/(2)/(Domain Group)/g\" | sed \"s/(3)/(Domain User)/g\" | sed \"s/(4)/(Local Group)/g\" | grep '(Local User)' | cut -d'\' -f2 | cut -d'(' -f1 ")."\n";
-	    for ($rid = 495;$rid<=555;$rid++) $result .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep -v \"NT_STATUS_ACCESS_DENIED\" | grep -v \"*unknown*\" |  sed \"s/(1)/(Local User)/g\" | sed \"s/(2)/(Domain Group)/g\" | sed \"s/(3)/(Domain User)/g\" | sed \"s/(4)/(Local Group)/g\" | grep '(Local User)' | cut -d'\' -f2 | cut -d'(' -f1 ")."\n";
-	    for ($rid = 995;$rid<=1055;$rid++) $result .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep -v \"NT_STATUS_ACCESS_DENIED\" | grep -v \"*unknown*\" |  sed \"s/(1)/(Local User)/g\" | sed \"s/(2)/(Domain Group)/g\" | sed \"s/(3)/(Domain User)/g\" | sed \"s/(4)/(Local Group)/g\" | grep '(Local User)' | cut -d'\' -f2 | cut -d'(' -f1 ")."\n";
+	    for ($rid = 0;$rid<=55;$rid++) $result .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep -v \"NT_STATUS_ACCESS_DENIED\" | grep -v \"Error was NT_STATUS\" | grep -v \"Cannot connect to server\" | grep -v \"*unknown*\" |  sed \"s/(1)/(Local User)/g\" | sed \"s/(2)/(Domain Group)/g\" | sed \"s/(3)/(Domain User)/g\" | sed \"s/(4)/(Local Group)/g\" | grep '(Local User)' | cut -d'\' -f2 | cut -d'(' -f1 ")."\n";
+	    for ($rid = 495;$rid<=555;$rid++) $result .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep -v \"NT_STATUS_ACCESS_DENIED\" | grep -v \"Error was NT_STATUS\" | grep -v \"Cannot connect to server\" | grep -v \"*unknown*\" |  sed \"s/(1)/(Local User)/g\" | sed \"s/(2)/(Domain Group)/g\" | sed \"s/(3)/(Domain User)/g\" | sed \"s/(4)/(Local Group)/g\" | grep '(Local User)' | cut -d'\' -f2 | cut -d'(' -f1 ")."\n";
+	    for ($rid = 995;$rid<=1055;$rid++) $result .= $this->req_ret_str("rpcclient -c 'lookupsids $sid-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null | grep -v \"NT_STATUS_ACCESS_DENIED\" | grep -v \"Error was NT_STATUS\" | grep -v \"Cannot connect to server\" | grep -v \"*unknown*\" |  sed \"s/(1)/(Local User)/g\" | sed \"s/(2)/(Domain Group)/g\" | sed \"s/(3)/(Domain User)/g\" | sed \"s/(4)/(Local Group)/g\" | grep '(Local User)' | cut -d'\' -f2 | cut -d'(' -f1 ")."\n";
 	    
 	    
 	    $result = trim($result);

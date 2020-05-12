@@ -324,7 +324,6 @@ class lan4linux extends LAN{
         $result = "";
         $this->titre(__FUNCTION__);
         
-        $this->port2root($this->templateB64_shell);
         
         /*
         $tab_flag_name = array("user.txt","root.txt","flag.txt");

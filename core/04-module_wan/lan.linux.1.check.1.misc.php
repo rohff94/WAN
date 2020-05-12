@@ -398,7 +398,7 @@ lxc launch SomeAlias MyMachine
                         $auth_user2pass = trim($auth_user2pass);
                         $this->article("USER PASSWORD", $auth_user2pass);
                         
-                        if(!empty($auth_user2name)) $result .= $this->yesAUTH($this->port2id, $auth_user2name, $auth_user2pass,NULL,NULL,NULL,NULL,NULL,"crack $this->vm_tmp_lin/$this->ip.$this->port.$this->protocol.htpasswd with john ", $this->ip2geoip());
+                        if(!empty($auth_user2name)) $result .= $this->yesAUTH($this->port2id, $auth_user2name, $auth_user2pass,"crack $this->vm_tmp_lin/$this->ip.$this->port.$this->protocol.htpasswd with john ");
                     }
                 }
             }

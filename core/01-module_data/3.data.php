@@ -113,39 +113,6 @@ public function  req2BD4in($colonne,$table,$where,$result){
 
 
 
-public function  port2root8db($port2id){
-    $sql_w = "SELECT port2root FROM PORT WHERE id = $port2id AND port2root IS NOT NULL ";
-    if ($this->checkBD($sql_w)!==FALSE){
-        return trim(base64_decode($this->mysql_ressource->query($sql_w)->fetch_assoc()['port2root']));
-    }
-    return FALSE;
-}
-
-
-public function  port2shell8db($port2id){
-    $sql_w = "SELECT port2shell FROM PORT WHERE id = $port2id AND port2shell IS NOT NULL ";
-    if ($this->checkBD($sql_w)!==FALSE){
-        return trim(base64_decode($this->mysql_ressource->query($sql_w)->fetch_assoc()['port2shell']));
-    }
-    return FALSE;
-}
-
-public function  port2read8db($port2id){
-    $sql_w = "SELECT port2read FROM PORT WHERE id = $port2id AND port2read IS NOT NULL ";
-    if ($this->checkBD($sql_w)!==FALSE){
-        return trim(base64_decode($this->mysql_ressource->query($sql_w)->fetch_assoc()['port2read']));
-    }
-    return FALSE;
-}
-
-public function  port2write8db($port2id){
-    $sql_w = "SELECT port2write FROM PORT WHERE id = $port2id AND port2write IS NOT NULL ";
-    if ($this->checkBD($sql_w)!==FALSE){
-        return trim(base64_decode($this->mysql_ressource->query($sql_w)->fetch_assoc()['port2write']));
-    }
-    return FALSE;
-}
-
 public function checkBD($sql):bool{
     
 /*
