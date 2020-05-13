@@ -51,7 +51,7 @@ class tunnel4linux extends pivot4linux{
     
     public function tunnel_icmp_server($stream) {
         $this->ssTitre(__FUNCTION__);
-        //$victime = new vm($this->target_vmx_name);
+        //$victime = new VM($this->target_vmx_name);
         $victime->vm2upload("$this->dir_tools/Malware/ISHELL-v0.2.tar.gz","$this->vm_tmp_lin/ISHELL-v0.2.tar.gz");
         $this->cmd($this->target_vmx_name, "sudo tar -xvf $this->vm_tmp_lin/ISHELL-v0.2.tar.gz -C /opt " );
         $this->cmd($this->target_vmx_name, "cd /opt/ISHELL-v0.2/; make linux" );
@@ -176,7 +176,7 @@ class tunnel4linux extends pivot4linux{
         $this->ssTitre("Covert TCP - IP Identification - IPID"); // -e frame.number -e ip.src -e ip.dst -e tcp.srcport -e tcp.dstport -e data -T fields
         
         $this->requette("cp -v $this->dir_c/covert_tcp.c $this->dir_tmp");
-        //$vm = new vm($this->target_vmx_name);
+        //$vm = new VM($this->target_vmx_name);
         
         $file_c = new FILE("$this->dir_tmp/covert_tcp.c");       
         $file_c->file_c2elf(""); // compilation : -> -no PIE section .text est fixe en mémoire(PIE désactivé).        
@@ -271,7 +271,7 @@ class tunnel4linux extends pivot4linux{
     
     public function tunnel_http2tcp4tunneld_server($stream){
         $this->ssTitre("tunneld Server");
-        // $vm = new vm($this->target_vmx_name);
+        // $vm = new VM($this->target_vmx_name);
         $this->article("Usage","Start the tunneld server on a remote machine. The server listens on a port specified by parameter -p for HTTP connection from a client program.
 The server then read the HTTP payload and send it to the target using TCP connection. The target is specified by the client when establishing the tunnel.
 Usually, tunneling will actually be useful when you use the default HTTP port 80 so that the connection from tunnel client to tunnel server is not blocked by firewall.");
@@ -320,7 +320,7 @@ Usually, tunneling will actually be useful when you use the default HTTP port 80
     
     public function tunnel_http2tcp4hts($stream) {
         $this->titre(__FUNCTION__);
-        //$vm = new vm($this->target_vmx_name);
+        //$vm = new VM($this->target_vmx_name);
         
         $this->tunnel_http2tcp4hts_server();
         $this->tunnel_http2tcp4hts_client();
@@ -338,7 +338,7 @@ Usually, tunneling will actually be useful when you use the default HTTP port 80
     
     public function tunnel_http2tcp4hts_server($stream){
         $this->ssTitre("tunneld server");
-        //$vm = new vm($this->target_vmx_name);
+        //$vm = new VM($this->target_vmx_name);
         $vm->vm2upload("$this->dir_tools/Malware/httptunnel-3.0.5.tar.gz", "$this->vm_tmp_lin/httptunnel-3.0.5.tar.gz");
         $this->cmd($this->target_vmx_name, "sudo tar -xvf $this->vm_tmp_lin/httptunnel-3.0.5.tar.gz -C /opt ");
         $this->cmd($this->target_vmx_name, "cd /opt/httptunnel-3.0.5/; ./configure ; make ; sudo make install ");

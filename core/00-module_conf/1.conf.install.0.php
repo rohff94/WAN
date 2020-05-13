@@ -297,7 +297,7 @@ class INSTALL extends CONFIG{
 	
 	function install_for_sandbox_win($vm){
 		$this->ssTitre(__FUNCTION__);
-		//$vm_obj = new vm($vm);
+		//$vm_obj = new VM($vm);
 		$this->requette("zip $this->dir_install/Win/for/* -d $this->dir_tmp/Forensics.zip");
 		//$vm_obj->vm2upload("$this->dir_tmp/Forensics.zip", "$this->vm_tmp_win/Forensics.zip");
 	}

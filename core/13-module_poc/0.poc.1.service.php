@@ -111,7 +111,7 @@ class poc4service extends poc4net {
         $kio1_port_netbios = new PORT($ip,139, 'T');
         $kio1_port_netbios->port4pentest();$this->pause();
         
-        $kio1_service_smb = new SERVICE4COM($ip,139, 'T');
+        $kio1_service_smb = new SERVICE($ip,139, 'T');
         $kio1_service_smb->service2netbios();$this->pause();
         
         $this->titre("Be root with exploit");
