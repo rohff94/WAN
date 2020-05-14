@@ -104,7 +104,7 @@ class URL extends WEB{
 	    $this->ssTitre(__FUNCTION__);
 	    $result .= $this->url2form($this->url);
 	    $result .= $this->url2info();
-	    //$result .= $this->url2search($this->user2agent, $this->url,"");
+	    //$result .= $this->url2html("", $this->url2wget("", "", $this->url, "GET"));
 	    return $result;
 	}
 
@@ -224,18 +224,11 @@ class URL extends WEB{
 
 
 
-	
-	
-	public function url2search($user2agent,$url,$filter){
-	    $this->ssTitre(__FUNCTION__);
-	    $query = "wget --user-agent='$user2agent' \"$url\" --timeout=40 --tries=2 --no-check-certificate -qO- | strings $filter 2> /dev/null";
-	    $tmp = $this->req_str($this->stream,$query,$this->stream_timeout," | grep -Po '$search' ");
-	    if(!empty($tmp)) return FALSE ;else return TRUE;
-	}
+
 	
 	public function url2check($user2agent,$url,$filter){
 	    $this->ssTitre(__FUNCTION__);
-	    if (empty($this->url2search($user2agent, $url, $filter))) return FALSE ;
+	    if (empty($this->url2html("", $this->url2wget("", "", $url, "GET")))) return FALSE ;
 	    else return TRUE;
 	}
 	

@@ -1013,6 +1013,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         
     }
     
+
     
     public function msf2search($cve){
         $this->ssTitre(__FUNCTION__);

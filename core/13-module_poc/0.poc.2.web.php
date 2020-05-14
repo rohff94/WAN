@@ -14,7 +14,7 @@ class poc4web extends poc4service{
     
     
     public function poc4web($eth,$domain,$web,$fonction2exec){
-        $obj_web = new WEB($eth, $domain, $web);
+        $obj_web = new WEB("",$eth, $domain, $web);
         
         
         $flag_poc = FALSE;
@@ -33,6 +33,13 @@ class poc4web extends poc4service{
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
         
+        $ip = "10.60.10.185"; // BSides-Vancouver-2018-Workshop
+        $port = "80";
+        $web = "http://$ip:$port/backup_wordpress/";
+        $this->poc4web($eth,$domain,$web,$fonction2exec);
+        
+        
+        exit();
         $ip = "10.60.10.183"; // Billu_box2 OK exploit/unix/webapp/drupal_drupalgeddon2
         $port = "80";
         $web = "http://$ip:$port/";

@@ -1,7 +1,7 @@
 <?php
 
 
-class WEB extends PORT{
+class WEB extends SERVICE{
 
     var $web ;
     var $vhost ;
@@ -256,8 +256,7 @@ https://cmsdetect.com/
 	    $apps = array();
 	    $url = $this->url2norme($url);
 	    if ( (!empty($url)) && ($this->url2code($url)==="200")  ){
-	    $content = $this->url2search($this->user2agent, $url, $filter);
-	    $apps=$this->web2cms8html($content);
+	        $apps=$this->web2cms8html($this->url2html("", $this->url2wget("", "", $url, "GET"), $filter));
 	    foreach($apps as $app)
 	    {       
 	        $this->article("App Used",$app);
@@ -507,7 +506,19 @@ https://cmsdetect.com/
 		    return $result;
 		}
 
+		
+		public function url2html($stream, $url2wget, $filter){
+		    return $this->req_str($stream, $url2wget, $this->stream_timeout, $filter);
+		}
 
+		
+		
+		public function url2search($stream,$user2agent,$url,$search,$filter){
+		    $this->ssTitre(__FUNCTION__);
+		    $url2wget = $this->url2wget($user2agent, "", $url, "GET");
+		    $tmp = $this->url2html($stream, $url2wget," | strings $filter | grep '$search' ");
+		    if(!empty($tmp)) return FALSE ;else return TRUE;
+		}
 		
 		public function web4pentest(){
 		    $result = "";

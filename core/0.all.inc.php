@@ -26,15 +26,6 @@ include_once("./core/03-module_local/eth.domain.0.php");
 include_once("./core/03-module_local/eth.host.0.php");
 include_once("./core/03-module_local/ip.0.php");
 include_once("./core/03-module_local/ip.port.0.php");
-include_once("./core/03-module_local/web.0.php");
-include_once("./core/03-module_local/web.url.0.php");
-include_once("./core/03-module_local/web.url.param.0.php");
-include_once("./core/03-module_local/web.url.param.1.ce.php");
-include_once("./core/03-module_local/web.url.param.2.fi.php");
-include_once("./core/03-module_local/web.url.param.3.sqli.php");
-include_once("./core/03-module_local/web.url.param.4.xml.php");
-include_once("./core/03-module_local/web.url.param.5.xss.php");
-include_once("./core/03-module_local/web.url.param.all.php");
 include_once("./core/04-module_wan/0.file.com/1.file.0.php");
 include_once("./core/04-module_wan/0.file.com/1.file.bin.0.php");
 include_once("./core/04-module_wan/0.file.com/1.file.bin.linux.0.php");
@@ -83,9 +74,18 @@ include_once("./core/04-module_wan/service.0.asterisk.php");
 include_once("./core/04-module_wan/service.0.smb.php");
 include_once("./core/04-module_wan/service.0.ssh.php");
 include_once("./core/05-module_service/service.1.all.php");
-include_once("./core/06-module_lan/lan.0.php");
-include_once("./core/06-module_lan/lan.linux.0.com.php");
-include_once("./core/06-module_lan/lan.linux.1.check.6.users.php");
+include_once("./core/06-module_web/web.0.php");
+include_once("./core/06-module_web/web.url.0.php");
+include_once("./core/06-module_web/web.url.param.0.php");
+include_once("./core/06-module_web/web.url.param.1.ce.php");
+include_once("./core/06-module_web/web.url.param.2.fi.php");
+include_once("./core/06-module_web/web.url.param.3.sqli.php");
+include_once("./core/06-module_web/web.url.param.4.xml.php");
+include_once("./core/06-module_web/web.url.param.5.xss.php");
+include_once("./core/06-module_web/web.url.param.all.php");
+include_once("./core/07-module_lan/lan.0.php");
+include_once("./core/07-module_lan/lan.linux.0.com.php");
+include_once("./core/07-module_lan/lan.linux.1.check.6.users.php");
 include_once("./core/13-module_poc/0.poc.0.enum.php");
 include_once("./core/13-module_poc/0.poc.1.service.php");
 include_once("./core/13-module_poc/0.poc.2.web.php");
@@ -95,7 +95,6 @@ include_once("./core/13-module_poc/0.poc.5.root.php");
 include_once("./core/13-module_poc/0.poc.6.malware.php");
 include_once("./core/13-module_poc/1.poc.php");
 include_once("./core/13-module_poc/2.tp.php");
-
 
 
 

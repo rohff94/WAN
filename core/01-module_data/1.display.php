@@ -98,7 +98,7 @@ class com4display extends INSTALL {
 	    if (empty($tmp)) {$this->note("Empty Result");return $tmp;}
 	    $tmp = array_filter($tmp);
 	    echo $this->tab($tmp);
-	    var_dump($tmp);
+	    //var_dump($tmp);
 	    return $tmp;
 	}
 	

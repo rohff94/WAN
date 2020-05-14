@@ -1447,7 +1447,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	public function ip2udp4top200(): array{
 	    $this->ssTitre(__FUNCTION__);
 	    
-		$query = "echo '$this->root_passwd' | sudo -S nmap -sU -Pn -n --reason --top-ports 60 $this->ip --open -e $this->eth -oX -  ";		
+		$query = "echo '$this->root_passwd' | sudo -S nmap -sU -Pn -n --reason --top-ports 200 $this->ip --open -e $this->eth -oX -  ";		
 		
 		$firewall = $this->ip2fw4enable();		
 		if (!$firewall) $query = $query." --scan-delay 1 | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";

