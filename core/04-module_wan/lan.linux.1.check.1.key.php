@@ -188,7 +188,7 @@ class check4linux8key extends check4linux8enum{
         $this->article("Remote Home User", $local_home_user);
         $this->article("Remote User2use", $remote_username);
         $private_key_ssh_rsa_file = "$this->dir_tmp/$this->ip.$remote_username.rsa.priv";
-        $obj_file = new FILE($private_key_ssh_rsa_file);
+        $obj_file = new FILE($this->stream,$private_key_ssh_rsa_file);
         $public_key_ssh_rsa_file = "$obj_file->file_dir/$obj_file->file_name.pub";
         $pass_phrase = '';
         $this->key2gen4priv("",10,$private_key_ssh_rsa_file, $pass_phrase);

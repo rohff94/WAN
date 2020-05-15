@@ -143,16 +143,7 @@ class lan4linux extends LAN{
     
     public function lan2init2var(){
         $this->titre(__FUNCTION__);
-        $data = "uname -r";
-        $os_kernel = trim($this->lan2stream4result($data,$this->stream_timeout*2));
-        
-        $data = "uname -s";
-        $os_plateforme = trim($this->lan2stream4result($data,$this->stream_timeout*2));
-        
-        $this->os_kernel_number = trim($this->req_ret_str("echo \"$os_kernel\" | grep -Po \"[2-4]{1}\.[0-9]{1,2}\.[0-9]{1,3}\-[[:print:]]{1,}\" "));
-        $this->os_plateforme_name = trim($this->req_ret_str("echo \"$os_plateforme\" | grep -i -E \"(linux|windows|debian|unix)\" "));
-        $this->ip2os4arch($this->os_plateforme_name);
-        $this->parse4kernel($this->os_kernel_number);
+
     }
     
     public function lan2init2app(){

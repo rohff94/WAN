@@ -706,7 +706,7 @@ TCP n'est pas réservé qu'au transfert de zone et est utilisé si la taille de 
         $this->pause();
         $this->cmd("localhost", "python $this->dir_tools/enum/ms08-067_check-0.6/ms08-067_check.py -t $this->xp ");
         $this->pause();
-        $this->requette("echo '$this->root_passwd' | sudo -S wget https://raw.githubusercontent.com/pwnieexpress/metasploit-framework/master/modules/auxiliary/scanner/smb/ms08_067_check.rb -O /opt/metasploit/apps/pro/msf3/modules/auxiliary/scanner/smb/ms08_067_check.rb ");
+        $this->requette("echo '$this->root_passwd' | sudo -S wget https://raw.githubusercontent.com/pwnieexpress/metasploit-framework/master/modules/auxiliary/scanner/smb/ms08_067_check.rb -qO /opt/metasploit/apps/pro/msf3/modules/auxiliary/scanner/smb/ms08_067_check.rb ");
         $this->cmd("localhost", "echo '$this->root_passwd' | sudo -S msfcli auxiliary/scanner/smb/ms08_067_check RHOSTS=10.50.10.0/24 E");
         $this->pause();
         $this->cmd("localhost", "echo '$this->root_passwd' | sudo -S nmap --script vuln -vvv $this->xp $this->msf $this->owasp $dvl $this->win7 $win08 -n");
@@ -1956,7 +1956,7 @@ This type of scan method involves opening a full connection to the remote comput
         
         $this->ssTitre("Without tor socket");
         $this->requette("curl http://ifconfig.me/ip");
-        $this->requette("wget http://what-is-my-ip.net/?text -O $this->dir_tmp/ip_real.txt ; cat $this->dir_tmp/ip_real.txt;echo ");
+        $this->requette("wget http://what-is-my-ip.net/?text -qO $this->dir_tmp/ip_real.txt ; cat $this->dir_tmp/ip_real.txt;echo ");
         $this->pause();
         $this->ssTitre("Using usewithtor");
         $this->article("SSH", "usewithtor ssh login@host.tld ");
@@ -1964,10 +1964,10 @@ This type of scan method involves opening a full connection to the remote comput
         $this->article("SFTP", "usewithtor sftp login@host.tld ");
         $this->article("telnet", "usewithtor telnet host.tld ");
         $this->requette("usewithtor wget -qO- http://ifconfig.me/ip");
-        $this->requette("usewithtor wget http://what-is-my-ip.net/?text -O $this->dir_tmp/ip_usewithtor.txt ; cat $this->dir_tmp/ip_usewithtor.txt;echo ");
+        $this->requette("usewithtor wget http://what-is-my-ip.net/?text -qO $this->dir_tmp/ip_usewithtor.txt ; cat $this->dir_tmp/ip_usewithtor.txt;echo ");
         $this->ssTitre("Using torify");
         $this->requette("torify wget -qO- http://ifconfig.me/ip");
-        $this->requette("torify wget http://what-is-my-ip.net/?text -O $this->dir_tmp/ip_torify.txt ; cat $this->dir_tmp/ip_torify.txt;echo ");
+        $this->requette("torify wget http://what-is-my-ip.net/?text -qO $this->dir_tmp/ip_torify.txt ; cat $this->dir_tmp/ip_torify.txt;echo ");
         $this->requette("man torify");
         $this->pause();
         $this->requette("usewithtor nmap -Pn -sT -r -n -p 21,22,23,25,53,80,143,443,465,587,993,995 www.mbis-inc.net -vvv --packet-trace --reason --stats-every 20s");

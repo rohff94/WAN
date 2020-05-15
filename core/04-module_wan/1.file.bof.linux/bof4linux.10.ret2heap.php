@@ -150,7 +150,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_fastbin_dup";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -162,7 +162,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_first_fit";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -173,7 +173,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_fastbin_dup_into_stack";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -185,7 +185,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_fastbin_dup_consolidate";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -197,7 +197,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_house_of_einherjar";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -207,7 +207,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_house_of_force";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -217,7 +217,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_house_of_lore";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -227,7 +227,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_house_of_orange";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -237,7 +237,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_house_of_spirit";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -247,7 +247,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_large_bin_attack";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -258,7 +258,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_overlapping_chunks";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -269,7 +269,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_overlapping_chunks_2";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -280,7 +280,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_poison_null_byte";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -291,7 +291,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_unsafe_unlink";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -302,7 +302,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_unsorted_bin_attack";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -314,7 +314,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_unsorted_bin_into_stack";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -326,7 +326,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_tcache_dup";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -337,7 +337,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_tcache_house_of_spirit";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -348,7 +348,7 @@ public function ret2heap4linux_intro(){
     $name = "ret2heap4linux_tcache_poisoning";
     $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
     $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-    $file_c = new FILE("$this->dir_tmp/$name.c");
+    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
     //$this->requette("gedit $file_c->file_path");
     $programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
     $argv = "";
@@ -374,7 +374,7 @@ function ret2heap4linux_dlmalloc() {
 	$name = "ret2heap4linux_0";
 	$this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
 	$c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-	$file_c = new FILE("$this->dir_tmp/$name.c");
+	$file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
 	$this->requette("gedit $file_c->file_path");
 	$programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
 	$this->requette($programme );
@@ -387,7 +387,7 @@ function ret2heap4linux_dlmalloc() {
 	$name = "ret2heap4linux_1";
 	$this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
 	$c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-	$file_c = new FILE("$this->dir_tmp/$name.c");
+	$file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
 	
 	$this->requette("gedit $file_c->file_path");
 	$programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
@@ -397,7 +397,7 @@ function ret2heap4linux_dlmalloc() {
 	$name = "ret2heap4linux_2";
 	$this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
 	$c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-	$file_c = new FILE("$this->dir_tmp/$name.c");
+	$file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
 	
 	$programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
 	$this->article("Tester in name", " AAAAA | AAAAAAAAAAAAAAAAcat /etc/passwd | AAAAAAAAAAAAAAAA/bin/sh\n" );
@@ -410,7 +410,7 @@ function ret2heap4linux_dlmalloc() {
 	$name = "ret2heap4linux_malloc_ptr_addr_bss";
 	$this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
 	$c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-	$file_c = new FILE("$this->dir_tmp/$name.c");
+	$file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
 	
 	$programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
 	$this->requette($programme );

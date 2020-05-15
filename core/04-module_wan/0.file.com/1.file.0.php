@@ -272,7 +272,7 @@ john 7zhash --wordlist:/usr/share/wordlists/rockyou.txt
 	
 	// else net("$lien_virustotal");
 	else
-	$this->cmd("localhost", "wget $lien_virustotal -O $this->file_path.virustotal");
+	$this->cmd("localhost", "wget $lien_virustotal -qO $this->file_path.virustotal");
 	exec("grep -A3 -i 'Ratio de détection' $this->file_path.virustotal | tail -1  ", $tmp);
 	if (empty($tmp)) {
 	$virustotal_resultat = "ce fichier n'a jamais ete soumis a Virustotal";
@@ -539,7 +539,7 @@ public function file2strings($filter){
 	    $query = "zip -re $this->file_path.zip $this->file_path ";
 	    if (!exists("$this->file_path.zip"))  $this->requette($query);
 	    else $this->cmd("localhost",$query);
-	    return new FILE("$this->file_path.zip");
+	    return new FILE($this->stream,"$this->file_path.zip");
 	}
 	
 	public  function file2zip4pass2read($password){
@@ -548,7 +548,7 @@ public function file2strings($filter){
 		$query = "zip -P $password -r $this->file_path.zip $this->file_path ";
 		if (!exists("$this->file_path.zip"))  $this->requette($query);
 		else $this->cmd("localhost",$query);
-		return new FILE("$this->file_path.zip");
+		return new FILE($this->stream,"$this->file_path.zip");
 	}
 	
 	public  function pdf2info(){	

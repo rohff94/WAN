@@ -47,7 +47,7 @@ class com4code extends com4dot {
         $this->ssTitre(__FUNCTION__);
         $raw = $this->shellcode2raw();
         $raw = trim($raw);
-        $raw_file = new FILE($raw);
+        $raw_file = new FILE("",$raw);
         $raw_file->raw2graph($raw);
     }
     
@@ -67,7 +67,7 @@ class com4code extends com4dot {
         $this->ssTitre(__FUNCTION__);
         $hex = trim(get_contents($this->path));
         system("echo \"unsigned char shellcode[] =\\\"$hex\\\"; \n\nvoid main(){\n\t(*(void(*)()) shellcode)();\n}\" | tee $this->dir/$this->name.c ");
-        return new file("$this->dir/$this->name.c");
+        return new FILE("","$this->dir/$this->name.c");
     }
     
     
@@ -109,7 +109,7 @@ class com4code extends com4dot {
     public function raw2shellcode2norme() { // del_obstacle // raw file
         $this->ssTitre(__FUNCTION__);
         $this->requette( "cat $this->path | sudo  msfvenom -e x86/shikata_ga_nai -b \"\\x00\\x20\\x0a\" -t c > $this->path.h ");
-        $h = new FILE("$this->path.h");
+        $h = new FILE("","$this->path.h");
         $hex = $h->c2shellcode();
         return $this->payload2check4norme($hex,$this->badchars);
     }
@@ -118,7 +118,7 @@ class com4code extends com4dot {
         $hex = trim(get_contents($this->path));
         system("echo \"#include <stdio.h>\nunsigned char shellcode[] =\\\"$hex\\\"; \n\nvoid main(){\n\t(*(void(*)()) shellcode)();\n}\" | tee $this->dir/$this->name.c ");
         //return "$this->dir_tmp/$this->name.c";
-        return new file("$this->dir_tmp/$this->name.c");
+        return new FILE("","$this->dir_tmp/$this->name.c");
         
     }
     
@@ -146,7 +146,7 @@ class com4code extends com4dot {
         $this->ssTitre( ".h to HEX");
         return $this->req_ret_str( "grep -Po \"\\\\\x[0-9a-fA-F]{1,2}\" $this->path | tr -d '\\n' | tee $this->dir/$this->name.hex ");
         return "$this->dir/$this->name.hex";
-        return new file("$this->dir/$this->name.hex");
+        return new FILE("","$this->dir/$this->name.hex");
     }
     
     public function c2so($cmd){

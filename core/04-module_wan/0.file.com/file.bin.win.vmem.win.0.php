@@ -148,7 +148,7 @@ class for4win extends bin4win{
 	return $this->note("Empty Result");
 	// $dlls = file("$this->file_dir/$file_dlls");
 	foreach($file_dlls as $dll){
-	$check = new file("$this->file_dir/$dll"); $check->file_file2virus2vt();
+	$check = new file("$this->file_dir/$dll"); $check->file2virus2vt();
 	}
 	
 	return $file_dlls;
@@ -161,7 +161,7 @@ class for4win extends bin4win{
 	if (empty($dlls))
 	return;
 	foreach($dlls as $dll){
-	$check = new file("$this->file_dir/$dll"); $check->file_file2virus2vt();	}
+	$check = new file("$this->file_dir/$dll"); $check->file2virus2vt();	}
 	}
 	public function for4win_Malware_handles($filter) {
 	$cmd = "handles";
@@ -375,8 +375,8 @@ class for4win extends bin4win{
 	$execs = $this->for4win_Dump_process_exe("--pid=$pid");
 	foreach($execs as $exec){
 	$check = new file("$this->file_dir/$exec");
-	$check->file_file2virus2vt();
-	$check->file_file2sandbox("cuckoo1");
+	$check->file2virus2vt();
+	$check->file2sandbox("cuckoo1");
 	}
 	
 	}
@@ -392,7 +392,7 @@ class for4win extends bin4win{
 	$execs = $this->req_ret_tab("cat $file_dump | grep -Po \"executable.*.exe\" ");
 	foreach($execs as $exec){
 	$check = new file("$this->file_dir/$exec");
-	$check->file_file2virus2vt();$check->file_file2sandbox("cuckoo1");
+	$check->file2virus2vt();$check->file2sandbox("cuckoo1");
 	}
 	}
 	public function for4win_Dump_file_process_all($pid, $filter) {
@@ -409,7 +409,7 @@ class for4win extends bin4win{
 	foreach($execs as $exec)
 	{
 	$check = new file("$this->file_dir/$exec");
-	$check->file_file2virus2vt();$check->file_file2sandbox("cuckoo1");
+	$check->file2virus2vt();$check->file2sandbox("cuckoo1");
 	}
 	}
 	public function for4win_Dump_file_name($file_name, $filter) {
@@ -427,8 +427,8 @@ class for4win extends bin4win{
 	foreach($files as $file)
 	{
 	$check = new file("$this->file_dir/$file");
-	$check->file_file2virus2vt();
-	$check->file_file2sandbox("cuckoo1");
+	$check->file2virus2vt();
+	$check->file2sandbox("cuckoo1");
 	}
 	return $files_tmp;
 	}
@@ -544,7 +544,7 @@ class for4win extends bin4win{
 	if (! empty($file)) {
 	$this->requette("file $this->file_dir/$file");
 	$this->requette("hexdump -C $this->file_dir/$file | head -4 ");
-	$check = new file("$this->file_dir/$file"); $check->file_file2virus2vt();
+	$check = new file("$this->file_dir/$file"); $check->file2virus2vt();
 	}
 	}
 	}
@@ -613,8 +613,8 @@ On Windows systems executable files have file signature of (MZ) or hexadecimal c
 	$this->requette("file $this->file_dir/$file");
 	$this->requette("hexdump -C $this->file_dir/$file | head -4 ");
 	$check = new file("$this->file_dir/$file");
-	$check->file_file2virus2vt();
-	//$check->file_file2virus4scan2local4clamav();
+	$check->file2virus2vt();
+	//$check->file2virus4scan2local4clamav();
 	                   }
 	                       }
 	                   }
@@ -643,7 +643,7 @@ On Windows systems executable files have file signature of (MZ) or hexadecimal c
 	if (! empty($file)) {
 	system("echo \"$file#" .$this->req_ret_str("md5sum $this->file_dir/$file"). "\" >> $this->file_dir/file_analysis_MZ_Injection_$this->file_name.db");
 	$i ++;
-	$check = new file("$this->file_dir/$file"); $check->file_file2virus2vt();
+	$check = new file("$this->file_dir/$file"); $check->file2virus2vt();
 	}
 	}
 	$this->requette("cat $this->file_dir/file_analysis_MZ_Injection_$this->file_name.db | cut -d'#' -f2 | sort | uniq -c ");
@@ -678,7 +678,7 @@ On Windows systems executable files have file signature of (MZ) or hexadecimal c
 	 	exec("echo '$file_name' | cut -d'.' -f2 | cut -d'.' -f1", $tmp_pid);
 	 	$process_pid = $tmp_pid [0];
 	 	unset($tmp_pid);
-	 	$check = new file("$this->file_dir/$file_name");$check->file_file2virus2vt();
+	 	$check = new file("$this->file_dir/$file_name");$check->file2virus2vt();
 	 	unset($file_name);
 	 }
 	 $this->note("ne pas oublier qu'il y'a d'autre injection '8d'  ");

@@ -7,7 +7,7 @@ class exploit4linux extends bin4linux{
         $name = __CLASS__;
         $rep_path = "/tmp/$name";
         if (!is_dir($rep_path)) $this->create_folder($rep_path);
-        $obj_file = new FILE($bin_bof);
+        $obj_file = new FILE($this->stream,$bin_bof);
         $query = "cp -v $bin_bof $rep_path";
         $this->requette($query);
         $new_bin = "$rep_path/$obj_file->file_name$obj_file->file_ext";

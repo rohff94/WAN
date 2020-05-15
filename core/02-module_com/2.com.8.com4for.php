@@ -77,7 +77,7 @@ Default location on Linux: /var/log/lastlog
  * net("http://www.threatmetrix.com/threatmetrix-labs/web-fraud-map/");
  *
  * ssTitre("test PEid2yara");
- * requette("upx -1 -o setup_upx.exe setup.exe");
+ * requette("upx -1 -qO setup_upx.exe setup.exe");
  * requette("$this->dir_tools/av/yara/yara $this->dir_tools/av/peid2yara.yara setup_upx.exe");
  * //pause();
  */
@@ -209,7 +209,7 @@ Default location on Linux: /var/log/lastlog
 /*
  * time : (/urs/bin/time) obtenir un rapport d'exécution,
  * : temps de calculs et bien d'autres choses.
- * : /usr/bin/time -a -o mesures.txt prog.exe
+ * : /usr/bin/time -a -qO mesures.txt prog.exe
  *
  * mtrace -> heap - malloc trace
  * ltrace -> libraries trace
@@ -433,7 +433,7 @@ class com4for extends com4code{
 
 
 	public function vmem2bulk(){
-	$query = "bulk_extractor $this->file_path -o $this->file_dir ";
+	$query = "bulk_extractor $this->file_path -qO $this->file_dir ";
 	if (!file_exists("$this->file_dir/packets.pcap")) $this->requette($query); else $this->cmd("localhost",$query);
 	$this->requette("ls $this->file_dir");
 	}
@@ -449,7 +449,7 @@ class com4for extends com4code{
 	 memory can be dumped with volatility.
 	 python volatility memdmp -f images/hn_forensics.vmem -p 1752
 	 * Using the forensics tool Foremost 1 , the possible PDF files can be extracted from the memory dump.
-	 foremost -i 1752.dmp -t pdf -o output
+	 foremost -i 1752.dmp -t pdf -qO output
 	 */
 
 	public function vmem2win(){
@@ -570,7 +570,7 @@ Collect the contents of this file in addition to a raw memory dump, because the 
 	    // dd if=\\.\PhysicalMemory of=c:\xp-2005-07-04-1430.img conv=noerror
 	    $this->net("http://www.moonsols.com/windows-memory-toolkit/");
 	    $this->cmd($xp, "DumpIt.exe");
-	    $this->cmd($xp, "mdd_1.3.exe -o C:\MEMORY.DMP");
+	    $this->cmd($xp, "mdd_1.3.exe -O C:\MEMORY.DMP");
 	    $this->ssTitre("Extract Memory from Hibernation File (hiberfil.sys) ");
 	    $this->article("Hibernation File", "\n• Contains a compressed RAM Image\n• %SystemDrive%/hiberfil.sys");
 	    $this->article("Exemple", "Example: Extract hibernation file memory and save to a USB DRIVE\n

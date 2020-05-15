@@ -208,7 +208,7 @@ Many times, we do want to see if there are any files owned by those users outsid
                 $exec_path = trim($exec_path);
                 if(!empty($exec_path)){
                     echo "\n====START FILE=======================================================\n";
-                    $obj_file = new FILE($exec_path);
+                    $obj_file = new FILE($this->stream,$exec_path);
                     $data = "chmod 777 $obj_file->file_path";
                     $this->req_str($stream,$data,$this->stream_timeout,"");
                     
@@ -365,7 +365,7 @@ EOC;
     public function suids8app2lib($stream,$lib,$suid){ // OK //billu box 2
         $result = "";
         $this->ssTitre(__FUNCTION__);
-        $obj_file = new FILE($lib);
+        $obj_file = new FILE($this->stream,$lib);
 
         if ($this->file4exist($stream,$obj_file->file_path)===FALSE) {
             if ($this->file4exist($stream,$obj_file->file_dir)===FALSE){
@@ -534,7 +534,7 @@ EOC;
     
     public function suids8bof($stream,$suid_path){ // OK 
         $this->titre(__FUNCTION__);
-        $obj_suid = new FILE($suid_path);
+        $obj_suid = new FILE($this->stream,$suid_path);
         $data = "ls -al $suid_path";
         $this->req_str($stream,$data,$this->stream_timeout,"");
 

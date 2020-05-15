@@ -362,7 +362,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	    $this->ssTitre(__FUNCTION__);
 	    // https://null-byte.wonderhowto.com/how-to/easily-detect-cves-with-nmap-scripts-0181925/
 	    $filename = "/usr/share/nmap/scripts/vulners.nse";
-	    if(!file_exists($filename)) $this->requette("echo '$this->root_passwd' | sudo -S wget https://raw.githubusercontent.com/Vulnerability-scanner/nmap-vulners/master/vulners.nse -O $filename");
+	    if(!file_exists($filename)) $this->requette("echo '$this->root_passwd' | sudo -S wget https://raw.githubusercontent.com/Vulnerability-scanner/nmap-vulners/master/vulners.nse -qO $filename");
 	    $query = "echo '$this->root_passwd' | sudo -S nmap -sV --script vulners $this->ip -Pn -n -e $this->eth -oX -";
 	    return $this->req2BD(__FUNCTION__,__CLASS__,"$this->ip2where ",$query);
 	}
@@ -862,7 +862,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	    $file_path_xml = trim($file_path_xml);
 	    if(!empty($file_path_xml)){
 	        $obj_file = new FILE($this->stream,$file_path_xml);
-	        $size = $obj_file->file_file2size();
+	        $size = $obj_file->file2size();
 	        if( ($size != 40) || ($size > 40) ){
 	            $query = "python /usr/share/python-faraday/faraday.py --cli --workspace $this->faraday_workspace_name --report $file_path_xml > /dev/null ";
 	            $this->requette($query);
@@ -1195,7 +1195,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	public function ip2os2nmap(){
 	    $result = "";
 	    $result .= $this->ssTitre(__FUNCTION__);
-		$query = "echo '$this->root_passwd' | sudo -S nmap -n --reason -O --osscan-guess $this->ip -F -sSU -Pn -e $this->eth -oX - ";
+		$query = "echo '$this->root_passwd' | sudo -S nmap -n --reason -qO --osscan-guess $this->ip -F -sSU -Pn -e $this->eth -oX - ";
 		$result .= $this->cmd("localhost",$query);
 		return $this->req_ret_str($query);
 		

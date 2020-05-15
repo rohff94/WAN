@@ -159,7 +159,7 @@ class check4linux8protocol extends AUTH{
                 $racine_ftp = ftp_pwd($ftp_stream);
                 
                 $private_key_ssh_rsa_file = "$this->dir_tmp/$this->ip.$remote_username_ftp.rsa.priv";
-                $obj_file = new FILE($private_key_ssh_rsa_file);
+                $obj_file = new FILE($this->stream,$private_key_ssh_rsa_file);
                 $public_key_ssh_rsa_file = "$obj_file->file_dir/$obj_file->file_name.pub";
                 $private_key_passwd = '';
                 $private_keys_str = $this->key2gen4priv("",10,$private_key_ssh_rsa_file, $public_key_ssh_rsa_file);

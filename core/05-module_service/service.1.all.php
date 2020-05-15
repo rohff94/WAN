@@ -156,7 +156,7 @@ class SERVICE extends service2ssh {
 	     */
 	    $this->ssTitre(__FUNCTION__);
 	    
-	    $obj_file = new FILE($private_key_file);
+	    $obj_file = new FILE($stream,$private_key_file);
 	    $public_key_file = "$obj_file->file_dir/$obj_file->file_name.pub";
 	    
 	    
@@ -1176,7 +1176,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 	
 	public function file4add($stream,$filename,$add_data){
 	    $this->ssTitre(__FUNCTION__);
-	    $obj_filename = new FILE($filename);
+	    $obj_filename = new FILE($stream,$filename);
 	    
 	    if ($this->file4search8path($stream,$obj_filename->file_path, $add_data)){
 	        $this->note("Already Added: $add_data");
@@ -1237,7 +1237,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 	public function file4replace($stream,$filename,$search_data,$replace_data){
 	    $result = "";
 	    $this->ssTitre(__FUNCTION__);
-	    $obj_filename = new FILE($filename);
+	    $obj_filename = new FILE($stream,$filename);
 	    
 	    if ($this->file4search8path($stream,$obj_filename->file_path,$search_data)){
 	        $data = "cat $obj_filename->file_path";

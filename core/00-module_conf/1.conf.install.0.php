@@ -382,7 +382,7 @@ class INSTALL extends CONFIG{
 	function install_exploit_exploitdb_update(){
 		$this->ssTitre(__FUNCTION__);
 		$this->net("http://www.exploit-db.com/");
-		$this->requette("wget http://www.exploit-db.com/archive.tar.bz2 -O $this->dir_tmp/exploitdb.tar.bz2");
+		$this->requette("wget http://www.exploit-db.com/archive.tar.bz2 -qO $this->dir_tmp/exploitdb.tar.bz2");
 		$this->requette("tar -xjvf $this->dir_tmp/exploitdb.tar.bz2 ");
 		$this->requette("echo '$this->root_passwd' | sudo -S mv -v $this->dir_tmp/exploitdb/file.csv /opt/exploitdb/");
 		$this->pause();
@@ -608,7 +608,7 @@ CONF;
 	    $this->requette("locate metasm.rb");
 	    if(! file_exists($file_path_metasm)) {
 			//$this->net( "https://github.com/jjyg/metasm");
-			//$this->requette( "wget -c https://github.com/jjyg/metasm/archive/master.zip -O /tmp/metasm.zip ");
+			//$this->requette( "wget -c https://github.com/jjyg/metasm/archive/master.zip -qO /tmp/metasm.zip ");
 			$this->requette( "echo '$this->root_passwd' | sudo -S git clone https://github.com/jjyg/metasm.git /opt/metasm-master ");$this->pause();						
 			$this->requette( "echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local -R /opt/metasm-master ");$this->pause();
 			$this->requette( "export RUBYLIB='/opt/metasm-master/metasm'");$this->pause();
@@ -808,7 +808,7 @@ IDE;
 	function install_malware_antirootkit_chkrootkit(){
 		$this->ssTitre(__FUNCTION__);
 		if (!is_dir("/opt/chkrootkit-0.52")) {
-			$this->requette("wget -c ftp://ftp.pangeia.com.br/pub/seg/pac/chkrootkit.tar.gz -O /tmp/chkrootkit.tar.gz");
+			$this->requette("wget -c ftp://ftp.pangeia.com.br/pub/seg/pac/chkrootkit.tar.gz -qO /tmp/chkrootkit.tar.gz");
 			$this->requette("echo '$this->root_passwd' | sudo -S tar -xvzf /tmp/chkrootkit.tar.gz -C /opt/");
 			$this->requette("cd /opt/chkrootkit-0.52;echo '$this->root_passwd' | sudo -S make sense");
 		}
@@ -867,7 +867,7 @@ deb-src http://ppa.launchpad.net/nicolas-zin/ossec-ubuntu/ubuntu trusty main ";
 			$this->requette("echo '$this->root_passwd' | sudo -S tar -xvzf $this->dir_install/localhost/memdump.tar.gz -C /opt/");
 		}
 		$this->requette("echo '$this->root_passwd' | sudo -S chown -R $this->user2local:$this->user2local /opt/memdump");
-		$this->requette("cd /opt/memdump/; gcc main.c memdump.c -o memdump ; ./memdump -h");
+		$this->requette("cd /opt/memdump/; gcc main.c memdump.c -qO memdump ; ./memdump -h");
 	
 	}
 	
@@ -877,7 +877,7 @@ deb-src http://ppa.launchpad.net/nicolas-zin/ossec-ubuntu/ubuntu trusty main ";
 	    if(!is_dir("/opt/PcapViz")) {
 	        $this->requette("echo '$this->root_passwd' | sudo -S git clone https://github.com/mateuszk87/PcapViz  /opt/PcapViz/");
 	        $this->requette("echo '$this->root_passwd' | sudo -S -H pip3 install /opt/PcapViz/requirements.txt ");
-	        $this->requette("wget -N http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz -O /opt/PcapViz/GeoIP.dat.gz ");
+	        $this->requette("wget -N http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz -qO /opt/PcapViz/GeoIP.dat.gz ");
 	        $this->requette("cd /opt/PcapViz/; gunzip GeoIP.dat.gz ");
 	        $this->requette("echo '$this->root_passwd' | sudo -S chown -R $this->user2local:$this->user2local /opt/PcapViz");
 	    }	    
@@ -913,7 +913,7 @@ deb-src http://ppa.launchpad.net/nicolas-zin/ossec-ubuntu/ubuntu trusty main ";
 		$this->ssTitre(__FUNCTION__);
 		$this->ssTitre("Avira for linux");
 		$this->net("http://www.chip.de/downloads/AntiVir-Personal-Free-Antivirus-fuer-Linux_23188958.html");
-		$this->requette("wget http://dl.cdn.chip.de/downloads/3250486/antivir_workstation3135-pers.tar.gz -O $this->dir_tools/av/");
+		$this->requette("wget http://dl.cdn.chip.de/downloads/3250486/antivir_workstation3135-pers.tar.gz -qO $this->dir_tools/av/");
 		/*
 		 Installation via InstallScript:
 		 ./install
@@ -1132,7 +1132,7 @@ deb-src http://ppa.launchpad.net/nicolas-zin/ossec-ubuntu/ubuntu trusty main ";
 		$this->ssTitre(__FUNCTION__);
 		$this->requette("echo '$this->root_passwd' | sudo -S unzip $this->dir_install/backdoor/Hyperion-1.2.zip -d /opt/");
 		$this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local -R /opt/Hyperion-1.2");
-		$this->requette("cd /opt/Hyperion-1.2; i686-w64-mingw32-c++ ./Src/Crypter/*.cpp -o ./hyperion.exe");
+		$this->requette("cd /opt/Hyperion-1.2; i686-w64-mingw32-c++ ./Src/Crypter/*.cpp -qO ./hyperion.exe");
 	}
 	
 	function install_malware_code_injector(){
@@ -1185,10 +1185,10 @@ deb-src http://ppa.launchpad.net/nicolas-zin/ossec-ubuntu/ubuntu trusty main ";
 	function install_bof_stack4linux_wifirx(){
 		$this->ssTitre(__FUNCTION__);
 		$this->requette("tar -xvf $this->dir_install/bof/wifirxpower.tar.gz -C $this->dir_tmp/");
-		$this->requette("cd $this->dir_tmp/wifirxpower/; cc -ggdb -fno-stack-protector  -fno-pie -z execstack -z norelro -m32 -mtune=i386 -c -o wifirx.o wifirx.c");
-		$this->requette("cd $this->dir_tmp/wifirxpower/; cc -ggdb -fno-stack-protector  -fno-pie -z execstack -z norelro -m32 -mtune=i386 -c -o XDriver.o XDriver.c");
-		$this->requette("cd $this->dir_tmp/wifirxpower/; cc -ggdb -fno-stack-protector  -fno-pie -z execstack -z norelro -m32 -mtune=i386 -c -o DrawFunctions.o DrawFunctions.c");
-		$this->requette("cd $this->dir_tmp/wifirxpower/; gcc -ggdb -fno-stack-protector  -fno-pie -z execstack -z norelro -mtune=i386 -m32 -o wifirx wifirx.o XDriver.o DrawFunctions.o -lX11 -lm -lpthread -lXinerama -lXext");
+		$this->requette("cd $this->dir_tmp/wifirxpower/; cc -ggdb -fno-stack-protector  -fno-pie -z execstack -z norelro -m32 -mtune=i386 -c -qO wifirx.o wifirx.c");
+		$this->requette("cd $this->dir_tmp/wifirxpower/; cc -ggdb -fno-stack-protector  -fno-pie -z execstack -z norelro -m32 -mtune=i386 -c -qO XDriver.o XDriver.c");
+		$this->requette("cd $this->dir_tmp/wifirxpower/; cc -ggdb -fno-stack-protector  -fno-pie -z execstack -z norelro -m32 -mtune=i386 -c -qO DrawFunctions.o DrawFunctions.c");
+		$this->requette("cd $this->dir_tmp/wifirxpower/; gcc -ggdb -fno-stack-protector  -fno-pie -z execstack -z norelro -mtune=i386 -m32 -qO wifirx wifirx.o XDriver.o DrawFunctions.o -lX11 -lm -lpthread -lXinerama -lXext");
 		$this->cmd("localhost","cd $this->dir_tmp/wifirxpower/; ./wifirx $this->eth_wan");
 	
 	}

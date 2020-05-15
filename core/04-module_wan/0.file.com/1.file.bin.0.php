@@ -70,7 +70,7 @@ class BIN extends FILE {
 	    fwrite($file_w, $code_c);
 	    fclose($file_w);
 	    
-	    $file_c = new FILE($output_filename_c);
+	    $file_c = new FILE($this->stream,$output_filename_c);
 	    $obj_elf = $file_c->file_c2elf($option_gcc);
 	    if (is_object($obj_elf)){
 	        $query = "$obj_elf->file_path";
@@ -116,7 +116,7 @@ class BIN extends FILE {
 	    
 	    if (!file_exists("$this->dir_tmp/$name.elf")) $this->requette("cp -v $this->dir_c/$name.c $this->dir_tmp/$name.c");
 	    $c_code = file_get_contents("$this->dir_tmp/$name.c"); // -fno-pie -z norelro -z execstack -fno-stack-protector -m32 -mtune=i386 -static
-	    $file_c = new FILE("$this->dir_tmp/$name.c");
+	    $file_c = new FILE($this->stream,"$this->dir_tmp/$name.c");
 	    //$this->requette("gedit $file_c->file_path");
 	    $name_prog = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
 	    

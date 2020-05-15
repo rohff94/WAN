@@ -65,7 +65,7 @@ class tunnel4linux extends pivot4linux{
         $this->ssTitre(__FUNCTION__);
         $this->requette("tar -xvzf $this->dir_tools/Malware/ISHELL-v0.2.tar.gz -C $this->dir_tmp");
         $this->requette("cd $this->dir_tmp/ISHELL-v0.2/; make linux" );
-        $this->file_file2virus2vt();
+        $this->file2virus2vt();
         $this->elf2info();$this->pause();
     }
     
@@ -178,7 +178,7 @@ class tunnel4linux extends pivot4linux{
         $this->requette("cp -v $this->dir_c/covert_tcp.c $this->dir_tmp");
         //$vm = new VM($this->target_vmx_name);
         
-        $file_c = new FILE("$this->dir_tmp/covert_tcp.c");       
+        $file_c = new FILE($this->stream,"$this->dir_tmp/covert_tcp.c");       
         $file_c->file_c2elf(""); // compilation : -> -no PIE section .text est fixe en mémoire(PIE désactivé).        
         $vm->vm2upload("$this->dir_tmp/covert_tcp.c", "$this->vm_tmp_lin/covert_tcp.c");
         $this->cmd("localhost", "sudo $this->file_path --help");

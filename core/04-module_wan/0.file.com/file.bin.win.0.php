@@ -239,18 +239,18 @@ class bin4win extends BIN{
 
 	public function win2info(){
 	    $this->ssTitre(__FUNCTION__);
-	    $this->file_file2virus4scan2local4clamav();$this->pause();	
-	    $this->file_file2hash();$this->pause();
-	    $this->file_file2info();$this->pause();
-	    $this->file_file2metadata();$this->pause();
-	    $this->file_file2strings(" | grep -E -i \"[[:print:]]{20,}\" ");$this->pause();
-	    $this->file_file2strings(" | grep -E -i \"(Get|LoadLibrary|Create|Mutex|Crypt|Open|Virtual|Process|Reg|Token|Privileges)\" ");$this->pause();
-	    $this->file_file2virus4scan2local4ssma();$this->pause();
+	    $this->file2virus4scan2local4clamav();$this->pause();	
+	    $this->file2hash();$this->pause();
+	    $this->file2info();$this->pause();
+	    $this->file2metadata();$this->pause();
+	    $this->file2strings(" | grep -E -i \"[[:print:]]{20,}\" ");$this->pause();
+	    $this->file2strings(" | grep -E -i \"(Get|LoadLibrary|Create|Mutex|Crypt|Open|Virtual|Process|Reg|Token|Privileges)\" ");$this->pause();
+	    $this->file2virus4scan2local4ssma();$this->pause();
 	}
 	
 public function pe2debug(){
 	$this->ssTitre(__FUNCTION__);
-	$this->file_file2debug();
+	$this->file2debug();
 }
 
 public function pe4exe2upx() {
@@ -259,7 +259,7 @@ public function pe4exe2upx() {
 	//$this->net("http://compression.ca/act/act-exepack.html" );
 	$this->requette("upx --ultra-brute $this->file_path -o $this->file_dir/$this->file_name"."_upx.exe" );
 	$check = new bin4win("$this->file_dir/$this->file_name"."_upx.exe"); // 38 / 57
-	$check->file_file2virus2vt();
+	$check->file2virus2vt();
 	$check->win2info();
 	return "$this->file_dir/$this->file_name"."_upx.exe";
 }
@@ -271,7 +271,7 @@ public function pe4exe2hyperion() {
 	$file_exe_hyperion = str_replace(".exe", "_hyperion.exe", $this->file_ext );
 	if (! file_exists("$this->file_dir/$file_exe_hyperion"))
 	$this->requette("cd /opt/Hyperion-1.2; wine ./hyperion.exe $this->file_path $this->file_dir/$file_exe_hyperion" );
-	$check = new file("$this->file_dir/$file_exe_hyperion");$check->file_file2virus2vt();
+	$check = new file("$this->file_dir/$file_exe_hyperion");$check->file2virus2vt();
 	return "$this->file_dir/$file_exe_hyperion";
 }
 
@@ -330,7 +330,7 @@ public function pe4exe2vba() {
 	$this->ssTitre(__FUNCTION__);
 	if (! file_exists("$file_exe.vba" ))
 	$this->requette("ruby /opt/metasploit/apps/pro/msf3/tools/exe2vba.rb $this->file_path $this->file_path.vba" );
-	$check = new file("$this->file_path.vba");$check->file_file2virus2vt();
+	$check = new file("$this->file_path.vba");$check->file2virus2vt();
 	return "$file_exe.vba";
 }
 
@@ -345,7 +345,7 @@ public function pe4exe2vbs() {
 	$file_exe_name = str_replace(".exe", "", $this->file_ext );
 	// net("https://github.com/dnet/base64-vbs.py");
 	$this->requette("cd $this->dir_tools/backdoor/; python ./b64vbs.py $this->file_path $this->file_dir/$file_exe_name" . "2vbs.vbs" );
-	$check = new file("$this->file_dir/$file_exe_name" . "2vbs.vbs");$check->file_file2virus2vt();
+	$check = new file("$this->file_dir/$file_exe_name" . "2vbs.vbs");$check->file2virus2vt();
 	return "$this->file_dir/$file_exe_name" . "2vbs.vbs";
 }
 
