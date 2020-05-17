@@ -437,19 +437,16 @@ If the user does not have a password, then the password field will have an *(ast
         return $result;
     }
     
+
+    
     public function misc2etc_passwd2add($stream,$username,$userpass,$etc_passwd_lanpath){
 
         $this->ssTitre(__FUNCTION__);
         $username = trim($username);
         $userpass = trim($userpass);
         $etc_passwd_lanpath = trim($etc_passwd_lanpath);
-        
-        $query = "mkpasswd -m SHA-512 $userpass";
-        $user_pass_crypt = trim($this->req_ret_str($query));
-        $query = "openssl passwd -1 -salt $username $userpass";
-        $user_pass_crypt = trim($this->req_ret_str($query));
-        $this->article("user_pass_crypt",$user_pass_crypt);
-        $search = "$username:$user_pass_crypt:0:0:root:/root:/bin/sh";
+
+        $search = $this->user2pass2salt4etc_passwd($username,$userpass);
         
         if (!$this->file4search8path($stream,$etc_passwd_lanpath, $search)){
             $this->file4add($stream,$etc_passwd_lanpath, $search);

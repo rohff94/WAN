@@ -119,7 +119,22 @@ class POC extends poc4malware{
 	
 		public function poc4vdo(){
 		   $ip = "10.60.10.183"; // Billu_box2 OK exploit/unix/webapp/drupal_drupalgeddon2
-		    
+		   $ip = "10.60.10.134"; // covfefe
+		   $ip = "10.60.10.137"; // DC1 
+		   $ip = "10.60.10.0"; // Zico2 
+		   $ip = "10.60.10.0"; // WinterMute One
+		   $ip = "10.60.10.0"; // WebDeveloper 1 
+		   $ip = "10.60.10.0"; // NightMare
+		   $ip = "10.60.10.0"; // wakanda 1 
+		   $ip = "10.60.10.161"; // W1R3S
+		   $ip = "10.60.10.0"; // VulnOS2
+		   $ip = "10.60.10.132"; // Vulnix
+		   $ip = "10.60.10.0"; // Violator
+		   $ip = "10.60.10.147"; // OK typhoon 1.02 
+		   $ip = "10.60.10.0"; // library1
+		   $ip = "10.60.10.0"; // The Ether EvilScience
+		   $ip = "10.60.10.0"; // temple of doom
+		   $ip = "10.60.10.0"; // ted1
 		}
 	
 

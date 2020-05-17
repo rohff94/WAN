@@ -54,7 +54,7 @@ class check4linux8key extends check4linux8enum{
         $this->ssTitre ( "Gen Private key " );
         $privkey_str = "";
         $type_crypt = trim($type_crypt);
-        $privkey_str = $this->req_str($stream,"openssl genpkey -algorithm $type_crypt -pkeyopt $type_crypt._keygen_bits:4096 ",$this->stream_timeout,"");
+        $privkey_str = $this->req_str($stream,"openssl genpkey -algorithm $type_crypt -pkeyopt $type_crypt"."_keygen_bits:2048 ",$this->stream_timeout,"");
         return $this->key2norme8str($privkey_str,$type_crypt);
     }
     
@@ -345,9 +345,9 @@ class check4linux8key extends check4linux8enum{
         $this->req_str($stream,"chmod 0600 /tmp/$hash.pem",$this->stream_timeout,"");
         $this->req_str($stream, "chmod 0600 /tmp/$hash.priv", $this->stream_timeout, "");
         
-        $query = "ssh -i /tmp/$hash.priv $username@$host -p $ssh_port -o PasswordAuthentication=no ";
+        $query = "ssh -i /tmp/$hash.priv $username@$host -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no ";
         $this->cmd("localhost",$query);
-        $query = "ssh -i /tmp/$hash.pem $username@$host -p $ssh_port -o PasswordAuthentication=no ";
+        $query = "ssh -i /tmp/$hash.pem $username@$host -p $ssh_port -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no ";
         $this->cmd("localhost",$query);
         
         
@@ -461,7 +461,7 @@ class check4linux8key extends check4linux8enum{
     public function key2norme8str($privkey_str,$type_crypt):string{   
         $result = "";
         $type_crypt = strtoupper($type_crypt);
-        if (!empty($privkey_str)) $result = $this->req_ret_str("echo '$privkey_str'  | awk '/BEGIN $type_crypt PRIVATE KEY/,/END $type_crypt PRIVATE KEY/' ");  
+        if (!empty($privkey_str)) $result = $this->req_ret_str("echo '$privkey_str'  | awk '/BEGIN PRIVATE KEY/,/END PRIVATE KEY/' "); //| awk '/BEGIN $type_crypt PRIVATE KEY/,/END $type_crypt PRIVATE KEY/' 
         return $result;
     }
     

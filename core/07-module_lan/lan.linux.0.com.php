@@ -386,10 +386,10 @@ class lan4linux extends LAN{
         }
         else {
             //if (!$this->ip2root8db($this->ip2id)) {$this->misc($this->stream);$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->suids($this->stream);$this->pause();}
+            //if (!$this->ip2root8db($this->ip2id)) {$this->suids($this->stream);$this->pause();}
             //if (!$this->ip2root8db($this->ip2id)) {$this->users($this->stream);$this->pause();}
             //if (!$this->ip2root8db($this->ip2id)) {$this->jobs($this->stream);$this->pause();}
-            //if (!$this->ip2root8db($this->ip2id)) {$this->exploits($this->stream);$this->pause();}
+            if (!$this->ip2root8db($this->ip2id)) {$this->exploits($this->stream);$this->pause();}
         }
         
         $this->lan2brief();

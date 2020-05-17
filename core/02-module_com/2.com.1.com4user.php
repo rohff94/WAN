@@ -29,7 +29,18 @@ class com4user extends DATA {
     }
 
     
-
+    
+    public function user2pass2salt4etc_passwd($username,$userpass){
+        $this->ssTitre(__FUNCTION__);
+        $query = "mkpasswd -m SHA-512 $userpass";
+        $user_pass_crypt = trim($this->req_ret_str($query));
+        $query = "openssl passwd -1 -salt $username $userpass";
+        $user_pass_crypt = trim($this->req_ret_str($query));
+        $this->article("user_pass_crypt",$user_pass_crypt);
+        $salt = "$username:$user_pass_crypt:0:0:root:/root:/bin/sh";
+        return $salt;
+    }
+    
    
     public function parse4id($id_result){
         $this->ssTitre(__FUNCTION__);
@@ -208,6 +219,24 @@ class com4user extends DATA {
         }
     }
     
+    public function monitor(){
+        $this->requette("top");
+        $this->requette("ps aux | grep pentest | grep domain | grep 4service | wc -l");
+        $this->requette("ps aux | grep pentest | grep domain | grep 4service");
+        $this->requette("ps aux | grep pentest | grep domain | grep 4service | awk '{print $15}' | sort -u");
+        $this->requette("ps aux | grep pentest | grep domain | grep 4info | wc -l");
+        $this->requette("ps aux | grep pentest | grep domain | grep 4info");
+        $this->requette("ps aux | grep pentest | grep domain | grep 4info | awk '{print $15}' | sort -u");
+        $this->requette("screen -r ");
+        $this->requette("ps axjf");
+        $this->requette("tail -f /var/log/syslog");
+        $this->requette("tail -f /var/log/auth.log");
+        $this->requette("tail -f /var/log/kern.log");
+        $this->requette("tail -f /var/log/mail.log");
+        $this->requette("tail -f $this->log_succes_path");
+        $this->requette("tail -f $this->log_error_path");
+        $this->requette("grep -i segfault /var/log/kern.log");
+    }
     
     public function watching($ip){
         $chaine = "Monitors your environment";
@@ -222,30 +251,14 @@ class com4user extends DATA {
             $this->cmd("localhost", $query);
         }
         
-        $query = "echo '$this->root_passwd' | sudo -S top";
-        $this->cmd("localhost", $query);
-        $query = "echo '$this->root_passwd' | sudo -S ps axjf";
-        $this->cmd("localhost", $query);
+
         $query = "echo '$this->root_passwd' | sudo -S snort -A console -q -c /etc/snort/snort.conf -i $this->eth  'not host $this->ip'";
         $this->cmd("localhost", $query);
         $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=bot";
         $this->cmd("localhost", $query);
         $query = "cd $this->dir_tmp; php -S $this->ip:$this->port_rfi";
         $this->cmd("localhost", $query);
-        $query = "tail -f /var/log/syslog";
-        $this->cmd("localhost", $query);
-        $query = "tail -f /var/log/auth.log";
-        $this->cmd("localhost", $query);
-        $query = "tail -f /var/log/kern.log";
-        $this->cmd("localhost", $query);
-        $query = "tail -f /var/log/mail.log";
-        $this->cmd("localhost", $query);
-        $query = "watch -n 5 -e \"grep -i segfault /var/log/kern.log\"";
-        $this->cmd("localhost", $query);
-        $query = "tail -f $this->log_error_path";
-        $this->cmd("localhost", $query);
-        $query = "tail -f $this->log_succes_path";
-        $this->cmd("localhost", $query);
+
     }
     
     

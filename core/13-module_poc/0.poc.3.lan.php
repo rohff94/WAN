@@ -34,6 +34,23 @@ class poc4lan extends poc4web {
         $domain = 'hack.vlan';
         
         
+        $ip = "10.60.10.0"; // tr0ll3 
+        $port = "22";
+        $protocol = "T";
+        
+        $login = "start" ;
+        $pass = "here";
+        
+        $login = "wytshadow" ;
+        $pass = "gaUoCe34t1";
+        
+        $login = "genphlux" ;
+        $pass = "HF9nd0cr!";
+        
+        $login = "maleus";
+        $pass = $private_keys;
+        
+        //=========================================
         
         $ip = $this->k2; // k2
         $port = "22";
@@ -53,10 +70,15 @@ class poc4lan extends poc4web {
         $pass = "custodio";
         
         
-        $login = "";
-        $pass = "";
+        $ip = "10.60.10.132"; // Vulnix
+        $port = "22";
+        $protocol = "T";
+        $login = "user" ;
+        $pass = "letmein";
+        
+
         $titre = "";
-        $fonction2exec = "";
+        $fonction2exec = "users";
         $vm = "";
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         
@@ -118,6 +140,50 @@ class poc4lan extends poc4web {
         }
     }
     
+    
+    public function poc4root8suid2py(){ // 
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.0"; // View2aKill
+        $port = "22";
+        $protocol = "T";
+        $login = "jenny" ;
+        $pass = '!!!sfbay!!!';
+        
+        $ip = "10.60.10.0"; // toppo1
+        $port = "22";
+        $protocol = "T";
+        $login = "ted" ;
+        $pass = '12345ted123';
+        
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
+    
+    public function poc4root8suid2mawk(){ //
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.0"; // toppo1
+        $port = "22";
+        $protocol = "T";
+        $login = "ted" ;
+        $pass = '12345ted123';
+        
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
     public function poc4root8suid2elf(){ // OK
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
@@ -156,7 +222,51 @@ class poc4lan extends poc4web {
         $login = "";
         $pass = "";
         $titre = "";
-        $fonction2exec = "";
+        $fonction2exec = "suids";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+        
+    }
+    
+    
+    
+    
+    public function poc4root8sudoers2file8exec2users2root8sudoers2nmap(){ // OK
+        $this->titre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        
+        $ip = "10.60.10.143"; // DC-6
+        $port = "22";
+        $protocol = "T";
+        $login = "graham" ;
+        $pass = 'GSo7isUM1D4';
+        
+        
+        $titre = "test";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+        
+    }
+    
+    
+    public function poc4root8users2sudoers8app2write8sudoedit(){
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.132"; // Vulnix
+        $port = "22";
+        $protocol = "T";
+        $login = "user" ;
+        $pass = "letmein";
+        
+        $titre = "";
+        $fonction2exec = "users";
         $vm = "";
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         
@@ -232,6 +342,21 @@ class poc4lan extends poc4web {
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
         
+        $ip = "10.60.10.0"; // zeus1
+        $port = "22";
+        $protocol = "T";
+        $login = 'gogu' ;
+        $pass = 'universal';
+        
+        $titre = "";
+        $fonction2exec = "suids";
+
+        $vm = "";
+        $suid = "/etc/jailkit";
+        $suid_call = "date";
+        $this->suids8env2path4add($suid,$suid_call);
+        
+        exit();
         $ip = "10.60.10.159"; // Silky-CTF
         $port = "22";
         $protocol = "T";
@@ -250,10 +375,38 @@ class poc4lan extends poc4web {
         
     }
     
-    public function poc4root8users2sudoers8app2cmd2tcpdump(){ // OK
+    public function poc4root8users2sudoers8app2cmd2systemctl(){ 
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.0"; //Torment
+        $port = "22";
+        $protocol = "T";
+        $login = "patrick" ;
+        $pass = $privkey;
+        
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
+    
+    public function poc4root8users2sudoers8app2cmd2apt(){
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.0"; // ted1
+    }
+    public function poc4root8users2sudoers8app2cmd2tcpdump(){ 
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.0"; // temple of doom
         
         $ip = "10.60.10.169"; //webdeveloper
         $port = "22";
@@ -287,24 +440,18 @@ class poc4lan extends poc4web {
     
     
 
+ 
     
-    public function poc4root8users2sudoers8app2cmd2all(){ // OK
+    public function poc4root8users2sudoers8app2cmd2tar(){ //
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
         
-        $ip = "10.60.10.160"; // W34kn3ss One
+        $ip = "10.60.10.0"; // zico2
         $port = "22";
         $protocol = "T";
-        $login = 'n30' ;
-        $pass = 'dMASDNB!!#B!#!#33';
-        
-        $ip = "10.60.10.161"; // W1R3S
-        $port = "22";
-        $protocol = "T";
-        $login = 'w1r3s' ;
-        $pass = 'computer';
-        
+        $login = "" ;
+        $pass = '';
         
         $titre = "";
         $fonction2exec = "users";
@@ -312,8 +459,24 @@ class poc4lan extends poc4web {
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         
     }
- 
-
+    
+    public function poc4root8users2sudoers8app2cmd2zip(){ //
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.0"; // zico2
+        $port = "22";
+        $protocol = "T";
+        $login = "" ;
+        $pass = '';
+        
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
 
     public function poc4root8users2sudoers8app2cmd2ftp(){ // 
         $this->ssTitre(__FUNCTION__);
@@ -351,12 +514,39 @@ class poc4lan extends poc4web {
         
     }
     
-    public function poc4root8users2sudoers8app2cmd2php(){ // OK
+    public function poc4root8users2sudoers8app2cmd2awk(){ // 
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
         
-        $ip = "10.60.10.168"; // me and my girlfriend
+        $ip = "10.60.10.135"; // Cyberry
+        $port = "22";
+        $protocol = "T";
+        $login = "nick" ;
+        $pass = "custodio";
+        
+
+        
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
+    public function poc4root8users2sudoers8app2cmd2php(){ // 
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.135"; // Cyberry
+        $port = "22";
+        $protocol = "T";
+        $login = "nick" ;
+        $pass = "custodio";
+        
+        
+        $ip = "10.60.10.168"; // me and my girlfriend OK 
         $port = "22";
         $protocol = "T";
         $login = "alice" ;
@@ -389,14 +579,52 @@ class poc4lan extends poc4web {
         
     }
     
-    public function poc4root8users2sudoers8app2cmd2git(){
+    
+    public function poc4root8users2sudoers8app2cmd2pip(){
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
         
-        /*
-         la restriction ne fonctionne pas avec ce script, tout fonctionne normalement !!! OK
-         */
+        $ip = "10.60.10.0"; // wakanda 1
+        $port = 3333;
+        $protocol = "T";
+        $login = "mamadou" ;
+        $pass = 'Niamey4Ever227!!!';
+        
+        
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    public function poc4root8users2sudoers8app2cmd2iptables(){
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        
+        $ip = "10.60.10.0"; // temple of doom
+        
+        $ip = "10.60.10.0"; // nightmare
+        $port = "";
+        $protocol = "T";
+        $login = "" ;
+        $pass = '';
+
+
+        $titre = "";
+        $fonction2exec = "users";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
+    public function poc4root8users2sudoers8app2cmd2git(){
+        $this->ssTitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+
         $ip = "10.60.10.141"; // DC-2
         $port = "7744";
         $protocol = "T";
@@ -408,19 +636,40 @@ class poc4lan extends poc4web {
         $login = "";
         $pass = "";
         $titre = "";
-        $fonction2exec = "";
+        $fonction2exec = "users";
         $vm = "";
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         
     }
     
+    public function poc4restricted_shell(){
+        $this->ssTitre(__FUNCTION__);
+        
+        $ip = "10.60.10.0"; // tr0ll2
+    }
     
     public function poc4root8su(){
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
         
-
+        $ip = "10.60.10.133"; // Lin.Security v1.0
+        $port = "22";
+        $protocol = "T";       
+        $login = "bob" ;
+        $pass = "secret";
+        
+        $ip = "10.60.10.160"; // W34kn3ss One
+        $port = "22";
+        $protocol = "T";
+        $login = 'n30' ;
+        $pass = 'dMASDNB!!#B!#!#33';
+        
+        $ip = "10.60.10.161"; // W1R3S
+        $port = "22";
+        $protocol = "T";
+        $login = 'w1r3s' ;
+        $pass = 'computer';
 
         $ip = "10.60.10.140"; // Matrix1 OK
         $port = "22";
@@ -673,6 +922,7 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $login = "baksteen" ;
         $pass = "S1ck3nBluff+secureshell";
         
+        $ip = "10.60.10.0"; // trollcave 1-2 
 
         $titre = "";
         $fonction2exec = "";
@@ -686,6 +936,35 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
         
+        
+        $ip = "10.60.10.0"; // WinterMute One
+        $port = "22";
+        $protocol = "T";
+        $login = "" ;
+        $pass = '';
+        
+        $titre = "";
+        $fonction2exec = "exploits";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
+    
+    
+    public function poc4root8exploit8app_11111_exim4(){ //
+        $this->gtitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.179"; // Chanakya Not yet
+        $port = 21 ;
+        $remote_username_ftp = "ashoka";
+        $remote_userpass_ftp = 'kautilya';
+        
+        $this->poc4ftp();
+        
+        
         $login = "";
         $pass = "";
         $titre = "";
@@ -694,6 +973,32 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         
     }
+    
+    
+    public function poc4root8exploit8app_11111_chkrootkit(){ //
+        $this->gtitre(__FUNCTION__);
+        $eth = 'vmnet6';
+        $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.179"; // Chanakya Not yet 
+        $port = 21 ;
+        $remote_username_ftp = "ashoka";
+        $remote_userpass_ftp = 'kautilya';
+        
+        $this->poc4ftp();
+        
+        
+        $login = "";
+        $pass = "";
+        $titre = "";
+        $fonction2exec = "";
+        $vm = "";
+        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
+        
+    }
+    
+    
+    
     
     public function poc4root8exploit8app_38362_sudoedit(){ //
         $this->gtitre(__FUNCTION__);
@@ -746,11 +1051,19 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
     }
     
     
+ 
+    
     
     public function poc4root8exploit8kernel_39166_CVE_2015_8660(){ //
         $this->ssTitre(__FUNCTION__);
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
+        
+        $ip = "10.60.10.0"; // tommyboy
+        $port = "22";
+        $protocol = "T";
+        $login = "bigtommysenior" ;
+        $pass = 'fatguyinalittlecoat1938!!';
         
         
         $ip = "10.60.10.138"; // analoguepond
@@ -808,6 +1121,11 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $eth = 'vmnet6';
         $domain = 'hack.vlan';
         
+        $ip = "10.60.10.0"; // VulnOS2
+        $port = "22";
+        $protocol = "T";
+        $login = "webmin1980" ;
+        $pass = "webmin";
         
         $ip = "10.60.10.147"; // OK typhoon 1.02 exploit_37292
         $port = "22";
@@ -832,7 +1150,7 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         $login = "";
         $pass = "";
         $titre = "";
-        $fonction2exec = "";
+        $fonction2exec = "exploits";
         $vm = "";
         $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
         
@@ -974,27 +1292,7 @@ e5ofsDLuIOhCVzsw/DIUrF+4liQ3R36Bu2R5+kmPFIkkeW1tYWIY7CpfoJSd74VC
         
     }
     
-    
-    public function poc4root8users2root(){
-        $this->ssTitre(__FUNCTION__);
-        $eth = 'vmnet6';
-        $domain = 'hack.vlan';
-        $ip = "10.60.10.133"; // Lin.Security v1.0
-        $port = "22";
-        $protocol = "T";
-        
-        $login = "bob" ;
-        $pass = "secret";
-        
-        $login = "";
-        $pass = "";
-        $titre = "";
-        $fonction2exec = "";
-        $vm = "";
-        $this->poc4root($eth,$domain,$ip,$port,$protocol,$login,$pass,$titre,$fonction2exec,$vm);
-        
-    }
-    
+
     
     public function poc4root8users2sudoers2app2cmd(){
         $this->ssTitre(__FUNCTION__);

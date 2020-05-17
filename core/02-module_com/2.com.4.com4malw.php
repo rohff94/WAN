@@ -205,6 +205,7 @@ CODE;
 
             
             switch ($obj_file->file_ext) {
+                case ($obj_file->file_ext==".c.tmp") :
                 case ($obj_file->file_ext==".c") :
                     $option_compile = trim($obj_file->req_ret_str("grep -i -E \"(gcc |cc |clang )\" $obj_file->file_path | grep -Po \"(gcc |cc |clang )[[:print:]]{1,}\" "));
                     $this->article("OPT GCC",$option_compile);
@@ -224,7 +225,7 @@ CODE;
                 case ($obj_file->file_ext==".pl") :
                     return "perl /tmp/$obj_file->file_name$obj_file->file_ext" ;
                 case ($obj_file->file_ext==".sh") :
-                    return "sh /tmp/$obj_file->file_name$obj_file->file_ext" ;
+                    return "bash /tmp/$obj_file->file_name$obj_file->file_ext" ;
                 case ($obj_file->file_ext==".php") :
                     return "php /tmp/$obj_file->file_name$obj_file->file_ext" ;
                 case ($obj_file->file_ext==".rb") :
