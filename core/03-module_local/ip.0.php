@@ -1727,7 +1727,7 @@ as the header options; the TTL changes.");
 	    $this->ip2port();$this->pause();
 	    $port_sum = count($this->tab_open_ports_all);
 	    $this->article("ALL PORT SUM",$port_sum);
-	    if ($port_sum > 50 ) { $this->log2error("HONEYPOT DETECTED");return true ;}
+	    if ($port_sum > 50 ) { $this->log2error("HONEYPOT DETECTED:$this->domain:$this->ip:".$this->ip2host(""));return true ;}
 	    else return false ;
 	}
 	
@@ -2073,6 +2073,18 @@ public function ip2vhost(){
 	     $this->titre(__FUNCTION__);
 	     $tab_users = array();
 	     $this->ip2port();
+	     /*
+   0  auxiliary/gather/kerberos_enumusers                                 normal  No     Kerberos Domain User Enumeration
+   1  auxiliary/scanner/smb/smb_enumusers                                 normal  No     SMB User Enumeration (SAM EnumUsers)
+   2  auxiliary/scanner/smb/smb_enumusers_domain                          normal  No     SMB Domain User Enumeration
+   3  auxiliary/scanner/snmp/snmp_enumusers                               normal  No     SNMP Windows Username Enumeration
+   4  auxiliary/scanner/snmp/xerox_workcentre_enumusers                   normal  No     Xerox WorkCentre User Enumeration (SNMP)
+   5  auxiliary/scanner/ssh/cerberus_sftp_enumusers      2014-05-27       normal  No     Cerberus FTP Server SFTP Username Enumeration
+   6  auxiliary/scanner/ssh/ssh_enumusers                                 normal  No     SSH Username Enumeration
+
+
+	      */
+	     // https://www.nccgroup.com/uk/about-us/newsroom-and-events/blogs/2015/june/username-enumeration-techniques-and-their-value/
 	     foreach ($this->tab_open_ports_all as $port){
 	         if (!empty($port))  {
 	             foreach ($port as $port_num => $protocol)
@@ -2093,6 +2105,17 @@ public function ip2vhost(){
 	                         case "snmp" : 
 	                             //auxiliary/scanner/snmp/snmp_enumusers
 	                             break ;
+	                             // auxiliary/gather/kerberos_enumusers- Kerberos Username Enumeration -krb5-enum-users [6] nmap nse script
+	                             // wordpress 
+	                             // finger 
+	                             // ACF2 (Access Control Facility) is a commercial, discretionary, access control software security system developed for the MVS (z/OS), VSE (z/VSE) and VM (z/VM) IBM mainframe operating systems
+	                             // ident - Port 113 
+	                             
+	                             
+	                             
+	                             // TCP/UDP 389: LDAP
+	                             
+	                             // TCP/UDP 3368: Global Catalog Service
 	                             
 	                     }
 	                 }
@@ -2143,7 +2166,7 @@ public function ip2vhost(){
 	    else  {
 	        if ($this->flag_poc)  {
 	            $this->ip4info2display();
-	            $this->ip2dot();
+	            //$this->ip2dot();
 	        }
 	    }
 	    echo "End ".__FUNCTION__.":$this->domain:$this->ip =============================================================================\n";	    
@@ -2152,7 +2175,7 @@ public function ip2vhost(){
 	
 	public function ip4service(){
 	    echo "=============================================================================\n";
-	    
+	    $this->gtitre(__FUNCTION__);
 	    if  (!$this->ip4service8db($this->ip2id) ) {
 	        $this->ip4service2display();
 	        //$this->ip4enum2users();

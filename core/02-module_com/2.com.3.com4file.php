@@ -7,6 +7,9 @@ class com4file extends com4net {
         parent::__construct();
     }
     
+
     
     
 }
+
+?>

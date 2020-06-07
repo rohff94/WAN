@@ -31,7 +31,7 @@ class com4net extends com4user {
         
         //$url_test = $this->web.$this->url2encode($path);
         //$query ="wget --server-response --no-check-certificate --spider --timeout=5 --tries=2 \"$url\" -qO-  | grep 'HTTP/' | grep -Po \"[0-9]{3}\" | tail -1";
-        $query = "curl -o /dev/null --silent --head --write-out '%{http_code}' --connect-timeout 30 --no-keepalive '$url' | grep -Po \"[0-9]{3}\" | head -1";
+        $query = "curl -o /dev/null --silent --head --write-out '%{http_code}' --connect-timeout 30 --no-keepalive '$url'  | grep -Po \"[0-9]{3}\" | head -1";
         return trim($this->req_ret_str($query));
     }
     
@@ -212,7 +212,7 @@ class com4net extends com4user {
                     $id8port = trim($id8port8db['id8port']);
                     
                     $sql_port = "SELECT id8ip,port,protocol FROM PORT WHERE id = '$id8port' LIMIT 1" ;
-                    $this->article("SQL ID8IP AND PORT NUMBER", $sql_port);
+                    $this->article("SQL id8ip AND PORT NUMBER", $sql_port);
                     $port_info = $this->mysql_ressource->query($sql_port);
                     $port_info_row = $port_info->fetch_assoc();
                     $id8ip = trim($port_info_row['id8ip']);
@@ -313,6 +313,30 @@ class com4net extends com4user {
        }
     }
     
+    public function run8vps(){
+        $time = 1;
+        
+        $file_path = "/home/rohff/bounty.bugs.1";
+        $fonction2exec = "domain4service";
+        $eth = "ens3";
+        echo $this->run8vps4domain2fork32($file_path, $fonction2exec, $eth);
+        $this->pause();
+        
+        $file_path = "/home/rohff/bounty.bugs.2";
+        $fonction2exec = "domain4service";
+        $eth = "ens3";
+        echo $this->run8vps4domain2fork32($file_path, $fonction2exec, $eth);
+        $this->pause();
+        
+        $file_path = "/home/rohff/bounty.bugs";
+        $fonction2exec = "domain4info";
+        $eth = "ens3";
+        
+        $cmd1 = "for i in $(cat $file_path ); do php pentest.php DOMAIN  \"$eth \$i $fonction2exec FALSE\";done";
+        $cmd2 = "for i in $(tac $file_path ); do php pentest.php DOMAIN  \"$eth \$i $fonction2exec FALSE\";done";
+        echo $this->exec_para4print($cmd1, $cmd2, $time)."\n";
+        $this->pause();
+    }
   
     public function run8vps4domain2fork32info(){
         $file_path = "/home/rohff/bounty.bugs";
@@ -340,7 +364,7 @@ class com4net extends com4user {
         $step = ceil($total_domains/$fork);
         $this->article("Step", $step);
         
-        $poc = new POC();
+        $poc = new com4code();
         $time = 1 ;
 
         $cmd1 = "for i in $(head -".intval($step*16)." $file_path | tac | head -$step ); do php pentest.php DOMAIN  \"$eth \$i $fonction2exec FALSE\";done";
@@ -455,7 +479,7 @@ class com4net extends com4user {
         $step = ceil($total_domains/$fork);
         $this->article("Step", $step);
         
-        $poc = new POC();
+        $poc = new com4code();
         $time = 1 ;
         
         $cmd1 = "for i in $(head -".intval($step*16)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";

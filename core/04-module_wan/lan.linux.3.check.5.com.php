@@ -1,6 +1,6 @@
 <?php
 
-class check4linux extends tunnel4linux{
+class check4linux extends com4wifi{
     
     
     

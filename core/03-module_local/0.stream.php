@@ -1,5 +1,5 @@
 <?php
-class STREAM4REQ extends com4for{
+class STREAM4REQ extends com4code{
     var $stream ; 
     var $stream_timeout ;
     

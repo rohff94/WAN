@@ -2,10 +2,7 @@
 
 # rename // for i in `find . -type f -iname "*.php" | sort -u`;do  mv -v $i  $(echo "$i" | sed "s/ip.port.auth.service2/service./g") ;done
 
-//  for i in `find . -type f -iname "*.php" | sort -u`;do echo -e "include_once(\"$i\");" | tac | uniq | grep 'core' | grep -v "all.inc" | tee -a ./all.inc.class.php.bak ;done
-
-
-
+//  for i in `find . -type f -iname "*.php" | sort -u`;do echo -e "include_once(\"$i\");" | tac | uniq | grep -E "(core|poc)" | grep -v "all.inc" | tee -a ./all.inc.class.php.bak ;done
 
 include_once("./core/00-module_conf/1.conf.0.php");
 include_once("./core/00-module_conf/1.conf.install.0.php");
@@ -18,7 +15,6 @@ include_once("./core/02-module_com/2.com.4.com4malw.php");
 include_once("./core/02-module_com/2.com.5.com4bin.php");
 include_once("./core/02-module_com/2.com.6.com4dot.php");
 include_once("./core/02-module_com/2.com.7.com4code.php");
-include_once("./core/02-module_com/2.com.8.com4for.php");
 include_once("./core/03-module_local/0.stream.php");
 include_once("./core/03-module_local/eth.0.php");
 include_once("./core/03-module_local/eth.cidr.php");
@@ -29,10 +25,8 @@ include_once("./core/03-module_local/ip.port.0.php");
 include_once("./core/04-module_wan/0.file.com/1.file.0.php");
 include_once("./core/04-module_wan/0.file.com/1.file.bin.0.php");
 include_once("./core/04-module_wan/0.file.com/1.file.bin.linux.0.php");
-include_once("./core/04-module_wan/0.file.com/1.file.bin.linux.vmem.linux.0.php");
-include_once("./core/04-module_wan/0.file.com/file.bin.win.0.php");
-include_once("./core/04-module_wan/0.file.com/file.bin.win.vmem.win.0.php");
-include_once("./core/04-module_wan/0.file.com/file.vm.php");
+include_once("./core/04-module_wan/0.file.com/file.image.php");
+include_once("./core/04-module_wan/0.file.com/file.pcap.php");
 include_once("./core/04-module_wan/1.file.bof.linux/bof4linux.01.ret2code.php");
 include_once("./core/04-module_wan/1.file.bof.linux/bof4linux.02.ret2int.php");
 include_once("./core/04-module_wan/1.file.bof.linux/bof4linux.03.ret2fmt.php");
@@ -45,17 +39,6 @@ include_once("./core/04-module_wan/1.file.bof.linux/bof4linux.09.ret2rop.php");
 include_once("./core/04-module_wan/1.file.bof.linux/bof4linux.10.ret2heap.php");
 include_once("./core/04-module_wan/1.file.bof.linux/bof4linux.sploits.php");
 include_once("./core/04-module_wan/2.com.9.auth.php");
-include_once("./core/04-module_wan/2.file.malw4win/malw4win.0.php");
-include_once("./core/04-module_wan/2.file.malw4win/malw4win.1.backdoor.php");
-include_once("./core/04-module_wan/2.file.malw4win/malw4win.2.injected.php");
-include_once("./core/04-module_wan/2.file.malw4win/malw4win.3.trojan.php");
-include_once("./core/04-module_wan/2.file.malw4win/malw4win.4.rootkit.php");
-include_once("./core/04-module_wan/2.file.malw4win/malw4win.5.tunnel.php");
-include_once("./core/04-module_wan/2.file.malw4win/malw4win.6.worm.php");
-include_once("./core/04-module_wan/3.file.bof4win/bof4win.02.ret2int.php");
-include_once("./core/04-module_wan/3.file.bof4win/bof4win.04.ret2stack.php");
-include_once("./core/04-module_wan/3.file.bof4win/bof4win.05.ret2lib.php");
-include_once("./core/04-module_wan/3.file.bof4win/bof4win.07.ret2canary.php");
 include_once("./core/04-module_wan/lan.linux.0.check.0.protocol.php");
 include_once("./core/04-module_wan/lan.linux.1.check.0.enum.php");
 include_once("./core/04-module_wan/lan.linux.1.check.1.key.php");
@@ -86,15 +69,8 @@ include_once("./core/06-module_web/web.url.param.all.php");
 include_once("./core/07-module_lan/lan.0.php");
 include_once("./core/07-module_lan/lan.linux.0.com.php");
 include_once("./core/07-module_lan/lan.linux.1.check.6.users.php");
-include_once("./core/13-module_poc/0.poc.0.enum.php");
-include_once("./core/13-module_poc/0.poc.1.service.php");
-include_once("./core/13-module_poc/0.poc.2.web.php");
-include_once("./core/13-module_poc/0.poc.3.lan.php");
-include_once("./core/13-module_poc/0.poc.4.bof.php");
-include_once("./core/13-module_poc/0.poc.5.root.php");
-include_once("./core/13-module_poc/0.poc.6.malware.php");
-include_once("./core/13-module_poc/1.poc.php");
-include_once("./core/13-module_poc/2.tp.php");
+
+
 
 
 

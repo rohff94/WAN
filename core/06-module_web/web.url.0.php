@@ -6,6 +6,7 @@ class URL extends WEB{
     var $uri_path;
     var $uri_dirname_path;
     var $uri_query ;
+    var $meta_tags ;
 
 	
 
@@ -18,6 +19,7 @@ class URL extends WEB{
 	    $this->uri_path_dirname = dirname($this->url);
 	    $this->uri_query = parse_url( $this->url, PHP_URL_QUERY);
 	    $this->article("URL", $this->url);
+
 	}
 
 

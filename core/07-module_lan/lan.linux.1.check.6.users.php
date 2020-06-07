@@ -1,6 +1,6 @@
 <?php
 
-class check4linux8users extends lan4linux{
+class check4linux8users8pass extends lan4linux{
 
     var $uid_pass ;
 

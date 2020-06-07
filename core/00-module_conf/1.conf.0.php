@@ -70,7 +70,7 @@ class CONFIG {
 	$this->user2local = trim($tmp2[0]);
 
 	$this->dir_tools = "$this->racine/tools";
-	$this->dir_vm = "$this->racine/../Hack.vlan";
+	$this->dir_vm = "$this->racine/../vmware";
 	$this->dir_tmp = "$this->racine/../TMP";
 	$this->dir_c = "$this->racine/cs";
 	$this->dir_vdo = "$this->racine/VDO";

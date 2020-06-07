@@ -43,7 +43,7 @@ class PORT extends IP{
 	        $this->port = trim($port);
 	    }
 	    else {
-	        $this->log2error("Error on Port Numer");
+	        $this->log2error("Error on Port Numner:$port_check ");
 	    }
 	    
     

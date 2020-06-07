@@ -141,8 +141,8 @@ class WEB extends SERVICE{
 	    $uri_dirname_path = dirname($url2get);
 	    $uri_query = parse_url($url2get, PHP_URL_QUERY);
 	    
-	    if ($methode_http==="GET") $data = "wget  \"$url2get\" --timeout=30 --tries=2 --no-check-certificate --user-agent='$user2agent' --header='$header' -qO- 2> /dev/null  "; // --user-agent='$user2agent' --header=\"Referer: $user2agent\"
-	    if ($methode_http==="POST") $data = "wget  \"$http_type://$vhost:$port$uri_path\" --post-data \"$uri_query\" --timeout=30 --tries=2 --no-check-certificate --user-agent='$user2agent' --header='$header' -qO- 2> /dev/null  "; // --user-agent='$user2agent' --header=\"Referer: $user2agent\"
+	    if ($methode_http==="GET") $data = "wget  \"$url2get\" --timeout=30 --tries=2 --no-check-certificate --user-agent='$user2agent' --header='$header' -qO- 2> /dev/null | strings  "; // --user-agent='$user2agent' --header=\"Referer: $user2agent\"
+	    if ($methode_http==="POST") $data = "wget  \"$http_type://$vhost:$port$uri_path\" --post-data \"$uri_query\" --timeout=30 --tries=2 --no-check-certificate --user-agent='$user2agent' --header='$header' -qO- 2> /dev/null  | strings "; // --user-agent='$user2agent' --header=\"Referer: $user2agent\"
 	    
 	    //$data = "curl --silent  \"$http_type://$vhost:$port$uri_path\" --data \"$uri_query\" --connect-timeout 30 --no-keepalive 2> /dev/null "; //--user-agent='$user2agent' --header='$header' --header=\"Referer: $user2agent\"
 	    
@@ -256,7 +256,13 @@ https://cmsdetect.com/
 	    $apps = array();
 	    $url = $this->url2norme($url);
 	    if ( (!empty($url)) && ($this->url2code($url)==="200")  ){
-	        $apps=$this->web2cms8html($this->url2html("", $this->url2wget("", "", $url, "GET"), $filter));
+	        $url2html = $this->url2html("", $this->url2wget("", "", $url, "GET"), $filter);
+	        $apps=$this->web2cms8html($url2html);
+
+	        $query = "echo '".base64_encode($url2html)."' | base64 -d | tr -d '\n' | sed 's/ lang=\"\w+\"//gi' | grep -iPo '(?<=<title>)(.*)(?=</title>)'";
+	        $title = exec($query);
+	        $this->article("title", $title);
+	        $this->pause();
 	    foreach($apps as $app)
 	    {       
 	        $this->article("App Used",$app);
@@ -597,27 +603,29 @@ https://cmsdetect.com/
 		        echo $robots;
 		        $tmp_robots = array();
 		        exec("echo '$robots' $this->filter_file_path ",$tmp_robots);
-		        foreach ($tmp_robots as $val) $tab_tmp[] = "$this->http_type://$this->ip:$this->port".trim($val);
+		        foreach ($tmp_robots as $val) {
+		            if(!empty($val))   $tab_tmp[] = "$this->http_type://$this->ip:$this->port".trim($val);
+		        }
 		        $this->article("URLs from robot.txt", $this->tab($tmp_robots));
 		        $this->pause();
 		        
 		        $nmap = $this->web2enum();
 		        echo $nmap;
 		        exec("echo '$nmap' $this->filter_file_path ",$tab_enum1);
-		        foreach ($tab_enum1 as $val) $tab_tmp[] = "$this->http_type://$this->ip:$this->port".trim($val);
+		        foreach ($tab_enum1 as $val) if(!empty($val))   $tab_tmp[] = "$this->http_type://$this->ip:$this->port".trim($val);
 		        $this->article("URLs from enum", $this->tab($tab_enum1));
 		        $this->pause();
 
 		        $scancli = $this->web2scan4cli();
 		        exec("echo '$scancli' $this->filter_file_path ",$tab_enum2);
-		        foreach ($tab_enum2 as $val) $tab_tmp[] = "$this->http_type://$this->ip:$this->port".trim($val);
+		        foreach ($tab_enum2 as $val) if(!empty($val))   $tab_tmp[] = "$this->http_type://$this->ip:$this->port".trim($val);
 		        $this->article("URLs from scanCLI", $this->tab($tab_enum2));
 		        $this->pause();
 		        
 
 		        
 		        $tab_spider = $this->web2urls4spider($this->web);
-		        foreach ($tab_spider as $val) $tab_tmp[] = $val;
+		        foreach ($tab_spider as $val) if(!empty($val))   $tab_tmp[] = $val;
 		        
 		        //$tab_result = array_merge($tab_tmp,$this->web2urls4spider($this->web)); // 
 		        $this->article("URLs from After Spidering", $this->tab($tab_final));
@@ -627,7 +635,7 @@ https://cmsdetect.com/
 		        $tab_dico = array();
 		        if (count($tab_result)<50) {
 		            $tab_dico = $this->web2dico();
-		            foreach ($tab_dico as $val) $tab_tmp[] = $val;
+		            foreach ($tab_dico as $val) if(!empty($val))   $tab_tmp[] = $val;
 		            $this->article("URLs from Dico", $this->tab($tab_dico));
 		            $this->pause();
 		        }
@@ -1366,7 +1374,7 @@ https://cmsdetect.com/
 	        
 	        if ($this->flag_poc)  {
 	            $this->web4info2display();
-	            $this->web2dot();
+	            //$this->web2dot();
 	        }
 	    }
 	    echo "End ".__FUNCTION__.":$this->web =============================================================================\n";
@@ -1391,11 +1399,16 @@ https://cmsdetect.com/
 	        $url = trim($url);
 	        if(!empty($url)){
 	            $url = $this->url2norme($url);
-	            $result .= $this->tab($this->web2cms($url));
+	            $result .= $this->tab($this->web2cms8local($url));
 	            $this->pause();
+
 	        }
 	    }
+
+	   
+	        //var_dump($meta_tags);
 	    
+	    //echo $result;
 	    return $result;
 	}
 	

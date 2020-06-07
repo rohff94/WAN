@@ -31,7 +31,7 @@
  * // vmrun -T server -h https://hostname:8333/sdk -u root -p mypassword start "[standard] Maszyna1/Maszyna1.vmx"
  * }
  *
- * $user_local @labs:~/Bureau/CEH$ vmrun -T ws -gu "$user_local " -gp "hacker" runProgramInGuest /home/$user_local /vm/Hack.vlan/xp3/xp3.vmx cmd.exe "/c C:\WINDOWS\system32\ipconfig.exe > C:\vmip.txt"
+ * $user_local @labs:~/Bureau/CEH$ vmrun -T ws -gu "$user_local " -gp "hacker" runProgramInGuest /home/$user_local /vm/vmware/xp3/xp3.vmx cmd.exe "/c C:\WINDOWS\system32\ipconfig.exe > C:\vmip.txt"
  */
 class VM extends BIN{
 	var $vms_access ;
@@ -42,7 +42,7 @@ class VM extends BIN{
 	
 	public function __construct($vmx_name) {
 	    $this->vmx_name = trim($vmx_name);
-	    $this->vmx_path = "/home/rohff/Hack.vlan/$this->vmx_name/$this->vmx_name.vmx";	    
+	    $this->vmx_path = "/home/rohff/vmware/$this->vmx_name/$this->vmx_name.vmx";	    
 	    $this->article("VMX PATH", $this->vmx_path);
 	    $this->pause();
 	    parent::__construct($this->vmx_path);
@@ -251,7 +251,7 @@ public function vm2process_list() {
 		$this->requette("egrep \"(ip =|internet =|machinery =)\" /opt/cuckoo/conf/cuckoo.conf");
 		$this->requette("egrep \"(interface =|vmx_path =|resultserver_ip =|snapshot =|ip =)\" /opt/cuckoo/conf/vmware.conf");
 		$this->requette("egrep \"(mongodb)\" /opt/cuckoo/conf/reporting.conf");
-		$this->rouge("il ne faut pas que le PATH de la vmx ait un point exp: /home/rohff/EH/VM/Hack.vlan/xp3/xp3.vmx -> ne foncitonne pas le mettre dans -> /home/rohff/EH/VM/sdbx_xp3/sdbx_xp3.vmx");
+		$this->rouge("il ne faut pas que le PATH de la vmx ait un point exp: /home/rohff/EH/VM/vmware/xp3/xp3.vmx -> ne foncitonne pas le mettre dans -> /home/rohff/EH/VM/sdbx_xp3/sdbx_xp3.vmx");
 		$this->pause();
 		$this->requette("gedit /opt/cuckoo/conf/cuckoo.conf /opt/cuckoo/conf/reporting.conf /opt/cuckoo/conf/vmware.conf");
 		$this->pause();

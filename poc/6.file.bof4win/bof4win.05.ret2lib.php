@@ -114,7 +114,7 @@ class ret2lib4win extends bin4win{
 
 function ret2lib4win_methode1($rep_path,$host, $offset_eip) {
 	$this->gtitre("Methode 1 ");
-	$vm_machine = new VM("$this->dir_vm/Hack.vlan/$host/$host.vmx");
+	$vm_machine = new VM("$this->dir_vm/vmware/$host/$host.vmx");
 	$this->titre("Find compostants addr from Payload -> &WinExec &ExitProcess &cmd.exe ");
 	$programme_pid = $vm_machine->vm4win2pid("$this->file_name.exe");
 	$winexec = $vm_machine->vm2addr4fonction_prog_pid($programme_pid, "WinExec");
@@ -150,7 +150,7 @@ function ret2lib4win_methode1($rep_path,$host, $offset_eip) {
 
 function ret2lib4win_system_exit_cmd_string_payload($rep_path, $host, $header,$footer,$winexec, $exitProcess, $cmd_addr,  $offset, $ext_file) {
 
-	$vm_machine = new VM("$this->dir_vm/Hack.vlan/$host/$host.vmx");
+	$vm_machine = new VM("$this->dir_vm/vmware/$host/$host.vmx");
 	
 	$size_header = $this->hex2size($header);
 	$size_footer = $this->hex2size($footer);

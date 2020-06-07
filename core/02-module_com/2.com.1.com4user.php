@@ -219,26 +219,153 @@ class com4user extends DATA {
         }
     }
     
+    
     public function monitor(){
-        $this->requette("top");
-        $this->requette("ps aux | grep pentest | grep domain | grep 4service | wc -l");
-        $this->requette("ps aux | grep pentest | grep domain | grep 4service");
-        $this->requette("ps aux | grep pentest | grep domain | grep 4service | awk '{print $15}' | sort -u");
-        $this->requette("ps aux | grep pentest | grep domain | grep 4info | wc -l");
-        $this->requette("ps aux | grep pentest | grep domain | grep 4info");
-        $this->requette("ps aux | grep pentest | grep domain | grep 4info | awk '{print $15}' | sort -u");
-        $this->requette("screen -r ");
-        $this->requette("ps axjf");
-        $this->requette("tail -f /var/log/syslog");
-        $this->requette("tail -f /var/log/auth.log");
-        $this->requette("tail -f /var/log/kern.log");
-        $this->requette("tail -f /var/log/mail.log");
-        $this->requette("tail -f $this->log_succes_path");
-        $this->requette("tail -f $this->log_error_path");
-        $this->requette("grep -i segfault /var/log/kern.log");
+        //$this->monitor8fw();$this->pause();
+        $this->monitor8service();$this->pause();
+        $this->monitor8db();$this->pause();
+        $this->monitor8malw();$this->pause();
+        $this->monitor8bot();$this->pause();
+        
+        //$this->monitor8lan($ip)
     }
     
-    public function watching($ip){
+    public function monitor8bot(){
+        $data = "echo '$this->root_passwd' | sudo -S grep 'Failed password for invalid user' /var/log/auth.log $this->filter_ip | sort -u ";
+        $tab_bot = $this->req_ret_tab($data);
+        $this->article("ALLBots", $this->tab($tab_bot));
+        foreach ($tab_bot as $bot){
+            if (!empty($bot) && $this->isIPv4($bot)){
+                $this->article("Bot", $bot);
+                $data = "echo '$this->root_passwd' | sudo -S grep '$bot' /var/log/auth.log | grep -i -E \"(succes|accept|authoriz)\" ";
+                $this->requette($data);
+                $data = "echo '$this->root_passwd' | sudo -S grep '$bot' /var/log/auth.log | wc -l ";
+                $this->requette($data);
+                
+                $ip = $bot ;
+                $eth = "ens3";
+                $domain = "malw.bot";
+                $obj_ip = new IP("", $eth, $domain, $ip);
+                $obj_ip->poc(TRUE);
+                $obj_ip->ip4info();$this->pause();
+                $obj_ip->ip4service();$this->pause();
+                //$obj_ip->ip4enum2users();$this->pause();
+                
+                $query = "php pentest.php IP \"$eth $domain $ip ip4enum2users FALSE\" ";
+                $this->cmd("localhost", $query);
+                
+                $query = "echo '$this->root_passwd' | sudo -S fail2ban-client set sshd banip $ip";
+                $this->requette($query);
+                $this->pause();
+            }
+        }
+    }
+    public function monitor8malw(){
+        //$this->requette("top");
+        //$this->requette("echo '$this->root_passwd' | sudo -S ps axjf");
+        //$this->requette("echo '$this->root_passwd' | sudo -S cat /var/log/auth.log");
+        $this->requette("echo '$this->root_passwd' | sudo -S tail -20 /var/log/syslog");$this->pause();
+        $this->requette("echo '$this->root_passwd' | sudo -S grep -i -E \"(fail|error)\" /var/log/auth.log");$this->pause();
+        $this->requette("echo '$this->root_passwd' | sudo -S tail -20 /var/log/kern.log");$this->pause();
+        $this->requette("echo '$this->root_passwd' | sudo -S tail -20 /var/log/mail.log");$this->pause();
+        $this->requette("echo '$this->root_passwd' | sudo -S tail -20 $this->log_succes_path");$this->pause();
+        $this->requette("echo '$this->root_passwd' | sudo -S tail -20 $this->log_error_path");$this->pause();
+        $this->requette("echo '$this->root_passwd' | sudo -S grep -i -E \"(segfault|error|fail|crash)\" /var/log/kern.log");$this->pause();
+   $this->requette("echo '$this->root_passwd' | sudo -S fail2ban-client status");
+   $this->requette("echo '$this->root_passwd' | sudo -S fail2ban-client status sshd");
+   $this->requette("echo '$this->root_passwd' | sudo -S tail -40 /var/log/fail2ban.log");
+    }
+  
+    
+    public function monitor8service(){
+        $this->requette("ps aux | grep pentest | grep domain | grep 4service | wc -l");$this->pause();
+        $this->requette("ps aux | grep pentest | grep domain | grep 4service");$this->pause();
+        $this->requette("ps aux | grep pentest | grep domain | grep 4service | awk '{print $15}' | sort -u $this->filter_domain");$this->pause();
+        $this->requette("ps aux | grep pentest | grep domain | grep 4info | wc -l");$this->pause();
+        $this->requette("ps aux | grep pentest | grep domain | grep 4info");$this->pause();
+        $this->requette("ps aux | grep pentest | grep domain | grep 4info | awk '{print $15}' | sort -u $this->filter_domain");$this->pause();
+        $this->requette("screen -r ");$this->pause();
+        
+    }
+    
+    
+    public function monitor8fw(){
+        $this->ssTitre("Scan TCP");
+        
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -L -nv");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -F;sudo iptables -X");
+        
+        /*
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -L -nv");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -N synScan");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A synScan -p TCP -m state --state NEW -m limit --limit 1/s --limit-burst 1 -j RETURN");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A synScan -p TCP -j LOG --log-prefix \"ROHFF SYN SCAN Reject: \"");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A synScan -p TCP -j REJECT --reject-with tcp-reset");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A INPUT -p TCP --syn -j synScan");
+        $this->pause();
+        
+        
+        $this->ssTitre("Scan UDP");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -N udpScan");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A udpScan -p UDP -m state --state NEW -m limit --limit 1/s --limit-burst 1 -j RETURN");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A udpScan -p UDP -j LOG --log-prefix \"ROHFF UDP SCAN Reject: \"");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A udpScan -p UDP -j REJECT --reject-with port-unreach");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A INPUT -p UDP -j udpScan");
+        $this->pause();
+        
+                $this->ssTitre("Block BruteForce SSH user");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -N SSHSCAN");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A INPUT -i lo -p tcp -m tcp --dport 22 -m state --state NEW -j SSHSCAN");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A SSHSCAN -m recent --set --name SSH_BRUTEFORCE --rsource");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A SSHSCAN -m recent --update --seconds 360 --hitcount 10 --name SSH_BRUTEFORCE --rsource -j LOG --log-prefix \"Anti SSH-Bruteforce: \" ");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A SSHSCAN -m recent --update --seconds 360 --hitcount 10 --name SSH_BRUTEFORCE --rsource -j DROP");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A SSHSCAN -m recent --rcheck --name SSH_BRUTEFORCE -j ACCEPT");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -L -nv");
+        $this->pause();
+        
+
+        
+        $this->ssTitre("Block BruteForce SSH user");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -N SSHSCAN");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A INPUT -i lo -p tcp -m tcp --dport 22 -m state --state NEW -j SSHSCAN");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A SSHSCAN -m recent --set --name SSH_BRUTEFORCE --rsource");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A SSHSCAN -m recent --update --seconds 360 --hitcount 10 --name SSH_BRUTEFORCE --rsource -j LOG --log-prefix \"Anti SSH-Bruteforce: \" ");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A SSHSCAN -m recent --update --seconds 360 --hitcount 10 --name SSH_BRUTEFORCE --rsource -j DROP");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -A SSHSCAN -m recent --rcheck --name SSH_BRUTEFORCE -j ACCEPT");
+        $this->requette("echo '$this->root_passwd' | sudo -S iptables -L -nv");
+        $this->pause();
+        $query = "medusa -u \"root\" -P \"$this->dico_password.1000\" -h '127.0.0.1' -M ssh -f -t 8 -e s -n 22  ";
+        $query = "hydra -l \"root\" -P \"$this->dico_password.100\" 127.0.0.1 ssh -f -t 8 -e sr -s 22 -w 5s";
+        $this->requette($query);
+        */
+    }
+    
+    
+    public function monitor8db(){
+        
+        $sql = "select distinct(service2name) FROM SERVICE ORDER BY service2name ASC";
+        $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql\"  2>/dev/null ";
+        $this->requette($query);$this->pause();
+        $sql = "select distinct(service2product) FROM SERVICE ORDER BY service2product ASC";
+        $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql\"  2>/dev/null ";
+        $this->requette($query);$this->pause();
+        $sql = "select distinct(service2name),service2version,service2product,service2extrainfo FROM SERVICE ORDER BY service2name ASC";
+        $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql\"  2>/dev/null ";
+        $this->requette($query);$this->pause();
+        
+        $sql = "select ladate,user2name,user2pass,from_base64(user2info) FROM AUTH";
+        $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql\"  2>/dev/null ";
+        $this->requette($query);$this->pause();
+        
+        $sql = "select ladate,user2name,user2methode,from_base64(user2infos) FROM USERS";
+        $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql\"  2>/dev/null ";
+        $this->requette($query);$this->pause();
+        
+        $sql = "select * FROM LAN";
+        $query = "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql\"  2>/dev/null ";
+        $this->requette($query);$this->pause();
+    }
+    public function monitor8lan($ip){
         $chaine = "Monitors your environment";
         $this->rouge($chaine);
         if ($this->ip4priv($this->ip)){

@@ -2,7 +2,34 @@
 
 include "./core/0.all.inc.php";
 
-
+include_once("./poc/0.poc.0.enum.php");
+include_once("./poc/0.poc.1.service.php");
+include_once("./poc/0.poc.2.web.php");
+include_once("./poc/0.poc.3.users.php");
+include_once("./poc/0.poc.4.bof.php");
+include_once("./poc/0.poc.5.root.php");
+include_once("./poc/0.poc.6.malware.php");
+include_once("./poc/0.poc.7.for.php");
+include_once("./poc/0.poc.8.exploits.php");
+include_once("./poc/1.poc.php");
+include_once("./poc/2.com.8.com4for.php");
+include_once("./poc/2.tp.php");
+include_once("./poc/4.file.for/1.file.bin.linux.vmem.linux.0.php");
+include_once("./poc/4.file.for/file.bin.win.0.php");
+include_once("./poc/4.file.for/file.bin.win.vmem.win.0.php");
+include_once("./poc/5.file.malw4win/malw4win.0.php");
+include_once("./poc/5.file.malw4win/malw4win.1.backdoor.php");
+include_once("./poc/5.file.malw4win/malw4win.2.injected.php");
+include_once("./poc/5.file.malw4win/malw4win.3.trojan.php");
+include_once("./poc/5.file.malw4win/malw4win.4.rootkit.php");
+include_once("./poc/5.file.malw4win/malw4win.5.tunnel.php");
+include_once("./poc/5.file.malw4win/malw4win.6.worm.php");
+include_once("./poc/6.file.bof4win/bof4win.02.ret2int.php");
+include_once("./poc/6.file.bof4win/bof4win.04.ret2stack.php");
+include_once("./poc/6.file.bof4win/bof4win.05.ret2lib.php");
+include_once("./poc/6.file.bof4win/bof4win.07.ret2canary.php");
+include_once("./poc/file.vm.php");
+//====================================================================
 
 
 
@@ -161,11 +188,11 @@ $poc->poc4lan4crypto();
 //$poc->show_all_station_in_essid_selected ($bssid, $essid);
 //$poc->test_inject_data_in_interface_monitor ();
 //$poc->get_handshake_from_one_station_in_one_essid ( $bssid, $station, $essid ); // ne fonctionne pas avec aircrack -> j'arrive pas a avoir le handshake
-//$poc->crack_handshake ( "/media/trucrypt5/EH/TMP/capture_handshake.pcap" );
-//$poc->wifi_crack_faster ( $bssid );
-//$poc->get_handshake_from_all_station_in_all_essid ();
-//$poc->get_handshake_from_all_station_in_one_essid ( $bssid );
-//$poc->crack_handshake ( "/opt/aircrack-ng-1.2-beta1/wpa.cap" );
+//$poc->crack_handshake("/media/trucrypt5/EH/TMP/capture_handshake.pcap" );
+//$poc->wifi_crack_faster($bssid );
+//$poc->get_handshake_from_all_station_in_all_essid();
+//$poc->get_handshake_from_all_station_in_one_essid($bssid );
+//$poc->crack_handshake("/opt/aircrack-ng-1.2-beta1/wpa.cap" );
 //$poc->method_crack_wifi();//ok
 //$poc->method_0_Deauthentication ();//ok
 //$poc->method_1_Fake_authentication ();//ok
