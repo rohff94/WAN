@@ -39,11 +39,11 @@ class PORT extends IP{
         if(!$this->isIPv4($ip)) parent::__construct($stream,$eth,$domain,gethostbyname($ip));
 	
 	    $port_check = intval($port,10);
-	    if ( ($port_check>0) && ($port_check<65535) ){
+	    if ( ($port_check>0) && ($port_check<=65535) ){
 	        $this->port = trim($port);
 	    }
 	    else {
-	        $this->log2error("Error on Port Numner:$port_check ");
+	        $this->log2error("Error on Port Numner:$port_check - ID8PORT=$this->port2id");
 	    }
 	    
     

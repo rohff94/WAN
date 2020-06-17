@@ -268,8 +268,8 @@ class com4user extends DATA {
         $this->requette("echo '$this->root_passwd' | sudo -S grep -i -E \"(fail|error)\" /var/log/auth.log");$this->pause();
         $this->requette("echo '$this->root_passwd' | sudo -S tail -20 /var/log/kern.log");$this->pause();
         $this->requette("echo '$this->root_passwd' | sudo -S tail -20 /var/log/mail.log");$this->pause();
-        $this->requette("echo '$this->root_passwd' | sudo -S tail -20 $this->log_succes_path");$this->pause();
-        $this->requette("echo '$this->root_passwd' | sudo -S tail -20 $this->log_error_path");$this->pause();
+        $this->requette("echo '$this->root_passwd' | sudo -S cat $this->log_succes_path");$this->pause();
+        $this->requette("echo '$this->root_passwd' | sudo -S cat $this->log_error_path");$this->pause();
         $this->requette("echo '$this->root_passwd' | sudo -S grep -i -E \"(segfault|error|fail|crash)\" /var/log/kern.log");$this->pause();
    $this->requette("echo '$this->root_passwd' | sudo -S fail2ban-client status");
    $this->requette("echo '$this->root_passwd' | sudo -S fail2ban-client status sshd");
@@ -287,6 +287,8 @@ class com4user extends DATA {
         $this->requette("screen -r ");$this->pause();
         
     }
+    
+    
     
     
     public function monitor8fw(){
@@ -460,6 +462,13 @@ class com4user extends DATA {
         $this->pause();
         return array($minute,$hour,$day,$month,$day8week,$user,$exec_file);
     }
+    
+    
+    
+    
+    
+    
+    
     
     
 }

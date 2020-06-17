@@ -1,13 +1,13 @@
 <?php
 class STREAM4REQ extends com4code{
     var $stream ; 
-    var $stream_timeout ;
+    
     
     
     public function __construct($stream) {
         parent::__construct();
         $this->stream = $stream;
-        $this->stream_timeout = 5 ;
+        
     }
 
     

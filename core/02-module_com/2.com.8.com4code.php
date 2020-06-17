@@ -1,6 +1,6 @@
 <?php
 
-class com4code extends com4dot {
+class com4code extends com4wifi {
     
  
     public function __construct() {

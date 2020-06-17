@@ -48,6 +48,8 @@ class CONFIG {
     var $log_error_path ;
     var $log_succes_path ;
 	
+    var $stream_timeout ;
+    
 	public function __construct() {
 	
 
@@ -88,6 +90,7 @@ class CONFIG {
 	$this->log_error_path = "/tmp/log.error.wan.log";
 	$this->log_succes_path = "/tmp/log.succes.wan.log";
 	$this->time_start = microtime(TRUE);
+	$this->stream_timeout = 5 ;
 }
 
 

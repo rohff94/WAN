@@ -76,8 +76,15 @@ Only root can forward privileged ports. Dynamic port forwardings can also be spe
     }
     
     
-    
-    
+    public function lan2device2ip($stream){
+        $this->titre(__FUNCTION__);
+        
+        $this->note("IPs");
+        $data = "ip a 2>/dev/null ";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        $data = "ip route show default 2>/dev/null ";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+    }
     
     
     public function lan4info(){
