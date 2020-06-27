@@ -212,13 +212,17 @@ class DOMAIN extends ETH{
 	
 	
 	public function domain2ip8db(): array{
-	    $sql_r = "SELECT ip FROM IP WHERE id8domain = '$this->domain2id'  ";
-	    //echo "$sql_r\n";
+	    $sql_r = "SELECT ip,ip2host FROM IP WHERE id8domain = '$this->domain2id' ORDER BY ip ASC ";
+	    echo "$sql_r\n";
 	    $req = $this->mysql_ressource->query($sql_r);
 	    $tab_ips = array();
 	    while ($row = $req->fetch_assoc()) {
-	        $tab_ips[] = $row['ip'];
+	        $ip = $row['ip'];
+	        $host = $row['ip2host'];
+	        $tab_ips[] = $ip;
+	        $this->article($host, $ip);
 	    }
+	    $this->article("IP Recorded", $this->tab($tab_ips));
 	    return $tab_ips;
 	}
 	public function domain4pentest(){
@@ -280,6 +284,7 @@ class DOMAIN extends ETH{
 	
 	public function domain4service(){
 	    $this->gtitre(__FUNCTION__);
+	    echo $this->domain2search();
 	    $tab_ips = $this->domain2ip8db();
 	    $file_path = "/tmp/$this->eth.$this->domain.ip4service";
 	    $fp = fopen($file_path, 'w+');
@@ -386,6 +391,8 @@ class DOMAIN extends ETH{
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->domain2where AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->domain2where));
 	    else {
+	        $filepath_search = "$this->dir_tmp/$this->domain.search";
+	        if (!file_exists($filepath_search)){
 	    //$result .= $this->domain2search4harvest();$this->pause();
 	    $result .= $this->domain2search4sublister();$this->pause();
 	    $result .= $this->domain2search4web();$this->pause();
@@ -395,11 +402,11 @@ class DOMAIN extends ETH{
 	    exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tmp);
 	    //echo $this->tab($tab_cidr);
 	    $size = count($tmp);
-	    if($size<20){
-	        //$dico = $this->domain2dico();echo $dico;     $result .= $dico ;$this->pause();
+	    if($size<70){
+	        $dico = $this->domain2dico();echo $dico;     $result .= $dico ;$this->pause();
 	        exec("echo '$result' | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ",$tab_cidr);
 	        $size = count($tab_cidr);
-	        if($size<50){
+	        if($size<100){
 	    for ($i=0;$i<$size;$i++){
 	        $cidr = trim($tab_cidr[$i]);
 	        
@@ -411,9 +418,12 @@ class DOMAIN extends ETH{
 
 	    }
 	    }
+	        }
+	        else $result = file_get_contents($filepath_search);
 	    $result = base64_encode($result);
 	    return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,$this->domain2where,$result));
-	    
+	        
+	        
 	    }
 	    
 	}
@@ -606,10 +616,12 @@ class DOMAIN extends ETH{
 	
 	public function  domain4info(){
 	    $this->gtitre(__FUNCTION__);
-	    /*
+	    
 	    $cidr = $this->domain2cidr() ;
 	    echo $this->tab($cidr);$this->pause();
 	    
+	    $this->domain2ns();$this->pause();
+	    /*
 	    $mails = $this->domain2mail() ;
 	    echo $mails;$this->pause();
 	    
@@ -623,8 +635,7 @@ class DOMAIN extends ETH{
 	    echo $whois;$this->pause();
 
 	    
-	    $hosts = $this->domain2host() ;
-	   	    
+	    $hosts = $this->domain2host() ;	   	    
 	    if(!empty($hosts)){
 	        
 	        $tab_tmp_host = array();
@@ -657,6 +668,37 @@ class DOMAIN extends ETH{
 	            echo "END $host =====================================================================\n";
 	        }
 	    }
+	    
+	    
+	    /*
+	    $tab_ips = $this->domain2ip();
+	    if(!empty($tab_ips)){
+	        
+	        $tab_tmp_host = array();
+	        
+	        $size = count($tab_ips);
+	        for($i=0;$i<$size;$i++){
+	            echo "\n\n$i/$size : $tab_ips[$i] =======================================================\n";
+	            $ip = $tab_ips[$i];
+	            $obj_host = new IP($this->stream,$this->eth, $this->domain,$ip);
+	            $obj_host->poc($this->flag_poc);
+	            $obj_host->ip4service();
+	            echo "END $ip =====================================================================\n";
+	        }
+	    }
+	    */
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
 	}
 	
 	
@@ -734,7 +776,7 @@ class DOMAIN extends ETH{
         $file_path = "$this->dir_tmp/$this->domain.search";
         if(!file_exists($file_path)){
         $search = $this->domain2search();
-        $this->str2file($search, $file_path);
+        $this->str2file("",$search, $file_path);
         }
         $query = "cat $file_path | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -v '192.168' | grep -v '127.0' | sort -u ";
         return array_filter($this->req_ret_tab($query));

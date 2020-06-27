@@ -1270,8 +1270,9 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	        else {
 	            
 	            $tab_open_ports_tcp = $this->ip2tcp4select();
+	            $tab_open_ports_tcp += $this->ip2tcp4top10000();
 	            $tab_open_ports_udp = $this->ip2udp4top200();
-	            if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4top4000();
+	            //if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4top4000();
 
 	        }
 	        $rst_tcp = implode(",",$tab_open_ports_tcp);
@@ -1320,7 +1321,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	
 	public function ip2tcp4top10000(): array{
 	    $this->ssTitre(__FUNCTION__);
-		$query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --host-timeout 30m --reason --top-ports 10000 --open $this->ip -e $this->eth -oX - ";
+		$query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --host-timeout 50m --reason --top-ports 10000 --open $this->ip -e $this->eth -oX - ";
 		$query = $query." | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
 		return $this->req_ret_tab($query);
 	}
@@ -2060,6 +2061,14 @@ public function ip2vhost(){
 	                    if (!empty($port_num)) {
 	                        $obj_service = new SERVICE($this->stream,$this->eth,$this->domain,$this->ip,$port_num, $protocol);
 	                        $obj_service->service4info();
+	                        switch ($obj_service->service_name) {
+	                            case "http" :
+	                            case "https" :
+	                                $obj_web = new WEB($obj_service->stream,$obj_service->eth,$obj_service->domain,"$obj_service->service_name://$obj_service->ip:$obj_service->port/");
+	                                $obj_web->poc($this->flag_poc);
+	                                $obj_web->web2scan4gui4zap();
+	                                break ;
+	                        }
 	                    }
 	            }
 	        }
@@ -2110,8 +2119,7 @@ public function ip2vhost(){
 	                             // finger 
 	                             // ACF2 (Access Control Facility) is a commercial, discretionary, access control software security system developed for the MVS (z/OS), VSE (z/VSE) and VM (z/VM) IBM mainframe operating systems
 	                             // ident - Port 113 
-	                             
-	                             
+
 	                             
 	                             // TCP/UDP 389: LDAP
 	                             
@@ -2169,7 +2177,7 @@ public function ip2vhost(){
 	            //$this->ip2dot();
 	        }
 	    }
-	    echo "End ".__FUNCTION__.":$this->domain:$this->ip =============================================================================\n";	    
+	    echo "End ".__FUNCTION__.":".$this->ip2host("").":$this->ip =============================================================================\n";	    
 	}
 	
 	
@@ -2178,8 +2186,8 @@ public function ip2vhost(){
 	    $this->gtitre(__FUNCTION__);
 	    if  (!$this->ip4service8db($this->ip2id) ) {
 	        $this->ip4service2display();
-	        //$this->ip4enum2users();
-	        $this->ip2os();$this->pause();	        
+	        $this->ip4enum2users();
+	        $this->ip2os();$this->pause();
 	        //$this->ip2auth();$this->pause();
 	        $sql_ip = "UPDATE IP SET ip4service=1 WHERE id = $this->ip2id  ";
 	        $this->mysql_ressource->query($sql_ip);
@@ -2187,7 +2195,7 @@ public function ip2vhost(){
 	    else  {
 	        if ($this->flag_poc)  $this->ip4service2display();
 	    }
-	    echo "End ".__FUNCTION__.":$this->domain:$this->ip =============================================================================\n";
+	    echo "End ".__FUNCTION__.":".$this->ip2host("").":$this->ip =============================================================================\n";
 	}
 	
 	
@@ -2202,7 +2210,7 @@ public function ip2vhost(){
 	    else  {
 	        if ($this->flag_poc)  $this->ip4pentest2display();
 	    }
-	    echo "End ".__FUNCTION__.":$this->domain:$this->ip =============================================================================\n";
+	    echo "End ".__FUNCTION__.":".$this->ip2host("").":$this->ip =============================================================================\n";
 	}
 	
 	public function ip4pentest2display(){ // OK
@@ -2213,6 +2221,8 @@ public function ip2vhost(){
 
 		//$this->ip2cve();$this->pause();
 		//$result .=  $this->ip2vuln();$this->pause();
+	    
+
 	    
 	    if(!$this->ip2honey()){
 	        if (!empty($this->tab_open_ports_all)){

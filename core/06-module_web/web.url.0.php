@@ -67,12 +67,12 @@ class URL extends WEB{
 	    $result = "";
 	    if (!empty($this->url)){
 	        
-	        /*
-	        $this->web2scan4gui4burp();
-	        $this->article("Burp","localproxy $this->proxy_port_burp ");
-	        $this->requette("wget -qO- --no-check-certificate --timeout=2 --tries=1 -e use_proxy=yes -e http_proxy=$this->proxy_addr:$this->proxy_port_burp -e https_proxy=$this->proxy_addr:$this->proxy_port_burp \"$this->url\" --user-agent='$this->user2agent' > /dev/null ");
+	        
+	        //$this->web2scan4gui4burp();
+	        //$this->article("Burp","localproxy $this->proxy_port_burp ");
+	        //$this->requette("wget -qO- --no-check-certificate --timeout=2 --tries=1 -e use_proxy=yes -e http_proxy=$this->proxy_addr:$this->proxy_port_burp -e https_proxy=$this->proxy_addr:$this->proxy_port_burp \"$this->url\" --user-agent='$this->user2agent' > /dev/null ");
 	        $this->web2scan4gui4zap();
-	        */
+	        
 	        
 	        $code = $this->url2code($this->url);
 	        $code = trim($code);

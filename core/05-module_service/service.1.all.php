@@ -21,7 +21,8 @@ class SERVICE extends service2ssh {
         $this->created_user_name = "syslog_admin";
         $this->created_user_pass = "admin123456789";
         
-            list($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf,$service_ostype) = $this->port2version4run($this->port2version());
+        
+        list($service_name,$service_version,$service_product,$service_extrainfo,$service_hostname,$service_conf,$service_ostype) = $this->port2version4run($this->port2version());
             
             $this->service_name = trim($service_name);
             $this->service_version = trim($service_version);

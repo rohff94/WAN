@@ -785,7 +785,7 @@ https://cmsdetect.com/
 		// /ZAP_2.4.0/zap.sh -port 8090 -host 0.0.0.0 -newsession /ZAP_2.4.0/session/test8 -daemon &
 		// -config scanner.attackOnStart=true -config view.mode=attack
 		// -config scanner.attackPolicy=MyAttackPolicy
-		
+	/*	
 		while (!$this->tcp2open("127.0.0.1", $this->proxy_port_zap)) {
         $filename = "/opt/zaproxy/zap.sh";
         $this->article("ZAP","localproxy $this->proxy_port_burp without connection outgoing  ");        
@@ -794,6 +794,7 @@ https://cmsdetect.com/
 		$this->cmd("localhost","bash $filename");
 		sleep(30);
 	}
+	*/
 	$this->requette("wget -qO- --no-check-certificate --timeout=2 --tries=1 -e use_proxy=yes -e http_proxy=$this->proxy_addr:$this->proxy_port_zap  -e https_proxy=$this->proxy_addr:$this->proxy_port_zap \"$this->web\" --user-agent='$this->user2agent' > /dev/null ");
 	
 	}
