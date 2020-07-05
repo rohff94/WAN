@@ -3,29 +3,8 @@
 
 
 
-/*
- * http://sourceforge.net/projects/spiderfoot/?source=typ_redirect
-
- * 
- * nmap -sP 192.168.x.0/24 --disable-arp-ping -oX -
- * 
- */
-
-/*
- Session splicing is an IDS evasion technique in which an attacker delivers data in multiple small- sized packets to the target computer. Hence, it becomes very
- difficult for an IDS to detect the attack signatures of such attacks. Which of the following tools can be used to perform session splicing attacks?
- Each correct answer represents a complete solution. Choose all that apply.
- A. Whisker
- B. Fragroute
- C. Nessus
- D. Y.A.T.
-
- Correct Answer: AC
 
 
- Packet filters forward the original packet through the other side, while proxy firewalls create a new packet before forwarding it.
-
- */ 
 
 class IP extends DOMAIN{
 
@@ -76,7 +55,7 @@ class IP extends DOMAIN{
 			
 			if ( ($this->ip ==="127.0.0.1") && ($this->eth !== "lo") ) {
 			    $this->log2error("localhost IP from $this->eth interface");
-			    exit();
+			   exit();
 			}
 		    
 		}
@@ -149,7 +128,7 @@ class IP extends DOMAIN{
 		node [fontsize = \"16\" shape = \"circle\"];
 		edge [penwidth=2.0 ];\n	";
 	    
-	    $this->ssTitre(__FUNCTION__);
+
 	    $file_output = "/tmp/$this->ip.".__FUNCTION__.".dot";
 	    $dot .= $dot_header;
 	    $dot .= "label = \"$this->ip\";
@@ -283,8 +262,8 @@ class IP extends DOMAIN{
 	    $ip2dot4body = $ip2dot_ip;
 	    
 	    if ($this->flag_poc) {
-	        //$this->requette("gedit $file_output");
 	        $this->dot4make($file_output,$ip2dot);
+	        $this->requette("gedit $file_output");	        
 	    }
 	    
 	    
@@ -390,7 +369,9 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	
 	public function  ip2host4nslookup($ip){
 	    $this->ssTitre(__FUNCTION__);
+	    
 	    $query = "nslookup -query=ptr $ip 2> /dev/null | grep 'name' | cut -d'=' -f2 | sed \"s/\.$//g\" | tr -d ' ' | grep  -i -Po \"([0-9a-zA-Z_-]{1,}\.)+[a-zA-Z]{1,4}\" ";
+	    $query = "dig -x $ip +short 2> /dev/null | grep  -i -Po \"([0-9a-zA-Z_-]{1,}\.)+[a-zA-Z]{1,4}\" ";
 	    return $this->req_ret_tab($query);
 	}
 	
@@ -1270,7 +1251,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	        else {
 	            
 	            $tab_open_ports_tcp = $this->ip2tcp4select();
-	            $tab_open_ports_tcp += $this->ip2tcp4top10000();
+	            $tab_open_ports_tcp += $this->ip2tcp4top4000();
 	            $tab_open_ports_udp = $this->ip2udp4top200();
 	            //if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4top4000();
 
@@ -1544,21 +1525,20 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    $result = "";
 	    $this->ssTitre(__FUNCTION__);
 		$query = "echo '$this->root_passwd' | sudo -S nmap -f -Pn -n --reason  --top-ports 5 $this->ip -e $this->eth -oX - ";
-		return $this->req_ret_str($query);		
-		
+		return $this->req_ret_str($query);				
 	}
 	
-	public function  ip2host($hostname){
-	    $result = "";
-	    //$this->titre(__FUNCTION__);
-	    $hostname = trim($hostname);
-	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->ip2where  AND ".__FUNCTION__." IS NOT NULL";
-	    if ($this->checkBD($sql_r_1) ) return $this->req2BD4out(__FUNCTION__,__CLASS__,$this->ip2where);
-	    else {
-	        if (empty($hostname)) $result = trim($this->tab($this->ip2host4nslookup($this->ip)));
-	        else $result = $hostname;
-		return $this->req2BD4in(__FUNCTION__,__CLASS__,$this->ip2where,$result);
+	public function  ip2host(){
+	    $tab_hosts = array();
+	    $sql = "SELECT host from HOST where host2ip = '$this->ip' ";
+	    if ( $tab_hosts8db = $this->mysql_ressource->query($sql) ) {
+	        while ($hosts_row = $tab_hosts8db->fetch_assoc()) {
+	            $tab_hosts[] = trim($hosts_row['host']);
+	        }
 	    }
+	    if (empty($tab_hosts)) $tab_hosts = $this->ip2host4nslookup($this->ip);
+	    $this->article("All Hosts Compatible IP:$this->ip ", $this->tab($tab_hosts));
+	    return $tab_hosts;
 	}
 	
 
@@ -1725,10 +1705,10 @@ as the header options; the TTL changes.");
 	public function ip2honey():bool{
 	    $this->ssTitre(__FUNCTION__);
 
-	    $this->ip2port();$this->pause();
+	    $this->ip2port();
 	    $port_sum = count($this->tab_open_ports_all);
 	    $this->article("ALL PORT SUM",$port_sum);
-	    if ($port_sum > 50 ) { $this->log2error("HONEYPOT DETECTED:$this->domain:$this->ip:".$this->ip2host(""));return true ;}
+	    if ($port_sum > 50 ) { $this->log2error("HONEYPOT DETECTED:$this->domain:$this->ip");return true ;}
 	    else return false ;
 	}
 	
@@ -1848,13 +1828,18 @@ public function ip2vhost8tab(array $tab_vhosts){
                         $ip = trim($ip);
                         if ($this->isIPv4($ip)){
                             if ($ip===$this->ip){
-                                $query = "php pentest.php WEB \"$this->eth $this->domain $vhost web2check_200 FALSE\" ";
-                                $this->requette($query);
-                                $this->rouge("Compatible IP from $vhost:$ip to ".$this->ip2host("").":$this->ip");
+                                $obj_host = new HOST($this->stream, $this->eth, $this->domain, $ip, $vhost);
+                                $obj_host->host2host();
+                                $obj_web = new WEB($this->stream, $this->eth, $this->domain,$this->ip, $vhost);
+                                $obj_web->web2check_200();
+                                $obj_web->web2scan4gui4zap();
+
+                                $this->rouge("Compatible IP from $vhost:$ip ");
                                 $result .= "$vhost\n";
+                                $this->pause();
                             }
                             else {
-                                $this->note("Not Compatible IP from $vhost:$ip to ".$this->ip2host("").":$this->ip");
+                                $this->note("Not Compatible IP from $vhost:$ip ");
                             }
                         }
                         
@@ -1878,11 +1863,12 @@ public function ip2vhost(){
 	    else {
 	    //$tmp .= $this->ip2vhost4nmap();$this->pause(); // not usefull
 	    
-	    $tab_vhosts = $this->ip2vhost4web();$this->pause();
+	    $tab_vhosts = $this->ip2vhost4web();
 		//$tab_vhosts = $this->req_ret_tab("echo '$tmp' $this->filter_host "); // | grep -i -Po \"([0-9a-z\-_]{1,}\.)+$this->domain\"
 	    //$tab_vhosts = file("$this->dir_tmp/vhosts.all");
 		$result = $this->ip2vhost8tab($tab_vhosts);
 		echo $result;
+		$this->pause();
 		$result = base64_encode($result);
 		return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,"$this->ip2where ",$result));
 		}
@@ -1898,20 +1884,21 @@ public function ip2vhost(){
 	
 	public function ip2vhost4web():array{
 	    $result = "";
+	    $tab_vhost = array();
 	    $this->titre(__FUNCTION__);
 	    if (!$this->ip4priv($this->ip)) {
 
 	        $query = "curl 'https://domains.yougetsignal.com/domains.php' -H 'User-Agent: $this->user2agent' -H 'Accept: text/javascript, text/html, application/xml, text/xml, */*' -H 'Accept-Language: en-GB,en;q=0.5' --compressed -H 'X-Requested-With: XMLHttpRequest' -H 'X-Prototype-Version: 1.6.0' -H 'Content-type: application/x-www-form-urlencoded; charset=UTF-8' -H 'Origin: https://www.yougetsignal.com' -H 'Connection: keep-alive' -H 'Referer: https://www.yougetsignal.com/tools/web-sites-on-web-server/' -H 'TE: Trailers' --data 'remoteAddress=$this->ip&key=' $this->filter_host  ";
 	        $result .= $this->req_ret_str($query);
-	        $this->pause();
+
 	        
 	        $query = "curl 'https://www.dnsqueries.com/en/ip_neighbors.php' -H 'User-Agent: $this->user2agent' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' -H 'Accept-Language: en-GB,en;q=0.5' --compressed -H 'Content-Type: application/x-www-form-urlencoded' -H 'Origin: https://www.dnsqueries.com' -H 'Connection: keep-alive' -H 'Referer: https://www.dnsqueries.com/en/ip_neighbors.php' -H 'Upgrade-Insecure-Requests: 1' --data 'host=$this->ip' | grep ' nofollow=\"true\" target=\"_blank\">' $this->filter_host  ";
 	        //$result .= $this->req_ret_str($query);
-	        $this->pause();	        
+       
 	        
 	        $query = "wget  --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"https://tools.tracemyip.org/lookup/$this->ip\" | grep '.tracemyip.org/lookup/' | grep -v -E \"(tracemyip\.org|www\.mobiletracker\.org)\" $this->filter_host ";
             $result .= $this->req_ret_str($query);
-            $this->pause();
+
 
             $query = "wget --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"http://www.ip-neighbors.com/hostsearch/$this->ip/ipneighbors_page/1\" | grep 'Page:' | grep -Po \"1/[0-9]{1,5}\" | cut -d'/' -f2 ";
             $max = intval($this->req_ret_str($query));
@@ -1919,14 +1906,16 @@ public function ip2vhost(){
             $query = "wget --user-agent='$this->user2agent' --no-check-certificate --timeout=60 --tries=2 -qO- \"http://www.ip-neighbors.com/hostsearch/$this->ip/ipneighbors_page/$i\" $this->filter_host ";
             $result .= $this->req_ret_str($query);
             }
-            $this->pause();
+
             
             $query = "curl -X POST -d \"theinput=$this->ip&thetest=reverseiplookup&name_of_nonce_field=b6b2d9c9ef&_wp_http_referer=%2Freverse-ip-lookup%2F\" \"https://hackertarget.com/reverse-ip-lookup/\" | grep -v '<' $this->filter_host | grep -v -E \"a\.async|a\.src|m\.parentnode.inser|s\.creat|s\.getel|www\.google-analytics\.com\"  ";
             $result .= $this->req_ret_str($query);
             $this->pause();
  
 	    }
-	    return explode("\n", $result);
+	    $tab_vhost = explode("\n", $result);
+	    $this->article("All vhost", $this->tab($tab_vhost));
+	    return $tab_vhost; 
 	}
 	
 
@@ -2062,12 +2051,13 @@ public function ip2vhost(){
 	                        $obj_service = new SERVICE($this->stream,$this->eth,$this->domain,$this->ip,$port_num, $protocol);
 	                        $obj_service->service4info();
 	                        switch ($obj_service->service_name) {
+
+	                            
 	                            case "http" :
 	                            case "https" :
-	                                $obj_web = new WEB($obj_service->stream,$obj_service->eth,$obj_service->domain,"$obj_service->service_name://$obj_service->ip:$obj_service->port/");
-	                                $obj_web->poc($this->flag_poc);
-	                                $obj_web->web2scan4gui4zap();
+	                                $obj_service->service2web();
 	                                break ;
+	                            
 	                        }
 	                    }
 	            }
@@ -2075,6 +2065,8 @@ public function ip2vhost(){
 	        }
 
 	    }
+
+	    $this->pause();
 	 }
 
 	 
@@ -2150,22 +2142,34 @@ public function ip2vhost(){
 	        //$this->titre("Searching what happened In the PAST");$this->pause();
 	        //$this->ip2vt();$this->pause();
 	        //$this->ip2malw();$this->pause();
+	        $vhosts = trim($this->ip2vhost());
+
+	        $tab_vhosts = explode("\n", $vhosts);
+	        foreach ($tab_vhosts as $vhost){
+	            if (!empty($vhost)){
+	                $host = $this->host2norme($vhost);
+	                if (!empty($host)){
+	                    $obj_host = new HOST($this->stream, $this->eth, $this->domain, $this->ip, $host);
+	                    $obj_host->host2host();
+	                }
+	            }
+	        }
 	    }
 	    
 
 	    $ip2root = $this->ip2root8db($this->ip2id);
 	    if ($ip2root) $this->article("ip2root",$ip2root);
-
-	    
-	    if (!$this->ip4priv($this->ip)) {
-	        $vhosts = trim($this->ip2vhost());$this->article("ALL vHosts", $vhosts);
-	    }
 	    $ip2tracert = trim($this->ip2tracert());$this->article("IP TraceRoute",$ip2tracert);
-	    
+	    $this->pause();
 	}
+	
+	
 	public function ip4info(){ 	 
 	    echo " =============================================================================\n";
 	    $this->gtitre(__FUNCTION__);
+	    
+	    
+	    
 	    if  (!$this->ip4info8db($this->ip2id) ) {	    
 	        $this->ip4info2display();
 	    $sql_ip = "UPDATE IP SET ip4info=1 WHERE id = $this->ip2id  ";
@@ -2177,7 +2181,7 @@ public function ip2vhost(){
 	            //$this->ip2dot();
 	        }
 	    }
-	    echo "End ".__FUNCTION__.":".$this->ip2host("").":$this->ip =============================================================================\n";	    
+	    echo "End ".__FUNCTION__.":$this->ip =============================================================================\n";	    
 	}
 	
 	
@@ -2186,16 +2190,14 @@ public function ip2vhost(){
 	    $this->gtitre(__FUNCTION__);
 	    if  (!$this->ip4service8db($this->ip2id) ) {
 	        $this->ip4service2display();
-	        $this->ip4enum2users();
-	        $this->ip2os();$this->pause();
-	        //$this->ip2auth();$this->pause();
+
 	        $sql_ip = "UPDATE IP SET ip4service=1 WHERE id = $this->ip2id  ";
 	        $this->mysql_ressource->query($sql_ip);
 	    }
 	    else  {
 	        if ($this->flag_poc)  $this->ip4service2display();
 	    }
-	    echo "End ".__FUNCTION__.":".$this->ip2host("").":$this->ip =============================================================================\n";
+	    echo "End ".__FUNCTION__.":$this->ip =============================================================================\n";
 	}
 	
 	
@@ -2210,7 +2212,7 @@ public function ip2vhost(){
 	    else  {
 	        if ($this->flag_poc)  $this->ip4pentest2display();
 	    }
-	    echo "End ".__FUNCTION__.":".$this->ip2host("").":$this->ip =============================================================================\n";
+	    echo "End ".__FUNCTION__.":$this->ip =============================================================================\n";
 	}
 	
 	public function ip4pentest2display(){ // OK
@@ -2218,7 +2220,9 @@ public function ip2vhost(){
 	    $this->gtitre(__FUNCTION__);
 	    $this->ip4info();$this->pause();
 	    $this->ip4service();$this->pause();
-
+	    $this->ip4enum2users();$this->pause();
+	    $this->ip2os();$this->pause();
+	    $this->ip2auth();$this->pause();
 		//$this->ip2cve();$this->pause();
 		//$result .=  $this->ip2vuln();$this->pause();
 	    

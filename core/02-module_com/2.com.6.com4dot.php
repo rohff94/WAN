@@ -15,50 +15,7 @@ class com4dot extends com4bin{
 		
 	}
 	
-	
-	
-	public function cidr2dot($ip){
-	    $this->titre(__FUNCTION__);
-	    $ip = trim($ip);
-	    $cidr2dot_scan = "";
-	    $cidr2dot_cidr = "";
-	    $cidr2dot_edge = "";
-	    $cidr2dot4body = "";
-	    
-	    $file_output = "$this->dir_tmp/$ip.".__FUNCTION__.".dot";
-	    $color_scan = "violet";$color_cidr = "violet";$color_arrow = "violet";
-	    $cidr2dot_header = "digraph structs {
-	label = \"".__FUNCTION__.":$this->cidr\";
-		graph [rankdir = \"LR\" layout = dot];
-		node [fontsize = \"16\" shape = \"plaintext\"];
-		edge [penwidth=2.0 ];";
-	    
-	    // <TR><TD>ALIVE HOST ALL</TD><TD PORT=\"cidr2scan\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->cidr2scan()))."</TD></TR>
-	    // <TR><TD>ALIVE HOST PORT</TD><TD PORT=\"cidr2scan4port\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->cidr2scan4port()))."</TD></TR>
-	    
-	    $cidr2dot_cidr .= "
-		\"$this->cidr\" [label=<<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">
-	<TR><TD>CIDR</TD><TD PORT=\"cidr\" bgcolor=\"$color_cidr\">$this->cidr</TD></TR>
-	<TR><TD>ALIVE HOST NMAP</TD><TD PORT=\"cidr2scan4nmap\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->cidr2scan4nmap()))."</TD></TR>
-	<TR><TD>ALIVE HOST FPING</TD><TD PORT=\"cidr2scan4fping\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->cidr2scan4fping()))."</TD></TR>
-		</TABLE>>];
-				";
-	    
-	    $cidr2dot_footer = "
-		}";
-	    
-	    $cidr2dot = $cidr2dot_header.$cidr2dot_cidr.$cidr2dot_edge.$cidr2dot_footer;
-	    $cidr2dot4body = $cidr2dot_cidr;
-	    //system("echo '$cidr2dot' > $file_output ");
-	    //$this->requette("gedit $file_output");
-	    $this->dot4make($file_output,$cidr2dot);
-	    
-	    return $cidr2dot4body;
-	    
-	}
-	
 
-	
 	
 	public function domain2dot4all(){
 	    $this->gtitre(__FUNCTION__);
@@ -110,42 +67,7 @@ class com4dot extends com4bin{
 	    return $domain2dot4body;
 	}
 	
-	
-	
-	public function cidr2dot4all(){
-	    $this->titre(__FUNCTION__);
-	    $cidr2dot_ip = "";
-	    $cidr2dot_scan = "";
-	    $cidr2dot_cidr = "";
-	    $cidr2dot_edge = "";
-	    $cidr2dot4body = "";
-	    
-	    $file_output = "$this->dir_tmp/$this->cidr.".__FUNCTION__.".dot";
-	    $color_scan = "violet";$color_cidr = "violet";$color_arrow = "violet";
-	    $cidr2dot_header = "digraph structs {
-	label = \"".__FUNCTION__."$this->ip:$this->cidr\";
-		graph [rankdir = \"LR\" layout = dot];
-		node [fontsize = \"16\" shape = \"plaintext\"];
-		edge [penwidth=2.0 ];";
-	    //$obj_ip = new ip($this->ip);
-	    $cidr2dot_ip .= $obj_ip->ip2dot();
-	    $cidr2dot_cidr .= $this->cidr2dot($obj_ip->ip);
-	    $cidr2dot_edge .= "
-		\"$obj_ip->ip\":ip2cidr4range -> \"$obj_ip->ip:$this->cidr\":cidr [color=\"$color_arrow\"];
-		";
-	    
-	    $cidr2dot_footer = "
-		}";
-	    
-	    $cidr2dot = $cidr2dot_header.$cidr2dot_ip.$cidr2dot_cidr.$cidr2dot_edge.$cidr2dot_footer;
-	    $cidr2dot4body = $cidr2dot_ip.$cidr2dot_cidr.$cidr2dot_edge;
-	    system("echo '$cidr2dot' > $file_output ");
-	    //$this->requette("gedit $file_output");
-	    $this->dot2xdot("$file_output ");
-	    return $cidr2dot4body;
-	}
-	
-	
+
 	
 	
 	public function port2dot4web(){
@@ -178,7 +100,7 @@ class com4dot extends com4bin{
 	                $port2dot_port .= $obj_port->port2dot();
 	                
 	                if ($obj_port->port=='80' || $obj_port->port=='443' || $obj_port->port=='8080') {
-	                    $tab_vhost = explode("\n", $obj_port->ip2host(""));
+	                    $tab_vhost = explode("\n", $obj_port->ip2host());
 	                    $tab_vhost = array_map("trim",$tab_vhost);
 	                    $count_vhost = count($tab_vhost);
 	                    for ($i=0;$i<$count_vhost;$i++){
@@ -239,7 +161,7 @@ class com4dot extends com4bin{
 	
 
 	public function dot2xdot($file_dot){
-		$this->requette("xdot $file_dot 2> /dev/null "); //2> /dev/null
+		//$this->requette("xdot $file_dot 2> /dev/null "); //2> /dev/null
 		return $file_dot;
 	}
 	

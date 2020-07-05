@@ -58,10 +58,7 @@ class DOMAIN extends ETH{
 	}
 
 	
-	public function domain2dot4service(){
-	    $this->gtitre(__FUNCTION__);
-	    // twopi 
-	}
+
 	
 	
 	public function domain2dot(){
@@ -80,13 +77,14 @@ class DOMAIN extends ETH{
 	    <TR><TD>IPs</TD><TD PORT=\"domain2ip\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->domain2ip()))."</TD></TR>
 		<TR><TD>HOSTS</TD><TD PORT=\"domain2host\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->domain2host()))."</TD></TR>
 		<TR><TD>DOMAIN WHOIS</TD><TD PORT=\"domain2whois\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->domain2whois()))."</TD></TR>
+		<TR><TD>Mail</TD><TD PORT=\"domain2mail\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->domain2mail()))."</TD></TR>
 		
 	     */
 	    $domain2dot_domain = "
 			\"$this->domain\" [label=<<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">
 		<TR><TD><IMG SRC=\"$this->dir_img/ico/domain.png\" /></TD><TD PORT=\"domain\" bgcolor=\"$color_domain\">$this->domain</TD></TR>
 		<TR><TD>DNS</TD><TD PORT=\"domain2ns\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->domain2ns()))."</TD></TR>
-		<TR><TD>EMAIL</TD><TD PORT=\"domain2mail\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->domain2mail()))."</TD></TR>
+		<TR><TD>Whois</TD><TD PORT=\"domain2whois\" >".$this->dot2diagram(str_replace("\n","<BR/>\n",$this->domain2whois()))."</TD></TR>
 				</TABLE>>];
 				";
 	    
@@ -95,8 +93,9 @@ class DOMAIN extends ETH{
 	    
 	    $domain2dot = $domain2dot_header.$domain2dot_domain.$domain2dot_footer;
 	    $domain2dot4body = $domain2dot_domain;
+	    $this->str2file("", $domain2dot, $file_output);
 	    //system("echo '$domain2dot' > $file_output ");
-	    //$this->requette("gedit $file_output");
+	    $this->requette("gedit $file_output");
 	    $this->dot4make($file_output,$domain2dot);
 	    return $domain2dot4body;
 	}
@@ -113,7 +112,7 @@ class DOMAIN extends ETH{
 	    $this->article("Service Target", $service_name);
 	    $this->article("Function 2 run", $fonction2run);
 	    
-
+	    $file_path = "/tmp/$this->eth.$this->domain.services.$service_name";
 	    
 	    $sql_r = "SELECT id FROM IP WHERE id8domain = '$this->domain2id'  ";
 	    //echo "$sql_r\n";
@@ -143,7 +142,7 @@ class DOMAIN extends ETH{
 	    $this->article("ID8SERVICE", $this->tab($id8services));
 	    $max = count($id8services);
 	    
-	    $file_path = "/tmp/$this->eth.$this->domain.services.$service_name";
+	    
 	    $fp = fopen($file_path, 'w+');
 	    
 	    for ($i=0;$i<$max;$i++){
@@ -162,7 +161,7 @@ class DOMAIN extends ETH{
 	        $this->article("PORT", $port);
 	        $this->article("PROTOCOL", $protocol);
 	        
-	        $data = "$ip $port $protocol";
+	        $data = "$this->eth $this->domain $ip $port $protocol $fonction2run FALSE";
 	        $data = $data."\n";
 	        fputs($fp,$data);
 	
@@ -171,36 +170,14 @@ class DOMAIN extends ETH{
 	    }
 	    fclose($fp);
 	    
-	    $query = "gedit $file_path";
-	    //$this->requette($query);
 	    
-	    $runs = file($file_path);
-	    //var_dump($runs);
-	    
-	    foreach ($runs as $run){
-	        var_dump($run);
-	        if (!empty($run))  list($ip, $port, $protocol) = explode(" ", $run);
-	        $protocol = trim($protocol);
-	        $this->article("IP", $ip);
-	        $this->article("PORT", $port);
-	        $this->article("PROTOCOL", $protocol);
-	        $this->article("FUNCTION", $fonction2run);
-	    if (!empty($protocol_search)){
-	        if ($protocol_search===$protocol){
-	            $this->note("found protocol $protocol_search");
-	            $obj_port = new PORT($this->stream,$this->eth, $this->domain, $ip, $port, $protocol_search);
-	            $obj_port->poc($this->flag_poc);
-	            echo $obj_port->$fonction2run();
-	            $this->pause();
-	        }
-	    }
-	    else {
-	        $obj_port = new PORT($this->stream,$this->eth, $this->domain, $ip, $port, $protocol);
-	        $obj_port->poc($this->flag_poc);
-	        echo $obj_port->$fonction2run();
-	    }
-	    }
-	    
+	    $query = "cat $file_path";
+	    $this->requette($query);
+	    $this->pause();
+	    $query = "wc -l $file_path";
+	    $this->requette($query);
+	    $this->pause();
+
 	}
 	  
 	public function domain4all(){
@@ -212,15 +189,15 @@ class DOMAIN extends ETH{
 	
 	
 	public function domain2ip8db(): array{
-	    $sql_r = "SELECT ip,ip2host FROM IP WHERE id8domain = '$this->domain2id' ORDER BY ip ASC ";
+	    $sql_r = "SELECT ip FROM IP WHERE id8domain = '$this->domain2id' ORDER BY ip ASC ";
 	    echo "$sql_r\n";
 	    $req = $this->mysql_ressource->query($sql_r);
 	    $tab_ips = array();
 	    while ($row = $req->fetch_assoc()) {
 	        $ip = $row['ip'];
-	        $host = $row['ip2host'];
+	
 	        $tab_ips[] = $ip;
-	        $this->article($host, $ip);
+
 	    }
 	    $this->article("IP Recorded", $this->tab($tab_ips));
 	    return $tab_ips;
@@ -242,10 +219,47 @@ class DOMAIN extends ETH{
 	    fclose($fp);
 	    
 	    $this->requette("wc -l  $file_path");$this->pause();
-	    $this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
+	    //$this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
 
 	}
 	
+	public function domain2dot4ip(){
+	    $result = "";
+	    $this->titre(__FUNCTION__);
+	    $dot = "";
+	    $ips = array();
+	    $file_output = "/tmp/$this->domain.".__FUNCTION__.".dot";
+	    // http://www.yosbits.com/wordpress/?page_id=6182
+	    // twopi
+	    $host2dot_header = "digraph ".__FUNCTION__." {
+	    graph [rankdir = \"LR\",layout = neato]
+        node [shape = circle,style = filled,color = grey,fixedsize=true]
+        node [fillcolor = \"#65d1f9\",label = \"$this->domain\"]\n\"$this->domain\"\n";
+	    
+	    $sql_r = "SELECT ip,ladate FROM IP WHERE id8domain = '$this->domain2id' ";
+	    echo "$sql_r\n";
+	    $req = $this->mysql_ressource->query($sql_r);
+	    while ($row = $req->fetch_assoc()) {
+	        $ip = $row['ip'];
+	        $ladate = $row['ladate'];
+	        
+	        $obj_ip = new IP($this->stream,$this->eth, $this->domain,$ip);
+	        $host = trim($this->tab($obj_ip->ip2host()));
+	        $dot .= "node [fillcolor = \"#f9f765\",label = \"$obj_ip->ip\"]\n\"$obj_ip->ip\"\n";
+	        $dot .= "edge [color = grey,len=2]\n\"$this->domain\" -> \"$obj_ip->ip\" \n";
+	        $dot .= $obj_ip->ip2dot4port();
+	    }
+	    
+	    
+	    $host2dot_footer = "\n}\n";
+	    $host2dot = $host2dot_header.$dot.$host2dot_footer;
+	    $host2dot4body = $dot;
+	    
+	    $this->dot4make($file_output,$host2dot);
+	    //$this->dot2xdot($file_output);
+	    $this->requette("gedit $file_output");
+	    return $host2dot4body;
+	}
 	
 	public function domain2dot4host(){
 	    $result = "";
@@ -254,17 +268,55 @@ class DOMAIN extends ETH{
 	    $ips = array();
 	    $file_output = "/tmp/$this->domain.".__FUNCTION__.".dot";
 	    // http://www.yosbits.com/wordpress/?page_id=6182
+	    // twopi
 	    $host2dot_header = "digraph ".__FUNCTION__." {
-	    graph [rankdir = \"LR\",layout = twopi]
+	    graph [rankdir = \"LR\",layout = neato]
         node [shape = circle,style = filled,color = grey,fixedsize=true]
         node [fillcolor = \"#65d1f9\",label = \"$this->domain\"]\n\"$this->domain\"\n";
 	    
-	    $sql_r = "SELECT distinct(ip2host) FROM IP WHERE id8domain = '$this->domain2id' AND ip2host IS NOT NULL ";
+	    $sql_r = "SELECT host,host2ip FROM HOST WHERE id8domain = '$this->domain2id' AND host IS NOT NULL AND host2ip IS NOT NULL";
 	    echo "$sql_r\n";
 	    $req = $this->mysql_ressource->query($sql_r);
 	    while ($row = $req->fetch_assoc()) {
-	        $ip2host = $row['ip2host'];
-	        $obj_host = new HOST($this->stream,$this->eth, $this->domain, $ip2host);
+	        $ip2host = $row['host'];
+	        $ip = $row['host2ip'];
+	        $obj_host = new HOST($this->stream,$this->eth, $this->domain,$ip,$ip2host);
+	        $dot .= "node [fillcolor = \"#f9f765\",label = \"$obj_host->host\"]\n\"$obj_host->host\"\n";
+	        $dot .= "edge [color = grey,len=2]\n\"$this->domain\" -> \"$obj_host->host\"\n";
+	        //$dot .= $obj_host->host2dot4port();
+	    }
+	    
+	    
+	    $host2dot_footer = "\n}\n";
+	    $host2dot = $host2dot_header.$dot.$host2dot_footer;
+	    $host2dot4body = $dot;
+	    
+	    $this->dot4make($file_output,$host2dot);
+	    //$this->dot2xdot($file_output);
+	    $this->requette("gedit $file_output");
+	    return $host2dot4body;
+	}
+	
+	public function domain2dot4host4port(){
+	    $result = "";
+	    $this->titre(__FUNCTION__);
+	    $dot = "";
+	    $ips = array();
+	    $file_output = "/tmp/$this->domain.".__FUNCTION__.".dot";
+	    // http://www.yosbits.com/wordpress/?page_id=6182
+	    // twopi
+	    $host2dot_header = "digraph ".__FUNCTION__." {
+	    graph [rankdir = \"LR\",layout = neato]
+        node [shape = circle,style = filled,color = grey,fixedsize=true]
+        node [fillcolor = \"#65d1f9\",label = \"$this->domain\"]\n\"$this->domain\"\n";
+	    
+	    $sql_r = "SELECT host,host2ip FROM HOST WHERE id8domain = '$this->domain2id' AND host IS NOT NULL AND host2ip IS NOT NULL";
+	    echo "$sql_r\n";
+	    $req = $this->mysql_ressource->query($sql_r);
+	    while ($row = $req->fetch_assoc()) {
+	        $ip2host = $row['host'];
+	        $ip = $row['host2ip'];
+	        $obj_host = new HOST($this->stream,$this->eth, $this->domain,$ip,$ip2host);
 	        $dot .= "node [fillcolor = \"#f9f765\",label = \"$obj_host->host\"]\n\"$obj_host->host\"\n";
 	        $dot .= "edge [color = grey,len=2]\n\"$this->domain\" -> \"$obj_host->host\"\n";
 	        $dot .= $obj_host->host2dot4port();
@@ -276,11 +328,10 @@ class DOMAIN extends ETH{
 	    $host2dot4body = $dot;
 	    
 	    $this->dot4make($file_output,$host2dot);
-	    $this->dot2xdot($file_output);
-	    //$this->requette("gedit $file_output");
+	    //$this->dot2xdot($file_output);
+	    $this->requette("gedit $file_output");
 	    return $host2dot4body;
 	}
-	
 	
 	public function domain4service(){
 	    $this->gtitre(__FUNCTION__);
@@ -300,7 +351,7 @@ class DOMAIN extends ETH{
 	    fclose($fp);
 	    
 	    $this->requette("wc -l  $file_path");$this->pause();
-	    //$this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
+	    $this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
 
 	    foreach ($tab_ips as $ip){
 	        $ip = trim($ip);
@@ -312,6 +363,8 @@ class DOMAIN extends ETH{
 	            $obj_ip->ip4service();
 	        }
 	    }
+	    
+	    if ($this->flag_poc) $this->domain2dot4host4port();
 	}
 	
 	
@@ -332,9 +385,14 @@ class DOMAIN extends ETH{
 	            $host_filtred = "$hostname$i.$this->domain";
 	            $this->article("HOST8DOMAIN CHECK", $host_filtred);
 	            $this->pause();
-	            $obj_host_filtred = new HOST($this->stream,$this->eth, $this->domain,$host_filtred);
+	            $tab_host2ips = $this->host4ip($host_filtred);
+	            foreach ($tab_host2ips as $ip){
+	                if (!empty($ip) && ($this->isIPv4($ip)) ){
+	                $obj_host_filtred = new HOST($this->stream,$this->eth, $this->domain,$ip,$host_filtred);
 	            //$obj_host_filtred->poc($this->flag_poc);
 	            $obj_host_filtred->host4info();$this->pause();
+	                }
+	            }
 	            
 	        }
 	        
@@ -560,7 +618,7 @@ class DOMAIN extends ETH{
 	}
 	}
 	
-	public function dns4service(string $dns){
+	public function dns4service($stream,string $dns){
 	    $result = "";
 	    $tmp = array();
 	    $dns = trim($dns);
@@ -568,43 +626,74 @@ class DOMAIN extends ETH{
 				Each computer has to have this record for its IP address to be located via DNS.");
 	        $query = "dig @$dns $this->domain A +short | grep -v '^;' ";
 	        $result .= "$query\n";
-	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
+	        $filter = "";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
+	        	        
 	        $query = "dig @$dns $this->domain AAAA +short | grep -v '^;' ";
 	        $result .= "$query\n";
-	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
+	        $filter = "";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
+	        
+	        
 	        $query = "dig @$dns $this->domain AXFR +short | grep -v '^;' ";
 	        $result .= "$query\n";
-	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
+	        $filter = "";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
+	        
+	        
 	        $query = "dig @$dns $this->domain CNAME +short | grep -v '^;' ";
 	        $result .= "$query\n";
-	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
+	        $filter = "";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
+	        
 	        $query = "dig @$dns $this->domain HINFO +short | grep -v '^;' ";
 	        $result .= "$query\n";
-	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
+	        $filter = "";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
+	        
 	        $query = "dig @$dns $this->domain MX +short | grep -v '^;' ";
 	        $result .= "$query\n";
-	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
+	        $filter = "";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
+	        
 	        $query = "echo '$this->root_passwd' | sudo -S nmap --script dns-nsid -p 53 $dns -Pn -n ";
-	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
+	        $filter = "";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
+	        
 	        $query = "nslookup -query=ptr ".gethostbyname($dns)." | grep 'name' | cut -d'=' -f2 | sed \"s/\.$//g\" | tr -d ' ' | grep  -i -Po \"([0-9a-zA-Z_-]{1,}\.)+[a-zA-Z]{1,4}\"  | sort -u  ";
 	        $result .= "$query\n";
-	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
+	        $filter = "";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
+	        
 	        $query = "dig @$dns $this->domain RP +short | grep -v '^;' ";
 	        $result .= "$query\n";
-	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
+	        $filter = "";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
+	        
 	        $query = "dig @$dns $this->domain SOA +short | grep -v '^;' ";
 	        $result .="$query\n";
-	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
+	        $filter = "";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
+	        
 	        $query = "dig @$dns $this->domain SRV +short | grep -v '^;' ";
 	        $result .= "$query\n";
-	        exec($query,$tmp);$result .= $this->tab($tmp);unset($tmp);
+	        $filter = "";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
+
 	        
+	        $query = "dig @$dns $this->domain +nssearch | grep -v '^;' ";
+	        $result .= "$query\n";
+	        $filter = "";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
 	        
 	        $query = "dig @$dns $this->domain TXT +short  ";
 	        $result .= "$query\n";
-	        exec("$query | grep -v '^;'  | sed 's#/##g'  | sed \"s#\'##g\" | sed 's/\"//g' ",$tmp);
+	        $filter = " | grep -v '^;'  | sed 's#/##g'  | sed \"s#\'##g\" | sed 's/\"//g' ";
+	        $result .= $this->req_str($stream, $query, $this->stream_timeout, $filter);
+	        
+	        
 
-	        $result .= $this->tab($tmp);unset($tmp);
+	        //$result .= $this->tab($tmp);unset($tmp);
 	        $result = str_replace($this->clean_indb, " ", $result);
 	    return $result ;
 	}
@@ -616,11 +705,11 @@ class DOMAIN extends ETH{
 	
 	public function  domain4info(){
 	    $this->gtitre(__FUNCTION__);
+	  
 	    
-	    $cidr = $this->domain2cidr() ;
-	    echo $this->tab($cidr);$this->pause();
-	    
-	    $this->domain2ns();$this->pause();
+	    echo $this->domain2ns();$this->pause();
+
+
 	    /*
 	    $mails = $this->domain2mail() ;
 	    echo $mails;$this->pause();
@@ -633,9 +722,14 @@ class DOMAIN extends ETH{
 	    */
 	    $whois = $this->domain2whois() ;
 	    echo $whois;$this->pause();
-
 	    
-	    $hosts = $this->domain2host() ;	   	    
+	    
+	    $cidr = $this->domain2cidr() ;
+	    echo $this->tab($cidr);$this->pause();
+
+	    if ($this->flag_poc) $this->domain2dot();
+	    
+	    $hosts = $this->domain2host() ;	$this->pause();
 	    if(!empty($hosts)){
 	        
 	        $tab_tmp_host = array();
@@ -644,10 +738,13 @@ class DOMAIN extends ETH{
 	        for($i=0;$i<$size;$i++){
 	            echo "\n\n$i/$size : $hosts[$i] =======================================================\n";
 	            $host = $hosts[$i];
-	            $obj_host = new HOST($this->stream,$this->eth, $this->domain,$host);
+	            $tab_host2ips = $this->host4ip($host);
+	            foreach ($tab_host2ips as $ip){
+	                if (!empty($ip) && ($this->isIPv4($ip)) ){
+	            $obj_host = new HOST($this->stream,$this->eth, $this->domain,$ip,$host);
 	            $obj_host->poc($this->flag_poc);
 	            $obj_host->host4info();
-	            
+	            $this->pause();
 	            $tmp_host = str_replace(".$this->domain","", $host);
 	            $tab_tmp_host = explode(".", $tmp_host);
 	            if (!empty($tab_tmp_host)){
@@ -657,21 +754,29 @@ class DOMAIN extends ETH{
 	                    $prefix_check = trim($prefix_check);
 	                    $host_check_tmp = "$prefix_check.$host_check_tmp";
 	                    $host_check = "$host_check_tmp$this->domain";
-	                    $obj_host2 = new HOST($this->stream,$this->eth, $this->domain,$host_check);
+	                    $tab_host2ips2 = $this->host4ip($host_check);
+	                    foreach ($tab_host2ips2 as $ip2){
+	                        if (!empty($ip2) && ($this->isIPv4($ip)) ){
+	                    $obj_host2 = new HOST($this->stream,$this->eth, $this->domain,$ip2,$host_check);
 	                    $obj_host2->poc($this->flag_poc);
 	                    $this->pause();
 	                    $obj_host2->host4info();
 	                    $this->domain2host2check4info($host_check,10);
 	                    $this->pause();
+	                        }
+	                    }
 	                }
 	            }
 	            echo "END $host =====================================================================\n";
 	        }
+	            }
+	        }
+	        if ($this->flag_poc) $this->domain2dot4host();
 	    }
 	    
 	    
-	    /*
-	    $tab_ips = $this->domain2ip();
+	    
+	    $tab_ips = $this->domain2ip8db();
 	    if(!empty($tab_ips)){
 	        
 	        $tab_tmp_host = array();
@@ -682,11 +787,13 @@ class DOMAIN extends ETH{
 	            $ip = $tab_ips[$i];
 	            $obj_host = new IP($this->stream,$this->eth, $this->domain,$ip);
 	            $obj_host->poc($this->flag_poc);
-	            $obj_host->ip4service();
+	            $obj_host->ip4info();
 	            echo "END $ip =====================================================================\n";
 	        }
+	        
+	        if ($this->flag_poc) $this->domain2dot4ip();
 	    }
-	    */
+	    
 	    
 	    
 	    
@@ -722,15 +829,17 @@ class DOMAIN extends ETH{
 	            $dns = trim($tab_dns[$i]);
 	            if (!empty($dns)){
 	                $this->article("$i/$size DNS", $dns);
-	                $obj_dns = new HOST($this->stream,$this->eth, $this->domain, $dns);
-	                $tab_ip_dns = $this->host4ip($obj_dns->host);
-	                foreach ($tab_ip_dns as $ip_dns){
-	                    $this->article($dns, $ip_dns);
-	                    $result .= $this->dns4service($ip_dns);
+	                $tab_host2ips = $this->host4ip($dns);
+	                foreach ($tab_host2ips as $ip){
+	                    if (!empty($ip) && ($this->isIPv4($ip)) ){
+	                $obj_dns = new HOST($this->stream,$this->eth, $this->domain,$ip, $dns);
+	                $result .= $obj_dns->dns4service("",$ip);
+	                    }
 	                }
 	            }
 	        }
 	    }
+	     
 	    $result = base64_encode($result);
 	    return base64_decode($this->req2BD4in(__FUNCTION__,__CLASS__,$this->domain2where,$result));
 	    }

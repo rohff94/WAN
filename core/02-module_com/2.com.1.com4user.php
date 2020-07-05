@@ -249,9 +249,9 @@ class com4user extends DATA {
                 $obj_ip->poc(TRUE);
                 $obj_ip->ip4info();$this->pause();
                 $obj_ip->ip4service();$this->pause();
-                //$obj_ip->ip4enum2users();$this->pause();
+
                 
-                $query = "php pentest.php IP \"$eth $domain $ip ip4enum2users FALSE\" ";
+                $query = "php pentest.php IP \"$eth $domain $ip ip4pentest FALSE\" ";
                 $this->cmd("localhost", $query);
                 
                 $query = "echo '$this->root_passwd' | sudo -S fail2ban-client set sshd banip $ip";

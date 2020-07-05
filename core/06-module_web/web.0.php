@@ -16,8 +16,10 @@ class WEB extends SERVICE{
 	 */
 
 	
-	public function __construct($stream,$eth,$domain,$web) {		
+	public function __construct($stream,$eth,$domain,$ip,$web) {		
 	    if (empty($web)) return $this->log2error("EMPTY WEB");
+	    if (empty($ip)) return $this->log2error("EMPTY IP FROM WEB ");
+	    if (!$this->isIPv4($ip)) return $this->log2error("IS NOT IPv4 FROM WEB:$ip");
 	    $this->web = $this->url2norme($web);
 	    $this->vhost = parse_url( $this->web, PHP_URL_HOST);
 	    $this->http_type = parse_url( $this->web, PHP_URL_SCHEME);
@@ -30,7 +32,7 @@ class WEB extends SERVICE{
 	    }
 	    
 	    
-	    parent::__construct($stream,$eth,$domain,$this->vhost,$port,'T');	
+	    parent::__construct($stream,$eth,$domain,$ip,$port,'T');	
 	    $this->web2where = "id8port = '$this->port2id' AND vhost = '$this->vhost' ";
 	    
 		$sql_r = "SELECT vhost FROM ".__CLASS__." WHERE $this->web2where";
@@ -539,7 +541,7 @@ https://cmsdetect.com/
 			
             if ( !empty($tab_urls)  ) {			
 				//$result .= $this->web2waf();
-				//$this->web2scan4gui4zap();$this->pause();
+				$this->web2scan4gui4zap();$this->pause();
 				
                 $file_path = "/tmp/$this->eth.$this->domain.$this->ip.$this->port.urls";
                 $fp = fopen($file_path, 'w+');
@@ -633,7 +635,7 @@ https://cmsdetect.com/
 		        
 		        
 		        $tab_dico = array();
-		        if (count($tab_result)<50) {
+		        if (count($tab_result)<70) {
 		            $tab_dico = $this->web2dico();
 		            foreach ($tab_dico as $val) if(!empty($val))   $tab_tmp[] = $val;
 		            $this->article("URLs from Dico", $this->tab($tab_dico));
@@ -854,8 +856,8 @@ https://cmsdetect.com/
 	    $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->web2where AND ".__FUNCTION__." IS NOT NULL";
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->web2where"));
 	    else {
-	        	        
-		if ($this->web2check_200())
+	        $code_http = $this->url2code($this->web);
+	        if ( (!empty($this->web)) && ($code_http!=="404") && ($code_http!=="403")  )
 		{
 		    // https://kalilinuxtutorials.com/curate-tool-archived-urls/
 		$result .= $this->web2scan4cli4nikto(); // OK 		
@@ -1390,8 +1392,9 @@ https://cmsdetect.com/
 	    $this->titre(__FUNCTION__);
 	    $result = "";
 
-	    
-	    $result .= $this->web4info8nmap();
+	    $this->ip2vhost();
+	    $this->web2scan4gui4zap();
+	    $result .= $this->web4info8nmap();$this->pause();
 	    $tab_urls = $this->web2urls();
 	    $this->article("ALL URLs For Testing", $this->tab($tab_urls));
 	    $this->pause();
@@ -1400,16 +1403,15 @@ https://cmsdetect.com/
 	        $url = trim($url);
 	        if(!empty($url)){
 	            $url = $this->url2norme($url);
+	            $this->web2scan4gui4zap();
 	            $result .= $this->tab($this->web2cms8local($url));
-	            $this->pause();
-
 	        }
 	    }
 
 	   
 	        //var_dump($meta_tags);
 	    
-	    //echo $result;
+	    echo $result;$this->pause();
 	    return $result;
 	}
 	

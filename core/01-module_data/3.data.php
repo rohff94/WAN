@@ -115,12 +115,13 @@ public function  req2BD4in($colonne,$table,$where,$result){
 
 public function checkBD($sql):bool{
     
-/*
+    //echo "$sql;\n";
+    /*
 	echo "$sql;\n";
 	echo "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"SELECT EXISTS($sql);\"  2>/dev/null \n";
 	echo "mysql --user=$this->mysql_login --password=$this->mysql_passwd --database=$this->mysql_database --execute=\"$sql;\"  2>/dev/null \n";
 	$this->pause();
-	*/
+		*/
 	$result = $this->mysql_ressource->query("SELECT EXISTS($sql)");
 	if (is_bool($result)) return FALSE ;
 	$row = $result->fetch_array(MYSQLI_NUM);

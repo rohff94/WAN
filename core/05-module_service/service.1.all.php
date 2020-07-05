@@ -1946,7 +1946,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 	    $this->article("Date Now", $date_now);
 	    $this->article("Date Rec", $this->date_rec);
 
-	    $this->article("HOST", $this->ip2host(""));
+	    $this->article("HOST", $this->tab($this->ip2host()));
 	    $this->article("ID PORT", $this->port2id);
 	    $this->article("PORT NUMBER", $this->port);
 	    $this->article("PROTOCOL", $this->protocol);
@@ -2057,14 +2057,39 @@ This can also be used to determine local IPs, as well as gain a better understan
 
 	public function service2web(){
 	    $result = "";
-	    $result .= $this->ssTitre(__FUNCTION__);
+	    $this->ssTitre(__FUNCTION__);
 	    
-		$obj_web = new WEB($this->stream,$this->eth,$this->domain,"http://$this->ip:$this->port/");
+	    $this->ip2vhost();
+	    $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,"http://$this->ip:$this->port/");
+		$obj_web->poc($this->flag_poc);		
+		//$obj_web->web4info();
+		$obj_web->web4info8nmap();$obj_web->web2scan4gui4zap();
+		//if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
+		
+		$obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,"https://$this->ip:$this->port/");
 		$obj_web->poc($this->flag_poc);
-		if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
-		$obj_web = new WEB($this->stream,$this->eth,$this->domain,"https://$this->ip:$this->port/");
+		//$obj_web->web4info();
+		$obj_web->web4info8nmap();$obj_web->web2scan4gui4zap();
+		//if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
+
+		
+		$host = "";
+		$hosts = $obj_web->ip2host();
+		if (!empty($hosts)){
+		    foreach ($hosts as $host){
+		        $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,"http://$host:$this->port/");
 		$obj_web->poc($this->flag_poc);
-		if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
+		//$obj_web->web4info();
+		$obj_web->web4info8nmap();$obj_web->web2scan4gui4zap();
+		//if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
+		
+		$obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,"https://$host:$this->port/");
+		$obj_web->poc($this->flag_poc);
+		//$obj_web->web4info();
+		$obj_web->web4info8nmap();$obj_web->web2scan4gui4zap();
+		//if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
+		    }
+		}
 		
 		return $result;
 	}

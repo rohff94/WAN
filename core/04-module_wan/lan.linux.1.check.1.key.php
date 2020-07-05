@@ -16,7 +16,76 @@ class check4linux8key extends check4linux8enum{
     }
     
     
-
+    public function gpg2crypt($stream,$file_path,$user_id){
+        $this->ssTitre(__FUNCTION__);
+        $data = "gpg --encrypt --recipient '$user_id' $file_path";
+        return $this->req_str($stream,$data,$this->stream_timeout,"");
+    }
+    
+    public function gpg2decrypt($stream,$file_enc){
+        $this->ssTitre(__FUNCTION__);
+        $data = "gpg --decrypt --$file_enc";
+        return $this->req_str($stream,$data,$this->stream_timeout,"");
+    }
+    
+    
+    public function gpg2priv($stream,$keytype,$keysize,$realname,$email,$expire_date,$pub_name,$priv_name,$passphrase){
+        $data = "%echo Generating a basic OpenPGP key
+     Key-Type: DSA
+     Key-Length: 1024
+     Subkey-Type: ELG-E
+     Subkey-Length: 1024
+     Name-Real: Joe Tester
+     Name-Comment: with stupid passphrase
+     Name-Email: joe@foo.bar
+     Expire-Date: 2021-07-01
+     Passphrase: abc
+     %pubring foo.pub
+     %secring foo.sec
+     # Do a commit here, so that we can later print \"done\" :-)
+     %commit
+     %echo done";
+        $data = "gpg --batch --genkey";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+    }
+    
+    public function gpg2priv4list($stream){
+        $this->ssTitre(__FUNCTION__);
+        $data = "gpg --list-secret-keys --keyid-format LONG";
+        return $this->req_str($stream,$data,$this->stream_timeout,"");
+    }
+    
+    
+    public function gpg2version($stream){
+        $this->ssTitre(__FUNCTION__);
+        $data = "gpg --version";
+        return $this->req_str($stream,$data,$this->stream_timeout,"");
+    }
+    
+    
+    public function gpg2dir($stream){
+        $this->ssTitre(__FUNCTION__);
+        $home = $this->gpg2version($stream);
+        $data = "echo '$home' ";
+        $filter = "| grep 'Home:' | cut -d':' -f2 ";
+        return $this->req_str($stream,$data,$this->stream_timeout,$filter);
+    }
+    
+    
+    public function gpg2priv4list2id($stream):array{
+        $this->ssTitre(__FUNCTION__);
+        $str_list = $this->gpg2priv4list($stream);
+        $data = "echo '$str_list'";
+        $filter = "| grep 'sec'  | grep '/' | cut -d '/' -f2 | cut -d ' ' | grep -Po \"[A-Z0-9]{8}\" ";
+        return $this->req_tab($stream,$data,$this->stream_timeout,$filter);
+    }
+    
+    
+    public function gpg2pub8id($stream,$imported_keypriv_id,$outputpath_asc){
+        $this->ssTitre(__FUNCTION__);
+        $data = "gpg --armor --export $imported_keypriv_id > $outputpath_asc";
+        return $this->req_str($stream,$data,$this->stream_timeout,"");
+    }
     
     
     public function key8priv4pass2nopass($stream,$privkey_str_pass,$privkey_passwd,$type_crypt):string{
