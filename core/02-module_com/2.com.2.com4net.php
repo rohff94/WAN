@@ -556,9 +556,10 @@ class com4net extends com4user {
         
         $cmddf = $poc->exec_para4print($cmda, $cmdg, $time);
         
-        $this->jaune($poc->exec_para4print($cmddf, $cmdgf, $time));
+        $fin = $poc->exec_para4print($cmddf, $cmdgf, $time);
+        $this->jaune($fin);
         
-        
+        return $fin;
     }
     
     

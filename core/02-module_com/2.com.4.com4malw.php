@@ -1,6 +1,6 @@
 <?php
 
-class com4malw extends com4net{
+class com4malw extends com4file{
     
     var $badchars ;
     var $path_exploitdb ;

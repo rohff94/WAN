@@ -2053,13 +2053,56 @@ This can also be used to determine local IPs, as well as gain a better understan
 
 	// #################################################################################
 
-	
-
 	public function service2web(){
 	    $result = "";
 	    $this->ssTitre(__FUNCTION__);
 	    
-	    $this->ip2vhost();
+	    //$this->ip2vhost();
+	    /*
+	     $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,"http://$this->ip:$this->port/");
+	     $obj_web->poc($this->flag_poc);
+	     //$obj_web->web4info();
+	     $obj_web->web4info8nmap();$obj_web->web2scan4gui4zap();
+	     //if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
+	     
+	     $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,"https://$this->ip:$this->port/");
+	     $obj_web->poc($this->flag_poc);
+	     //$obj_web->web4info();
+	     $obj_web->web4info8nmap();$obj_web->web2scan4gui4zap();
+	     //if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
+	     */
+	    
+	    $host = "";
+	    $hosts = $this->ip2host();
+	    if (!empty($hosts)){
+	        foreach ($hosts as $host){
+	            $host = trim($host);
+	            if (!empty($host)){
+	                $url = "http://$host:$this->port/";
+	                if ($this->url2code($this->url2norme($url))===200){
+	                    $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,$url);
+	                    $obj_web->poc($this->flag_poc);
+	                    $obj_web->web4pentest();
+	                }
+	                
+	                $url = "https://$host:$this->port/";
+	                if ($this->url2code($this->url2norme($url))===200){
+	                    $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,$url);
+	                    $obj_web->poc($this->flag_poc);
+	                    $obj_web->web4pentest();
+	                }
+	            }
+	        }
+	    }
+	    
+	}
+
+	public function service2web4info(){
+	    $result = "";
+	    $this->ssTitre(__FUNCTION__);
+	    
+	    //$this->ip2vhost();
+	    /*
 	    $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,"http://$this->ip:$this->port/");
 		$obj_web->poc($this->flag_poc);		
 		//$obj_web->web4info();
@@ -2071,27 +2114,33 @@ This can also be used to determine local IPs, as well as gain a better understan
 		//$obj_web->web4info();
 		$obj_web->web4info8nmap();$obj_web->web2scan4gui4zap();
 		//if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
-
+*/
 		
 		$host = "";
-		$hosts = $obj_web->ip2host();
+		$hosts = $this->ip2host();
 		if (!empty($hosts)){
 		    foreach ($hosts as $host){
-		        $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,"http://$host:$this->port/");
+		        $host = trim($host);
+		        if (!empty($host)){
+		        $url = "http://$host:$this->port/";
+		        $code = $this->url2code($url);
+		        if (($code==="200") || ($code==="301")){
+		            $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,$url);
 		$obj_web->poc($this->flag_poc);
-		//$obj_web->web4info();
-		$obj_web->web4info8nmap();$obj_web->web2scan4gui4zap();
-		//if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
-		
-		$obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,"https://$host:$this->port/");
+		$obj_web->web4info();
+		        }
+
+		        $url = "https://$host:$this->port/";
+		        $code = $this->url2code($url);
+		        if (($code==="200") || ($code==="301")){
+		            $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,$url);
 		$obj_web->poc($this->flag_poc);
-		//$obj_web->web4info();
-		$obj_web->web4info8nmap();$obj_web->web2scan4gui4zap();
-		//if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
+		$obj_web->web4info();
+		        }
+		    }
 		    }
 		}
 		
-		return $result;
 	}
 	
 	

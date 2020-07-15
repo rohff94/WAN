@@ -647,7 +647,8 @@ https://cmsdetect.com/
 			
 		        foreach ($tab_tmp as $url){
 			    $url = $this->url2norme($url);
-			    if ( (!empty($url)) && ($this->url2code($url)!=="404") && ($this->url2code($url)!=="403")  ){
+			    $code = $this->url2code($url);
+			    if ( (!empty($url)) && ($code!=="404") && ($code!=="403")  ){
 			        $tab_spider = $this->web2urls4spider($url);
 			        $tab_final[] = $url;
 			        foreach ($tab_spider as $val) if (!empty($val)) $tab_final[] = $val;
@@ -1392,7 +1393,7 @@ https://cmsdetect.com/
 	    $this->titre(__FUNCTION__);
 	    $result = "";
 
-	    $this->ip2vhost();
+	    
 	    $this->web2scan4gui4zap();
 	    $result .= $this->web4info8nmap();$this->pause();
 	    $tab_urls = $this->web2urls();

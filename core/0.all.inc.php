@@ -15,7 +15,8 @@ include_once("./core/02-module_com/2.com.4.com4malw.php");
 include_once("./core/02-module_com/2.com.5.com4bin.php");
 include_once("./core/02-module_com/2.com.6.com4dot.php");
 include_once("./core/02-module_com/2.com.7.com4wifi.php");
-include_once("./core/02-module_com/2.com.8.com4code.php");
+include_once("./core/02-module_com/2.com.8.com4for.php");
+include_once("./core/02-module_com/2.com.9.com4code.php");
 include_once("./core/03-module_local/0.stream.php");
 include_once("./core/03-module_local/eth.0.php");
 include_once("./core/03-module_local/eth.cidr.php");
@@ -70,6 +71,12 @@ include_once("./core/06-module_web/web.url.param.all.php");
 include_once("./core/07-module_lan/lan.0.php");
 include_once("./core/07-module_lan/lan.linux.0.com.php");
 include_once("./core/07-module_lan/lan.linux.1.check.6.users.php");
+include_once("./core/11-module_mob/mob.0.php");
+include_once("./core/11-module_mob/mob.android.php");
+include_once("./core/12-module_doc/doc.0.php");
+include_once("./core/12-module_doc/doc.forensic.php");
+include_once("./core/12-module_doc/doc.incident.php");
+include_once("./core/12-module_doc/doc.pentest.php");
 
 
 

@@ -351,22 +351,65 @@ class DOMAIN extends ETH{
 	    fclose($fp);
 	    
 	    $this->requette("wc -l  $file_path");$this->pause();
-	    $this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
+	    //$this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
 
 	    foreach ($tab_ips as $ip){
 	        $ip = trim($ip);
 	        if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
-	            $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4service FALSE\" ";
-	            $this->requette($query);
+	            
+	            if ($this->flag_poc) {
 	            $obj_ip = new IP($this->stream,$this->eth, $this->domain, $ip);
 	            $obj_ip->poc($this->flag_poc);
 	            $obj_ip->ip4service();
+	            }
+	            else {
+	                $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4service FALSE\" ";
+	                $this->requette($query);
+	            }
 	        }
 	    }
 	    
 	    if ($this->flag_poc) $this->domain2dot4host4port();
 	}
 	
+	public function domain4web(){
+	    $this->gtitre(__FUNCTION__);
+	    echo $this->domain2search();
+	    $tab_ips = $this->domain2ip8db();
+	    $file_path = "/tmp/$this->eth.$this->domain.ip4web";
+	    $fp = fopen($file_path, 'w+');
+	    foreach ($tab_ips as $ip){
+	        $ip = trim($ip);
+	        if(!empty($ip) ){
+	            $data = "$this->eth $this->domain $ip ip4web FALSE";
+	            $data = $data."\n";
+	            fputs($fp,$data);
+	            
+	        }
+	    }
+	    fclose($fp);
+	    
+	    $this->requette("wc -l  $file_path");$this->pause();
+	    //$this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
+	    
+	    foreach ($tab_ips as $ip){
+	        $ip = trim($ip);
+	        if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
+	            
+	            if ($this->flag_poc) {
+	                $obj_ip = new IP($this->stream,$this->eth, $this->domain, $ip);
+	                $obj_ip->poc($this->flag_poc);
+	                $obj_ip->ip4web();
+	            }
+	            else {
+	                $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4web FALSE\" ";
+	                $this->requette($query);
+	            }
+	        }
+	    }
+	    
+
+	}
 	
 	
 	public function domain2host2check4info(string $host_check,int $iter){
@@ -775,7 +818,7 @@ class DOMAIN extends ETH{
 	    }
 	    
 	    
-	    
+	    /*
 	    $tab_ips = $this->domain2ip8db();
 	    if(!empty($tab_ips)){
 	        
@@ -794,7 +837,7 @@ class DOMAIN extends ETH{
 	        if ($this->flag_poc) $this->domain2dot4ip();
 	    }
 	    
-	    
+	    */
 	    
 	    
 	    

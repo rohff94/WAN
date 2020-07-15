@@ -10,8 +10,7 @@ class STREAM4REQ extends com4code{
         
     }
 
-    
-    
+
     
     
     function id2env($id,$nops, $shellcode_hex) {

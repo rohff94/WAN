@@ -2038,8 +2038,43 @@ public function ip2vhost(){
 		}
 	}
 	
+	public function ip4web(){
+	    $this->titre(__FUNCTION__);
+	    $hosts = array();
+	    $hosts = $this->ip2host();
+	    if(!$this->ip2honey()){
+	        if (!empty($this->tab_open_ports_all)){
+	            $max_iter = count($this->tab_open_ports_all);
+	            $this->rouge("ITER PORT $max_iter");
+	            foreach ($this->tab_open_ports_all as $port){
+	                if (!empty($port))  {
+	                    foreach ($port as $port_num => $protocol)
+	                        if (!empty($port_num)) {
+	                            $obj_service = new SERVICE($this->stream,$this->eth,$this->domain,$this->ip,$port_num, $protocol);
+	                            switch ($obj_service->service_name) {
+	                                
+	                                
+	                                case "http" :
+	                                case "https" :
+	                                    $obj_service->service2web4info();
+	                                    break ;
+	                                    
+	                            }
+	                        }
+	                }
+	            }
+	        }
+	        
+	    }
+	    
+	    $this->pause();
+	}
+	
+	
 	public function ip4service2display(){
 	    $this->titre("Determining IP SERVICES");
+
+	    
 	    if(!$this->ip2honey()){	 	        
 	        if (!empty($this->tab_open_ports_all)){
 	        $max_iter = count($this->tab_open_ports_all);
@@ -2055,7 +2090,8 @@ public function ip2vhost(){
 	                            
 	                            case "http" :
 	                            case "https" :
-	                                $obj_service->service2web();
+	                                        
+	                                //$obj_service->service2web();
 	                                break ;
 	                            
 	                        }
@@ -2069,6 +2105,8 @@ public function ip2vhost(){
 	    $this->pause();
 	 }
 
+	 
+	 
 	 
 	 public function ip4enum2users(){
 	     $this->titre(__FUNCTION__);
@@ -2222,6 +2260,7 @@ public function ip2vhost(){
 	    $this->ip4service();$this->pause();
 	    $this->ip4enum2users();$this->pause();
 	    $this->ip2os();$this->pause();
+	    $this->ip4web();$this->pause();
 	    $this->ip2auth();$this->pause();
 		//$this->ip2cve();$this->pause();
 		//$result .=  $this->ip2vuln();$this->pause();

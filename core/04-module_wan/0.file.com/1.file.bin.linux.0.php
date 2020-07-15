@@ -48,11 +48,7 @@ class bin4linux extends BIN{
 	$this->shellcode_id = '\x31\xc9\x83\xe9\xf6\xe8\xff\xff\xff\xff\xc0\x5e\x81\x76\x0e\xbc\xb2\xfb\x7c\x83\xee\xfc\xe2\xf4\xd6\xb9\xa3\xe5\xee\xd4\x93\x51\xdf\x3b\x1c\x14\x93\xc1\x93\x7c\xd4\x9d\x99\x15\xd2\x3b\x18\x2e\x54\xb1\xfb\x7c\xbc\xdb\x9f\x7c\xeb\xe1\x72\x9d\x71\x32\xfb\x7c';
 	
 	}
-	
-	public function for4linux_Dyn4invest_preload_library($host, $cmd) {
-	    $this->for4linux_Dyn4invest_cmd($host, "$this->vm_tmp_lin/preloadcheck $cmd");
-	    $this->for4linux_Dyn4invest_cmd($host, "gdb --batch -q -ex \"b dlsym\" -ex \"bt\" -ex \"run\" $cmd");
-	}
+
 
 	
 	public  function elf2header(){
