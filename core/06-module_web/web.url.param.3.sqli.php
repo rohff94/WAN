@@ -8,8 +8,8 @@ class SQLI extends FI{
 		$query = "sqlmap --batch --crawl=10 --forms --smart --hpp --threads 8 --all --answers=Y --fingerprint -v0 --keep-alive -o --parse-errors --technique=BEUSTQ --level=5 --risk=3 --tamper=charencode --random-agent  --alert='notify-send -i \"$this->dir_img/hacker.png\" \"SQLI FOUND\"'  --url '$this->http_type://$this->vhost:$this->port' ";
 		
      */
-    public function __construct($stream,$url,$param,$value,$methode_http) {
-        parent::__construct($stream,$url,$param,$value,$methode_http);
+    public function __construct($stream,$eth,$domain,$ip,$url,$param,$value,$methode_http) {
+        parent::__construct($stream,$eth,$domain,$ip,$url,$param,$value,$methode_http);
 	}
 
 

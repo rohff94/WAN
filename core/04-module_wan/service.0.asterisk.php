@@ -1048,7 +1048,7 @@ $result .= $this->req_ret_str($query);
 }
 
 
-public function service2snmp4exec(){
+public function service2snmp(){
     $result = "";
     /*
      auxiliary/scanner/snmp/snmp_enum                                                          normal  Yes    SNMP Enumeration Module

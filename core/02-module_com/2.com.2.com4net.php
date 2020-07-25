@@ -8,6 +8,26 @@ class com4net extends com4user {
     }
     
 
+    public function ip4addr4target($target_ip){
+        $target_ip = trim($target_ip);
+        if($this->isIPv4($target_ip)){
+            $query = "ip -o route get to $target_ip 2> /dev/null | grep -Po \"src [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"";
+            return trim(exec($query));
+        }
+        else $this->log2error("$target_ip IS NOT IPv4");
+    }
+    
+    public function ip4eth4target($target_ip){
+        $target_ip = trim($target_ip);
+        if($this->isIPv4($target_ip)){
+            $query = "ip -o route get to $target_ip 2> /dev/null | grep -Po \"dev [[:print:]]{1,} src\" | sed \"s/dev//g\"  | sed \"s/src//g\" ";
+            exec($query,$tmp);
+            return trim($tmp[0]);
+        }
+        else $this->log2error("$target_ip IS NOT IPv4");
+    }
+    
+    
     public function gpg2remove($stream,$user_id){
         $this->ssTitre(__FUNCTION__);
         $data = "gpg --delete-secret-keys $user_id"; // private 
@@ -121,7 +141,7 @@ class com4net extends com4user {
         
         //$url_test = $this->web.$this->url2encode($path);
         //$query ="wget --server-response --no-check-certificate --spider --timeout=5 --tries=2 \"$url\" -qO-  | grep 'HTTP/' | grep -Po \"[0-9]{3}\" | tail -1";
-        $query = "curl -o /dev/null --silent --head --write-out '%{http_code}' --connect-timeout 30 --no-keepalive '$url'  | grep -Po \"[0-9]{3}\" | head -1";
+        $query = "curl -o /dev/null --silent --head --write-out '%{http_code}' --connect-timeout 3 --no-keepalive '$url'  | grep -Po \"[0-9]{3}\" | head -1";
         return trim($this->req_ret_str($query));
     }
     
@@ -185,7 +205,7 @@ class com4net extends com4user {
     
     
     
-    public function  host4ip($host){
+    public function  host4ip($host):array{
         $this->ssTitre(__FUNCTION__);
         $host = trim($host);
         $query = "dig $host a +short 2> /dev/null | grep -Po \"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | sort -u";
@@ -290,158 +310,39 @@ class com4net extends com4user {
         public function run8vps4list($service2enum){
             $this->ssTitre(__FUNCTION__);
             $service2enum = trim($service2enum);
-            $sql_id8port = "SELECT id8port FROM SERVICE WHERE service2name='$service2enum'  ";
-            $this->article("SQL ID8PORT", $sql_id8port);
             
-            $file_path = "/tmp/service.$service2enum.lst";
+            $sql = "select eth,domain,ip,port,protocol FROM PORT JOIN IP ON IP.id = PORT.id8ip JOIN DOMAIN ON DOMAIN.id = IP.id8domain JOIN ETH ON ETH.id = DOMAIN.id8eth where PORT.id IN (select id8port FROM SERVICE where service2name = '$service2enum') ORDER BY domain ;";
+            $this->article("SQL ", $sql);
             
-            if ( $ids8port = $this->mysql_ressource->query($sql_id8port) ) {
-                $fp = fopen($file_path, 'w+');
+            $file_path = "/tmp/services.$service2enum.lst";
+            
+            if ( $ids = $this->mysql_ressource->query($sql) ) {
+                $fp = fopen("$file_path.tmp", 'w+');
                 
-                while ($id8port8db = $ids8port->fetch_assoc()) {
-                    $id8port = trim($id8port8db['id8port']);
-                    
-                    $sql_port = "SELECT id8ip,port,protocol FROM PORT WHERE id = '$id8port' LIMIT 1" ;
-                    $this->article("SQL id8ip AND PORT NUMBER", $sql_port);
-                    $port_info = $this->mysql_ressource->query($sql_port);
-                    $port_info_row = $port_info->fetch_assoc();
-                    $id8ip = trim($port_info_row['id8ip']);
-                    $port = trim($port_info_row['port']);
-                    $protocol = trim($port_info_row['protocol']);
-                    
-                    
-                    $sql_ip = "SELECT ip,id8domain FROM IP WHERE id = '$id8ip'  LIMIT 1" ;
-                    $this->article("SQL IP", $sql_ip);
-                    $ip_info = $this->mysql_ressource->query($sql_ip);
-                    $ip_info_row = $ip_info->fetch_assoc();
-                    $ip = trim($ip_info_row['ip']);
-                    $id8domain = trim($ip_info_row['id8domain']);
-                    
-                    $sql_domain = "SELECT id8eth,domain FROM DOMAIN WHERE id = '$id8domain'  LIMIT 1" ;
-                    $this->article("SQL domain", $sql_domain);
-                    $domain_info = $this->mysql_ressource->query($sql_domain);
-                    $domain_info_row = $domain_info->fetch_assoc();
-                    $domain = trim($domain_info_row['domain']);
-                    $id8eth = trim($domain_info_row['id8eth']);
-                    
-                    $sql_eth = "SELECT eth FROM ETH WHERE id = '$id8eth'  LIMIT 1" ;
-                    $this->article("SQL eth", $sql_eth);
-                    $eth_info = $this->mysql_ressource->query($sql_eth);
-                    $eth_info_row = $eth_info->fetch_assoc();
-                    $eth = trim($eth_info_row['eth']);
+                while ($id = $ids->fetch_assoc()) {
+
+                    $port = trim($id['port']);
+                    $protocol = trim($id['protocol']);
+                    $ip = trim($id['ip']);
+                    $domain = trim($id['domain']);
+                    $eth = trim($id['eth']);
                     
 
                     $val = "$eth $domain $ip $port $protocol";
                     fputs($fp,"$val\n");
-                        
-                        
-  
                 }
             }
             fclose($fp);
+            $query = "cat $file_path.tmp | sort -u | tee $file_path";
+            $this->requette($query);
+            $query = "wc -l $file_path";
+            $this->requette($query);
             return file($file_path);
         }
         
         
         
-        
-    public function run8vps4service4ip2enum(){
-        $this->ssTitre(__FUNCTION__);
-        $service2search = "ssh";
-
-       $sql_id8port = "SELECT id8port,service2name FROM SERVICE WHERE service2name='ssh' OR service2name='netbios-ssn' ";
-       $this->article("SQL ID8PORT", $sql_id8port);
-       
-       
-       if ( $ids8port = $this->mysql_ressource->query($sql_id8port) ) {
-           while ($id8port8db = $ids8port->fetch_assoc()) {
-               $id8port = trim($id8port8db['id8port']);
-               $service2name = trim($id8port8db['service2name']);
-               
-               $sql_port = "SELECT port,id8ip FROM PORT WHERE id = '$id8port' LIMIT 1" ;
-               $this->article("SQL ID8IP AND PORT NUMBER", $sql_port);
-               $port_info = $this->mysql_ressource->query($sql_port);
-               $port_info_row = $port_info->fetch_assoc();
-               $id8ip = trim($port_info_row['id8ip']);
-               $port = trim($port_info_row['port']);
-               
-               
-               $sql_ip = "SELECT ip,id8domain FROM IP WHERE id = '$id8ip'  LIMIT 1" ;
-               $this->article("SQL IP", $sql_ip);
-               $ip_info = $this->mysql_ressource->query($sql_ip);
-               $ip_info_row = $ip_info->fetch_assoc();
-               $ip = trim($ip_info_row['ip']);
-               $id8domain = trim($ip_info_row['id8domain']);
-               
-               $sql_domain = "SELECT id8eth,domain FROM DOMAIN WHERE id = '$id8domain'  LIMIT 1" ;
-               $this->article("SQL domain", $sql_domain);
-               $domain_info = $this->mysql_ressource->query($sql_domain);
-               $domain_info_row = $domain_info->fetch_assoc();
-               $domain = trim($domain_info_row['domain']);
-               $id8eth = trim($domain_info_row['id8eth']);
-               
-               $sql_eth = "SELECT eth FROM ETH WHERE id = '$id8eth'  LIMIT 1" ;
-               $this->article("SQL eth", $sql_eth);
-               $eth_info = $this->mysql_ressource->query($sql_eth);
-               $eth_info_row = $eth_info->fetch_assoc();
-               $eth = trim($eth_info_row['eth']);
-               
-               $stream = "";
-               $protocol = 'T';
-               $flag_poc = FALSE;
-
-               
-               $obj_service = new IP($stream, $eth, $domain, $ip);
-               $obj_service->poc($flag_poc);
-               $obj_service->ip4service();
-               
-               //$obj_service = new SERVICE($stream, $eth, $domain, $ip, $port, $protocol);
-               //$obj_service->poc($flag_poc);
-               //if ($service2name==='ssh') $obj_service->ssh4enum();
-               //if ($service2name==='netbios-ssn') $obj_service->service2smb4enum2users();
-           }
-       }
-    }
-    
-    public function run8vps(){
-        $time = 1;
-        
-        $file_path = "/home/rohff/bounty.bugs.1";
-        $fonction2exec = "domain4service";
-        $eth = "ens3";
-        echo $this->run8vps4domain2fork32($file_path, $fonction2exec, $eth);
-        $this->pause();
-        
-        $file_path = "/home/rohff/bounty.bugs.2";
-        $fonction2exec = "domain4service";
-        $eth = "ens3";
-        echo $this->run8vps4domain2fork32($file_path, $fonction2exec, $eth);
-        $this->pause();
-        
-        $file_path = "/home/rohff/bounty.bugs";
-        $fonction2exec = "domain4info";
-        $eth = "ens3";
-        
-        $cmd1 = "for i in $(cat $file_path ); do php pentest.php DOMAIN  \"$eth \$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tac $file_path ); do php pentest.php DOMAIN  \"$eth \$i $fonction2exec FALSE\";done";
-        echo $this->exec_para4print($cmd1, $cmd2, $time)."\n";
-        $this->pause();
-    }
-  
-    public function run8vps4domain2fork32info(){
-        $file_path = "/home/rohff/bounty.bugs";
-        $fonction2exec = "domain4info";
-        $eth = "ens3";
-        $this->run8vps4domain2fork32($file_path,$fonction2exec,$eth);
-    }
-    
-    
-    public function run8vps4domain2fork32service(){
-        $file_path = "/home/rohff/bounty.bugs";
-        $fonction2exec = "domain4service";
-        $eth = "ens3";
-        $this->run8vps4domain2fork32($file_path,$fonction2exec,$eth);
-    }
+   
     
     
     public function run8vps4domain2fork32($file_path,$fonction2exec,$eth){
@@ -562,242 +463,8 @@ class com4net extends com4user {
         return $fin;
     }
     
-    
-    public function run8vps2fork32($file_path,$service){
-
-        $file_path = trim($file_path);
-        $service = trim($service);
-
-        $fork = 32 ;
-        if (!file_exists($file_path)) return $this->rouge("$file_path no Found");
-        $total_domains = intval(trim($this->req_ret_str("wc -l $file_path")));
-        $this->article("Total Domain to run", $total_domains);
-        $step = ceil($total_domains/$fork);
-        $this->article("Step", $step);
-        
-        $poc = new com4code();
-        $time = 1 ;
-
-        $cmd1 = "for i in $(head -".intval($step*16)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*16)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*15)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*15)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmda1 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        
-        $cmd1 = "for i in $(head -".intval($step*14)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*14)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*13)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*13)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmda2 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        $cmda = $poc->exec_para4print($cmda1, $cmda2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*12)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*12)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*11)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*11)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmdg1 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        
-        $cmd1 = "for i in $(head -".intval($step*10)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*10)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*9)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*9)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmdg2 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        $cmdg = $poc->exec_para4print($cmdg1, $cmdg2, $time);
-        
-        $cmdgf = $poc->exec_para4print($cmda, $cmdg, $time);
-        
-        // ============
-        
-        $cmd1 = "for i in $(head -".intval($step*8)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*8)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*7)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*7)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmda1 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        
-        $cmd1 = "for i in $(head -".intval($step*6)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*6)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*5)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*5)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmda2 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        $cmda = $poc->exec_para4print($cmda1, $cmda2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*4)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*4)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*3)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*3)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmdg1 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        
-        $cmd1 = "for i in $(head -".intval($step*2)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*2)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*1)." $file_path | tac | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmd2 = "for i in $(tail -".intval($step*1)." $file_path | head -$step ); do php pentest.php $service \"\$i\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmdg2 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        $cmdg = $poc->exec_para4print($cmdg1, $cmdg2, $time);
-        
-        $cmddf = $poc->exec_para4print($cmda, $cmdg, $time);
-        
-        $command = $poc->exec_para4print($cmddf, $cmdgf, $time);
-        
-        $output_path = "$file_path.sh";
-        $this->str2file("", $command, $output_path);
-        $this->jaune("bash $output_path");
-        }
-    
-    
-    public function run8vps4service2fork32($file_path,$fonction2exec){
-        $fonction2exec = trim($fonction2exec);
-        $file_path = trim($file_path);
-        $fork = 32 ;
-        if (!file_exists($file_path)) return $this->rouge("$file_path no Found");
-        $total_domains = intval(trim($this->req_ret_str("wc -l $file_path")));
-        $this->article("Total Services to run", $total_domains);
-        $step = ceil($total_domains/$fork);
-        $this->article("Step", $step);
-        
-        $poc = new com4code();
-        $time = 1 ;
-        
-        $cmd1 = "for i in $(head -".intval($step*16)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*16)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*15)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*15)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmda1 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        
-        $cmd1 = "for i in $(head -".intval($step*14)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*14)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*13)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*13)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmda2 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        $cmda = $poc->exec_para4print($cmda1, $cmda2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*12)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*12)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*11)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*11)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmdg1 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        
-        $cmd1 = "for i in $(head -".intval($step*10)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*10)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*9)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*9)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmdg2 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        $cmdg = $poc->exec_para4print($cmdg1, $cmdg2, $time);
-        
-        $cmdgf = $poc->exec_para4print($cmda, $cmdg, $time);
-        
-        // ============
-        
-        $cmd1 = "for i in $(head -".intval($step*8)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*8)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*7)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*7)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmda1 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        
-        $cmd1 = "for i in $(head -".intval($step*6)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*6)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*5)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*5)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmda2 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        $cmda = $poc->exec_para4print($cmda1, $cmda2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*4)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*4)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*3)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*3)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmdg1 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        
-        $cmd1 = "for i in $(head -".intval($step*2)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*2)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmd1 = "for i in $(head -".intval($step*1)." $file_path | tac | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmd2 = "for i in $(tail -".intval($step*1)." $file_path | head -$step ); do php pentest.php SERVICE  \"\$i $fonction2exec FALSE\";done";
-        $cmdf2 = $poc->exec_para4print($cmd1, $cmd2, $time);
-        
-        $cmdg2 = $poc->exec_para4print($cmdf1, $cmdf2, $time);
-        
-        $cmdg = $poc->exec_para4print($cmdg1, $cmdg2, $time);
-        
-        $cmddf = $poc->exec_para4print($cmda, $cmdg, $time);
-        
-        $this->jaune($poc->exec_para4print($cmddf, $cmdgf, $time));
-    }
-    
+ 
+ 
     
     
 }

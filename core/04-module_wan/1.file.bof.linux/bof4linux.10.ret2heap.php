@@ -378,7 +378,7 @@ function ret2heap4linux_dlmalloc() {
 	$this->requette("gedit $file_c->file_path");
 	$programme = $file_c->file_c2elf("-ggdb -w -fno-stack-protector -fno-pie -z execstack -z norelro -m32 -mtune=i386 -ldl");
 	$this->requette($programme );
-	$file_bin = new bin4linux($programme);
+	$file_bin = new bin4linux("",$programme);
 	//$file_bin->elf2heap2size("AAAA");$this->pause();
 	//$file_bin->elf2dll();$this->pause();
 	$file_bin->elf2heap();$this->pause();

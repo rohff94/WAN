@@ -530,7 +530,7 @@ class service2smb extends service2asterisk {
 
         for ($rid = 500;$rid<=550;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids S-1-22-1-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v \"Error was NT_STATUS\" | grep -v \"Cannot connect to server\" | grep -v '*unknown*'  | grep -v '\\\\$rid' | cut -d'\' -f2  | cut -d'(' -f1"); // | cut -d'\' -f2  | cut -d'(' -f1
         for ($rid = 1000;$rid<=1050;$rid++) $tmp2 .= $this->req_ret_str("rpcclient -c 'lookupsids S-1-22-1-$rid' -U '$user2name'%'$user2pass'  '$this->ip' -p $this->port  2>/dev/null  | grep -v \"Error was NT_STATUS\" | grep -v \"Cannot connect to server\" | grep -v '*unknown*'  | grep -v '\\\\$rid' | cut -d'\' -f2  | cut -d'(' -f1"); // | cut -d'\' -f2  | cut -d'(' -f1
-        var_dump($tmp2);
+        //var_dump($tmp2);
         $this->pause();
         $tmp2 = trim($tmp2);
         if (empty($tmp2)) return $users_found;

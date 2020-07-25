@@ -38,7 +38,7 @@ class HOST extends IP{
         
         else {
             $this->requette($query);
-            $this->log2error("Empty Host");
+            $this->log2error("Host not valid:$host");
             exit();
         }
         
@@ -152,14 +152,7 @@ class HOST extends IP{
     
     
     public function host2host():array{
-        $this->ssTitre(__FUNCTION__);
-        $tab_hosts = array();
-        // update HOST set host2host = NULL where host2host IS NOT NULL ;
-        $query = "nslookup -query=ptr ".gethostbyname($this->host);
-        $filter = "  | cut -d'=' -f2 | grep -v '$this->host' | grep -v 'arpa' | grep -Po \"[a-z0-9_\-]{1,}\.[a-z_\-]{1,}\.[a-z]{1,5}\"  ";
-        $tab_hosts = $this->req_tab($this->stream, $query, $this->stream_timeout, $filter);
-        $this->article("Host2host", $this->tab($tab_hosts));
-        return $tab_hosts;
+        return $this->ip2host4nslookup($this->ip);
           }
  
 

@@ -4,8 +4,8 @@ class XSS extends XML{
     
     
     
-    public function __construct($stream,$url,$param,$value,$methode_http) {
-        parent::__construct($stream,$url,$param,$value,$methode_http);
+    public function __construct($stream,$eth,$domain,$ip,$url,$param,$value,$methode_http) {
+        parent::__construct($stream,$eth,$domain,$ip,$url,$param,$value,$methode_http);
         
     }
 

@@ -728,9 +728,44 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
     
     
     
-    
-    
     public function users2sudoers8filepath($stream,$sudoers_str){
+        $this->titre(__FUNCTION__);
+        $this->users2sudoers8filepath2root8bin($stream,$sudoers_str);$this->pause();
+        $this->users2sudoers8filepath2suids4one($stream, $sudoers_str);$this->pause();
+        $this->users2sudoers8filepath2suids8env2path2xtrace($stream, $sudoers_str);$this->pause();
+    }
+    
+    public function users2sudoers8filepath2root8bin($stream,$sudoers_str){
+        $result = "";
+        $this->ssTitre(__FUNCTION__);
+        
+        $data = "echo '$sudoers_str' | grep -v \"=\"  | grep -Po \"[[:space:]]{1}/[a-z0-9\-_]{1,}/[[:print:]]{1,}\"  | grep -Po \"(/[a-z0-9\-\_]{1,}(/[a-z0-9\-\_\.]{1,})+)\" | sort -u ";
+        $this->requette($data);
+        
+        //$this->flag_poc = TRUE ;
+        $this->pause();
+        $tab_apps = array();
+        exec($data,$tab_apps);
+
+        $tab_apps = array_unique($tab_apps);
+        sort($tab_apps,SORT_STRING);
+        $this->article("App Sudoers", $this->tab($tab_apps));$this->pause();
+        $size = count($tab_apps);
+        for ($i=0;$i<$size;$i++){
+            $app = $tab_apps[$i];
+            $app = trim($app);
+            if (!empty($app)) {
+                
+                $this->article("$i/$size", $app);
+                if (!$this->ip2root8db($this->ip2id)) {
+                    $this->root8bin($stream,$app, TRUE, '');$this->pause();
+                }
+            }
+        }
+        return $result;
+    }
+    
+    public function users2sudoers8filepath2suids4one($stream,$sudoers_str){
         $result = "";
         $this->ssTitre(__FUNCTION__);
         $data = "echo '$sudoers_str' | grep -E \"\([a-zA-Z0-9_\-]{1,}\)\" | cut -d')' -f2  | grep -Po \"[[:space:]]{1}/[a-z0-9\-_]{1,}/[[:print:]]{1,}\"  | grep -Po \"(/[a-z0-9\-\_]{1,}(/[a-z0-9\-\_\.]{1,})+)\"  ";
@@ -747,9 +782,34 @@ If /etc/exports if writable, you can add an NFS entry or change and existing ent
             if (!empty($app)) {
                 
                 $this->article("$i/$size", $app);
-                if (!$this->ip2root8db($this->ip2id)) $this->root8bin($stream,$app, TRUE, '');$this->pause();
-                if (!$this->ip2root8db($this->ip2id)) $this->suids4one($stream,$app);$this->pause();
-                if (!$this->ip2root8db($this->ip2id)) $this->suids8env2path2xtrace($stream,$app);$this->pause();
+                if (!$this->ip2root8db($this->ip2id)) {
+                    $this->suids4one($stream,$app);$this->pause();
+                }
+            }
+        }
+        return $result;
+    }
+    
+    public function users2sudoers8filepath2suids8env2path2xtrace($stream,$sudoers_str){
+        $result = "";
+        $this->ssTitre(__FUNCTION__);
+        $data = "echo '$sudoers_str' | grep -E \"\([a-zA-Z0-9_\-]{1,}\)\" | cut -d')' -f2  | grep -Po \"[[:space:]]{1}/[a-z0-9\-_]{1,}/[[:print:]]{1,}\"  | grep -Po \"(/[a-z0-9\-\_]{1,}(/[a-z0-9\-\_\.]{1,})+)\"  ";
+        $list_apps = exec($data);
+        $result .= $list_apps;
+        $tab_apps = explode(",", $list_apps);
+        $tab_apps = array_unique($tab_apps);
+        sort($tab_apps,SORT_STRING);
+        $this->article("App Sudoers", $this->tab($tab_apps));$this->pause();
+        $size = count($tab_apps);
+        for ($i=0;$i<$size;$i++){
+            $app = $tab_apps[$i];
+            $app = trim($app);
+            if (!empty($app)) {
+                
+                $this->article("$i/$size", $app);
+                if (!$this->ip2root8db($this->ip2id)) {
+                    $this->suids8env2path2xtrace($stream,$app);$this->pause();
+                }
             }
         }
         return $result;

@@ -420,7 +420,7 @@ In order to hide a certain connection, i replaced the default read function with
         $pid_rootkit = 10956;
         $filter = "";
         
-        $poc4rootkit4linux_kernel_avgcoder = new bin4linux($this->file_path, $this->attacker_port); // "LinuxUbuntu10040x86"
+        $poc4rootkit4linux_kernel_avgcoder = new bin4linux("","",$this->file_path); // "LinuxUbuntu10040x86"
        // $poc4rootkit4linux_kernel_avgcoder->for4linux_all("");  $this->pause();
         
         
@@ -492,7 +492,7 @@ In order to hide a certain connection, i replaced the default read function with
          foreach ($tab_lkm as $lkm){
              $lkm = trim($lkm);
              if (!empty($lkm)){
-             $file_lkm = new bin4linux($lkm);
+             $file_lkm = new bin4linux("",$lkm);
              $file_lkm->file2virus4scan();
              }
          }
@@ -625,7 +625,7 @@ directories and processes.
         $this->article("Start Kbeast Backdoor", "cd /usr/_h4x_/; ./_h4x_bd");
         $this->ssTitre("send exec to virustotal");
         $victime->vm2download("/usr/_h4x_/_h4x_bd", "$this->vm_tmp_lin/_h4x_bd.elf");
-        $check = new bin4linux("$this->vm_tmp_lin/_h4x_bd.elf");
+        $check = new bin4linux("","$this->vm_tmp_lin/_h4x_bd.elf");
         //$check->file2virus2vt();
         $this->pause();
         
@@ -705,7 +705,7 @@ directories and processes.
          *
          */
         
-        $rootkit4linux_kernel_kbeastv1 = new bin4linux($this->file_path, $this->attacker_port);
+        $rootkit4linux_kernel_kbeastv1 = new bin4linux("",$this->file_path, $this->attacker_port);
        // $rootkit4linux_kernel_kbeastv1->for4linux_all("");exit();$this->pause();
         
        // $this->ssTitre("Petit resume du resultat");$this->cmd("localhost","egrep -i \"(vol.py|kbeast|h4x|10.100.10.1|HOOKED|h4ck3r|$pid|$ppid|$deamon|ipsec)\" kbeastv1.rst"); $this->pause();
@@ -751,7 +751,7 @@ directories and processes.
         $this->ssTitre("Dump hidden modules");
         $file_dump_module = $rootkit4linux_kernel_kbeastv1->for4linux_Dump_Module_Kernel($inode_module, "");
         $file_name = $this->req_ret_str("grep -Po -i \"[0-9a-z._]*.lkm\" $file_dump_module");
-        $check = new bin4linux("$this->file_dir/$this->file_name/$file_name");
+        $check = new bin4linux("","$this->file_dir/$this->file_name/$file_name");
         $check->file2virus2vt();
         $this->pause();
         
@@ -825,7 +825,7 @@ directories and processes.
         
         $this->ssTitre("Dump Malware PATH");
         $file_exec = $rootkit4linux_kernel_kbeastv1->for4linux_Dump_file("/usr/_h4x_/_h4x_bd", "");
-        $malw = new bin4linux($file_exec);
+        $malw = new bin4linux("",$file_exec);
         $malw->file2virus2vt();$this->pause();
         $malw->file2strings();$this->pause();
         $malw->elf2fonctions_externes();$this->pause();
@@ -986,7 +986,7 @@ However, Rkhunter was not successful in discovering any hidden processes, hooked
         $filter = "";
         
         
-        $for4linux_azazel = new bin4linux($this->file_path, $this->attacker_port);
+        $for4linux_azazel = new bin4linux("",$this->file_path, $this->attacker_port);
         //$for4linux_azazel->for4linux_all("");$this->pause();
         //$this->ssTitre("Petit resume du resultat");$this->cmd("localhost","egrep -i \"(vol.py|azazel|libselinux.so|changeme|61040|__|10.100.10.1|HOOKED|h4ck3r|13328)\" azazel.rst");$this->pause();
         
@@ -1042,11 +1042,11 @@ However, Rkhunter was not successful in discovering any hidden processes, hooked
         $this->ssTitre("Chargement de la librairie malicieuse pour toutes les applications");
         $for4linux_azazel->for4linux_Information_find_file_name('/etc/ld.so.preload', ""); $this->pause();
         $lib_preload_file = $for4linux_azazel->for4linux_Dump_file('/etc/ld.so.preload');$this->pause();
-        $lib_preload = new bin4linux($lib_preload_file);
+        $lib_preload = new bin4linux("",$lib_preload_file);
         $lib_preload->file2strings();
         $this->pause();
         $tmp_file = $for4linux_azazel->for4linux_Dump_file('/lib/libselinux.so');$this->pause();
-        $malw = new bin4linux($tmp_file);
+        $malw = new bin4linux("",$tmp_file);
         $malw->elf2info();$this->pause();
         $malw->file2virus2vt();$this->pause();
         $malw->file2strings();$this->pause();
@@ -1163,7 +1163,7 @@ By default, this action does not log to syslog.");
         // cmd($this->target_ip, "gcc ./preloadcheck.c -ggdb -o ./preloadcheck -w -m32 -ldl; ./preloadcheck");
         $this->requette("strings $this->dir_tmp/jynx2.so");
         $this->pause();
-        $check = new bin4linux("$this->dir_tmp/jynx2.so");
+        $check = new bin4linux("","$this->dir_tmp/jynx2.so");
         $check->file2virus2vt();
         $check->bin2fonctions();
         $check->elf2fonctions();
@@ -1180,7 +1180,7 @@ By default, this action does not log to syslog.");
         $pid = "21402"; // 21113,21125,21286,21354,
         $filter = "";
         
-        $for4linux_jynx2 = new bin4linux($this->file_path, $this->attacker_port); // ub1404x86_jynx2.vmem "LinuxUbuntu1404x86"
+        $for4linux_jynx2 = new bin4linux("",$this->file_path, $this->attacker_port); // ub1404x86_jynx2.vmem "LinuxUbuntu1404x86"
         //$for4linux_jynx2->for4linux_all("");$this->pause();
 
         

@@ -7,7 +7,7 @@ C:\> nslookup
 server 10.10.10.45
 > ls -d target.tgt
 • Linux:
-# dig @10.10.10.45 target.tgt —t AXFR
+# dig @10.10.10.45 target.tgt -t AXFR
 
 
 	// /opt/metasploit/common/share/nmap/scripts/

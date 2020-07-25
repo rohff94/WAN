@@ -6,8 +6,8 @@ class PARAM extends XSS{
     
     
     
-    public function __construct($stream,$url,$param,$value,$methode_http) {
-        parent::__construct($stream,$url,$param,$value,$methode_http);
+    public function __construct($stream,$eth,$domain,$ip,$url,$param,$value,$methode_http) {
+        parent::__construct($stream,$eth,$domain,$ip,$url,$param,$value,$methode_http);
         $this->article("Param", $this->param);
         $this->article("Value", $this->value);
     }

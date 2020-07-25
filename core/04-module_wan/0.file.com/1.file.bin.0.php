@@ -91,7 +91,7 @@ class BIN extends FILE {
 	    
 	    //$this->dot2xdot("$this->file_dir/$this->file_name.dot");
 	    
-	    //$file_bin = new bin4linux($elf);
+	    //$file_bin = new bin4linux("",$elf);
 	    //system("chmod +x $file_bin->file_path");
 	    //$file_bin->elf2info();
 	    //$this->requette("lsb_release -a");

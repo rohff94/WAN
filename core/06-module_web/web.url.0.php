@@ -11,15 +11,17 @@ class URL extends WEB{
 	
 
     
-	public function __construct($stream,$url) {	
+    public function __construct($stream,$eth,$domain,$ip,$url) {	
 	    $this->url = trim($url);
 	    if (empty($this->url)) return $this->log2error("EMPTY URL");
-	    parent::__construct($stream,$url);		
+	    $vhost = parse_url( $this->url, PHP_URL_HOST);
+	    $http_type = parse_url( $this->url, PHP_URL_SCHEME);
+	    $web = "$http_type://$vhost:$this->port/";
+	    parent::__construct($stream,$eth,$domain,$ip,$web);		
 	    $this->uri_path = parse_url( $this->url, PHP_URL_PATH);
 	    $this->uri_path_dirname = dirname($this->url);
 	    $this->uri_query = parse_url( $this->url, PHP_URL_QUERY);
 	    $this->article("URL", $this->url);
-
 	}
 
 
@@ -47,7 +49,7 @@ class URL extends WEB{
 		foreach($my_arr as $key=>$value){	
 			if(!is_array($key && !empty($value))){
 			    
-			    $obj_fi = new PARAM($this->eth,$this->domain,$this->url,$key,$value,"GET");
+			    $obj_fi = new PARAM($this->stream,$this->eth,$this->domain,$this->ip,$this->url,$key,$value,"GET");
 			    $obj_fi->poc($this->flag_poc);
 				$obj_fi->param4pentest($OS);
 				$this->pause();

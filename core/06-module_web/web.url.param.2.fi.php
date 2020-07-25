@@ -7,20 +7,10 @@ class FI extends CE{
     // curl -d Name="Lee" -d Age="36" -d Town="The Internet" https://example.com/form-data.php
     //$this->cmd("test", "wget --timeout=2 --tries=2 --post-data 'Name=Lee&Age=36&Town=The%20Internet' https://example.com/page-two.php");
     
-/*
- A few of the more interesting proc entries include:
-Directory 	Description
-/proc/sched_debug 	This is usually enabled on newer systems, such as RHEL 6.  It provides information as to what process is running on which cpu.  This can be handy to get a list of processes and their PID number.
-/proc/mounts 	Provides a list of mounted file systems.  Can be used to determine where other interesting files might be located
-/proc/net/arp 	Shows the ARP table.  This is one way to find out IP addresses for other internal servers.
-/proc/net/route 	Shows the routing table information.
-/proc/net/tcp and /proc/net/udp 	Provides a list of active connections.  Can be used to determine what ports are listening on the server
-/proc/net/fib_trie 	This is used for route caching.  This can also be used to determine local IPs, as well as gain a better understanding of the target’s networking structure
-/proc/version 	Shows the kernel version.  This can be used to help determine the OS running and the last time it’s been fully updated.
- */
+
 	
-    public function __construct($stream,$url,$param,$value,$methode_http) {
-        parent::__construct($stream,$url,$param,$value,$methode_http);
+    public function __construct($stream,$eth,$domain,$ip,$url,$param,$value,$methode_http) {
+        parent::__construct($stream,$eth,$domain,$ip,$url,$param,$value,$methode_http);
 
 	}
 	

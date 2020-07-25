@@ -12,10 +12,10 @@ class PARAM4COM extends URL{
 
 
     
-    public function __construct($stream,$url,$param,$value,$methode_http) {
+    public function __construct($stream,$eth,$domain,$ip,$url,$param,$value,$methode_http) {
         $html_original = array();
         if (empty($param)) return $this->log2error("EMPTY PARAM");
-        parent::__construct($stream,$url);
+        parent::__construct($stream,$eth,$domain,$ip,$url);
         $this->null_byte = "%00";
         $this->param = trim($param);
         $this->value = trim($value);
@@ -43,8 +43,11 @@ class PARAM4COM extends URL{
                 return $this->log2error($chaine);
             }
         
-        
     }
+    
+    
+    
+    
  
     public function param2fi($user_agent,$file_path,$cmd,$filter){ // OK
         $this->ssTitre(__FUNCTION__);

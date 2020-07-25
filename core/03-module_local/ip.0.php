@@ -367,7 +367,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	}
 	
 	
-	public function  ip2host4nslookup($ip){
+	public function  ip2host4nslookup($ip):array{
 	    $this->ssTitre(__FUNCTION__);
 	    
 	    $query = "nslookup -query=ptr $ip 2> /dev/null | grep 'name' | cut -d'=' -f2 | sed \"s/\.$//g\" | tr -d ' ' | grep  -i -Po \"([0-9a-zA-Z_-]{1,}\.)+[a-zA-Z]{1,4}\" ";
@@ -442,24 +442,7 @@ $filenames = explode("\n",$test->req_ret_str($query));
 	    return $this->req_ret_str($query);
 	}
 	
-	public function ip4addr4target($target_ip){
-	    $target_ip = trim($target_ip);
-	    if($this->isIPv4($target_ip)){
-	        $query = "ip -o route get to $target_ip 2> /dev/null | grep -Po \"src [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\" | grep -Po \"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\"";
-	        return trim(exec($query));
-	    }
-	    else $this->log2error("$target_ip IS NOT IPv4");
-	}
-	
-	public function ip4eth4target($target_ip){
-	    $target_ip = trim($target_ip);
-	    if($this->isIPv4($target_ip)){
-	        $query = "ip -o route get to $target_ip 2> /dev/null | grep -Po \"dev [[:print:]]{1,} src\" | sed \"s/dev//g\"  | sed \"s/src//g\" ";
-	        exec($query,$tmp);
-	        return trim($tmp[0]);
-	    }
-	    else $this->log2error("$target_ip IS NOT IPv4");
-	}
+
 	
 	
 	
@@ -1253,7 +1236,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	            $tab_open_ports_tcp = $this->ip2tcp4select();
 	            $tab_open_ports_tcp += $this->ip2tcp4top4000();
 	            $tab_open_ports_udp = $this->ip2udp4top200();
-	            //if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4top4000();
+	            //if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4top10000();
 
 	        }
 	        $rst_tcp = implode(",",$tab_open_ports_tcp);
@@ -1293,7 +1276,7 @@ routed halfway around the world) you may want to work with your ISP to investiga
 
 	public function ip2tcp4all(): array{
 	    $this->ssTitre(__FUNCTION__);
-		$query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --reason -p 1-65535 --open $this->ip -e $this->eth -oX - ";
+		$query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --host-timeout 70m --min-parallelism 10 --reason -p 1-65535 --open $this->ip -e $this->eth -oX - ";
 		$query = $query." | xmlstarlet sel -t -v /nmaprun/host/ports/port/@portid ";
 		return $this->req_ret_tab($query);
 	}
@@ -1538,6 +1521,13 @@ messages from leaving your internal network and 3) use a proxy server instead of
 	    }
 	    if (empty($tab_hosts)) $tab_hosts = $this->ip2host4nslookup($this->ip);
 	    $this->article("All Hosts Compatible IP:$this->ip ", $this->tab($tab_hosts));
+	    foreach ($tab_hosts as $host){
+	        $host = trim($host);
+	        if (!empty($host)){
+	        $obj_host = new HOST($this->stream, $this->eth, $this->domain, $this->ip, $host);
+	        //$obj_host->host4info();
+	        }
+	    }
 	    return $tab_hosts;
 	}
 	
@@ -2040,8 +2030,7 @@ public function ip2vhost(){
 	
 	public function ip4web(){
 	    $this->titre(__FUNCTION__);
-	    $hosts = array();
-	    $hosts = $this->ip2host();
+
 	    if(!$this->ip2honey()){
 	        if (!empty($this->tab_open_ports_all)){
 	            $max_iter = count($this->tab_open_ports_all);
@@ -2085,16 +2074,6 @@ public function ip2vhost(){
 	                    if (!empty($port_num)) {
 	                        $obj_service = new SERVICE($this->stream,$this->eth,$this->domain,$this->ip,$port_num, $protocol);
 	                        $obj_service->service4info();
-	                        switch ($obj_service->service_name) {
-
-	                            
-	                            case "http" :
-	                            case "https" :
-	                                        
-	                                //$obj_service->service2web();
-	                                break ;
-	                            
-	                        }
 	                    }
 	            }
 	        }
@@ -2102,7 +2081,7 @@ public function ip2vhost(){
 
 	    }
 
-	    $this->pause();
+	    
 	 }
 
 	 
@@ -2112,49 +2091,65 @@ public function ip2vhost(){
 	     $this->titre(__FUNCTION__);
 	     $tab_users = array();
 	     $this->ip2port();
-	     /*
-   0  auxiliary/gather/kerberos_enumusers                                 normal  No     Kerberos Domain User Enumeration
-   1  auxiliary/scanner/smb/smb_enumusers                                 normal  No     SMB User Enumeration (SAM EnumUsers)
-   2  auxiliary/scanner/smb/smb_enumusers_domain                          normal  No     SMB Domain User Enumeration
-   3  auxiliary/scanner/snmp/snmp_enumusers                               normal  No     SNMP Windows Username Enumeration
-   4  auxiliary/scanner/snmp/xerox_workcentre_enumusers                   normal  No     Xerox WorkCentre User Enumeration (SNMP)
-   5  auxiliary/scanner/ssh/cerberus_sftp_enumusers      2014-05-27       normal  No     Cerberus FTP Server SFTP Username Enumeration
-   6  auxiliary/scanner/ssh/ssh_enumusers                                 normal  No     SSH Username Enumeration
-
-
-	      */
-	     // https://www.nccgroup.com/uk/about-us/newsroom-and-events/blogs/2015/june/username-enumeration-techniques-and-their-value/
 	     foreach ($this->tab_open_ports_all as $port){
 	         if (!empty($port))  {
 	             foreach ($port as $port_num => $protocol)
 	                 if (!empty($port_num)) {
 	                     $obj_service = new SERVICE($this->stream,$this->eth,$this->domain,$this->ip,$port_num, $protocol);
-	                     //$obj_service->service4info();
+
 	                     switch ($obj_service->service_name) {
+	                         
 	                         case "ssh" :
 	                             $obj_service->ssh2enum($this->dico_users);
+	                             $this->pause();
 	                             break ;
+	                             
 	                         case "netbios-ssn" :
-	                             // auxiliary/scanner/smb/smb_enumusers
 	                             $obj_service->service2smb4enum2users();
+	                             $this->pause();
 	                             break ;
+	                             
 	                         case "smtp" :
-	                           //  $obj_service->service2smtp2users();
+	                         case "smtps" :
+	                             $obj_service->service2smtp2users();
+	                             $this->pause();
 	                             break ;
+	                             
+	                         case "kerberos-sec":
+	                             $obj_service->service2kerberos($this->domain);
+	                             $this->pause();
+	                             break ;
+	                             
+	                         case "ldap":
+	                             $obj_service->service2ldap();
+	                             $this->pause();
+	                             break ;
+	                             
 	                         case "snmp" : 
-	                             //auxiliary/scanner/snmp/snmp_enumusers
+	                             $obj_service->service2snmp();
+	                             $this->pause();
 	                             break ;
-	                             // auxiliary/gather/kerberos_enumusers- Kerberos Username Enumeration -krb5-enum-users [6] nmap nse script
+	                             
+	                         case "finger" :
+	                             $obj_service->service2finger();
+	                             $this->pause();
+	                             break ;
+	                             
+	                         case "auth":
+	                         case "ident":
+	                             $obj_service->service2ident();
+	                             $this->pause();
+	                             break ;
+	                             
+	                        /*
 	                             // wordpress 
-	                             // finger 
-	                             // ACF2 (Access Control Facility) is a commercial, discretionary, access control software security system developed for the MVS (z/OS), VSE (z/VSE) and VM (z/VM) IBM mainframe operating systems
-	                             // ident - Port 113 
+	                         case "http" :
+	                         case "https" :
+	                             $obj_service->service2users8wordpress();
+	                             $this->pause();
+	                             break ;
 
-	                             
-	                             // TCP/UDP 389: LDAP
-	                             
-	                             // TCP/UDP 3368: Global Catalog Service
-	                             
+                             */
 	                     }
 	                 }
 	         }
@@ -2162,6 +2157,7 @@ public function ip2vhost(){
 	     
 	    $tab_users = $this->ip2users();
 	    $this->parchment($this->tab($tab_users));
+	    $this->pause();
 	 }
 	
 	
@@ -2180,21 +2176,12 @@ public function ip2vhost(){
 	        //$this->titre("Searching what happened In the PAST");$this->pause();
 	        //$this->ip2vt();$this->pause();
 	        //$this->ip2malw();$this->pause();
-	        $vhosts = trim($this->ip2vhost());
+	        
+	        $this->ip2vhost();
 
-	        $tab_vhosts = explode("\n", $vhosts);
-	        foreach ($tab_vhosts as $vhost){
-	            if (!empty($vhost)){
-	                $host = $this->host2norme($vhost);
-	                if (!empty($host)){
-	                    $obj_host = new HOST($this->stream, $this->eth, $this->domain, $this->ip, $host);
-	                    $obj_host->host2host();
-	                }
-	            }
-	        }
 	    }
 	    
-
+	    $this->article("vHOST Compatible IP", $this->tab($this->ip2host()));
 	    $ip2root = $this->ip2root8db($this->ip2id);
 	    if ($ip2root) $this->article("ip2root",$ip2root);
 	    $ip2tracert = trim($this->ip2tracert());$this->article("IP TraceRoute",$ip2tracert);
@@ -2203,7 +2190,7 @@ public function ip2vhost(){
 	
 	
 	public function ip4info(){ 	 
-	    echo " =============================================================================\n";
+	    echo "START ".__FUNCTION__.":$this->ip =============================================================================\n";
 	    $this->gtitre(__FUNCTION__);
 	    
 	    
@@ -2220,11 +2207,12 @@ public function ip2vhost(){
 	        }
 	    }
 	    echo "End ".__FUNCTION__.":$this->ip =============================================================================\n";	    
+	    $this->pause();
 	}
 	
 	
 	public function ip4service(){
-	    echo "=============================================================================\n";
+	    echo "START ".__FUNCTION__.":$this->ip =============================================================================\n";
 	    $this->gtitre(__FUNCTION__);
 	    if  (!$this->ip4service8db($this->ip2id) ) {
 	        $this->ip4service2display();
@@ -2236,11 +2224,12 @@ public function ip2vhost(){
 	        if ($this->flag_poc)  $this->ip4service2display();
 	    }
 	    echo "End ".__FUNCTION__.":$this->ip =============================================================================\n";
+	    $this->pause();
 	}
 	
 	
 	public function ip4pentest(){
-	    echo "=============================================================================\n";
+	    echo "START ".__FUNCTION__.":$this->ip =============================================================================\n";
 	    $this->gtitre(__FUNCTION__);
 	    if  (!$this->ip4pentest8db($this->ip2id) ) {
 	        $this->ip4pentest2display();
@@ -2251,16 +2240,25 @@ public function ip2vhost(){
 	        if ($this->flag_poc)  $this->ip4pentest2display();
 	    }
 	    echo "End ".__FUNCTION__.":$this->ip =============================================================================\n";
+	    $this->pause();
+	}
+	
+	
+	public function ip4rsm(){
+	    echo "START ".__FUNCTION__.":$this->ip =============================================================================\n";
+	    $this->ip4info();
+	    $this->ip4service();
+	    //$this->ip2os();
+	    echo "End ".__FUNCTION__.":$this->ip =============================================================================\n";	    
+        $this->pause();
 	}
 	
 	public function ip4pentest2display(){ // OK
-	    echo "=============================================================================\n";
+	    echo "START ".__FUNCTION__.":$this->ip =============================================================================\n";
 	    $this->gtitre(__FUNCTION__);
-	    $this->ip4info();$this->pause();
-	    $this->ip4service();$this->pause();
-	    $this->ip4enum2users();$this->pause();
-	    $this->ip2os();$this->pause();
+	    $this->ip4rsm();$this->pause();
 	    $this->ip4web();$this->pause();
+	    $this->ip4enum2users();$this->pause();	    	    
 	    $this->ip2auth();$this->pause();
 		//$this->ip2cve();$this->pause();
 		//$result .=  $this->ip2vuln();$this->pause();
@@ -2300,13 +2298,21 @@ public function ip2vhost(){
 	    $this->ssTitre(__FUNCTION__);
 	    $tab_ip2users4shell = array("root");
 	    $sql_r_2 = "SELECT distinct(user2name) FROM USERS WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' AND ( from_base64(user2infos) LIKE \"%/bin/sh%\" OR from_base64(user2infos) LIKE \"%/bin/bash%\") ) ORDER by user2name ASC ";
-	    //echo "$sql_r_2\n";
+	    echo "$sql_r_2\n";
+	    $conn = $this->mysql_ressource->query($sql_r_2);
+	    while($row = $conn->fetch_assoc()){
+	        $user2name = trim($row["user2name"]);
+	        $tab_ip2users4shell[] = $user2name ;
+	    }
+	    $sql_r_2 = "SELECT distinct(user2name) FROM AUTH WHERE id8port IN (select id from PORT where id8ip = '$this->ip2id' ) AND ( user2name != '' )  ";
+	    echo "$sql_r_2\n";
 	    $conn = $this->mysql_ressource->query($sql_r_2);
 	    while($row = $conn->fetch_assoc()){
 	        $user2name = trim($row["user2name"]);
 	        $tab_ip2users4shell[] = $user2name ;
 	    }
 	    $tab_ip2users4shell = array_reverse(array_filter(array_unique($tab_ip2users4shell)));
+	    var_dump($tab_ip2users4shell);
 	    return $tab_ip2users4shell;
 	}
 	

@@ -667,7 +667,7 @@ class SERVICE extends service2ssh {
 	            foreach ($this->tab_sudo8app2shell as $app){
 	                if (!empty($app)){
 	                    if (strstr($rst_app,$app)!==FALSE){
-	                        $obj_bin = new bin4linux($app);
+	                        $obj_bin = new bin4linux($this->stream,$app);
 	                        $this->log2succes("Found APP to Bash");
 	                        $this->article("APP", $obj_bin->file_path);
 	                        $query = "echo '$rst_app' | grep '$app' ";
@@ -1110,164 +1110,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 	    
 	    
 	}
-	
-	public function file4exist8name($stream,$filename):bool{
-	    $this->ssTitre(__FUNCTION__);
-	    $filepath = $this->file4locate($stream,$filename);
-	    if (!empty($filepath)){
-	        return TRUE;
-	    }
-	    ELSE return FALSE;
-	}
-	
-	public function file4exist8path($stream,$filepath):bool{
-	    $this->ssTitre(__FUNCTION__);
-	    $filepath_found = "";
-	    $data = "ls -al $filepath";
-	    $filepath_found = $this->req_str($stream,$data, $this->stream_timeout,"| awk '{print $9}' $this->filter_file_path ");
-	    
-	    if (!empty($filepath_found)){
-	        $chaine = "file exist";
-	        $this->note($chaine);
-	        return TRUE;
-	    }
-	    else {
-	        $chaine = "file does not exist";
-	        $this->rouge($chaine);
-	        return FALSE;
-	    }
-	}
-	
-	public function file4locate($stream,$filename){
-	    $this->ssTitre(__FUNCTION__);
-	    
-	    $data = "which $filename ";
-	    $files_found = "";
-	    $files_found = trim($this->req_str($stream,$data,$this->stream_timeout*3,"$this->filter_file_path | grep '$filename' "));
-	    if( !empty($files_found)) return $files_found ;
-	    
-	    $data = "locate $filename ";
-	    $files_found = "";
-	    $files_found = trim($this->req_str($stream,$data,$this->stream_timeout*3,"$this->filter_file_path | grep '$filename' "));
-	    if( !empty($files_found)) return $files_found ;
-	    
-	    
-	    $data = "find / -iname $filename -type f -exec ls {} \; 2> /dev/null ";
-	    $files_found = "";
-	    $files_found = trim($this->req_str($stream,$data,$this->stream_timeout*3,"$this->filter_file_path | grep '$filename' "));
-	    if( !empty($files_found)) return $files_found ;
-	}
-	
-	public function file4search8path($stream,$file_path,$search_data):bool{
-	    $this->ssTitre(__FUNCTION__);
-	    $search_data = trim($search_data);
-	    
-	    $data = "cat $file_path";
-	    $lines_str = $this->req_str($stream,$data,$this->stream_timeout,"| grep '$search_data' ");
-	    
-	    if (strstr($lines_str, $search_data)!==FALSE)
-	    {
-	        $this->article($search_data, "Found ");
-	        return TRUE ;
-	    }
-	    
-	    $this->article($search_data, "Not Found");
-	    return FALSE;
-	}
-	
-	public function file4add($stream,$filename,$add_data){
-	    $this->ssTitre(__FUNCTION__);
-	    $obj_filename = new FILE($stream,$filename);
-	    
-	    if ($this->file4search8path($stream,$obj_filename->file_path, $add_data)){
-	        $this->note("Already Added: $add_data");
-	        return TRUE;
-	    }
-	    else {
-	        $this->note("ADD: $add_data");
-	        $this->req_str($stream,"echo '$add_data' >> $obj_filename->file_path",$this->stream_timeout,"");
-	        $data = "cat $obj_filename->file_path";
-	        $rst = $this->req_str($stream,$data,$this->stream_timeout,"| grep '$add_data' | grep -Po '$add_data'  ");
-	        if (!empty($rst)) {$this->log2succes("SUCCES ADD: $add_data");return TRUE;}
-	        else {$this->log2error("Failed ADD");return FALSE;}
-	    }
-	    
-	}
-	
-	
-	public function file4writable($stream,$filename){
-	    $this->ssTitre(__FUNCTION__);
-	    $writable_rst = array();
-	    if ($this->file4exist8path($stream,$filename)){
-	        $data = "stat $filename";
-	        $writable_test = trim($this->req_str($stream,$data,$this->stream_timeout,""));
-	        if (preg_match('/[0-7]{3}(?<user2write>[0-7]{1})\/[rwx\-]{7}/',$writable_test,$writable_rst))
-	        {
-	            if (isset($writable_rst['user2write'])){
-	                $this->article("User Permission",$writable_rst['user2write']);
-	                if ($writable_rst['user2write']>6) {
-	                    $this->rouge("Writeable $filename");
-	                    return TRUE;}
-	                    else {$this->note("Not Writeable less 6 $filename");return FALSE;}
-	            }
-	        }
-	        else {$this->note("Not Writeable $filename");return FALSE;}
-	    }
-	}
-	
-	public function file4readable($stream,$filename){
-	    $this->ssTitre(__FUNCTION__);
-	    $readable_rst = array();
-	    $data = "stat $filename";
-	    $readable_test = trim($this->req_str($stream,$data,$this->stream_timeout,""));
-	    if (preg_match('/[0-7]{3}(?<user2read>[0-7]{1})\/[rwx\-]{7}/',$readable_test,$readable_rst))
-	    {
-	        if (isset($readable_rst['user2read'])){
-	            $this->article("readable",$readable_rst['user2read']);
-	            if ($readable_rst['user2read']>4) {
-	                $this->note("readable $filename");
-	                return TRUE;}
-	                
-	        }
-	    }
-	    else {$this->note("Not readable $filename");return FALSE;}
-	}
-	
-	
-	
-	public function file4replace($stream,$filename,$search_data,$replace_data){
-	    $result = "";
-	    $this->ssTitre(__FUNCTION__);
-	    $obj_filename = new FILE($stream,$filename);
-	    
-	    if ($this->file4search8path($stream,$obj_filename->file_path,$search_data)){
-	        $data = "cat $obj_filename->file_path";
-	        $lines_tab = $this->req_tab($stream,$data,$this->stream_timeout,"");
-	        
-	        foreach ($lines_tab as $line){
-	            if (preg_match('#['.$search_data.']#',$line))
-	            {
-	                $this->article("Searching", "Found ");
-	                $result .= str_replace($search_data, $replace_data, $line);
-	            }
-	            else {
-	                $result .= $line;
-	            }
-	        }
-	        
-	        $this->article("Replacing", "Data ");
-	        $data = "echo '$result' > $obj_filename->file_path";
-	        $this->req_str($stream,$data,$this->stream_timeout,"");
-	        
-	    }
-	    else {
-	        $this->note("Data Not found: $search_data");
-	    }
-	    
-	    return $result;
-	}
-	
-	
+
 	
 	public function check4id8db($id8port,$templateB64_id,$id8b64):bool{
 	    $sql_w = "SELECT templateB64_id FROM LAN WHERE id8port = $id8port AND templateB64_id = '$templateB64_id' AND id8b64 = '$id8b64' ";
@@ -1483,14 +1326,10 @@ This can also be used to determine local IPs, as well as gain a better understan
 	
 	public function service2ident(){
 	    $result = "";
-	    $result .= $this->ssTitre(__FUNCTION__);
-	    $query = "echo '$this->root_passwd' | sudo -S nmap -n  -Pn --reason --script \"auth-owners\" $this->ip -s$this->protocol -p $this->port -e $this->eth -oX - ";
+	    $this->ssTitre(__FUNCTION__);
+	    $query = "echo '$this->root_passwd' | sudo -S nmap -n  -Pn --reason --script \"auth-owners\" $this->ip -s$this->protocol -e $this->eth -oX - ";
 	    $result .= $this->cmd("localhost",$query);
 	    $result .= $this->auth2login4nmap($this->req_ret_str($query),__FUNCTION__);
-	    
-	    
-	    $query = "perl /opt/ident-user-enum/ident-user-enum.pl $this->ip $this->port";
-	    $result .= $this->cmd("localhost",$query);  $result .= $this->req_ret_str($query);
 	    
 	    return $result;
 	}
@@ -1642,6 +1481,22 @@ This can also be used to determine local IPs, as well as gain a better understan
 	}
 	
 	
+	public function service2users8wordpress(){
+	    $this->ssTitre(__FUNCTION__);
+	    $query = "echo '$this->root_passwd' | sudo -S nmap -n $this->ip -p $this->port -e $this->eth --script http-wordpress-users ";
+	    $this->auth2login4nmap($this->req2BD($this->colonne,$this->table,"$this->port2where AND service2name = '$this->service_name' AND service2version = '$this->service_version' ",$query),__FUNCTION__);
+	    
+	}
+	
+	
+	public function service2kerberos($domain){
+	    $this->ssTitre(__FUNCTION__);
+	    $domain = trim($domain);
+	    if (empty($domain))  $domain = $this->domain;
+	    $query = "echo '$this->root_passwd' | sudo -S nmap -n $this->ip -p $this->port -e $this->eth --script krb5-enum-users --script-args krb5-enum-users.realm='$domain' ";
+	    return $this->auth2login4nmap($this->req2BD($this->colonne,$this->table,"$this->port2where AND service2name = '$this->service_name' AND service2version = '$this->service_version' ",$query),__FUNCTION__);
+	    
+	}
 	
 	public function service2shell(){
 	    $result = "";
@@ -1946,7 +1801,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 	    $this->article("Date Now", $date_now);
 	    $this->article("Date Rec", $this->date_rec);
 
-	    $this->article("HOST", $this->tab($this->ip2host()));
+	    
 	    $this->article("ID PORT", $this->port2id);
 	    $this->article("PORT NUMBER", $this->port);
 	    $this->article("PROTOCOL", $this->protocol);
@@ -2098,23 +1953,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 	}
 
 	public function service2web4info(){
-	    $result = "";
 	    $this->ssTitre(__FUNCTION__);
-	    
-	    //$this->ip2vhost();
-	    /*
-	    $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,"http://$this->ip:$this->port/");
-		$obj_web->poc($this->flag_poc);		
-		//$obj_web->web4info();
-		$obj_web->web4info8nmap();$obj_web->web2scan4gui4zap();
-		//if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
-		
-		$obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,"https://$this->ip:$this->port/");
-		$obj_web->poc($this->flag_poc);
-		//$obj_web->web4info();
-		$obj_web->web4info8nmap();$obj_web->web2scan4gui4zap();
-		//if($obj_web->web2check_200()) $result .= $obj_web->web4pentest();
-*/
 		
 		$host = "";
 		$hosts = $this->ip2host();
@@ -2122,22 +1961,20 @@ This can also be used to determine local IPs, as well as gain a better understan
 		    foreach ($hosts as $host){
 		        $host = trim($host);
 		        if (!empty($host)){
-		        $url = "http://$host:$this->port/";
-		        $code = $this->url2code($url);
-		        if (($code==="200") || ($code==="301")){
+		            $url = "http://$host:$this->port/";
 		            $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,$url);
-		$obj_web->poc($this->flag_poc);
-		$obj_web->web4info();
-		        }
-
-		        $url = "https://$host:$this->port/";
-		        $code = $this->url2code($url);
-		        if (($code==="200") || ($code==="301")){
+		            $obj_web->poc($this->flag_poc);
+		            $obj_web->web4info();
+		            
+		            
+		            $url = "https://$host:$this->port/";
 		            $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,$url);
-		$obj_web->poc($this->flag_poc);
-		$obj_web->web4info();
+		            $obj_web->poc($this->flag_poc);
+		            $obj_web->web4info();
+		        		    
 		        }
-		    }
+		        
+		    
 		    }
 		}
 		

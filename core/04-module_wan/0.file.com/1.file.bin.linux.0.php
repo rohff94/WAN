@@ -2072,6 +2072,8 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	    $this->ssTitre(__FUNCTION__);
 	    $target_ip = trim($target_ip);
 	    $attacker_ip = $this->ip4addr4target($target_ip);
+	    $ip_attacker = $attacker_ip;
+	    
 	    $cmd = trim($cmd);
 
 	    
@@ -2084,7 +2086,7 @@ L’espace noyau allant de 0xC0000000 à 0xFFFFFFFF ");
 	    $data_rst = "";
 	    $sha1_hash = sha1($cmd.time());
 	    
-	    $ip_attacker = $this->ip4addr4target($this->ip);
+	    
 	    $filename = "socat";
 	    $path_remotebin_socat = $this->bin2path($this->stream,$filename,$ip_attacker);
 	    

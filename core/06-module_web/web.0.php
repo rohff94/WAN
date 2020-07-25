@@ -246,7 +246,6 @@ https://sitereport.netcraft.com/?url=https%3A%2F%2Fwww.massagesessel-sanazen.de%
 https://www.web4future.com/free/cms-detector.htm
 https://whatcms.org/?s=www.massagesessel-sanazen.de
 https://cmsdetect.com/
-
 	     * */
 	    $query = " "; //
 	    return $this->req_ret_tab($query);
@@ -565,7 +564,7 @@ https://cmsdetect.com/
 			foreach ($tab_urls as $url){
 			    $url = trim($url);			    
 			    if(!empty($url)){
-			$obj_url = new URL($this->eth,$this->domain,$url);	
+			$obj_url = new URL($this->stream,$this->eth,$this->domain,$this->ip,$url);	
 			$obj_url->poc($this->flag_poc);
 			$result .= $obj_url->url4pentest();
 			$this->pause();
@@ -606,7 +605,7 @@ https://cmsdetect.com/
 		        $tmp_robots = array();
 		        exec("echo '$robots' $this->filter_file_path ",$tmp_robots);
 		        foreach ($tmp_robots as $val) {
-		            if(!empty($val))   $tab_tmp[] = "$this->http_type://$this->ip:$this->port".trim($val);
+		            if(!empty($val))   $tab_tmp[] = "$this->http_type://$this->vhost:$this->port".trim($val);
 		        }
 		        $this->article("URLs from robot.txt", $this->tab($tmp_robots));
 		        $this->pause();
@@ -614,13 +613,14 @@ https://cmsdetect.com/
 		        $nmap = $this->web2enum();
 		        echo $nmap;
 		        exec("echo '$nmap' $this->filter_file_path ",$tab_enum1);
-		        foreach ($tab_enum1 as $val) if(!empty($val))   $tab_tmp[] = "$this->http_type://$this->ip:$this->port".trim($val);
+		        foreach ($tab_enum1 as $val) if(!empty($val))   $tab_tmp[] = "$this->http_type://$this->vhost:$this->port".trim($val);
 		        $this->article("URLs from enum", $this->tab($tab_enum1));
 		        $this->pause();
 
+		        
 		        $scancli = $this->web2scan4cli();
 		        exec("echo '$scancli' $this->filter_file_path ",$tab_enum2);
-		        foreach ($tab_enum2 as $val) if(!empty($val))   $tab_tmp[] = "$this->http_type://$this->ip:$this->port".trim($val);
+		        foreach ($tab_enum2 as $val) if(!empty($val))   $tab_tmp[] = "$this->http_type://$this->vhost:$this->port".trim($val);
 		        $this->article("URLs from scanCLI", $this->tab($tab_enum2));
 		        $this->pause();
 		        
@@ -648,7 +648,7 @@ https://cmsdetect.com/
 		        foreach ($tab_tmp as $url){
 			    $url = $this->url2norme($url);
 			    $code = $this->url2code($url);
-			    if ( (!empty($url)) && ($code!=="404") && ($code!=="403")  ){
+			    if ( (!empty($url)) && (($code!=="404") || ($code!=="403") || ($code!=="000")) ){
 			        $tab_spider = $this->web2urls4spider($url);
 			        $tab_final[] = $url;
 			        foreach ($tab_spider as $val) if (!empty($val)) $tab_final[] = $val;
@@ -707,6 +707,14 @@ https://cmsdetect.com/
 		    
 		    $query = "cd /opt/crawlbox/;python2 crawlbox.py -u '$url' -w '$dico'  | grep '200' ";
 		    */
+		    
+		    $test_url = sha1("test url by rohff");
+		    $url_test = "$url$test_url.html";
+		    $code = $this->url2code($url_test);
+
+		    $this->web2response($code);
+		    if ( ($code==="404") ){
+		    
 		    $query = "wc -l $dico";
 		    $this->requette($query);
 		    $this->pause();
@@ -720,6 +728,7 @@ https://cmsdetect.com/
 		        $code = trim($code);
 		        echo "$i/$size: ".$this->web2response($code);
 		        switch ($code) {
+		            case "000" :
 		            case "403" :
 		            case "404" :
 		                break;
@@ -728,19 +737,25 @@ https://cmsdetect.com/
 		                break;
 		        }
 		    }
-
+		    
 		    $req_result_tab = explode("\n", $req_result);
 		    
 		    if (count($req_dico)<=count($req_result_tab)) $result = array("");
 		    else $result = $req_result_tab;
 		    
 		    $this->article("URLs FROM DICO", $this->tab($result)) ;
+		    }
 		    $this->pause();
 		    return $result;
 		}
 	
+		public function web2tcptraceroute(){
+		$query = "echo '$this->root_passwd' | sudo -S tcptraceroute $this->vhost $this->port ";
+		return $this->req_ret_str($query);
+		}
+		
 		public function web2dico():array{
-		    $tab_result = array();
+		    $tab_final = array();
            $this->ssTitre(__FUNCTION__);//  -e use_proxy=yes -e http_proxy=$this->proxy_addr:$this->proxy_port --spider 
            $sql_r_1 = "SELECT ".__FUNCTION__." FROM ".__CLASS__." WHERE $this->web2where AND ".__FUNCTION__." IS NOT NULL";
            if ($this->checkBD($sql_r_1) ) return  explode("\n", base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,$this->web2where)));
@@ -785,21 +800,7 @@ https://cmsdetect.com/
 	
 	public function web2scan4gui4zap(){
 		$this->ssTitre(__FUNCTION__);
-		// /ZAP_2.4.0/zap.sh -port 8090 -host 0.0.0.0 -newsession /ZAP_2.4.0/session/test8 -daemon &
-		// -config scanner.attackOnStart=true -config view.mode=attack
-		// -config scanner.attackPolicy=MyAttackPolicy
-	/*	
-		while (!$this->tcp2open("127.0.0.1", $this->proxy_port_zap)) {
-        $filename = "/opt/zaproxy/zap.sh";
-        $this->article("ZAP","localproxy $this->proxy_port_burp without connection outgoing  ");        
-		$this->cmd("Using TOR","echo '$this->root_passwd' | sudo -S bash $filename -DsocksProxyHost=127.0.0.1-DsocksProxyPort=9050");
-		//if(!file_exists($filename)) $this->install_web2scan4gui4zap();
-		$this->cmd("localhost","bash $filename");
-		sleep(30);
-	}
-	*/
-	$this->requette("wget -qO- --no-check-certificate --timeout=2 --tries=1 -e use_proxy=yes -e http_proxy=$this->proxy_addr:$this->proxy_port_zap  -e https_proxy=$this->proxy_addr:$this->proxy_port_zap \"$this->web\" --user-agent='$this->user2agent' > /dev/null ");
-	
+	$this->requette("wget -qO- --no-check-certificate --timeout=2 --tries=1 -e use_proxy=yes -e http_proxy=$this->proxy_addr:$this->proxy_port_zap  -e https_proxy=$this->proxy_addr:$this->proxy_port_zap \"$this->web\" --user-agent='$this->user2agent' > /dev/null ");	
 	}
 	
 
@@ -858,7 +859,7 @@ https://cmsdetect.com/
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->web2where"));
 	    else {
 	        $code_http = $this->url2code($this->web);
-	        if ( (!empty($this->web)) && ($code_http!=="404") && ($code_http!=="403")  )
+	        if ( (!empty($this->web)) && ($code_http!=="404") && ($code_http!=="403") && ($code_http!=="000")  )
 		{
 		    // https://kalilinuxtutorials.com/curate-tool-archived-urls/
 		$result .= $this->web2scan4cli4nikto(); // OK 		
@@ -1392,10 +1393,10 @@ https://cmsdetect.com/
 	public function web4info2display(){
 	    $this->titre(__FUNCTION__);
 	    $result = "";
-
 	    
 	    $this->web2scan4gui4zap();
 	    $result .= $this->web4info8nmap();$this->pause();
+	    $result .= $this->web2tcptraceroute();$this->pause();
 	    $tab_urls = $this->web2urls();
 	    $this->article("ALL URLs For Testing", $this->tab($tab_urls));
 	    $this->pause();
@@ -1408,8 +1409,6 @@ https://cmsdetect.com/
 	            $result .= $this->tab($this->web2cms8local($url));
 	        }
 	    }
-
-	   
 	        //var_dump($meta_tags);
 	    
 	    echo $result;$this->pause();
