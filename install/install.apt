@@ -167,6 +167,7 @@ ngrep
 nikto
 nstreams
 odt2txt
+onesixtyone
 openjdk-8-jdk
 openjfx
 p0f
@@ -256,6 +257,8 @@ siege
 sleuthkit
 smbclient
 snap
+snmp
+snmp-mibs-downloader
 source-highlight
 sqlite3
 ssdeep

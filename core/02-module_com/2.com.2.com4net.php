@@ -213,6 +213,14 @@ class com4net extends com4user {
     }
     
     
+    public function host2domain($host){
+        $host = trim($host);
+        $domain = "";
+        if (!empty($host)) $domain = exec("echo '$host' | grep -Po -i \"[0-9a-z_\-]{1,}\.[a-z]{2,5}$\" ");
+        else $this->log2error("empty HOST:$host:".__FILE__.__LINE__);
+        return $domain;
+    }
+    
     public function isDomain($domain){
         $tmp = array();
         $domain = trim($domain);
@@ -266,7 +274,7 @@ class com4net extends com4user {
         $this->ssTitre(__FUNCTION__.":$ip:$port");
         $tmp = array();
         $ip = trim($ip);$port = trim($port);
-        $query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --open -p $port $ip -e ".$this->ip4eth4target($ip)." 2> /dev/null | grep '$port/tcp' ";
+        $query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --open -p $port $ip --reason -e ".$this->ip4eth4target($ip)." 2> /dev/null | grep '$port/tcp' ";
         //$query = "wget --server-response --timeout=2 --tries=2 -e use_proxy=yes -e http_proxy=$this->proxy_addr:$this->proxy_port -e https_proxy=$this->proxy_addr:$this->proxy_port --spider \"$this->url\" 2>&1 | grep '200 OK' ";
         exec($query,$tmp);
         if (!empty($tmp)) return TRUE; else return FALSE;
@@ -305,16 +313,36 @@ class com4net extends com4user {
     }
     
 
+    public function vps4service2run4test($service2name,$service2exec){
+        $this->ssTitre(__FUNCTION__);
+        $tab_services = array();
+        $service2name = trim($service2name);
+        
+        
+        $file_path = "/tmp/services.$service2name.lst";
+        if (!file_exists($file_path)) $tab_services = $this->run8vps4list($service2name);
+        else $tab_services = file($file_path);
+        $size_tab = count($tab_services);
+        for($i=0;$i<$size_tab;$i++){
+        list($eth,$domain,$ip,$port,$protocol) = explode(" ", $tab_services[$i]);
+        $service2exec = trim($service2exec);
+        $protocol = trim($protocol);
+        $query = "php pentest.php SERVICE \"$eth $domain $ip $port $protocol $service2exec FALSE\" ";
+        $this->requette($query);
+        $this->pause();
+        }
+        
+    }
    
         
         public function run8vps4list($service2enum){
             $this->ssTitre(__FUNCTION__);
             $service2enum = trim($service2enum);
             
-            $sql = "select eth,domain,ip,port,protocol FROM PORT JOIN IP ON IP.id = PORT.id8ip JOIN DOMAIN ON DOMAIN.id = IP.id8domain JOIN ETH ON ETH.id = DOMAIN.id8eth where PORT.id IN (select id8port FROM SERVICE where service2name = '$service2enum') ORDER BY domain ;";
+            $sql = "select eth,domain,ip,port,protocol FROM PORT JOIN IP ON IP.id = PORT.id8ip JOIN DOMAIN ON DOMAIN.id = IP.id8domain JOIN ETH ON ETH.id = DOMAIN.id8eth where PORT.id IN (select id8port FROM SERVICE where service2name LIKE \"%$service2enum%\" ) ORDER BY ip ASC ;";
             $this->article("SQL ", $sql);
             
-            $file_path = "/tmp/services.$service2enum.lst";
+            $file_path = "/tmp/services.$service2enum.db";
             
             if ( $ids = $this->mysql_ressource->query($sql) ) {
                 $fp = fopen("$file_path.tmp", 'w+');
@@ -343,6 +371,79 @@ class com4net extends com4user {
         
         
    
+        public function run8vps4service2fork8($service2name,$service2exec){
+            $service2name = trim($service2name);
+            $service2exec = trim($service2exec);
+
+            $fork = 8 ;
+            $poc = new com4code();
+            $time = 1 ;
+            
+            $this->ssTitre(__FUNCTION__);
+            $tab_services = array();
+            $service2name = trim($service2name);
+            
+            
+            $file_path = "/tmp/services.$service2name.db";
+            if (!file_exists($file_path)) $tab_services = $this->run8vps4list($service2name);
+            else $tab_services = file($file_path);
+            $query = "wc -l $file_path";
+            $this->requette($query);
+            sleep(3);
+            $size_tab = count($tab_services);
+            $service2exec = trim($service2exec);
+            for($i=0;$i<$size_tab;){
+                $tab_services[$i] = trim($tab_services[$i]);
+                list($eth,$domain,$ip,$port,$protocol) = explode(" ", $tab_services[$i]);               
+                $cmd1 = "php pentest.php SERVICE \"$eth $domain $ip $port $protocol $service2exec FALSE\" ";
+                
+                $tab_services[$i+1] = trim($tab_services[$i+1]);
+                list($eth,$domain,$ip,$port,$protocol) = explode(" ", $tab_services[$i+1]);
+                $cmd2 = "php pentest.php SERVICE \"$eth $domain $ip $port $protocol $service2exec FALSE\" ";
+                $cmdf1 = $poc->exec_para4print($cmd1, $cmd2, $time);
+                
+                $tab_services[$i+2] = trim($tab_services[$i+2]);
+                list($eth,$domain,$ip,$port,$protocol) = explode(" ", $tab_services[$i+2]);
+                $cmd3 = "php pentest.php SERVICE \"$eth $domain $ip $port $protocol $service2exec FALSE\" ";
+                
+                $tab_services[$i+3] = trim($tab_services[$i+3]);
+                list($eth,$domain,$ip,$port,$protocol) = explode(" ", $tab_services[$i+3]);
+                $cmd4 = "php pentest.php SERVICE \"$eth $domain $ip $port $protocol $service2exec FALSE\" ";
+                $cmdf2 = $poc->exec_para4print($cmd3, $cmd4, $time);
+                
+                $cmda = $poc->exec_para4print($cmdf1, $cmdf2, $time);
+                
+                $tab_services[$i+4] = trim($tab_services[$i+4]);
+                list($eth,$domain,$ip,$port,$protocol) = explode(" ", $tab_services[$i+4]);
+                $cmd5 = "php pentest.php SERVICE \"$eth $domain $ip $port $protocol $service2exec FALSE\" ";
+                
+                $tab_services[$i+5] = trim($tab_services[$i+5]);
+                list($eth,$domain,$ip,$port,$protocol) = explode(" ", $tab_services[$i+5]);
+                $cmd6 = "php pentest.php SERVICE \"$eth $domain $ip $port $protocol $service2exec FALSE\" ";
+                $cmdg1 = $poc->exec_para4print($cmd5, $cmd6, $time);
+                
+                $tab_services[$i+6] = trim($tab_services[$i+6]);
+                list($eth,$domain,$ip,$port,$protocol) = explode(" ", $tab_services[$i+6]);
+                $cmd7 = "php pentest.php SERVICE \"$eth $domain $ip $port $protocol $service2exec FALSE\" ";
+                
+                $tab_services[$i+7] = trim($tab_services[$i+7]);
+                list($eth,$domain,$ip,$port,$protocol) = explode(" ", $tab_services[$i+7]);
+                $cmd8 = "php pentest.php SERVICE \"$eth $domain $ip $port $protocol $service2exec FALSE\" ";
+                $cmdg2 = $poc->exec_para4print($cmd7, $cmd8, $time);
+                
+                $cmdg = $poc->exec_para4print($cmdg1, $cmdg2, $time);
+                
+                $cmd = $poc->exec_para4print($cmda, $cmdg, $time);
+                $poc->jaune($cmd);
+                sleep(10);
+                $poc->exec_parallel($cmda, $cmdg, $time);
+                $i = $i+$fork;
+                
+                //return $cmd;
+            }
+            
+
+        }
     
     
     public function run8vps4domain2fork32($file_path,$fonction2exec,$eth){

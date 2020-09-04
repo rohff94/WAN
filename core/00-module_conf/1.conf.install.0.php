@@ -178,28 +178,42 @@ class INSTALL extends CONFIG{
 		$this->requette("echo '$this->root_passwd' | sudo -S $this->dir_install/localhost/Rapid7Setup-Linux64.bin");
 	}
 	
-	function install_scanner_openvas(){
+	
+	function update_scanner_openvas9(){
+	    $this->ssTitre("Update the vulnerability database");
+	    $this->requette("docker exec -it openvas greenbone-nvt-sync");$this->pause();
+	    $this->requette("docker exec -it openvas greenbone-scapdata-sync");$this->pause();
+	    $this->requette("docker exec -it openvas greenbone-certdata-sync");$this->pause();
+	    $this->requette("docker exec -it openvas service openvas-scanner status");$this->pause();
+	    $this->requette("docker exec -it openvas --rebuild --progress");$this->pause();
+	    $this->requette("docker exec -it openvas service openvas-scanner status");$this->pause();
+	    $this->requette("docker exec -it openvas openvas-check-setup");$this->pause();
+	    
+	}
+	
+	function install_scanner_openvas9(){
 	    $this->ssTitre(__FUNCTION__);
-	    $this->requette("echo '$this->root_passwd' | sudo -S apt install -y openvas");
-	    $this->requette("echo '$this->root_passwd' | sudo -S openvas-setup");
-	    $this->requette("echo '$this->root_passwd' | sudo -S netstat -antp | grep -E \"(openvas|gsad)\" ");
-	    $this->requette("echo '$this->root_passwd' | sudo -S openvas-start");
 	    
-	    $this->requette("echo '$this->root_passwd' | sudo -S greenbone-nvt-sync");
-	    $this->requette("echo '$this->root_passwd' | sudo -S greenbone-scapdata-sync");
-	    $this->requette("echo '$this->root_passwd' | sudo -S greenbone-certdata-sync");
 	    
-	    $this->requette("echo '$this->root_passwd' | sudo -S openvassd");
-	    $this->requette("echo '$this->root_passwd' | sudo -S openvasmd");
-	    $this->requette("echo '$this->root_passwd' | sudo -S openvas-check-setup");
-	    $this->requette("echo '$this->root_passwd' | sudo -S openvas-setup");
-	    $this->requette("echo '$this->root_passwd' | sudo -S openvasmd --rebuild --progress");
-	    $this->requette("echo '$this->root_passwd' | sudo -S openvas-check-setup");
-	    $this->requette("echo '$this->root_passwd' | sudo -S openvasmd --create-user=$this->mysql_login");
-	    $this->requette("echo '$this->root_passwd' | sudo -S openvasmd --get-users");
-	    $this->requette("echo '$this->root_passwd' | sudo -S openvasmd --user=rohff --new-password=hacker");
-	    $this->requette("echo '$this->root_passwd' | sudo -S openvas-start");
-	    $this->requette("echo '$this->root_passwd' | sudo -S ss -ant | grep ':939' ");
+	    
+	    $this->requette("docker pull mikesplain/openvas:9");
+
+	    
+	    $this->requette("docker run -d -p 127.0.0.1:8443:443 --name openvas mikesplain/openvas:9");
+	    $this->requette("docker exec -it openvas  openvasmd --get-users");$this->pause();
+	    $this->requette("docker exec -it openvas  openvasmd --user=$this->mysql_login --new-password=$this->mysql_passwd");$this->pause();
+	    $this->requette("docker exec -it openvas  openvas-start");$this->pause();
+	    $this->requette("docker exec -it openvas service openvas-scanner restart");$this->pause();
+	    $this->requette("docker exec -it openvas service openvas-manager restart");$this->pause();
+	    $this->requette("docker exec -it openvas service openvas-scanner status");$this->pause();
+	    
+	    $this->requette("docker top openvas");$this->pause();
+	    
+	    
+
+	    $site = "https://127.0.0.1:8443/";
+	    $this->net($site);$this->pause();
+	    $this->update_scanner_openvas9();
 	}
 	
 	function install_scanner_metasploit(){
@@ -518,6 +532,15 @@ class INSTALL extends CONFIG{
 	    $this->requette("echo '$this->root_passwd' | sudo -S chown $this->user2local:$this->user2local -R /opt/XSStrike");
 	    $this->requette("cd /opt/XSStrike; pip3 install -r requirements.txt");
 	    $this->requette("cd /opt/XSStrike; python3 xsstrike.py ");
+	    
+	}
+	
+	public function install_cve_faraday(){
+	    $this->ssTitre(__FUNCTION__);
+	    $this->requette("echo '$this->root_passwd' | sudo -S faraday-manage initdb");
+	    $this->requette("echo '$this->root_passwd' | sudo -S systemctl start faraday-server");
+	    $this->requette("faraday-manage openapi-yaml");
+	    $this->requette("cd /opt/libssh-scanner; python3 libsshscan.py ");
 	    
 	}
 	

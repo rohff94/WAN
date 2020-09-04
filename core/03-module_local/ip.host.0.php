@@ -47,17 +47,6 @@ class HOST extends IP{
     
     
     
-    
-    
-    public function host2domain($host){
-        $tmp = array();
-        $rst = "";
-        exec("echo '$host' | grep -Po -i \"[0-9a-z_\-]{1,}\.[a-z]{2,5}$\" ",$tmp);
-        //var_dump($tmp);$this->pause();
-        if(!isset($tmp[0])) $rst = "";
-        else $rst = $tmp[0] ;
-        return $rst;
-    }
 
     
     

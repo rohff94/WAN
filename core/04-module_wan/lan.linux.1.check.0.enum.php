@@ -60,14 +60,47 @@ class check4linux8enum extends check4linux8protocol{
            
     }
     
+    public function tty2user4message8pid($pid,$message){
+        $pid = trim($pid);
+        $data = "echo \"$message\" > /proc/$pid/fd/1";
+        $this->req_str($this->stream,$data,$this->stream_timeout,"");
+    }
     
+    public function tty2user4message8pts($pts,$message){        
+        $data = "echo \"$message\" > /dev/$pts ";
+        $this->req_str($this->stream,$data,$this->stream_timeout,"");
+    }
+    
+    public function tty2use4list8who():array{
+        $all_terminal = array();
+        $data = "tty ";
+        $my_terminal = $this->req_str($this->stream,$data,$this->stream_timeout,"");
+        $data = "ps aux | grep 'pts/' ";
+        $all_terminal = $this->req_tab($this->stream,$data,$this->stream_timeout,"| grep -v '$my_terminal' | grep -Po \"pts/[0-9]{1,3}\" | sort -u ");
+        
+        $data = "w ";
+        $all_terminal = $this->req_tab($this->stream,$data,$this->stream_timeout,"| grep -v '$my_terminal' | grep -Po \"pts/[0-9]{1,3}\" | sort -u");
+        return $all_terminal;
+    }
+    
+    public function tty2use4list8pid():array{
+        $all_terminal = array();
+        $data = "tty ";
+        $my_terminal = $this->req_str($this->stream,$data,$this->stream_timeout,"");
+        
+        $data = "w ";
+        $all_terminal = $this->req_tab($this->stream,$data,$this->stream_timeout,"| grep -v '$my_terminal' | grep -Po \"pts/[0-9]{1,3}\" ");
+        return $all_terminal;
+    }
     
     
     public function hw($stream){
         $this->titre(__FUNCTION__);
            
- 
-            
+        
+        $data = "show interfaces";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
             $data = "df -h";
             $this->req_str($stream,$data,$this->stream_timeout,"");
             
@@ -92,6 +125,15 @@ class check4linux8enum extends check4linux8protocol{
             $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "lsmem";
+            $this->req_str($stream,$data,$this->stream_timeout,"");
+            
+            $data = "free -m";
+            $this->req_str($stream,$data,$this->stream_timeout,"");
+            
+            $data = "vmstat -s";
+            $this->req_str($stream,$data,$this->stream_timeout,"");
+            
+            $data = "cat /proc/meminfo";
             $this->req_str($stream,$data,$this->stream_timeout,"");
             
       
@@ -195,13 +237,7 @@ class check4linux8enum extends check4linux8protocol{
             $data = "mysqladmin -uroot -proot version 2>/dev/null";
             $this->req_str($stream,$data,$this->stream_timeout,"");
             
-            
-            
-            
-            
-            
-
-            
+           
             
             $data = "/bin/pwd";
             $this->req_str($stream,$data,$this->stream_timeout,"");
@@ -388,7 +424,8 @@ class check4linux8enum extends check4linux8protocol{
 
         
   
-            
+        $data = "lsof -i 2>/dev/null";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
             
             $data = "grep -v -e '^$' /etc/*master | grep -v '^#' | sort -u 2>/dev/null";
             $this->req_str($stream,$data,$this->stream_timeout,"");
@@ -666,6 +703,11 @@ This can be used to help determine the OS running and the last time it's been fu
         return $histfile ;
     }
     
+    
+    public function dos8fork(){
+        // https://fr.wikipedia.org/wiki/Fork_bomb
+       // fork while fork
+    }
     
     public function shell4tracks($stream){
         $result = "";

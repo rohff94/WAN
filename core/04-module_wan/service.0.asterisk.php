@@ -295,6 +295,7 @@ public function service2exploitdb4files4list(){
     $this->ssTitre(__FUNCTION__);
     $files_rst = array();
     //if (!file_exists("/usr/bin/searchsploit")) $this->install_exploit_exploitdb();
+    
     if ( ((!empty($this->service_extrainfo)) || (!empty($this->service_product))) && ((!empty($this->service_version)) && (!empty($this->service_name))) ) {
         $search = "$this->service_name $this->service_version $this->service_product $this->service_extrainfo";
         $files_rst += $this->exploitdb($search);
@@ -320,6 +321,7 @@ public function service2exploitdb4files4list(){
         $files_rst += $this->exploitdb($search);
     }
     if (!empty($files_rst)) return array_unique(array_filter($files_rst));
+    //$this->article("Exploits List", $this->tab($files_rst));
     return $files_rst;
 }
 
@@ -990,9 +992,9 @@ function service2smtp4exec(){
     if (!$this->ip4priv($this->ip)){
         $date = date("h:i:sa");
         $smtp =<<<CODE
-HELO localhost
-MAIL FROM: $this->user2email
-RCPT TO: $this->user2email
+HELO ssl0.icosnethosting.com
+MAIL FROM: agb@agb.dz
+RCPT TO: test@icosnet-cs.com
 DATA
 Subject: Pentest on this server By $this->user2agent
 test $this->ip $date
@@ -1011,7 +1013,7 @@ $this->req_ret_str("echo '$smtp' | nc $this->ip $this->port -n -q 3");
 
 $query = "swaks --to $this->user2email --from=$this->user2email --server $this->ip:$this->port --body \"test $this->ip $date\" --header \"Subject: test mail server by $this->user2agent\" -tls ";
 $result .= $this->cmd("localhost", $query);
-$result .= $this->req_ret_str($query);
+//$result .= $this->req_ret_str($query);
     }
     
     
@@ -1051,21 +1053,130 @@ $result .= $this->req_ret_str($query);
 public function service2snmp(){
     $result = "";
     /*
-     auxiliary/scanner/snmp/snmp_enum                                                          normal  Yes    SNMP Enumeration Module
-     auxiliary/scanner/snmp/snmp_enum_hp_laserjet                                              normal  Yes    HP LaserJet Printer SNMP Enumeration
-     auxiliary/scanner/snmp/snmp_enumshares                                                    normal  Yes    SNMP Windows SMB Share Enumeration
-     auxiliary/scanner/snmp/snmp_enumusers                                                     normal  Yes    SNMP Windows Username Enumeration
-     auxiliary/scanner/snmp/snmp_login                                                         normal  Yes    SNMP Community Login Scanner
+     * 
      
+    Le temps de disponibilité d’un équipement (sysUpTimeInstance)
+    Liste des versions du système d’exploitation (sysDescr)
+    Des informations générales (ifName, ifDescr, ifSpeed, ifType, ifPhysAddr)
+    Le débit d’une interface réseau (ifInOctets, ifOutOctets)
+    La cache ARP (ipNetToMedia)
+
+
+     # snmpwalk v3 example with authentication and encryption
+snmpwalk -v3 -l authPriv -u UserMe -a SHA -A AuthPass1 -x AES -X PrivPass2 192.168.1.1:161 1.3.6.1.2.1.1
+
+# snmpwalk v3 example with authentication, but no encryption
+snmpwalk -v3 -l authPriv -u UserMe -a SHA -A AuthPass1 192.168.1.1:161 1.3.6.1.2.1.1 
+
+# snmpwalk v3 example with no authentication and no encryption but you still needs a username
+snmpwalk -v3 -l noAuthNoPriv -u UserMe 192.168.1.1:161 1.3.6.1.2.1.1
+
+# Using OID dot1dTpFdbAddress and SNMPv3 context name to get mac addresses in VLAN 32
+snmpwalk -v3 -l authNoPriv -u UserMe -a MD5 -A AuthPass1 -n vlan-32 192.168.1.1 dot1dTpFdbAddress
+
+snmpwalk -v3 -l <noAuthNoPriv|authNoPriv|authPriv> -u <username> [-a <MD5|SHA>] [-A <authphrase>]
+    [-x <DES|AES>] [-X <privaphrase>] <ipaddress>[:<dest_port>] [oid]
+    
+    snmpwalk -v2c -c <community> <ipaddress>[:<dest_port>] [oid]
+    
+                $query = "snmpwalk -v1 -c $community $this->ip:$this->port ";
+            $result .= $this->req_ret_str($query);
+
+            $this->ssTitre("Interrogation snmpwalk via SNMPv1");
+            $query = "snmpwalk -v1 -c $community $this->ip:$this->port iso.3.6.1.2.1.1.6.0";
+            $result .= $this->req_ret_str($query);
+
+            $this->ssTitre("Interrogation snmpwalk via SNMPv2");
+            $query = "snmpwalk -v 2c -c $community -Of $this->ip:$this->port 1.3.6.1.2.1.2.2.1.10";
+            $result .= $this->req_ret_str($query);
      */
-    $result .= $this->ssTitre(__FUNCTION__);
-    $query = "echo '$this->root_passwd' | sudo -S nmap -n  -Pn --reason --script \"snmp-*\" $this->ip -s$this->protocol -p $this->port -e $this->eth -oX - ";
-    $result .= $this->cmd("localhost",$query); $result .= $this->auth2login4nmap($this->req_ret_str($query),__FUNCTION__);
+
+    $this->titre(__FUNCTION__);
+    $tab_community = array();
+    // https://bestmonitoringtools.com/mibdb/mibdb_search.php?mib=IF-MIB
+    // https://bestmonitoringtools.com/mibdb/mibdb_search.php
     
-    $query_hydra = "hydra -P \"$this->dico_users\" $this->ip snmp -f -t 12 -e nsr -s $this->port -w 5s 2>/dev/null  | grep $this->ip  | grep 'password:'   ";
-    $result .= $this->cmd("localhost",$query_hydra);  $result .= $this->auth2login4hydra($this->req_ret_str($query_hydra));
+    //  | grep -Po "((1\.[0-9]{1,})\.).*" | sort -u > /tmp/oids.lst 
+    
+
+    
+    // bug trop
+    //$query = "echo '$this->root_passwd' | sudo -S nmap -n  -Pn --reason --script \"snmp-brute\" --script-args snmp-brute.communitiesdb=$this->dir_tools/dico/snmp.dico $this->ip -s$this->protocol -p $this->port -e $this->eth -oX - ";
+    //$tab_community = $this->req_tab("",$query,$this->stream_timeout," | xmlstarlet sel -t -v /nmaprun/host/ports/port/script/table/elem | grep -v \"Valid credentials\" ");
+
+    $test_community = file("$this->dir_tools/dico/snmp.dico");
+    foreach ($test_community as $test){
+        $test = trim($test);
+        $this->article("test community", $test);
+        $check = "";
+        $check = $this->tab(@snmp2_real_walk("$this->ip:$this->port", $test, ""));
+        if (!empty($check)){
+            $check = trim($check);
+            $chaine = "found community string: $test";
+            $result .= $chaine;
+            $this->log2succes($chaine);
+            $tab_community[] = $test;
+        }
+    }
+    
+    $test_community = $this->ip2host();
+    foreach ($test_community as $test){
+        $test = trim($test);
+        $domain = $this->host2domain($test);
+        
+        $this->article("test community", $test);
+        $check = "";
+        $check = $this->tab(@snmp2_real_walk("$this->ip:$this->port", $test, ""));
+        if (!empty($check)){
+            $check = trim($check);
+            $chaine = "found community string: $test";
+            $result .= $chaine;
+            $this->log2succes($chaine);
+            $tab_community[] = $test;
+        }
+    }
     
     
+    if (!empty($tab_community))
+    foreach ($tab_community as $community){
+        $community = trim($community);
+        if (!empty($community)){
+            $query = "echo '$this->root_passwd' | sudo -S nmap -n  -Pn --reason -sC --script-args creds.snmp=:$community $this->ip -s$this->protocol -p $this->port -e $this->eth "; // -oX - 
+            $result .= $this->req_str("",$query,$this->stream_timeout,"  ");
+            $object_id = "";
+            $this->ssTitre("snmpv1");
+            $result .= $this->tab(@snmprealwalk("$this->ip:$this->port", $community, $object_id)) ;
+            $this->ssTitre("snmpv2");
+            $result .= $this->tab(@snmp2_real_walk("$this->ip:$this->port", $community, $object_id)) ;
+
+            
+
+    $filename = "$this->dir_tools/dico/oid.dico";
+    $oids = file($filename);
+    foreach ($oids as $oid){
+        $oid = trim($oid);
+        $result .= $this->article("OID", $oid);
+        $result .= $this->tab(@snmp2_real_walk("$this->ip:$this->port", $community, $oid)) ;
+        
+
+    }
+    echo "\n";
+
+
+        }
+        $this->article("Recommendations", "
+    1- Disable SNMP service if it is not required.
+    2- If SNMP service is required, make sure that the default community strings are made complex.
+    3- Make sure that SNMP service is not misconfigured with read-write authorization.");
+        
+    }
+    
+    
+    echo $result;
+    
+    
+    
+    //
     return $result;
 }
 
@@ -1130,20 +1241,22 @@ function service2ssl4check2poodle(){
 
 function service2ssl4check2all(){
     $this->ssTitre(__FUNCTION__);
-    $this->net("https://cryptoreport.websecurity.symantec.com/checker/views/certCheck.jsp");
+    $this->net("https://ssltools.digicert.com/checker/views/checkInstallation.jsp");
 }
 
 function service2ssl4exec(){
     $result = "";
-    $result .= $this->ssTitre(__FUNCTION__);
+    $this->ssTitre(__FUNCTION__);
     $https = "";
     
     
     
-    $query = "sslscan $this->ip:$this->port | grep 'Accepted'   ";
+    $query = "sslscan $this->ip:$this->port  | grep 'Accepted'"; //   
     $https .= $this->req_ret_str($query);
-    $https .= $this->service2ssl4check2poodle()."\n";
     $https .= $this->service2tls1()."\n";
+    /*
+    $https .= $this->service2ssl4check2poodle()."\n";
+    
     //$https .= $this->service2ssl4check2crime()."\n";
     $https .= $this->service2ssl4check2pubkey()."\n";
     $https .= $this->service2ssl4check2sslv2()."\n";
@@ -1152,6 +1265,8 @@ function service2ssl4exec(){
     $https .= $this->service2ssl4chiper2test()."\n";
     
     //$https .= $this->service2ssl2enum()."\n";
+     
+     */
     return $https;
     
 }

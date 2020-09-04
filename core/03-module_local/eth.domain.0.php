@@ -25,14 +25,15 @@ class DOMAIN extends ETH{
 
 
 	public function __construct($stream,$eth,$domain) {
-	    $this->domain = trim($domain);	
-	    
+	
+	    $this->domain = $this->host2domain($domain);
+	    if (empty($this->domain)) {
+	        $this->log2error("Empty DOMAIN".__FILE__.__LINE__);
+	        exit();
+	    }
 
 		//$this->domain = $this->req_ret_str("echo '$this->host' | sed \"s/\.$//g\" | grep -Po -i \"[0-9a-z]{1,}\.[0-9a-z]{2,5}\$\" ");
-	    exec("echo '$this->domain' | grep -Po -i \"[0-9a-z_\-]{1,}\.[a-z]{2,5}$\" ",$tmp);
-	    //var_dump($tmp);$this->pause();
-		if(!isset($tmp[0])) $this->domain = "";
-		else $this->domain = $tmp[0] ;
+
 
 			
 		parent::__construct($stream,$eth);
@@ -56,6 +57,8 @@ class DOMAIN extends ETH{
 		
 		
 	}
+	
+
 
 	
 

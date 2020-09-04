@@ -32,7 +32,10 @@ class PORT extends IP{
 
 
     public function __construct($stream,$eth,$domain,$ip,$port,$protocol) {
-        if(empty($port)) return $this->log2error("EMPTY PORT");
+        if(empty($port)) {
+            $this->log2error("EMPTY PORT:$eth,$domain,$ip,$port,$protocol");
+            exit();
+        }
 
 	// /usr/share/nmap/scripts/
         if($this->isIPv4($ip)) parent::__construct($stream,$eth,$domain,$ip);
@@ -43,7 +46,7 @@ class PORT extends IP{
 	        $this->port = trim($port);
 	    }
 	    else {
-	        $this->log2error("Error on Port Numner:$port_check - ID8PORT=$this->port2id");
+	        $this->log2error("Error on Port Number:$port_check - ID8PORT=$this->port2id");
 	    }
 	    
     
@@ -283,7 +286,14 @@ class PORT extends IP{
 	    echo $this->port2version();	    
 	}
 	
-
+	
+	
+	public function  port4pentest8db($port2id):bool{
+	    $port2id = trim($port2id);
+	    $sql_w = "SELECT port4pentest FROM PORT WHERE id = '$port2id' AND port4pentest = 1 ";
+	    return $this->checkBD($sql_w);
+	}
+	
 	public function port2fake($version_resu):bool{
 		$this->ssTitre(__FUNCTION__);
 		$resu = array();
@@ -372,21 +382,38 @@ class PORT extends IP{
 	
 	public function port4pentest(){
 	    
-	    $result = "";
+	    echo "START ".__FUNCTION__.":$this->ip:$this->port =============================================================================\n";
 	    $this->gtitre(__FUNCTION__);
+	    if  (!$this->port4pentest8db($this->port2id) ) {
+	        $this->port4pentest2run();
+	        
+	        $sql_ip = "UPDATE PORT SET port4pentest=1 WHERE id = $this->port2id  ";
+	        $this->mysql_ressource->query($sql_ip);
+	    }
+	    else  {
+	        if ($this->flag_poc)  $this->port4pentest2run();
+	    }
+	    echo "End ".__FUNCTION__.":$this->ip:$this->port =============================================================================\n";
+	    $this->pause();
+	    
+	}
+	
+	public function port4pentest2run(){
+	    $result = "";
+	    $this->titre(__FUNCTION__);
 		
 	        
 	    
-	        $service = new SERVICE($this->stream,$this->eth,$this->domain,$this->ip,$this->port,$this->protocol);
+	   $service = new SERVICE($this->stream,$this->eth,$this->domain,$this->ip,$this->port,$this->protocol);
 	    $service->poc($this->flag_poc);
-
+	    
 	    
 	    if ($service->protocol==='T') {
 	        if ($service->tcp2open($service->ip, $service->port)===FALSE){
 	            return $this->log2error("Port Not Open, Maybe User Desktop OR Server using redondancy in Cloud");
 	        }
 	    }
-	    
+	    //$service->service4info();
 
 			$this->pause();
 			
@@ -648,7 +675,7 @@ class PORT extends IP{
 								
 			
 				default: 
-				    $result .= $service->service4switch();$this->pause();
+				    $result .= $service->service4name();$this->pause();
 					break ;
 			}
 

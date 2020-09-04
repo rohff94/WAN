@@ -8,6 +8,13 @@ class com4code extends com4for {
     }
   
 
+    public function url2encode($chaine){
+        $uri_encoded = "";
+        for($i = 0; $i < strlen($chaine)-1; $i ++)
+            $uri_encoded .= "%" . dechex(ord($chaine [$i]));
+            return $uri_encoded ;
+    }
+    
 
     function asm2hex($shellcode_asm) {
         $this->ssTitre("Shellcode ASM to HEX" );

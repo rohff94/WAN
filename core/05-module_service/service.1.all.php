@@ -1800,7 +1800,6 @@ This can also be used to determine local IPs, as well as gain a better understan
 	    $date_now = date('Y-m-d H:i:s');
 	    $this->article("Date Now", $date_now);
 	    $this->article("Date Rec", $this->date_rec);
-
 	    
 	    $this->article("ID PORT", $this->port2id);
 	    $this->article("PORT NUMBER", $this->port);
@@ -1812,12 +1811,13 @@ This can also be used to determine local IPs, as well as gain a better understan
 	    $this->article("hostname",$this->service_hostname);
 	    $this->article("Indice confiance",$this->service_conf."/10");
 	    $service2banner = trim($this->service2banner());$this->article("Banner",$service2banner);
+	    $this->article("CVE", $this->tab($this->service2exploitdb4files4list()));
 	    echo "====END SERVICE4INFO:$this->port=======================================================\n\n";	    
 	    	} 
 
 
 	
-	public function service4switch(){
+	public function service4name(){
 	    // https://kalilinuxtutorials.com/metateta-scanning-exploiting-network/
 	    
 	    $result = "";
@@ -1879,7 +1879,7 @@ This can also be used to determine local IPs, as well as gain a better understan
 		$service = "smtp";
 		if((stristr($this->service_name,$service)) || (stristr($this->service_version,$service)) || (stristr($this->service_name,"submission" )) ) return $result .= $this->service2smtp();
 		$service = "snmp";
-		if((stristr($this->service_name,$service )) || (stristr($this->service_version,$service)) || (stristr($this->service_name,"smux" )) ) return $result .= $this->service2snmp();
+		if((stristr($this->service_name,$service )) || (stristr($this->service_version,$service)) || (stristr($this->service_name,"smux" ))  || (stristr($this->service_name,"snmptrap" ))  ) return $result .= $this->service2snmp();
 		$service = "telnet";
 		if((stristr($this->service_name,$service )) || (stristr($this->service_version,$service))) return $result .= $this->service2telnet();
 		$service = "vpn";
@@ -1976,6 +1976,18 @@ This can also be used to determine local IPs, as well as gain a better understan
 		        
 		    
 		    }
+		}
+		else {
+		    $url = "http://$this->ip:$this->port/";
+		    $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,$url);
+		    $obj_web->poc($this->flag_poc);
+		    $obj_web->web4info();
+		    
+		    
+		    $url = "https://$this->ip:$this->port/";
+		    $obj_web = new WEB($this->stream,$this->eth,$this->domain,$this->ip,$url);
+		    $obj_web->poc($this->flag_poc);
+		    $obj_web->web4info();
 		}
 		
 	}

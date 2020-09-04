@@ -236,29 +236,35 @@ class com4user extends DATA {
         $this->article("ALLBots", $this->tab($tab_bot));
         foreach ($tab_bot as $bot){
             if (!empty($bot) && $this->isIPv4($bot)){
-                $this->article("Bot", $bot);
+                $this->article("Banning Bot", $bot);
                 $data = "echo '$this->root_passwd' | sudo -S grep '$bot' /var/log/auth.log | grep -i -E \"(succes|accept|authoriz)\" ";
                 $this->requette($data);
                 $data = "echo '$this->root_passwd' | sudo -S grep '$bot' /var/log/auth.log | wc -l ";
                 $this->requette($data);
+                $ip = $bot ;
+                $query = "echo '$this->root_passwd' | sudo -S fail2ban-client set sshd banip $ip";
+                $this->requette($query);
                 
+            }
+        }
+        
+        $this->pause();
+        
+        foreach ($tab_bot as $bot){
+            if (!empty($bot) && $this->isIPv4($bot)){
+                $this->article("Pentesting Bot", $bot);
                 $ip = $bot ;
                 $eth = "ens3";
                 $domain = "malw.bot";
                 $obj_ip = new IP("", $eth, $domain, $ip);
-                $obj_ip->poc(TRUE);
-                $obj_ip->ip4info();$this->pause();
-                $obj_ip->ip4service();$this->pause();
-
-                
+                $obj_ip->poc(FALSE);
+                $obj_ip->ip4rsm();
                 $query = "php pentest.php IP \"$eth $domain $ip ip4pentest FALSE\" ";
                 $this->cmd("localhost", $query);
                 
-                $query = "echo '$this->root_passwd' | sudo -S fail2ban-client set sshd banip $ip";
-                $this->requette($query);
-                $this->pause();
             }
         }
+        $this->pause();
     }
     public function monitor8malw(){
         //$this->requette("top");

@@ -33,11 +33,11 @@ class WEB extends SERVICE{
 	    
 	    
 	    parent::__construct($stream,$eth,$domain,$ip,$port,'T');	
-	    $this->web2where = "id8port = '$this->port2id' AND vhost = '$this->vhost' ";
+	    $this->web2where = "id8port = '$this->port2id' AND vhost = '$this->vhost' AND web2type = '$this->http_type' ";
 	    
 		$sql_r = "SELECT vhost FROM ".__CLASS__." WHERE $this->web2where";
 		if (!$this->checkBD($sql_r)) {
-			$sql_w = "INSERT  INTO ".__CLASS__." (id8port,vhost) VALUES ('$this->port2id','$this->vhost'); ";
+			$sql_w = "INSERT  INTO ".__CLASS__." (id8port,vhost,web2type) VALUES ('$this->port2id','$this->vhost','$this->http_type'); ";
 			$this->mysql_ressource->query($sql_w);
 			//echo "$sql_w\n";
 			echo $this->note("Working on WEB :$this->web for the first time");
@@ -633,7 +633,7 @@ https://cmsdetect.com/
 		        $this->article("URLs from After Spidering", $this->tab($tab_final));
 		        $this->pause();
 		        
-		        
+		        /*
 		        $tab_dico = array();
 		        if (count($tab_result)<70) {
 		            $tab_dico = $this->web2dico();
@@ -643,7 +643,7 @@ https://cmsdetect.com/
 		        }
 		        
 		        //var_dump($tab_tmp);
-			
+			*/
 			
 		        foreach ($tab_tmp as $url){
 			    $url = $this->url2norme($url);
@@ -819,7 +819,7 @@ https://cmsdetect.com/
 		$this->titre(__FUNCTION__);
 		// https://kalilinuxtutorials.com/archery-scan-vulnerabilities/
 		// https://kalilinuxtutorials.com/owtf-offensive-web-testing-framework/
-	
+	    // 
 		$this->article("ZAP","localproxy $this->proxy_port_burp without connection outgoing  ");
 		//$this->article("OWTF","Setting/INBOUND PROXY $this->proxy_port_burp  ");
 		//$this->article("ZAP","localproxy 8008 - connexion 127.0.0.1:$this->proxy_port_burp - Proxy_1_out ");
@@ -830,8 +830,7 @@ https://cmsdetect.com/
 		//$this->web2scan4gui4burp();
 		$this->web2scan4gui4zap();
 		$this->pause();
-		//$this->web2spider();$this->pause();
-		//$this->web2dico4rep();$this->web2dico4file();$this->web2cms();$this->pause();
+
 		$this->web2sqli();$this->pause();
 		$this->web2scan4cli();$this->pause();
 		
@@ -839,16 +838,11 @@ https://cmsdetect.com/
 		$this->web2scan4gui4arachni();
 		
 		$this->web2scan4gui4vega();
-		$this->net("http://localhost:9292/scans");
+
 		$this->pause();
-		$this->article ( "Pass Nessus To Proxy ZAP", "on $this->proxy_addr:$this->proxy_port" );
-		$this->net("https://localhost:8834/nessus6.html#/settings/communication" );
-		$this->web2scan4gui4nessus();
-		$this->web2scan4gui4msf();
+
 		$this->web2scan4gui4w3af();
-		$this->web2scan4gui4nexpose();
-		$this->web2scan4gui4armitage();
-		$this->web2scan4gui4maltego();
+
 		$this->pause();
 		}
 

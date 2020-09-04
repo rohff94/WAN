@@ -32,7 +32,10 @@ class IP extends DOMAIN{
 		$this->tab_open_ports_all = array();
 		$this->tab_cve_source = array();
 
-		if (empty($ip)) return $this->log2error("EMPTY IP");
+		if (empty($ip_addr)) {
+		    $this->log2error("EMPTY IP:$ip_addr".__FILE__.__LINE__);
+		    exit();
+		}
 		if ( ($this->isIPv4($ip_addr)) || ($this->isIPv6($ip_addr)) ) {
 		    $this->ip = $ip_addr;
 		   }
@@ -1228,8 +1231,8 @@ routed halfway around the world) you may want to work with your ISP to investiga
 	            $tab_open_ports_tcp = $this->ip2tcp4select();
 	            $tab_open_ports_udp = $this->ip2udp4top200();
 	            $tab_open_ports_tcp += $this->ip2tcp4first1000();
-	            $tab_open_ports_tcp += $this->ip2tcp4top10000();	            
-	            if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4all();
+	            $tab_open_ports_tcp += $this->ip2tcp4top4000();
+	            if (empty($tab_open_ports_tcp)) $tab_open_ports_tcp += $this->ip2tcp4top10000();
 	        }
 	        else {
 	            
@@ -1649,7 +1652,7 @@ as the header options; the TTL changes.");
 	    if ($this->checkBD($sql_r_1) ) return  base64_decode($this->req2BD4out(__FUNCTION__,__CLASS__,"$this->ip2where "));
 	    else {
 	        
-	        $query = "whois $this->ip | grep -v -i -E \"(^Comment|abuse|^%|^#)\"";
+	        $query = "whois $this->ip | grep -v -i -E \"(^Comment|abuse|^%|^#)\" | sed \"s/'//g\" ";
 	        $this->cmd("localhost", $query);
 	        $result = $this->req_ret_str($query);
 	        
@@ -2040,12 +2043,15 @@ public function ip2vhost(){
 	                    foreach ($port as $port_num => $protocol)
 	                        if (!empty($port_num)) {
 	                            $obj_service = new SERVICE($this->stream,$this->eth,$this->domain,$this->ip,$port_num, $protocol);
+	                            $obj_service->poc($this->flag_poc);
 	                            switch ($obj_service->service_name) {
 	                                
 	                                
-	                                case "http" :
+	                                
 	                                case "https" :
-	                                    $obj_service->service2web4info();
+	                                    $obj_service->service2ssl4exec();
+	                                case "http" :
+	                                    $obj_service->service2web4info();	                                    
 	                                    break ;
 	                                    
 	                            }
@@ -2062,9 +2068,7 @@ public function ip2vhost(){
 	
 	public function ip4service2display(){
 	    $this->titre("Determining IP SERVICES");
-
-	    
-	    if(!$this->ip2honey()){	 	        
+        if(!$this->ip2honey()){	 	        
 	        if (!empty($this->tab_open_ports_all)){
 	        $max_iter = count($this->tab_open_ports_all);
 	        $this->rouge("ITER PORT $max_iter");
@@ -2074,6 +2078,33 @@ public function ip2vhost(){
 	                    if (!empty($port_num)) {
 	                        $obj_service = new SERVICE($this->stream,$this->eth,$this->domain,$this->ip,$port_num, $protocol);
 	                        $obj_service->service4info();
+	                        $query = "echo '$this->root_passwd' | sudo -S nmap -sS -Pn -n --open -p $obj_service->port $obj_service->ip --reason -e $obj_service->eth 2> /dev/null | grep '$obj_service->port/tcp' ";
+	                        $this->req_ret_str($query);
+	                        
+	                        $obj_service->poc($this->flag_poc);
+	                        switch ($obj_service->service_name) {
+	                            
+	                            case "http" :
+	                            $site = "https://$obj_service->ip:$obj_service->port";
+	                            $this->net($site);
+	                            case "https" :
+	                           //$obj_service->service2ssl4exec();
+	                           $site = "https://$obj_service->ip:$obj_service->port";
+	                           $this->net($site);
+	                                break ;
+	                                
+	                        }
+	                        switch ($obj_service->port) {
+	                            
+	                            case "443" :
+	                            case "8443" :
+	                                $site = "https://$obj_service->ip:$obj_service->port";
+	                                $this->net($site);
+	                                //$obj_service->service2ssl4exec();
+	                                break ;
+	   
+	                                
+	                        }
 	                    }
 	            }
 	        }
@@ -2247,8 +2278,12 @@ public function ip2vhost(){
 	public function ip4rsm(){
 	    echo "START ".__FUNCTION__.":$this->ip =============================================================================\n";
 	    $this->ip4info();
+	    $this->ip2os();
 	    $this->ip4service();
-	    //$this->ip2os();
+	    //$this->ip2protocol();
+	    
+	    //$this->ip4web();
+	    //$this->ip4enum2users();
 	    echo "End ".__FUNCTION__.":$this->ip =============================================================================\n";	    
         $this->pause();
 	}
@@ -2257,8 +2292,8 @@ public function ip2vhost(){
 	    echo "START ".__FUNCTION__.":$this->ip =============================================================================\n";
 	    $this->gtitre(__FUNCTION__);
 	    $this->ip4rsm();$this->pause();
-	    $this->ip4web();$this->pause();
-	    $this->ip4enum2users();$this->pause();	    	    
+	    
+	    	    	    
 	    $this->ip2auth();$this->pause();
 		//$this->ip2cve();$this->pause();
 		//$result .=  $this->ip2vuln();$this->pause();
@@ -2382,9 +2417,7 @@ public function ip2vhost(){
 	    $sql_w = "SELECT ip2root FROM IP WHERE $this->ip2where AND ip2root = 1 ";
 	    return $this->checkBD($sql_w);
 	}
-	
 
-	
 	
 	
 	

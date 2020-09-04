@@ -53,8 +53,50 @@ class check4linux8misc extends check4linux8key{
     public function misc2container2docker($stream){
         $this->ssTitre(__FUNCTION__);
         // https://www.hackingarticles.in/docker-installation-configuration/
+        // docker run -p $HOST_PORT:$CONTAINER_PORT -d user/image
+        /*
+        docker pull mikesplain/openvas:9
+        docker run -d -p 8443:443 --name openvas mikesplain/openvas:9
+        docker top openvas
         
+        docker exec -it openvas bash
+        greenbone-nvt-sync
+        
+        docker run -p 127.0.0.1:$HOSTPORT:$CONTAINERPORT --name CONTAINER -t someimage
+        docker run -it -m 300M ubuntu:14.04 /bin/bash
+        docker run --rm -it --cap-add SYS_ADMIN --device /dev/fuse sshfs
+        docker run -it --device=/dev/ttyUSB0 debian bash
+        docker run -it --privileged -v /dev/bus/usb:/dev/bus/usb debian bash
+        docker events
+        docker-compose -f <docker-compose-file> up
+        
+        
+         */
         $this->note("specific checks - check to see if we're in a docker container");
+        $data = "docker iamges ls";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        $data = "docker container ls";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        $data = "docker container stats <container id>";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        
+        $data = "docker container inspect <container id>";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        $data = "docker container history <container id>";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        $data = "docker container logs <container id>";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        $data = "docker container port <container id>";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
+        
+        $data = "docker version --format '{{.Server.Version}}'";
+        $this->req_str($stream,$data,$this->stream_timeout,"");
         
         $data = "docker ps";
         $this->req_str($stream,$data,$this->stream_timeout,"");

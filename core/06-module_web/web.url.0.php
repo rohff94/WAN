@@ -169,12 +169,7 @@ class URL extends WEB{
 	    return $this->req_ret_str($query);
 	}
 	
-	public function url2encode($chaine){
-	    $uri_encoded = "";
-	    for($i = 0; $i < strlen($chaine)-1; $i ++)
-	        $uri_encoded .= "%" . dechex(ord($chaine [$i]));
-	        return $uri_encoded ;
-	}
+
 	
 	
 	

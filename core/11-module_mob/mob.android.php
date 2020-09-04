@@ -25,11 +25,183 @@ https://github.com/MobSF/Mobile-Security-Framework-MobSF
 https://github.com/mirfansulaiman/Command-Mobile-Penetration-Testing-Cheatsheet
 https://github.com/jdonsec/AllThingsAndroid
 https://gist.github.com/mrk-han/66ac1a724456cadf1c93f4218c6060ae
+https://github.com/OWASP/owasp-mstg/tree/master/Crackmes
+
+
      */
     
+    
+    /*
+    https://resources.infosecinstitute.com/android-hacking-security-part-8-root-detection-evasion/
+    https://mobile-security.gitbook.io/mobile-security-testing-guide/android-testing-guide/0x05j-testing-resiliency-against-reverse-engineering
+
+    Intro : we will look at the techniques being used by Android developers to detect if a device on which the app is running is rooted or not. 
+    There are good number of advantages for an application in detecting if it is running on a rooted device or not. 
+    Most of the techniques we use to pentest an Android application require root permission to install various tools and hence to compromise the security of the application.
+    Many Android applications do not run on rooted devices for security reasons. 
+    I have seen some banking applications check for root-access and stop running if the device is rooted. 
+     
+     Once a device is rooted, some new files may be placed on the device. 
+     Checking for those files and packages installed on the device is one way of finding out if a device is rooted or not. 
+     Some developers may execute the commands which are accessible only to root users, and some may look for directories with elevated permissions. 
+     I have listed few of these techniques below.
+
+https://github.com/scottyab/rootbeer
+
+
+
+    1- Superuser.apk is the most common package many apps look for in root detection. 
+    This application allows other applications to run as root on the device.
+    ls -al /system/app/Superuser.apk OR ls /system/app/ | grep super
+    
+    2- Many applications look for applications with specific package names. An example is show below.
+    adb shell pm list packages | grep super 
+    
+    3 - There are some specific applications which run only on rooted devices. Checking for those applications would also be a good idea to detect if the device is rooted.
+
+Example: Busybox.
+
+Busybox is an application which provides a way to execute the most common Linux commands on your Android device.
+busybox pwd 
+    4 - Executing “su” and “id” commands and looking at the UID to see if it is root.
+    
+    5 - Checking the BUILD tag for test-keys: This check is generally to see if the device is running with a custom ROM. By default, Google gives ‘release-keys’ as its tag for stock ROMs. If it is something like “test-keys”, then it is most likely built with a custom ROM.
+    adb shell cat system/build.prop | grep ro.build.tags 
+    
+    
+         Bypass Root Check Using Xposed:
+    1) Install Xposed https://repo.xposed.info/module/de.robv.android.xposed.installer
+    2) Install “RootCloak” (Xposed Module)
+    3) Open RootCloak > Add/Remove Apps > (select target app) and tap it.
+    4) Done! (open app and check if it’s works)
+     
+     Most root detection techniques rely on checking for files on the OS that indicate the device has been rooted. Using GREP, search for any of the follow strings and change them to something random:
+- Superuser
+- Supersu
+- /su
+- /system/app/Superuser.apk
+- /system/bin
+- /system/bin/su
+- /system/sd/xbin
+- /system/xbin/su
+- /system/xbin
+- /data/local
+- /data/local/bin
+- /data/local/xbin
+- /sbin
+- /system/bin/failsafe
+- /vendor/bin
+
+/system/app/Superuser.apk
+/system/etc/init.d/99SuperSUDaemon
+/dev/com.koushikdutta.superuser.daemon/
+/system/xbin/daemonsu
+
+/sbin/su  
+/system/bin/su  
+/system/bin/failsafe/su  
+/system/xbin/su  
+/system/xbin/busybox  
+/system/sd/xbin/su  
+/data/local/su  
+/data/local/xbin/su  
+/data/local/bin/su
+
+com.thirdparty.superuser
+eu.chainfire.supersu
+com.noshufou.android.su
+com.koushikdutta.superuser
+com.zachspong.temprootremovejb
+com.ramdroid.appquarantine
+com.topjohnwu.magisk
+
+private boolean isTestKeyBuild()
+{
+String str = Build.TAGS;
+if ((str != null) && (str.contains("test-keys")));
+for (int i = 1; ; i = 0)
+  return i;
+}
+
+
+Checking TracerPid
+/proc/<pid>/status or /proc/self/status
+
+$ adb shell ps -A | grep com.example.hellojni
+u0_a271      11657   573 4302108  50600 ptrace_stop         0 t com.example.hellojni
+$ adb shell cat /proc/11657/status | grep -e "^TracerPid:" | sed "s/^TracerPid:\t//"
+TracerPid:      11839
+$ adb shell ps -A | grep 11839
+u0_a271  
+
+
+
+
+Note: Other detection techniques look for any of the below-installed packages on the mobile device at runtime:
+- supersu.apk
+- Busybox
+- Root Cloak
+- Xpose framework
+- Cydia
+- Substrate
+
+dex2jar Android.apk
+
+
+    /home/rohff/Mobile-Security-Framework-MobSF-master/StaticAnalyzer/tools/jadx/bin/jadx '/home/rohff/0-Services/I10-android/APK/com-agb-agbonline1584331200.apk' -d /home/rohff/Desktop/AGB/APK/agb_jadx
+     grep -rn '\.method public isRooted(' decompiled/smali
+     grep -rn "/xbin/su" ./sources
+     
+     According to the Dalvik bytecode, if I want to return false I should use instructions as follow:
+const/4 v0, 0x0
+return v0
+
+unzip com-agb-agbonline1584331200.apk -d ./agb_unzip
+Delete the META-INF directory from the original APK to remove the old signature from the APK.
+
+keytool -printcert -file ./agb_unzip/META-INF/CERT.RSA
+dex2jar com-agb-agbonline1584331200.apk 
+
+     java -jar /home/rohff/Mobile-Security-Framework-MobSF-master/StaticAnalyzer/tools/apktool_2.4.1.jar b ./com-agb-agbonline1584331200 agb.apk
+     keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000
+     
+     jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore -storepass password -keypass password  agb.apk alias_name
+     /home/rohff/Android/Sdk/build-tools/30.0.0/apksigner sign -ks ./android.keystore ./decompiled/dist/ViewPGPkey.apk
+ 
+ jarsigner -verify my.s.apk
+     
+         Bypass Certificate Pinning With “Xposed” module:
+    If you need to bypass Certificate Pinning (in order to use the app with Burp Proxy for example) you can do this:
+    1) Once you have Xposed installed on your phone, search for “SSLUnpinning” module. Install it.
+    2) Open SSLUnpinning, look for the app on which you are trying to bypass the certificate pinning, and select it.
+    
+    
+    apktool d -r  android.apk
+    
+    
+    
+        Root Detection – a set of techniques used to detect if a device on which the application is running is rooted or not. Many Android  applications simply do not run on rooted devices for security reasons, e.g.  MDM software or many banking applications.
+
+    Certificate Pinning – a process of associating a host with its expected X.509 certificate.
+    
+    
+    
+     */
     public function __construct($stream,$device) {
 		$device = trim($device);
 		parent::__construct($stream,$device);
+	}
+	
+	public function emulator4checkmount(){
+	    $data = "mount ";
+	    $filter = "";
+	    $this->req_str($this->stream, $data, $this->stream_timeout, $filter);
+	}
+	
+	public function emulator2mount(){
+	    $data = "mount -o rw,remount -t yaffs /dev/block/mtdblock /system ";
+	    $filter = "";
+	    $this->req_str($this->stream, $data, $this->stream_timeout, $filter);
 	}
 
 	public function sdk2img2install($img):array{
@@ -46,7 +218,7 @@ https://gist.github.com/mrk-han/66ac1a724456cadf1c93f4218c6060ae
 	}
 	
 	public function avd2start(){
-	    $data = "emulator -netdelay none -netspeed full -avd $this->device_name ";
+	    $data = "emulator -netdelay none -netspeed full -avd $this->device_name -no-snapshot -show-kernel -verbose ";
 	    $filter = "";
 	    $this->req_str($this->stream, $data, $this->stream_timeout, $filter);
 	    $this->pause();
@@ -231,10 +403,17 @@ https://gist.github.com/mrk-han/66ac1a724456cadf1c93f4218c6060ae
 	    $this->adb2phone2exec($data, $filter);
 	}
 	
-	public function adb2phone4debug2gdb($remoteport,$cmd, $time){
+	public function adb2phone4debug8gdb($remoteport,$cmd, $time){
 	    $this->ssTitre("Debugging with gdb");
 	    $cmd2 = "gdbserver localhost:$remoteport $cmd";
 	    $cmd1 = "adb forward tcp:$remoteport tcp:$remoteport";
+	    $this->exec_parallel($cmd1, $cmd2, $time);
+	}
+	
+	public function adb2phone4hooking8frida($remoteport,$cmd, $time){
+	    $this->ssTitre("Debugging with gdb");
+	    $cmd2 = "frida-server localhost:$remoteport $cmd";
+	    $cmd1 = "frida";
 	    $this->exec_parallel($cmd1, $cmd2, $time);
 	}
 	
@@ -266,7 +445,9 @@ https://gist.github.com/mrk-han/66ac1a724456cadf1c93f4218c6060ae
 	    $data = "setprop";
 	    $filter = "";
 	    $this->adb2phone2exec($data, $filter);
-
+	    $data = "lsof -i";
+	    $filter = "";
+	    $this->adb2phone2exec($data, $filter);
 
 
 	}
